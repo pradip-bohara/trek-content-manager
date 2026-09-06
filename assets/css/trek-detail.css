@@ -1,0 +1,2105 @@
+/**
+ * Trek Content Manager - Master Stylesheet
+ * 
+ * Namespace: .trek-detail-page & .trek-*
+ * Design Language: Luxury Editorial Outdoor (Deep Green, Warm Gold, Ivory, Charcoal)
+ * Fully Responsive: 320px - 1920px+
+ * WCAG 2.1 AA Compliant (High Contrast, Focus Rings, Accessible Typography)
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap');
+
+/* ==========================================================================
+   1. CSS Custom Properties / Design Tokens
+   ========================================================================== */
+:root {
+  /* Brand Color Palette */
+  --trek-color-primary: #022f2e;        /* Deep Forest Green */
+  --trek-color-primary-dark: #011d1c;   /* Midnight Evergreen */
+  --trek-color-primary-light: #045857;  /* Alpine Forest Green */
+  --trek-color-accent: #c4a35f;         /* Elegant Gold */
+  --trek-color-accent-hover: #b3914a;   /* Deep Warm Gold */
+  --trek-color-accent-light: #fdfaf2;   /* Pale Gold Wash */
+  --trek-color-accent-border: #e2cca0;  /* Muted Gold Border */
+  
+  /* Neutral Palette */
+  --trek-color-bg: #fbfaf6;            /* Warm Paper / Ivory */
+  --trek-color-surface: #ffffff;       /* Pure White Card */
+  --trek-color-surface-alt: #f4f0e7;   /* Warm Cream */
+  --trek-color-surface-subtle: #f8f6f0;
+  --trek-color-text: #173331;          /* Deep Ink */
+  --trek-color-text-muted: #61716f;    /* Mountain Slate */
+  --trek-color-text-light: #8e9a95;    /* Soft Gray */
+  --trek-color-border: #e3ded5;        /* Subtle Stone Border */
+  --trek-color-border-subtle: #eeeadf;
+  
+  /* Semantic Status Colors */
+  --trek-status-published: #045857;
+  --trek-status-published-bg: #e6f4ee;
+  --trek-status-draft: #b25e00;
+  --trek-status-draft-bg: #fff3e0;
+  --trek-status-review: #4b38b3;
+  --trek-status-review-bg: #eeeaff;
+  --trek-status-error: #c53030;
+  --trek-status-error-bg: #ffebee;
+  --trek-status-warning: #d97706;
+  --trek-status-warning-bg: #fef3c7;
+  --trek-status-info: #0284c7;
+  --trek-status-info-bg: #e0f2fe;
+
+  /* Typography */
+  --trek-font-display: 'Newsreader', Georgia, serif;
+  --trek-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Spacing */
+  --trek-space-xxs: 4px;
+  --trek-space-xs: 8px;
+  --trek-space-sm: 12px;
+  --trek-space-md: 16px;
+  --trek-space-lg: 24px;
+  --trek-space-xl: 32px;
+  --trek-space-2xl: 48px;
+  --trek-space-3xl: 64px;
+  --trek-space-4xl: 96px;
+  
+  /* Layout & Sizing */
+  --trek-container-max: 1320px;
+  --trek-container-narrow: 920px;
+  --trek-header-height: 72px;
+  --trek-sticky-nav-height: 60px;
+  
+  /* Elevation & Shadows */
+  --trek-shadow-xs: 0 1px 2px rgba(14, 42, 34, 0.04);
+  --trek-shadow-sm: 0 2px 6px rgba(14, 42, 34, 0.06);
+  --trek-shadow-md: 0 8px 24px rgba(14, 42, 34, 0.08);
+  --trek-shadow-lg: 0 16px 36px rgba(14, 42, 34, 0.12);
+  --trek-shadow-xl: 0 24px 54px rgba(14, 42, 34, 0.18);
+  
+  /* Border Radius */
+  --trek-radius-xs: 4px;
+  --trek-radius-sm: 8px;
+  --trek-radius-md: 12px;
+  --trek-radius-lg: 16px;
+  --trek-radius-xl: 24px;
+  --trek-radius-full: 9999px;
+  
+  /* Transitions */
+  --trek-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --trek-transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --trek-transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   2. Reset & Baseline Styles (Namespaced to .trek-detail-page)
+   ========================================================================== */
+.trek-detail-page {
+  font-family: var(--trek-font-body);
+  color: var(--trek-color-text);
+  background-color: var(--trek-color-bg);
+  line-height: 1.65;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.trek-detail-page *,
+.trek-detail-page *::before,
+.trek-detail-page *::after {
+  box-sizing: inherit;
+}
+
+.trek-container {
+  width: 100%;
+  max-width: var(--trek-container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--trek-space-lg);
+  padding-right: var(--trek-space-lg);
+}
+
+.trek-container--narrow {
+  max-width: var(--trek-container-narrow);
+}
+
+/* Typography Helpers */
+.trek-serif-title {
+  font-family: var(--trek-font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.trek-kicker {
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--trek-color-accent);
+  margin-bottom: var(--trek-space-xs);
+  display: block;
+}
+
+.trek-section-title {
+  font-family: var(--trek-font-display);
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 600;
+  color: var(--trek-color-primary);
+  margin-top: 0;
+  margin-bottom: var(--trek-space-sm);
+  line-height: 1.2;
+}
+
+.trek-section-subtitle {
+  font-size: 1.125rem;
+  color: var(--trek-color-text-muted);
+  max-width: 720px;
+  margin-bottom: var(--trek-space-xl);
+}
+
+.trek-section {
+  padding-top: var(--trek-space-3xl);
+  padding-bottom: var(--trek-space-3xl);
+  border-bottom: 1px solid var(--trek-color-border-subtle);
+  position: relative;
+}
+
+.trek-section--alt {
+  background-color: var(--trek-color-surface-alt);
+}
+
+.trek-section--dark {
+  background-color: var(--trek-color-primary);
+  color: var(--trek-color-bg);
+}
+
+/* Accessibility Focus States */
+.trek-detail-page a:focus-visible,
+.trek-detail-page button:focus-visible,
+.trek-detail-page input:focus-visible,
+.trek-detail-page select:focus-visible,
+.trek-detail-page textarea:focus-visible {
+  outline: 3px solid var(--trek-color-accent);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   3. Interactive Role & Mode Switcher Bar (Demo & Management Tool)
+   ========================================================================== */
+.trek-role-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #081a14;
+  color: #e5edea;
+  border-bottom: 2px solid var(--trek-color-accent);
+  padding: 10px var(--trek-space-lg);
+  font-size: 0.875rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.trek-role-toolbar__inner {
+  max-width: var(--trek-container-max);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--trek-space-md);
+}
+
+.trek-role-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: var(--trek-space-md);
+  flex-wrap: wrap;
+}
+
+.trek-role-toolbar__brand {
+  font-weight: 700;
+  color: var(--trek-color-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.trek-role-toolbar__select-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trek-role-toolbar__select-group label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #a1b5ae;
+}
+
+.trek-role-toolbar select {
+  background-color: #123026;
+  color: #ffffff;
+  border: 1px solid #275244;
+  border-radius: var(--trek-radius-xs);
+  padding: 5px 12px;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.trek-role-toolbar__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--trek-radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.trek-role-toolbar__badge--draft {
+  background-color: rgba(217, 119, 6, 0.25);
+  color: #fcd34d;
+  border: 1px solid #d97706;
+}
+
+.trek-role-toolbar__badge--published {
+  background-color: rgba(16, 185, 129, 0.25);
+  color: #6ee7b7;
+  border: 1px solid #10b981;
+}
+
+.trek-role-toolbar__badge--review {
+  background-color: rgba(139, 92, 246, 0.25);
+  color: #c4b5fd;
+  border: 1px solid #8b5cf6;
+}
+
+.trek-role-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--trek-space-sm);
+  flex-wrap: wrap;
+}
+
+.trek-role-toolbar__score {
+  font-size: 0.8125rem;
+  color: #c9ded7;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trek-score-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: conic-gradient(var(--trek-color-accent) 92%, #224a3c 0);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.trek-btn-admin {
+  background-color: var(--trek-color-accent);
+  color: var(--trek-color-primary-dark);
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--trek-radius-xs);
+  border: none;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--trek-transition-fast);
+}
+
+.trek-btn-admin:hover {
+  background-color: var(--trek-color-accent-hover);
+}
+
+.trek-btn-admin--outline {
+  background-color: transparent;
+  color: #e5edea;
+  border: 1px solid #3c6b5b;
+}
+
+.trek-btn-admin--outline:hover {
+  background-color: #1a4235;
+  border-color: var(--trek-color-accent);
+}
+
+/* ==========================================================================
+   4. Hero Section
+   ========================================================================== */
+.trek-hero {
+  position: relative;
+  min-height: 85vh;
+  display: flex;
+  align-items: flex-end;
+  color: #ffffff;
+  padding-top: var(--trek-space-4xl);
+  padding-bottom: var(--trek-space-3xl);
+  background-color: var(--trek-color-primary-dark);
+  overflow: hidden;
+}
+
+.trek-hero__bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transform: scale(1.02);
+  transition: transform 12s ease-out;
+}
+
+.trek-hero:hover .trek-hero__bg {
+  transform: scale(1.06);
+}
+
+.trek-hero__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(7, 23, 19, 0.4) 0%,
+    rgba(7, 23, 19, 0.25) 40%,
+    rgba(7, 23, 19, 0.75) 75%,
+    rgba(7, 23, 19, 0.95) 100%
+  );
+  z-index: 2;
+}
+
+.trek-hero__content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+}
+
+.trek-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: #d1deda;
+  margin-bottom: var(--trek-space-md);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.trek-breadcrumb a {
+  color: #d1deda;
+  text-decoration: none;
+  transition: color var(--trek-transition-fast);
+}
+
+.trek-breadcrumb a:hover {
+  color: var(--trek-color-accent);
+}
+
+.trek-hero__meta-top {
+  display: flex;
+  align-items: center;
+  gap: var(--trek-space-md);
+  margin-bottom: var(--trek-space-sm);
+  flex-wrap: wrap;
+}
+
+.trek-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(212, 175, 55, 0.2);
+  color: var(--trek-color-accent);
+  border: 1px solid var(--trek-color-accent);
+  padding: 4px 12px;
+  border-radius: var(--trek-radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  backdrop-filter: blur(4px);
+}
+
+.trek-hero__title {
+  font-family: var(--trek-font-display);
+  font-size: clamp(2.75rem, 6vw, 4.75rem);
+  font-weight: 700;
+  line-height: 1.08;
+  margin: 0 0 var(--trek-space-sm) 0;
+  color: #ffffff;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  max-width: 950px;
+}
+
+.trek-hero__subtitle {
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  color: #e2ede9;
+  max-width: 780px;
+  margin-bottom: var(--trek-space-xl);
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.trek-hero__actions {
+  display: flex;
+  gap: var(--trek-space-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.trek-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #dfb743 0%, #c49d26 100%);
+  color: var(--trek-color-primary-dark);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 16px 32px;
+  border-radius: var(--trek-radius-sm);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+  transition: all var(--trek-transition-base);
+}
+
+.trek-btn-primary:hover {
+  background: linear-gradient(135deg, #ebd38d 0%, #d4af37 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(212, 175, 55, 0.45);
+}
+
+.trek-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 15px 28px;
+  border-radius: var(--trek-radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  transition: all var(--trek-transition-base);
+}
+
+.trek-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.22);
+  border-color: #ffffff;
+}
+
+/* ==========================================================================
+   5. Floating Quick Facts Grid
+   ========================================================================== */
+.trek-facts-wrapper {
+  margin-top: -40px;
+  position: relative;
+  z-index: 10;
+  padding-bottom: var(--trek-space-xl);
+}
+
+.trek-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background-color: var(--trek-color-border);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--trek-shadow-lg);
+}
+
+.trek-fact-card {
+  background-color: var(--trek-color-surface);
+  padding: var(--trek-space-lg) var(--trek-space-md);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--trek-space-md);
+  transition: background-color var(--trek-transition-fast);
+}
+
+.trek-fact-card:hover {
+  background-color: var(--trek-color-surface-subtle);
+}
+
+.trek-fact-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--trek-radius-md);
+  background-color: var(--trek-color-accent-light);
+  color: var(--trek-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.25rem;
+}
+
+.trek-fact-card__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--trek-color-text-muted);
+  margin-bottom: 4px;
+}
+
+.trek-fact-card__value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--trek-color-primary);
+  line-height: 1.2;
+}
+
+.trek-fact-card__unit {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--trek-color-text-muted);
+  margin-left: 2px;
+}
+
+/* ==========================================================================
+   6. Sticky Tab Navigation
+   ========================================================================== */
+.trek-sticky-nav {
+  position: sticky;
+  top: 50px;
+  z-index: 900;
+  background-color: var(--trek-color-surface);
+  border-bottom: 1px solid var(--trek-color-border);
+  box-shadow: 0 4px 12px rgba(14, 42, 34, 0.04);
+  transition: transform var(--trek-transition-base);
+}
+
+.trek-sticky-nav__inner {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0;
+  gap: 4px;
+}
+
+.trek-sticky-nav__inner::-webkit-scrollbar {
+  display: none;
+}
+
+.trek-nav-tab {
+  padding: 16px 20px;
+  color: var(--trek-color-text-muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: all var(--trek-transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trek-nav-tab:hover {
+  color: var(--trek-color-primary);
+  background-color: var(--trek-color-surface-subtle);
+}
+
+.trek-nav-tab.is-active {
+  color: var(--trek-color-primary);
+  border-bottom-color: var(--trek-color-accent);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   7. Overview & Route Information
+   ========================================================================== */
+.trek-overview-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: var(--trek-space-2xl);
+  align-items: start;
+}
+
+.trek-editorial-text p {
+  margin-bottom: var(--trek-space-md);
+  font-size: 1.0625rem;
+  color: #33403a;
+}
+
+.trek-editorial-quote {
+  font-family: var(--trek-font-display);
+  font-size: 1.5rem;
+  font-style: italic;
+  color: var(--trek-color-primary);
+  border-left: 4px solid var(--trek-color-accent);
+  padding: var(--trek-space-md) var(--trek-space-lg);
+  margin: var(--trek-space-xl) 0;
+  background-color: var(--trek-color-accent-light);
+  border-radius: 0 var(--trek-radius-md) var(--trek-radius-md) 0;
+}
+
+.trek-route-card {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-lg);
+  padding: var(--trek-space-xl);
+  box-shadow: var(--trek-shadow-sm);
+}
+
+.trek-route-card__header {
+  border-bottom: 1px solid var(--trek-color-border);
+  padding-bottom: var(--trek-space-md);
+  margin-bottom: var(--trek-space-md);
+}
+
+.trek-route-card__title {
+  font-family: var(--trek-font-display);
+  font-size: 1.5rem;
+  color: var(--trek-color-primary);
+  margin: 0;
+}
+
+.trek-route-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trek-route-meta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--trek-color-border);
+  font-size: 0.9375rem;
+}
+
+.trek-route-meta-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.trek-route-meta-item__label {
+  color: var(--trek-color-text-muted);
+}
+
+.trek-route-meta-item__val {
+  font-weight: 600;
+  color: var(--trek-color-primary);
+}
+
+.trek-map-preview {
+  margin-top: var(--trek-space-lg);
+  border-radius: var(--trek-radius-md);
+  overflow: hidden;
+  position: relative;
+  background-color: #e5ede9;
+  border: 1px solid var(--trek-color-border);
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: var(--trek-color-text-muted);
+}
+
+.trek-map-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   8. Highlights Cards Grid
+   ========================================================================== */
+.trek-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--trek-space-lg);
+  margin-top: var(--trek-space-xl);
+}
+
+.trek-highlight-card {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-md);
+  overflow: hidden;
+  transition: transform var(--trek-transition-base), box-shadow var(--trek-transition-base);
+  display: flex;
+  flex-direction: column;
+}
+
+.trek-highlight-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--trek-shadow-md);
+}
+
+.trek-highlight-card__img-wrap {
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.trek-highlight-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--trek-transition-smooth);
+}
+
+.trek-highlight-card:hover .trek-highlight-card__img {
+  transform: scale(1.05);
+}
+
+.trek-highlight-card__num {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--trek-color-primary);
+  color: var(--trek-color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: 2px solid var(--trek-color-accent);
+}
+
+.trek-highlight-card__body {
+  padding: var(--trek-space-lg);
+  flex-grow: 1;
+}
+
+.trek-highlight-card__title {
+  font-family: var(--trek-font-display);
+  font-size: 1.375rem;
+  color: var(--trek-color-primary);
+  margin: 0 0 8px 0;
+}
+
+.trek-highlight-card__desc {
+  font-size: 0.9375rem;
+  color: var(--trek-color-text-muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   9. Expandable Itinerary Day-by-Day Builder
+   ========================================================================== */
+.trek-itinerary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: var(--trek-space-xl);
+  flex-wrap: wrap;
+  gap: var(--trek-space-md);
+}
+
+.trek-itinerary-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.trek-btn-text {
+  background: none;
+  border: none;
+  color: var(--trek-color-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px 8px;
+}
+
+.trek-itinerary-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--trek-space-md);
+}
+
+.trek-itinerary-day {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-lg);
+  overflow: hidden;
+  transition: box-shadow var(--trek-transition-base);
+}
+
+.trek-itinerary-day.is-open {
+  box-shadow: var(--trek-shadow-md);
+  border-color: var(--trek-color-accent-border);
+}
+
+.trek-itinerary-day__summary {
+  padding: var(--trek-space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: var(--trek-space-md);
+  user-select: none;
+  background-color: var(--trek-color-surface);
+  transition: background-color var(--trek-transition-fast);
+}
+
+.trek-itinerary-day__summary:hover {
+  background-color: var(--trek-color-surface-subtle);
+}
+
+.trek-itinerary-day__left {
+  display: flex;
+  align-items: center;
+  gap: var(--trek-space-lg);
+  flex-grow: 1;
+}
+
+.trek-day-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  height: 68px;
+  border-radius: var(--trek-radius-md);
+  background-color: var(--trek-color-primary);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.trek-day-badge__label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--trek-color-accent);
+}
+
+.trek-day-badge__num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.trek-itinerary-day__info {
+  flex-grow: 1;
+}
+
+.trek-itinerary-day__title {
+  font-family: var(--trek-font-display);
+  font-size: 1.375rem;
+  color: var(--trek-color-primary);
+  margin: 0 0 6px 0;
+}
+
+.trek-itinerary-day__route-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.trek-activity-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--trek-color-surface-alt);
+  color: var(--trek-color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--trek-radius-xs);
+}
+
+.trek-activity-tag--trek {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.trek-activity-tag--drive {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.trek-activity-tag--rest {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.trek-activity-tag--flight {
+  background-color: #f3e8ff;
+  color: #7e22ce;
+}
+
+.trek-itinerary-day__toggle-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--trek-color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--trek-color-primary);
+  transition: transform var(--trek-transition-fast);
+  flex-shrink: 0;
+}
+
+.trek-itinerary-day.is-open .trek-itinerary-day__toggle-icon {
+  transform: rotate(180deg);
+  background-color: var(--trek-color-accent);
+  color: var(--trek-color-primary-dark);
+  border-color: var(--trek-color-accent);
+}
+
+.trek-itinerary-day__content {
+  padding: 0 var(--trek-space-lg) var(--trek-space-xl) var(--trek-space-lg);
+  border-top: 1px solid var(--trek-color-border-subtle);
+  display: none;
+}
+
+.trek-itinerary-day.is-open .trek-itinerary-day__content {
+  display: block;
+  animation: trekFadeIn 0.3s ease;
+}
+
+.trek-day-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  background-color: var(--trek-color-surface-subtle);
+  padding: var(--trek-space-md);
+  border-radius: var(--trek-radius-md);
+  margin: var(--trek-space-md) 0 var(--trek-space-lg) 0;
+  border: 1px solid var(--trek-color-border);
+}
+
+.trek-day-stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.trek-day-stat-item__label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: var(--trek-color-text-muted);
+  font-weight: 600;
+}
+
+.trek-day-stat-item__val {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--trek-color-primary);
+}
+
+.trek-day-details-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: var(--trek-space-xl);
+}
+
+.trek-day-desc {
+  font-size: 1rem;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.trek-day-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trek-day-box {
+  background-color: var(--trek-color-surface-alt);
+  padding: var(--trek-space-md);
+  border-radius: var(--trek-radius-md);
+  font-size: 0.875rem;
+}
+
+.trek-day-box__title {
+  font-weight: 700;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--trek-color-primary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trek-day-box--safety {
+  background-color: #fff8e1;
+  border-left: 3px solid #ffb300;
+  color: #795548;
+}
+
+/* ==========================================================================
+   10. Accommodation Section
+   ========================================================================== */
+.trek-accommodation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--trek-space-lg);
+  margin-top: var(--trek-space-xl);
+}
+
+.trek-acc-card {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-md);
+  overflow: hidden;
+  box-shadow: var(--trek-shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.trek-acc-card__img {
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.trek-acc-card__body {
+  padding: var(--trek-space-lg);
+  flex-grow: 1;
+}
+
+.trek-acc-card__type {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--trek-color-accent);
+  font-weight: 700;
+}
+
+.trek-acc-card__name {
+  font-family: var(--trek-font-display);
+  font-size: 1.5rem;
+  color: var(--trek-color-primary);
+  margin: 4px 0 8px 0;
+}
+
+.trek-acc-card__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.8125rem;
+  color: var(--trek-color-text-muted);
+  margin-bottom: var(--trek-space-md);
+}
+
+.trek-acc-card__desc {
+  font-size: 0.9375rem;
+  color: #4a5568;
+}
+
+/* ==========================================================================
+   11. Included vs Excluded Transparent Cost Lists
+   ========================================================================== */
+.trek-inex-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--trek-space-2xl);
+  margin-top: var(--trek-space-xl);
+}
+
+.trek-inex-column {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-lg);
+  padding: var(--trek-space-xl);
+  box-shadow: var(--trek-shadow-sm);
+}
+
+.trek-inex-column--included {
+  border-top: 4px solid #2e7d32;
+}
+
+.trek-inex-column--excluded {
+  border-top: 4px solid #c62828;
+}
+
+.trek-inex-column__title {
+  font-family: var(--trek-font-display);
+  font-size: 1.75rem;
+  margin-top: 0;
+  margin-bottom: var(--trek-space-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trek-inex-column--included .trek-inex-column__title {
+  color: #1b5e20;
+}
+
+.trek-inex-column--excluded .trek-inex-column__title {
+  color: #b71c1c;
+}
+
+.trek-inex-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.trek-inex-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.trek-inex-item__icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.trek-inex-column--included .trek-inex-item__icon {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.trek-inex-column--excluded .trek-inex-item__icon {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.trek-inex-item__text strong {
+  color: var(--trek-color-primary);
+  display: block;
+}
+
+.trek-inex-item__text span {
+  color: var(--trek-color-text-muted);
+  font-size: 0.875rem;
+}
+
+/* ==========================================================================
+   12. Safety, Health, Permits & Insurance
+   ========================================================================== */
+.trek-safety-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--trek-space-xl);
+}
+
+.trek-safety-card {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-lg);
+  padding: var(--trek-space-xl);
+}
+
+.trek-safety-card__title {
+  font-family: var(--trek-font-display);
+  font-size: 1.5rem;
+  color: var(--trek-color-primary);
+  margin-top: 0;
+  margin-bottom: var(--trek-space-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trek-permit-pill {
+  background-color: var(--trek-color-surface-subtle);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-md);
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trek-insurance-alert {
+  background-color: #fff9db;
+  border-left: 4px solid var(--trek-color-accent);
+  padding: var(--trek-space-md);
+  border-radius: 0 var(--trek-radius-md) var(--trek-radius-md) 0;
+  font-size: 0.9375rem;
+  color: #5c4300;
+  margin-top: var(--trek-space-md);
+}
+
+/* ==========================================================================
+   13. Dynamic Packing List
+   ========================================================================== */
+.trek-packing-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: var(--trek-space-lg);
+  flex-wrap: wrap;
+}
+
+.trek-packing-tab-btn {
+  padding: 8px 16px;
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-full);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--trek-color-text-muted);
+  cursor: pointer;
+  transition: all var(--trek-transition-fast);
+}
+
+.trek-packing-tab-btn.is-active,
+.trek-packing-tab-btn:hover {
+  background-color: var(--trek-color-primary);
+  color: #fff;
+  border-color: var(--trek-color-primary);
+}
+
+.trek-packing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.trek-packing-item {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.trek-packing-item__name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--trek-color-primary);
+}
+
+.trek-packing-item__badge {
+  font-size: 0.6875rem;
+  padding: 2px 8px;
+  border-radius: var(--trek-radius-full);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.trek-packing-item__badge--required {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.trek-packing-item__badge--recommended {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.trek-packing-item__badge--provided {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+/* ==========================================================================
+   14. Essential Information Accordions
+   ========================================================================== */
+.trek-accordion-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trek-accordion-item {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-md);
+  overflow: hidden;
+}
+
+.trek-accordion-btn {
+  width: 100%;
+  padding: var(--trek-space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--trek-font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--trek-color-primary);
+  cursor: pointer;
+  transition: background-color var(--trek-transition-fast);
+}
+
+.trek-accordion-btn:hover {
+  background-color: var(--trek-color-surface-subtle);
+}
+
+.trek-accordion-icon {
+  font-size: 1.25rem;
+  color: var(--trek-color-accent);
+  transition: transform var(--trek-transition-fast);
+}
+
+.trek-accordion-item.is-open .trek-accordion-icon {
+  transform: rotate(180deg);
+}
+
+.trek-accordion-content {
+  padding: 0 var(--trek-space-lg) var(--trek-space-lg) var(--trek-space-lg);
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+  border-top: 1px solid var(--trek-color-border-subtle);
+  display: none;
+}
+
+.trek-accordion-item.is-open .trek-accordion-content {
+  display: block;
+  animation: trekFadeIn 0.3s ease;
+}
+
+/* ==========================================================================
+   15. Gallery & Fullscreen Lightbox
+   ========================================================================== */
+.trek-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: var(--trek-space-xl);
+}
+
+.trek-gallery-item {
+  height: 220px;
+  border-radius: var(--trek-radius-md);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background-color: #0e2a22;
+}
+
+.trek-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--trek-transition-smooth);
+}
+
+.trek-gallery-item:hover img {
+  transform: scale(1.08);
+}
+
+.trek-gallery-item__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+  color: #fff;
+  font-size: 0.8125rem;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all var(--trek-transition-fast);
+}
+
+.trek-gallery-item:hover .trek-gallery-item__caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Lightbox Modal */
+.trek-lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(7, 23, 19, 0.96);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--trek-space-lg);
+  backdrop-filter: blur(8px);
+}
+
+.trek-lightbox.is-active {
+  display: flex;
+  animation: trekFadeIn 0.25s ease;
+}
+
+.trek-lightbox__content {
+  position: relative;
+  max-width: 1000px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.trek-lightbox__img {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: var(--trek-radius-sm);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.trek-lightbox__caption {
+  color: #e5edea;
+  font-size: 1rem;
+  margin-top: 14px;
+  text-align: center;
+}
+
+.trek-lightbox__close,
+.trek-lightbox__nav-btn {
+  position: absolute;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all var(--trek-transition-fast);
+}
+
+.trek-lightbox__close:hover,
+.trek-lightbox__nav-btn:hover {
+  background: var(--trek-color-accent);
+  color: var(--trek-color-primary-dark);
+}
+
+.trek-lightbox__close {
+  top: 24px;
+  right: 24px;
+}
+
+.trek-lightbox__prev {
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.trek-lightbox__next {
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ==========================================================================
+   16. Extensions & Add-ons
+   ========================================================================== */
+.trek-extensions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--trek-space-xl);
+  margin-top: var(--trek-space-xl);
+}
+
+.trek-extension-card {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--trek-shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.trek-extension-card__img {
+  height: 190px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.trek-extension-card__body {
+  padding: var(--trek-space-lg);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.trek-extension-card__duration {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--trek-color-accent);
+  letter-spacing: 0.08em;
+}
+
+.trek-extension-card__title {
+  font-family: var(--trek-font-display);
+  font-size: 1.375rem;
+  color: var(--trek-color-primary);
+  margin: 4px 0 8px 0;
+}
+
+.trek-extension-card__desc {
+  font-size: 0.9375rem;
+  color: var(--trek-color-text-muted);
+  flex-grow: 1;
+  margin-bottom: var(--trek-space-md);
+}
+
+.trek-extension-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--trek-color-border-subtle);
+  padding-top: var(--trek-space-md);
+}
+
+.trek-extension-card__price {
+  font-weight: 700;
+  color: var(--trek-color-primary);
+  font-size: 1.125rem;
+}
+
+/* ==========================================================================
+   17. Fixed Departures Table & Enquiry
+   ========================================================================== */
+.trek-departures-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin-top: var(--trek-space-lg);
+}
+
+.trek-departures-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--trek-color-text-muted);
+  font-weight: 600;
+}
+
+.trek-departure-row {
+  background-color: var(--trek-color-surface);
+  box-shadow: var(--trek-shadow-xs);
+  transition: transform var(--trek-transition-fast), box-shadow var(--trek-transition-fast);
+}
+
+.trek-departure-row:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--trek-shadow-sm);
+}
+
+.trek-departure-row td {
+  padding: 16px;
+  font-size: 0.9375rem;
+  border-top: 1px solid var(--trek-color-border);
+  border-bottom: 1px solid var(--trek-color-border);
+}
+
+.trek-departure-row td:first-child {
+  border-left: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-md) 0 0 var(--trek-radius-md);
+  font-weight: 600;
+  color: var(--trek-color-primary);
+}
+
+.trek-departure-row td:last-child {
+  border-right: 1px solid var(--trek-color-border);
+  border-radius: 0 var(--trek-radius-md) var(--trek-radius-md) 0;
+  text-align: right;
+}
+
+.trek-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--trek-radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.trek-status-badge--available {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.trek-status-badge--guaranteed {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.trek-status-badge--limited {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.trek-status-badge--closed {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* ==========================================================================
+   18. Reviews & Moderation
+   ========================================================================== */
+.trek-reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--trek-space-xl);
+  margin-top: var(--trek-space-xl);
+}
+
+.trek-review-card {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-lg);
+  padding: var(--trek-space-xl);
+  box-shadow: var(--trek-shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.trek-review-card__stars {
+  color: var(--trek-color-accent);
+  font-size: 1.125rem;
+  margin-bottom: 12px;
+}
+
+.trek-review-card__title {
+  font-family: var(--trek-font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--trek-color-primary);
+  margin: 0 0 8px 0;
+}
+
+.trek-review-card__text {
+  font-size: 0.9375rem;
+  color: #4a5568;
+  line-height: 1.6;
+  flex-grow: 1;
+  margin-bottom: var(--trek-space-md);
+}
+
+.trek-review-card__author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid var(--trek-color-border-subtle);
+  padding-top: var(--trek-space-md);
+}
+
+.trek-review-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--trek-color-primary);
+  color: var(--trek-color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.trek-review-author__name {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--trek-color-primary);
+}
+
+.trek-review-author__loc {
+  font-size: 0.75rem;
+  color: var(--trek-color-text-muted);
+}
+
+/* ==========================================================================
+   19. Public Enquiry / Booking Form
+   ========================================================================== */
+.trek-enquiry-card {
+  background-color: var(--trek-color-surface);
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-xl);
+  padding: var(--trek-space-3xl);
+  box-shadow: var(--trek-shadow-md);
+}
+
+.trek-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--trek-space-lg);
+}
+
+.trek-form-grid--full {
+  grid-column: span 2;
+}
+
+.trek-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trek-form-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--trek-color-primary);
+}
+
+.trek-form-input,
+.trek-form-select,
+.trek-form-textarea {
+  padding: 12px 16px;
+  border: 1px solid var(--trek-color-border);
+  border-radius: var(--trek-radius-sm);
+  font-family: var(--trek-font-body);
+  font-size: 0.9375rem;
+  background-color: #fff;
+  color: var(--trek-color-text);
+  transition: border-color var(--trek-transition-fast), box-shadow var(--trek-transition-fast);
+}
+
+.trek-form-input:focus,
+.trek-form-select:focus,
+.trek-form-textarea:focus {
+  border-color: var(--trek-color-accent);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  outline: none;
+}
+
+.trek-form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.trek-form-radio-group {
+  display: flex;
+  gap: var(--trek-space-md);
+  margin-top: 4px;
+}
+
+.trek-radio-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+/* Honey-pot Spam Protection (Visually Hidden) */
+.trek-honeypot {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  width: 0;
+  z-index: -1;
+}
+
+/* ==========================================================================
+   20. Data Quality & Completeness Panel (Staff/Admin/Reviewer Only)
+   ========================================================================== */
+.trek-data-quality-panel {
+  background-color: #0d201a;
+  color: #e5edea;
+  border: 1px solid #27473b;
+  border-radius: var(--trek-radius-lg);
+  padding: var(--trek-space-xl);
+  margin-bottom: var(--trek-space-2xl);
+  box-shadow: var(--trek-shadow-lg);
+}
+
+.trek-data-quality-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1f3d32;
+  padding-bottom: var(--trek-space-md);
+  margin-bottom: var(--trek-space-md);
+}
+
+.trek-data-quality-panel__title {
+  font-family: var(--trek-font-display);
+  font-size: 1.5rem;
+  color: var(--trek-color-accent);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trek-quality-alert {
+  padding: 10px 14px;
+  border-radius: var(--trek-radius-sm);
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.trek-quality-alert--warning {
+  background-color: rgba(217, 119, 6, 0.2);
+  border-left: 3px solid #d97706;
+  color: #fde68a;
+}
+
+.trek-quality-alert--error {
+  background-color: rgba(220, 38, 38, 0.2);
+  border-left: 3px solid #dc2626;
+  color: #fca5a5;
+}
+
+.trek-quality-alert--success {
+  background-color: rgba(16, 185, 129, 0.2);
+  border-left: 3px solid #10b981;
+  color: #a7f3d0;
+}
+
+/* ==========================================================================
+   21. Modals (Edit Inspector, Diff Viewer, Booking Modal)
+   ========================================================================== */
+.trek-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(7, 23, 19, 0.8);
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--trek-space-lg);
+  backdrop-filter: blur(4px);
+}
+
+.trek-modal.is-active {
+  display: flex;
+  animation: trekFadeIn 0.2s ease;
+}
+
+.trek-modal__dialog {
+  background-color: var(--trek-color-surface);
+  border-radius: var(--trek-radius-lg);
+  max-width: 650px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--trek-shadow-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.trek-modal__header {
+  padding: var(--trek-space-lg);
+  border-bottom: 1px solid var(--trek-color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trek-modal__title {
+  font-family: var(--trek-font-display);
+  font-size: 1.5rem;
+  color: var(--trek-color-primary);
+  margin: 0;
+}
+
+.trek-modal__body {
+  padding: var(--trek-space-lg);
+  flex-grow: 1;
+}
+
+.trek-modal__footer {
+  padding: var(--trek-space-md) var(--trek-space-lg);
+  border-top: 1px solid var(--trek-color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background-color: var(--trek-color-surface-subtle);
+}
+
+/* Toast Notifications */
+.trek-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trek-toast {
+  background-color: var(--trek-color-primary-dark);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: var(--trek-radius-md);
+  box-shadow: var(--trek-shadow-lg);
+  border-left: 4px solid var(--trek-color-accent);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: trekSlideUp 0.3s ease;
+}
+
+/* ==========================================================================
+   22. Animations & Keyframes
+   ========================================================================== */
+@keyframes trekFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes trekSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   23. Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .trek-overview-grid,
+  .trek-safety-layout,
+  .trek-inex-grid {
+    grid-template-columns: 1fr;
+    gap: var(--trek-space-xl);
+  }
+  
+  .trek-day-details-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .trek-hero {
+    min-height: 70vh;
+    padding-top: var(--trek-space-3xl);
+  }
+  
+  .trek-hero__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .trek-btn-primary,
+  .trek-btn-secondary {
+    width: 100%;
+  }
+  
+  .trek-facts-wrapper {
+    margin-top: -20px;
+  }
+  
+  .trek-facts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .trek-form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .trek-form-grid--full {
+    grid-column: span 1;
+  }
+  
+  .trek-departures-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .trek-facts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .trek-itinerary-day__left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* ==========================================================================
+   24. Accessibility & Print
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .trek-detail-page *,
+  .trek-detail-page *::before,
+  .trek-detail-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .trek-role-toolbar,
+  .trek-sticky-nav,
+  .trek-hero__actions,
+  .trek-enquiry-card,
+  .trek-lightbox,
+  .trek-modal {
+    display: none !important;
+  }
+  
+  .trek-hero {
+    min-height: auto;
+    color: #000;
+    background: none;
+  }
+  
+  .trek-itinerary-day__content {
+    display: block !important;
+  }
+}
