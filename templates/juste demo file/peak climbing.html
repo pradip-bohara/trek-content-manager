@@ -1,0 +1,3608 @@
+<section class="yatri-page" id="peak-climbing-page">
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Water+Brush&display=swap');
+
+
+/* =========================================================
+   YATRI PEAK CLIMBING
+   REAL PHOTOGRAPH EDITION
+========================================================= */
+
+#peak-climbing-page{
+
+    --peak-orange:#e98224;
+    --peak-orange-dark:#c96410;
+
+    --peak-navy:#0b1922;
+    --peak-navy-2:#142b38;
+
+    --peak-cream:#f5f1e9;
+    --peak-soft:#f7f8f7;
+
+    --peak-white:#fff;
+
+    --peak-text:#17242c;
+    --peak-muted:#69767e;
+
+    --peak-line:rgba(15,29,39,.11);
+
+    --font-news:'Newsreader',serif;
+    --font-inter:'Inter',sans-serif;
+    --font-corm:'Cormorant Garamond',serif;
+    --font-brush:'Water Brush',cursive;
+
+    width:100%;
+    max-width:none;
+
+    margin:0 !important;
+    padding:0 !important;
+
+    background:#fff;
+
+    color:var(--peak-text);
+
+    font-family:var(--font-inter);
+
+    line-height:1.6;
+
+    overflow:hidden;
+}
+
+
+#peak-climbing-page *,
+#peak-climbing-page *::before,
+#peak-climbing-page *::after{
+    box-sizing:border-box;
+}
+
+
+#peak-climbing-page h1,
+#peak-climbing-page h2,
+#peak-climbing-page h3,
+#peak-climbing-page p{
+    margin:0;
+}
+
+
+#peak-climbing-page img{
+    display:block;
+
+    width:100%;
+    max-width:100%;
+}
+
+
+#peak-climbing-page a{
+    text-decoration:none;
+}
+
+
+#peak-climbing-page .peak-container{
+
+    width:min(1240px,calc(100% - 48px));
+
+    margin:0 auto;
+
+}
+
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+#peak-climbing-page .peak-kicker{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:var(--peak-orange);
+
+    font-family:var(--font-inter);
+
+    font-size:10px;
+
+    font-weight:800;
+
+    letter-spacing:2.4px;
+
+    text-transform:uppercase;
+
+}
+
+
+#peak-climbing-page .peak-kicker::before{
+
+    content:"";
+
+    width:28px;
+
+    height:1px;
+
+    background:currentColor;
+
+}
+
+
+#peak-climbing-page .peak-kicker.center{
+
+    justify-content:center;
+
+}
+
+
+#peak-climbing-page .peak-kicker.center::before{
+
+    display:none;
+
+}
+
+
+#peak-climbing-page .peak-script{
+
+    font-family:var(--font-brush);
+
+    font-weight:400;
+
+    color:var(--peak-orange);
+
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+#peak-climbing-page .peak-hero{
+
+    position:relative;
+
+    min-height:100svh;
+
+    display:flex;
+
+    align-items:center;
+
+    overflow:hidden;
+
+    background:#101a20;
+
+    isolation:isolate;
+
+}
+
+
+/* REAL HERO IMAGE */
+
+#peak-climbing-page .peak-hero-image{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:-3;
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    object-position:center 48%;
+
+    transform:scale(1.015);
+
+}
+
+
+/* NATURAL IMAGE OVERLAY */
+
+#peak-climbing-page .peak-hero::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:-2;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            rgba(3,12,18,.82) 0%,
+            rgba(3,12,18,.53) 38%,
+            rgba(3,12,18,.18) 75%,
+            rgba(3,12,18,.20) 100%
+        );
+
+}
+
+
+/* BOTTOM FADE */
+
+#peak-climbing-page .peak-hero::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    height:210px;
+
+    z-index:-1;
+
+    background:
+
+        linear-gradient(
+            to bottom,
+            transparent,
+            rgba(3,12,18,.82)
+        );
+
+}
+
+
+/* HERO CONTENT */
+
+#peak-climbing-page .peak-hero-content{
+
+    position:relative;
+
+    z-index:3;
+
+    width:min(1180px,calc(100% - 48px));
+
+    margin:0 auto;
+
+    padding:150px 0 125px;
+
+    color:#fff;
+
+}
+
+
+/* TOP LABEL */
+
+#peak-climbing-page .peak-hero-topline{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    margin-bottom:24px;
+
+}
+
+
+#peak-climbing-page .peak-hero-topline-line{
+
+    width:42px;
+
+    height:1px;
+
+    background:var(--peak-orange);
+
+}
+
+
+#peak-climbing-page .peak-hero-topline span{
+
+    font-size:9px;
+
+    font-weight:800;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    color:rgba(255,255,255,.78);
+
+}
+
+
+/* LOCATION */
+
+#peak-climbing-page .peak-location{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-bottom:28px;
+
+    padding:8px 13px;
+
+    border:1px solid rgba(255,255,255,.28);
+
+    border-radius:2px;
+
+    background:rgba(0,0,0,.17);
+
+    backdrop-filter:blur(6px);
+
+    font-size:8px;
+
+    font-weight:700;
+
+    letter-spacing:1.8px;
+
+    text-transform:uppercase;
+
+}
+
+
+#peak-climbing-page .peak-location svg{
+
+    width:14px;
+
+    height:14px;
+
+    color:var(--peak-orange);
+
+}
+
+
+/* HERO TITLE */
+
+#peak-climbing-page .peak-hero h1{
+
+    font-family:var(--font-news);
+
+    font-size:clamp(65px,9vw,130px);
+
+    font-weight:500;
+
+    line-height:.78;
+
+    letter-spacing:-4px;
+
+    text-transform:uppercase;
+
+    color:#fff;
+
+    text-shadow:0 4px 25px rgba(0,0,0,.22);
+
+}
+
+
+/* SCRIPT */
+
+#peak-climbing-page .peak-hero-script{
+
+    display:block;
+
+    margin:12px 0 30px;
+
+    font-size:clamp(70px,8vw,120px);
+
+    line-height:.75;
+
+    transform:rotate(-3deg);
+
+    transform-origin:left center;
+
+    text-shadow:0 4px 20px rgba(0,0,0,.22);
+
+}
+
+
+/* DESCRIPTION */
+
+#peak-climbing-page .peak-hero-description{
+
+    max-width:610px;
+
+    color:rgba(255,255,255,.84);
+
+    font-size:13px;
+
+    line-height:1.85;
+
+}
+
+
+/* HERO BUTTONS */
+
+#peak-climbing-page .peak-hero-actions{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:12px;
+
+    margin-top:32px;
+
+}
+
+
+#peak-climbing-page .peak-btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:9px;
+
+    min-height:50px;
+
+    padding:0 23px;
+
+    border-radius:3px;
+
+    background:var(--peak-orange);
+
+    color:#fff;
+
+    font-family:var(--font-inter);
+
+    font-size:10px;
+
+    font-weight:800;
+
+    letter-spacing:1.3px;
+
+    text-transform:uppercase;
+
+    transition:.3s ease;
+
+}
+
+
+#peak-climbing-page .peak-btn:hover{
+
+    background:var(--peak-orange-dark);
+
+    color:#fff;
+
+    transform:translateY(-2px);
+
+}
+
+
+#peak-climbing-page .peak-btn svg{
+
+    width:15px;
+
+    height:15px;
+
+}
+
+
+#peak-climbing-page .peak-btn-outline{
+
+    border:1px solid rgba(255,255,255,.48);
+
+    background:rgba(255,255,255,.07);
+
+    backdrop-filter:blur(7px);
+
+}
+
+
+#peak-climbing-page .peak-btn-outline:hover{
+
+    background:#fff;
+
+    color:var(--peak-navy);
+
+}
+
+
+/* HERO PHOTO CREDIT */
+
+#peak-climbing-page .peak-hero-credit{
+
+    position:absolute;
+
+    right:28px;
+
+    bottom:30px;
+
+    z-index:5;
+
+    max-width:230px;
+
+    padding:10px 13px;
+
+    background:rgba(0,0,0,.42);
+
+    border-left:2px solid var(--peak-orange);
+
+    backdrop-filter:blur(5px);
+
+    color:rgba(255,255,255,.62);
+
+    font-size:7px;
+
+    line-height:1.55;
+
+    text-transform:uppercase;
+
+    letter-spacing:.7px;
+
+}
+
+
+#peak-climbing-page .peak-hero-credit strong{
+
+    color:#fff;
+
+    font-weight:700;
+
+}
+
+
+/* SCROLL */
+
+#peak-climbing-page .peak-scroll{
+
+    position:absolute;
+
+    z-index:5;
+
+    left:50%;
+
+    bottom:25px;
+
+    transform:translateX(-50%);
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:7px;
+
+    color:rgba(255,255,255,.68);
+
+    font-size:8px;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+
+#peak-climbing-page .peak-scroll-line{
+
+    width:1px;
+
+    height:38px;
+
+    background:rgba(255,255,255,.45);
+
+}
+
+
+/* =========================================================
+   FACTS
+========================================================= */
+
+#peak-climbing-page .peak-facts{
+
+    background:var(--peak-navy);
+
+    color:#fff;
+
+}
+
+
+#peak-climbing-page .peak-facts-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+}
+
+
+#peak-climbing-page .peak-fact{
+
+    min-height:128px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:24px 15px;
+
+    text-align:center;
+
+    border-right:1px solid rgba(255,255,255,.10);
+
+}
+
+
+#peak-climbing-page .peak-fact:last-child{
+
+    border-right:0;
+
+}
+
+
+#peak-climbing-page .peak-fact-icon{
+
+    width:29px;
+
+    height:29px;
+
+    margin-bottom:9px;
+
+    color:var(--peak-orange);
+
+}
+
+
+#peak-climbing-page .peak-fact strong{
+
+    font-family:var(--font-news);
+
+    font-size:26px;
+
+    font-weight:600;
+
+    line-height:1;
+
+}
+
+
+#peak-climbing-page .peak-fact span{
+
+    margin-top:5px;
+
+    color:rgba(255,255,255,.54);
+
+    font-size:8px;
+
+    font-weight:700;
+
+    letter-spacing:1.2px;
+
+    text-transform:uppercase;
+
+}
+
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+#peak-climbing-page .peak-intro{
+
+    padding:120px 0;
+
+    background:#fff;
+
+}
+
+
+#peak-climbing-page .peak-intro-grid{
+
+    display:grid;
+
+    grid-template-columns:.95fr 1.05fr;
+
+    gap:85px;
+
+    align-items:center;
+
+}
+
+
+#peak-climbing-page .peak-intro h2{
+
+    margin-top:18px;
+
+    font-family:var(--font-news);
+
+    font-size:clamp(42px,5vw,68px);
+
+    font-weight:600;
+
+    line-height:.95;
+
+    letter-spacing:-2px;
+
+}
+
+
+#peak-climbing-page .peak-intro h2 em{
+
+    font-family:var(--font-corm);
+
+    color:var(--peak-orange);
+
+    font-weight:500;
+
+    font-style:italic;
+
+}
+
+
+#peak-climbing-page .peak-intro p{
+
+    margin-top:24px;
+
+    color:var(--peak-muted);
+
+    font-size:14px;
+
+    line-height:1.9;
+
+}
+
+
+#peak-climbing-page .peak-intro p + p{
+
+    margin-top:14px;
+
+}
+
+
+#peak-climbing-page .peak-intro-image-wrap{
+
+    position:relative;
+
+}
+
+
+#peak-climbing-page .peak-intro-image-wrap::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:-18px;
+
+    bottom:-18px;
+
+    width:90px;
+
+    height:90px;
+
+    border-left:2px solid var(--peak-orange);
+
+    border-bottom:2px solid var(--peak-orange);
+
+}
+
+
+#peak-climbing-page .peak-intro-image{
+
+    position:relative;
+
+    z-index:1;
+
+    height:540px;
+
+    object-fit:cover;
+
+}
+
+
+#peak-climbing-page .peak-photo-credit{
+
+    position:absolute;
+
+    z-index:3;
+
+    right:-18px;
+
+    bottom:22px;
+
+    width:220px;
+
+    padding:16px 18px;
+
+    background:rgba(7,20,29,.94);
+
+    color:#fff;
+
+    font-size:9px;
+
+    line-height:1.55;
+
+}
+
+
+#peak-climbing-page .peak-photo-credit strong{
+
+    display:block;
+
+    margin-bottom:4px;
+
+    color:var(--peak-orange);
+
+    font-size:8px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+
+}
+
+
+/* =========================================================
+   STORY
+========================================================= */
+
+#peak-climbing-page .peak-story{
+
+    padding:110px 0;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            rgba(5,16,24,.93),
+            rgba(5,16,24,.62)
+        ),
+
+        url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Ama_Dablam_traverse.JPG")
+        center / cover no-repeat;
+
+    color:#fff;
+
+    text-align:center;
+
+}
+
+
+#peak-climbing-page .peak-story-inner{
+
+    width:min(820px,100%);
+
+    margin:0 auto;
+
+}
+
+
+#peak-climbing-page .peak-story h2{
+
+    margin-top:20px;
+
+    font-family:var(--font-news);
+
+    font-size:clamp(42px,5vw,68px);
+
+    font-weight:500;
+
+    line-height:.98;
+
+    letter-spacing:-2px;
+
+}
+
+
+#peak-climbing-page .peak-story h2 span{
+
+    font-family:var(--font-brush);
+
+    color:var(--peak-orange);
+
+    font-size:1.12em;
+
+}
+
+
+#peak-climbing-page .peak-story p{
+
+    max-width:670px;
+
+    margin:25px auto 0;
+
+    color:rgba(255,255,255,.71);
+
+    font-size:13px;
+
+    line-height:1.9;
+
+}
+
+
+/* =========================================================
+   COLLECTION
+========================================================= */
+
+#peak-climbing-page .peak-collection{
+
+    padding:120px 0;
+
+    background:var(--peak-cream);
+
+}
+
+
+#peak-climbing-page .peak-collection-heading{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-end;
+
+    gap:30px;
+
+    margin-bottom:50px;
+
+}
+
+
+#peak-climbing-page .peak-collection-heading h2{
+
+    margin-top:15px;
+
+    font-family:var(--font-news);
+
+    font-size:clamp(42px,5vw,64px);
+
+    font-weight:600;
+
+    line-height:.92;
+
+    letter-spacing:-2px;
+
+}
+
+
+#peak-climbing-page .peak-collection-heading p{
+
+    width:min(420px,100%);
+
+    color:var(--peak-muted);
+
+    font-size:13px;
+
+    line-height:1.75;
+
+}
+
+
+#peak-climbing-page .peak-card-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:16px;
+
+}
+
+
+#peak-climbing-page .peak-card{
+
+    position:relative;
+
+    height:450px;
+
+    overflow:hidden;
+
+    color:#fff;
+
+    background:#111;
+
+}
+
+
+#peak-climbing-page .peak-card img{
+
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    transition:transform .7s ease;
+
+}
+
+
+#peak-climbing-page .peak-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+
+        linear-gradient(
+            to top,
+            rgba(2,11,17,.96),
+            rgba(2,11,17,.18) 70%,
+            rgba(2,11,17,.02)
+        );
+
+}
+
+
+#peak-climbing-page .peak-card:hover img{
+
+    transform:scale(1.07);
+
+}
+
+
+#peak-climbing-page .peak-card-content{
+
+    position:absolute;
+
+    left:0;
+
+    right:0;
+
+    bottom:0;
+
+    z-index:2;
+
+    padding:25px;
+
+}
+
+
+#peak-climbing-page .peak-card-number{
+
+    margin-bottom:32px;
+
+    font-family:var(--font-corm);
+
+    font-size:13px;
+
+    color:rgba(255,255,255,.60);
+
+}
+
+
+#peak-climbing-page .peak-card-content h3{
+
+    font-family:var(--font-news);
+
+    font-size:28px;
+
+    font-weight:600;
+
+    line-height:1;
+
+}
+
+
+#peak-climbing-page .peak-card-height{
+
+    display:block;
+
+    margin-top:9px;
+
+    color:var(--peak-orange);
+
+    font-size:9px;
+
+    font-weight:800;
+
+    letter-spacing:1.3px;
+
+    text-transform:uppercase;
+
+}
+
+
+#peak-climbing-page .peak-card-link{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    margin-top:16px;
+
+    color:#fff;
+
+    font-size:9px;
+
+    font-weight:800;
+
+    letter-spacing:1.2px;
+
+    text-transform:uppercase;
+
+}
+
+
+#peak-climbing-page .peak-card-link svg{
+
+    width:13px;
+
+}
+
+
+/* =========================================================
+   REGIONS
+========================================================= */
+
+#peak-climbing-page .peak-regions{
+
+    padding:120px 0;
+
+    background:#fff;
+
+}
+
+
+#peak-climbing-page .peak-regions-grid{
+
+    display:grid;
+
+    grid-template-columns:1.1fr .9fr;
+
+    gap:70px;
+
+    align-items:center;
+
+}
+
+
+#peak-climbing-page .peak-regions-image{
+
+    width:100%;
+
+    height:560px;
+
+    object-fit:cover;
+
+}
+
+
+#peak-climbing-page .peak-regions-content h2{
+
+    margin-top:17px;
+
+    font-family:var(--font-news);
+
+    font-size:clamp(43px,5vw,67px);
+
+    font-weight:600;
+
+    line-height:.92;
+
+    letter-spacing:-2px;
+
+}
+
+
+#peak-climbing-page .peak-regions-content h2 span{
+
+    font-family:var(--font-brush);
+
+    color:var(--peak-orange);
+
+    font-size:1.06em;
+
+}
+
+
+#peak-climbing-page .peak-regions-content > p{
+
+    margin-top:24px;
+
+    color:var(--peak-muted);
+
+    font-size:14px;
+
+    line-height:1.85;
+
+}
+
+
+#peak-climbing-page .peak-region-list{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    margin-top:30px;
+
+    border-top:1px solid var(--peak-line);
+
+}
+
+
+#peak-climbing-page .peak-region{
+
+    padding:19px 0;
+
+    border-bottom:1px solid var(--peak-line);
+
+}
+
+
+#peak-climbing-page .peak-region:nth-child(odd){
+
+    padding-right:20px;
+
+    border-right:1px solid var(--peak-line);
+
+}
+
+
+#peak-climbing-page .peak-region:nth-child(even){
+
+    padding-left:20px;
+
+}
+
+
+#peak-climbing-page .peak-region strong{
+
+    display:block;
+
+    font-family:var(--font-corm);
+
+    font-size:23px;
+
+    font-weight:600;
+
+}
+
+
+#peak-climbing-page .peak-region span{
+
+    display:block;
+
+    margin-top:3px;
+
+    color:var(--peak-muted);
+
+    font-size:9px;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    letter-spacing:.8px;
+
+}
+
+
+/* =========================================================
+   JOURNEY
+========================================================= */
+
+#peak-climbing-page .peak-journey{
+
+    padding:120px 0;
+
+    background:var(--peak-soft);
+
+}
+
+
+#peak-climbing-page .peak-journey-head{
+
+    max-width:720px;
+
+    margin-bottom:55px;
+
+}
+
+
+#peak-climbing-page .peak-journey-head h2{
+
+    margin-top:16px;
+
+    font-family:var(--font-news);
+
+    font-size:clamp(43px,5vw,64px);
+
+    font-weight:600;
+
+    line-height:.92;
+
+    letter-spacing:-2px;
+
+}
+
+
+#peak-climbing-page .peak-journey-head h2 span{
+
+    color:var(--peak-orange);
+
+    font-family:var(--font-corm);
+
+    font-weight:500;
+
+}
+
+
+#peak-climbing-page .peak-journey-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    border-top:1px solid var(--peak-line);
+
+    border-bottom:1px solid var(--peak-line);
+
+}
+
+
+#peak-climbing-page .peak-step{
+
+    padding:35px 25px 40px;
+
+    border-right:1px solid var(--peak-line);
+
+}
+
+
+#peak-climbing-page .peak-step:last-child{
+
+    border-right:0;
+
+}
+
+
+#peak-climbing-page .peak-step-number{
+
+    color:var(--peak-orange);
+
+    font-family:var(--font-corm);
+
+    font-size:17px;
+
+}
+
+
+#peak-climbing-page .peak-step-icon{
+
+    width:31px;
+
+    height:31px;
+
+    margin:27px 0 20px;
+
+}
+
+
+#peak-climbing-page .peak-step h3{
+
+    font-family:var(--font-news);
+
+    font-size:25px;
+
+    font-weight:600;
+
+}
+
+
+#peak-climbing-page .peak-step p{
+
+    margin-top:10px;
+
+    color:var(--peak-muted);
+
+    font-size:11px;
+
+    line-height:1.75;
+
+}
+
+
+/* =========================================================
+   SAFETY
+========================================================= */
+
+#peak-climbing-page .peak-safety{
+
+    background:var(--peak-navy);
+
+    color:#fff;
+
+}
+
+
+#peak-climbing-page .peak-safety-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    min-height:620px;
+
+}
+
+
+#peak-climbing-page .peak-safety-image{
+
+    min-height:500px;
+
+    background:
+
+        linear-gradient(
+            rgba(5,17,25,.12),
+            rgba(5,17,25,.25)
+        ),
+
+        url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Ama_Dablam_traverse.JPG")
+        center / cover no-repeat;
+
+}
+
+
+#peak-climbing-page .peak-safety-content{
+
+    display:flex;
+
+    align-items:center;
+
+    padding:75px clamp(30px,6vw,90px);
+
+}
+
+
+#peak-climbing-page .peak-safety-inner{
+
+    max-width:535px;
+
+}
+
+
+#peak-climbing-page .peak-safety h2{
+
+    margin-top:17px;
+
+    font-family:var(--font-news);
+
+    font-size:clamp(43px,5vw,64px);
+
+    font-weight:500;
+
+    line-height:.93;
+
+    letter-spacing:-2px;
+
+}
+
+
+#peak-climbing-page .peak-safety h2 span{
+
+    font-family:var(--font-brush);
+
+    color:var(--peak-orange);
+
+}
+
+
+#peak-climbing-page .peak-safety-copy{
+
+    margin-top:25px;
+
+    color:rgba(255,255,255,.66);
+
+    font-size:13px;
+
+    line-height:1.85;
+
+}
+
+
+#peak-climbing-page .peak-safety-list{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:18px;
+
+    margin-top:32px;
+
+}
+
+
+#peak-climbing-page .peak-safety-item{
+
+    display:flex;
+
+    gap:10px;
+
+    align-items:flex-start;
+
+}
+
+
+#peak-climbing-page .peak-safety-item svg{
+
+    flex:0 0 20px;
+
+    width:20px;
+
+    height:20px;
+
+    color:var(--peak-orange);
+
+}
+
+
+#peak-climbing-page .peak-safety-item strong{
+
+    display:block;
+
+    font-size:10px;
+
+    font-weight:800;
+
+}
+
+
+#peak-climbing-page .peak-safety-item span{
+
+    display:block;
+
+    margin-top:3px;
+
+    color:rgba(255,255,255,.46);
+
+    font-size:9px;
+
+    line-height:1.5;
+
+}
+
+
+/* =========================================================
+   HUMAN STORY
+========================================================= */
+
+#peak-climbing-page .peak-human{
+
+    padding:120px 0;
+
+    background:#fff;
+
+}
+
+
+#peak-climbing-page .peak-human-grid{
+
+    display:grid;
+
+    grid-template-columns:.95fr 1.05fr;
+
+    gap:80px;
+
+    align-items:center;
+
+}
+
+
+#peak-climbing-page .peak-human-image{
+
+    position:relative;
+
+}
+
+
+#peak-climbing-page .peak-human-image img{
+
+    height:520px;
+
+    object-fit:cover;
+
+}
+
+
+#peak-climbing-page .peak-human-caption{
+
+    position:absolute;
+
+    left:20px;
+
+    bottom:20px;
+
+    padding:15px 18px;
+
+    background:#fff;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.12);
+
+    font-size:9px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+
+}
+
+
+#peak-climbing-page .peak-human-content h2{
+
+    margin-top:18px;
+
+    font-family:var(--font-news);
+
+    font-size:clamp(43px,5vw,68px);
+
+    font-weight:600;
+
+    line-height:.91;
+
+    letter-spacing:-2px;
+
+}
+
+
+#peak-climbing-page .peak-human-content h2 em{
+
+    color:var(--peak-orange);
+
+    font-family:var(--font-corm);
+
+    font-weight:500;
+
+}
+
+
+#peak-climbing-page .peak-human-content p{
+
+    margin-top:24px;
+
+    color:var(--peak-muted);
+
+    font-size:14px;
+
+    line-height:1.9;
+
+}
+
+
+#peak-climbing-page .peak-human-quote{
+
+    margin-top:28px;
+
+    padding:20px 0 0;
+
+    border-top:1px solid var(--peak-line);
+
+    font-family:var(--font-corm);
+
+    font-size:24px;
+
+    line-height:1.3;
+
+}
+
+
+/* =========================================================
+   FINAL CTA
+========================================================= */
+
+#peak-climbing-page .peak-final{
+
+    padding:130px 0;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            rgba(5,16,24,.94),
+            rgba(5,16,24,.55)
+        ),
+
+        url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Determination_on_the_Everest_Expedition.jpg")
+        center / cover no-repeat;
+
+    color:#fff;
+
+}
+
+
+#peak-climbing-page .peak-final-inner{
+
+    max-width:820px;
+
+}
+
+
+#peak-climbing-page .peak-final h2{
+
+    margin-top:18px;
+
+    font-family:var(--font-news);
+
+    font-size:clamp(49px,6vw,82px);
+
+    font-weight:500;
+
+    line-height:.9;
+
+    letter-spacing:-2.5px;
+
+}
+
+
+#peak-climbing-page .peak-final h2 span{
+
+    display:block;
+
+    font-family:var(--font-brush);
+
+    color:var(--peak-orange);
+
+    font-size:1.1em;
+
+    transform:rotate(-2deg);
+
+}
+
+
+#peak-climbing-page .peak-final p{
+
+    max-width:620px;
+
+    margin-top:25px;
+
+    color:rgba(255,255,255,.70);
+
+    font-size:13px;
+
+    line-height:1.85;
+
+}
+
+
+#peak-climbing-page .peak-final-actions{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:12px;
+
+    margin-top:32px;
+
+}
+
+
+/* =========================================================
+   PHOTO SOURCES / CREDIT
+========================================================= */
+
+#peak-climbing-page .peak-source-note{
+
+    padding:15px 20px;
+
+    background:#07131b;
+
+    color:rgba(255,255,255,.42);
+
+    font-size:8px;
+
+    line-height:1.6;
+
+    text-align:center;
+
+}
+
+
+#peak-climbing-page .peak-source-note a{
+
+    color:rgba(255,255,255,.62);
+
+}
+
+
+#peak-climbing-page .peak-source-note a:hover{
+
+    color:#fff;
+
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media(max-width:1050px){
+
+    #peak-climbing-page .peak-intro-grid,
+    #peak-climbing-page .peak-human-grid{
+
+        gap:50px;
+
+    }
+
+
+    #peak-climbing-page .peak-card-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+
+    #peak-climbing-page .peak-card:last-child{
+
+        grid-column:1/-1;
+
+    }
+
+
+    #peak-climbing-page .peak-journey-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+
+    #peak-climbing-page .peak-step:nth-child(2){
+
+        border-right:0;
+
+    }
+
+
+    #peak-climbing-page .peak-step:nth-child(-n+2){
+
+        border-bottom:1px solid var(--peak-line);
+
+    }
+
+
+    #peak-climbing-page .peak-safety-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    #peak-climbing-page .peak-safety-image{
+
+        min-height:480px;
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:700px){
+
+    #peak-climbing-page .peak-container{
+
+        width:min(100% - 32px,1240px);
+
+    }
+
+
+    #peak-climbing-page .peak-hero{
+
+        min-height:92svh;
+
+    }
+
+
+    #peak-climbing-page .peak-hero-image{
+
+        object-position:58% center;
+
+    }
+
+
+    #peak-climbing-page .peak-hero::before{
+
+        background:
+
+            linear-gradient(
+                90deg,
+                rgba(3,12,18,.78),
+                rgba(3,12,18,.42)
+            );
+
+    }
+
+
+    #peak-climbing-page .peak-hero-content{
+
+        width:calc(100% - 32px);
+
+        padding:110px 0 100px;
+
+    }
+
+
+    #peak-climbing-page .peak-hero-topline{
+
+        margin-bottom:20px;
+
+    }
+
+
+    #peak-climbing-page .peak-location{
+
+        margin-bottom:22px;
+
+    }
+
+
+    #peak-climbing-page .peak-hero h1{
+
+        font-size:58px;
+
+        letter-spacing:-2px;
+
+    }
+
+
+    #peak-climbing-page .peak-hero-script{
+
+        font-size:68px;
+
+        margin:10px 0 25px;
+
+    }
+
+
+    #peak-climbing-page .peak-hero-description{
+
+        font-size:12px;
+
+        line-height:1.75;
+
+    }
+
+
+    #peak-climbing-page .peak-hero-actions{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+
+    #peak-climbing-page .peak-btn{
+
+        width:100%;
+
+    }
+
+
+    #peak-climbing-page .peak-hero-credit{
+
+        right:12px;
+
+        bottom:65px;
+
+        max-width:170px;
+
+        font-size:6px;
+
+    }
+
+
+    #peak-climbing-page .peak-scroll{
+
+        display:none;
+
+    }
+
+
+    #peak-climbing-page .peak-facts-grid{
+
+        grid-template-columns:1fr 1fr;
+
+    }
+
+
+    #peak-climbing-page .peak-fact{
+
+        min-height:115px;
+
+    }
+
+
+    #peak-climbing-page .peak-fact:nth-child(2){
+
+        border-right:0;
+
+    }
+
+
+    #peak-climbing-page .peak-fact:nth-child(-n+2){
+
+        border-bottom:1px solid rgba(255,255,255,.10);
+
+    }
+
+
+    #peak-climbing-page .peak-intro,
+    #peak-climbing-page .peak-collection,
+    #peak-climbing-page .peak-regions,
+    #peak-climbing-page .peak-journey,
+    #peak-climbing-page .peak-human{
+
+        padding:80px 0;
+
+    }
+
+
+    #peak-climbing-page .peak-intro-grid,
+    #peak-climbing-page .peak-regions-grid,
+    #peak-climbing-page .peak-human-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    #peak-climbing-page .peak-intro h2,
+    #peak-climbing-page .peak-regions-content h2,
+    #peak-climbing-page .peak-human-content h2{
+
+        font-size:43px;
+
+    }
+
+
+    #peak-climbing-page .peak-intro-image,
+    #peak-climbing-page .peak-regions-image,
+    #peak-climbing-page .peak-human-image img{
+
+        height:390px;
+
+    }
+
+
+    #peak-climbing-page .peak-photo-credit{
+
+        right:10px;
+
+        bottom:15px;
+
+    }
+
+
+    #peak-climbing-page .peak-collection-heading{
+
+        display:block;
+
+    }
+
+
+    #peak-climbing-page .peak-collection-heading p{
+
+        margin-top:18px;
+
+    }
+
+
+    #peak-climbing-page .peak-card-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    #peak-climbing-page .peak-card:last-child{
+
+        grid-column:auto;
+
+    }
+
+
+    #peak-climbing-page .peak-card{
+
+        height:420px;
+
+    }
+
+
+    #peak-climbing-page .peak-region-list{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    #peak-climbing-page .peak-region:nth-child(odd){
+
+        padding-right:0;
+
+        border-right:0;
+
+    }
+
+
+    #peak-climbing-page .peak-region:nth-child(even){
+
+        padding-left:0;
+
+    }
+
+
+    #peak-climbing-page .peak-journey-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    #peak-climbing-page .peak-step,
+    #peak-climbing-page .peak-step:nth-child(2){
+
+        border-right:0;
+
+        border-bottom:1px solid var(--peak-line);
+
+    }
+
+
+    #peak-climbing-page .peak-step:last-child{
+
+        border-bottom:0;
+
+    }
+
+
+    #peak-climbing-page .peak-story{
+
+        padding:85px 0;
+
+    }
+
+
+    #peak-climbing-page .peak-safety-content{
+
+        padding:70px 20px;
+
+    }
+
+
+    #peak-climbing-page .peak-safety-list{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    #peak-climbing-page .peak-final{
+
+        padding:90px 0;
+
+    }
+
+
+    #peak-climbing-page .peak-final h2{
+
+        font-size:50px;
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media(max-width:420px){
+
+    #peak-climbing-page .peak-fact strong{
+
+        font-size:22px;
+
+    }
+
+
+    #peak-climbing-page .peak-fact span{
+
+        font-size:7px;
+
+    }
+
+
+    #peak-climbing-page .peak-intro h2,
+    #peak-climbing-page .peak-regions-content h2,
+    #peak-climbing-page .peak-human-content h2{
+
+        font-size:39px;
+
+    }
+
+
+    #peak-climbing-page .peak-hero h1{
+
+        font-size:52px;
+
+    }
+
+
+    #peak-climbing-page .peak-hero-script{
+
+        font-size:62px;
+
+    }
+
+}
+
+</style>
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="peak-hero">
+
+
+    <!-- REAL CLIMBING PHOTOGRAPH
+         Island Peak summit / Nepal
+    -->
+
+    <img
+        class="peak-hero-image"
+        src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Summitting_Island_Peak.jpg"
+        alt="Climber taking the final steps toward the summit of Island Peak in Nepal"
+        fetchpriority="high"
+    >
+
+
+    <div class="peak-hero-content">
+
+
+        <div class="peak-hero-topline">
+
+            <span class="peak-hero-topline-line"></span>
+
+            <span>
+                Nepal Himalayan Expeditions
+            </span>
+
+        </div>
+
+
+        <div class="peak-location">
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7">
+
+                <path d="M12 21s7-6 7-12A7 7 0 1 0 5 9c0 6 7 12 7 12Z"/>
+
+                <circle
+                    cx="12"
+                    cy="9"
+                    r="2.5"
+                />
+
+            </svg>
+
+            Khumbu · Hinku · Nepal Himalaya
+
+        </div>
+
+
+        <div
+            class="peak-kicker"
+            style="color:#fff;"
+        >
+
+            Real Mountains. Real Expeditions.
+
+        </div>
+
+
+        <h1>
+            Climb
+        </h1>
+
+
+        <span class="peak-script peak-hero-script">
+            Beyond
+        </span>
+
+
+        <p class="peak-hero-description">
+
+            Go higher into the Nepal Himalaya with experienced
+            mountain leaders, thoughtful acclimatisation and
+            carefully planned climbing journeys built around
+            the realities of the mountain.
+
+        </p>
+
+
+        <div class="peak-hero-actions">
+
+
+            <a
+                href="/all-trips/"
+                class="peak-btn"
+            >
+
+                Explore Peak Expeditions
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+
+                    <path d="M5 12h14M13 6l6 6-6 6"/>
+
+                </svg>
+
+            </a>
+
+
+            <a
+                href="/contact-us/"
+                class="peak-btn peak-btn-outline"
+            >
+
+                Talk To A Climbing Specialist
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+    <div class="peak-hero-credit">
+
+        <strong>Hero photograph</strong><br>
+
+        Island Peak, Nepal · Wikimedia Commons ·
+        CC BY 3.0 · Mountaineer
+
+    </div>
+
+
+    <div class="peak-scroll">
+
+        <span>
+            Discover
+        </span>
+
+        <span class="peak-scroll-line"></span>
+
+    </div>
+
+
+</section>
+
+
+<!-- =====================================================
+     QUICK FACTS
+===================================================== -->
+
+<section class="peak-facts">
+
+    <div class="peak-container">
+
+        <div class="peak-facts-grid">
+
+
+            <div class="peak-fact">
+
+                <svg
+                    class="peak-fact-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5">
+
+                    <path d="m3 19 7-10 4 6 3-4 4 8H3Z"/>
+
+                </svg>
+
+                <strong>
+                    6,476 m
+                </strong>
+
+                <span>
+                    Mera Peak
+                </span>
+
+            </div>
+
+
+            <div class="peak-fact">
+
+                <svg
+                    class="peak-fact-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5">
+
+                    <path d="M3 19h18"/>
+                    <path d="m5 19 7-14 7 14"/>
+                    <path d="m8 19 4-8 4 8"/>
+
+                </svg>
+
+                <strong>
+                    6,189 m
+                </strong>
+
+                <span>
+                    Island Peak
+                </span>
+
+            </div>
+
+
+            <div class="peak-fact">
+
+                <svg
+                    class="peak-fact-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5">
+
+                    <path d="M3 19h18"/>
+                    <path d="m5 19 7-15 7 15"/>
+                    <path d="m12 4 2 4"/>
+
+                </svg>
+
+                <strong>
+                    6,856 m
+                </strong>
+
+                <span>
+                    Ama Dablam
+                </span>
+
+            </div>
+
+
+            <div class="peak-fact">
+
+                <svg
+                    class="peak-fact-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5">
+
+                    <path d="M4 19h16"/>
+                    <path d="m6 19 6-13 6 13"/>
+
+                </svg>
+
+                <strong>
+                    8,849 m
+                </strong>
+
+                <span>
+                    Mount Everest
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     INTRO
+===================================================== -->
+
+<section class="peak-intro">
+
+    <div class="peak-container">
+
+        <div class="peak-intro-grid">
+
+
+            <div>
+
+                <div class="peak-kicker">
+                    Beyond The Trail
+                </div>
+
+
+                <h2>
+
+                    Nepal's mountains
+                    become your
+                    <em>story.</em>
+
+                </h2>
+
+
+                <p>
+
+                    Peak climbing in Nepal is not simply about
+                    standing on a summit. It is about waking before
+                    sunrise, moving through thin mountain air,
+                    following rope lines across snow and ice,
+                    and learning to trust your team when the
+                    landscape becomes bigger than anything
+                    you have seen before.
+
+                </p>
+
+
+                <p>
+
+                    We design climbing journeys around preparation,
+                    acclimatisation, experienced local leadership
+                    and honest mountain planning — so the focus
+                    stays on the experience rather than unnecessary
+                    complexity.
+
+                </p>
+
+            </div>
+
+
+            <div class="peak-intro-image-wrap">
+
+
+                <img
+                    class="peak-intro-image"
+                    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Mera_Peak_Climbing.jpg"
+                    alt="Mera Peak climbing in Nepal"
+                    loading="lazy"
+                >
+
+
+                <div class="peak-photo-credit">
+
+                    <strong>
+                        Real Nepal Climbing
+                    </strong>
+
+                    Mera Peak climbing photograph.
+                    Original photograph by Ngtreks,
+                    Wikimedia Commons.
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     EMOTIONAL STORY
+===================================================== -->
+
+<section class="peak-story">
+
+    <div class="peak-container">
+
+        <div class="peak-story-inner">
+
+
+            <div class="peak-kicker center">
+
+                The Mountain Moment
+
+            </div>
+
+
+            <h2>
+
+                There is a moment
+                <br>
+
+                when the mountain becomes
+                <span>your own.</span>
+
+            </h2>
+
+
+            <p>
+
+                The final ridge. The first sunlight touching
+                the summit. Your breathing slowing down.
+                Your teammates beside you. And below,
+                the valleys of Nepal stretching farther
+                than you imagined.
+
+            </p>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PEAK COLLECTION
+===================================================== -->
+
+<section class="peak-collection">
+
+    <div class="peak-container">
+
+
+        <div class="peak-collection-heading">
+
+
+            <div>
+
+                <div class="peak-kicker">
+                    Nepal Peak Collection
+                </div>
+
+
+                <h2>
+
+                    Choose your
+                    <br>
+                    mountain.
+
+                </h2>
+
+            </div>
+
+
+            <p>
+
+                From classic trekking peaks to serious
+                Himalayan climbing objectives, Nepal offers
+                a mountain for every prepared ambition.
+
+            </p>
+
+
+        </div>
+
+
+        <div class="peak-card-grid">
+
+
+            <!-- EVEREST -->
+
+            <article class="peak-card">
+
+                <img
+                    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Determination_on_the_Everest_Expedition.jpg"
+                    alt="Climber ascending Mount Everest in Nepal"
+                    loading="lazy"
+                >
+
+
+                <div class="peak-card-content">
+
+                    <div class="peak-card-number">
+                        01 / SAGARMATHA
+                    </div>
+
+
+                    <h3>
+                        Mount Everest
+                    </h3>
+
+
+                    <span class="peak-card-height">
+                        8,849 m · World's highest summit
+                    </span>
+
+
+                    <a
+                        href="/all-trips/"
+                        class="peak-card-link"
+                    >
+
+                        Explore Everest
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
+
+                            <path d="M5 12h14M13 6l6 6-6 6"/>
+
+                        </svg>
+
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- AMA DABLAM -->
+
+            <article class="peak-card">
+
+                <img
+                    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Ama_Dablam_traverse.JPG"
+                    alt="Climber traversing Ama Dablam in Nepal"
+                    loading="lazy"
+                >
+
+
+                <div class="peak-card-content">
+
+                    <div class="peak-card-number">
+                        02 / KHUMBU
+                    </div>
+
+
+                    <h3>
+                        Ama Dablam
+                    </h3>
+
+
+                    <span class="peak-card-height">
+                        6,856 m · Technical Himalayan objective
+                    </span>
+
+
+                    <a
+                        href="/all-trips/"
+                        class="peak-card-link"
+                    >
+
+                        Explore Ama Dablam
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
+
+                            <path d="M5 12h14M13 6l6 6-6 6"/>
+
+                        </svg>
+
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- MERA -->
+
+            <article class="peak-card">
+
+                <img
+                    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Mera_Peak_Climbing.jpg"
+                    alt="Mera Peak climbing expedition in Nepal"
+                    loading="lazy"
+                >
+
+
+                <div class="peak-card-content">
+
+                    <div class="peak-card-number">
+                        03 / HINKU VALLEY
+                    </div>
+
+
+                    <h3>
+                        Mera Peak
+                    </h3>
+
+
+                    <span class="peak-card-height">
+                        6,476 m · High-altitude trekking peak
+                    </span>
+
+
+                    <a
+                        href="/all-trips/"
+                        class="peak-card-link"
+                    >
+
+                        Explore Mera Peak
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
+
+                            <path d="M5 12h14M13 6l6 6-6 6"/>
+
+                        </svg>
+
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- ISLAND -->
+
+            <article class="peak-card">
+
+                <img
+                    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Island_Peak_Nepal.jpg"
+                    alt="Climbers ascending the fixed rope on Island Peak Nepal"
+                    loading="lazy"
+                >
+
+
+                <div class="peak-card-content">
+
+                    <div class="peak-card-number">
+                        04 / KHUMBU
+                    </div>
+
+
+                    <h3>
+                        Island Peak
+                    </h3>
+
+
+                    <span class="peak-card-height">
+                        6,189 m · Classic climbing experience
+                    </span>
+
+
+                    <a
+                        href="/all-trips/"
+                        class="peak-card-link"
+                    >
+
+                        Explore Island Peak
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
+
+                            <path d="M5 12h14M13 6l6 6-6 6"/>
+
+                        </svg>
+
+                    </a>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     REGIONS
+===================================================== -->
+
+<section class="peak-regions">
+
+    <div class="peak-container">
+
+        <div class="peak-regions-grid">
+
+
+            <div>
+
+                <img
+                    class="peak-regions-image"
+                    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Ama_Dablam_from_the_Pheriche_valley.jpg"
+                    alt="Ama Dablam and Himalayan landscape in Nepal"
+                    loading="lazy"
+                >
+
+            </div>
+
+
+            <div class="peak-regions-content">
+
+
+                <div class="peak-kicker">
+                    Nepal Himalaya
+                </div>
+
+
+                <h2>
+
+                    One country.
+                    <br>
+
+                    <span>
+                        Many mountains.
+                    </span>
+
+                </h2>
+
+
+                <p>
+
+                    Nepal is home to some of the world's most
+                    remarkable mountain environments. Your
+                    climbing experience can be shaped around
+                    the region, season, altitude and level of
+                    challenge that suits your expedition.
+
+                </p>
+
+
+                <div class="peak-region-list">
+
+
+                    <div class="peak-region">
+
+                        <strong>
+                            Khumbu
+                        </strong>
+
+                        <span>
+                            Everest · Ama Dablam · Island Peak
+                        </span>
+
+                    </div>
+
+
+                    <div class="peak-region">
+
+                        <strong>
+                            Hinku
+                        </strong>
+
+                        <span>
+                            Mera Peak · Remote valleys
+                        </span>
+
+                    </div>
+
+
+                    <div class="peak-region">
+
+                        <strong>
+                            Annapurna
+                        </strong>
+
+                        <span>
+                            Classic trekking & climbing landscapes
+                        </span>
+
+                    </div>
+
+
+                    <div class="peak-region">
+
+                        <strong>
+                            Beyond
+                        </strong>
+
+                        <span>
+                            Tailored Nepal mountain objectives
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     JOURNEY
+===================================================== -->
+
+<section class="peak-journey">
+
+    <div class="peak-container">
+
+
+        <div class="peak-journey-head">
+
+            <div class="peak-kicker">
+                From Kathmandu To Summit
+            </div>
+
+
+            <h2>
+
+                Every summit starts
+                <span>
+                    long before summit day.
+                </span>
+
+            </h2>
+
+        </div>
+
+
+        <div class="peak-journey-grid">
+
+
+            <div class="peak-step">
+
+                <div class="peak-step-number">
+                    01
+                </div>
+
+
+                <svg
+                    class="peak-step-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5">
+
+                    <circle cx="12" cy="12" r="9"/>
+
+                    <path d="M12 7v5l3 2"/>
+
+                </svg>
+
+
+                <h3>
+                    Prepare
+                </h3>
+
+
+                <p>
+
+                    Understand your route, equipment,
+                    altitude and preparation before
+                    the expedition begins.
+
+                </p>
+
+            </div>
+
+
+            <div class="peak-step">
+
+                <div class="peak-step-number">
+                    02
+                </div>
+
+
+                <svg
+                    class="peak-step-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5">
+
+                    <path d="M3 18 9 6l5 11 3-7 4 8"/>
+
+                </svg>
+
+
+                <h3>
+                    Acclimatise
+                </h3>
+
+
+                <p>
+
+                    Gain altitude gradually and give
+                    your body time to adjust to the
+                    Himalayan environment.
+
+                </p>
+
+            </div>
+
+
+            <div class="peak-step">
+
+                <div class="peak-step-number">
+                    03
+                </div>
+
+
+                <svg
+                    class="peak-step-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5">
+
+                    <path d="m4 18 7-11 4 6 3-4 3 9"/>
+
+                    <path d="M3 20h18"/>
+
+                </svg>
+
+
+                <h3>
+                    Climb
+                </h3>
+
+
+                <p>
+
+                    Move higher with your team,
+                    follow the mountain plan and
+                    prepare for summit day.
+
+                </p>
+
+            </div>
+
+
+            <div class="peak-step">
+
+                <div class="peak-step-number">
+                    04
+                </div>
+
+
+                <svg
+                    class="peak-step-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5">
+
+                    <circle cx="12" cy="12" r="9"/>
+
+                    <path d="m8 12 2.5 2.5L16 9"/>
+
+                </svg>
+
+
+                <h3>
+                    Return
+                </h3>
+
+
+                <p>
+
+                    Descend safely and return with
+                    stories, friendships and a new
+                    perspective on the mountains.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SAFETY
+===================================================== -->
+
+<section class="peak-safety">
+
+    <div class="peak-safety-grid">
+
+
+        <div class="peak-safety-image"></div>
+
+
+        <div class="peak-safety-content">
+
+            <div class="peak-safety-inner">
+
+
+                <div class="peak-kicker">
+                    Mountain First
+                </div>
+
+
+                <h2>
+
+                    Confidence comes
+                    from <span>preparation.</span>
+
+                </h2>
+
+
+                <p class="peak-safety-copy">
+
+                    High-altitude climbing asks for patience,
+                    preparation and respect. Good expedition
+                    planning means knowing when to push,
+                    when to pause and when the mountain
+                    has the final word.
+
+                </p>
+
+
+                <div class="peak-safety-list">
+
+
+                    <div class="peak-safety-item">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6">
+
+                            <path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4Z"/>
+
+                            <path d="m8.5 12 2.2 2.2 4.8-5"/>
+
+                        </svg>
+
+
+                        <div>
+
+                            <strong>
+                                Local Mountain Leadership
+                            </strong>
+
+                            <span>
+                                Guidance grounded in Nepal's
+                                mountain experience.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="peak-safety-item">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6">
+
+                            <circle cx="12" cy="12" r="9"/>
+
+                            <path d="M12 7v5l3 2"/>
+
+                        </svg>
+
+
+                        <div>
+
+                            <strong>
+                                Acclimatisation
+                            </strong>
+
+                            <span>
+                                Gradual altitude gain built
+                                into the journey.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="peak-safety-item">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6">
+
+                            <path d="M5 12h14"/>
+
+                            <path d="m13 6 6 6-6 6"/>
+
+                        </svg>
+
+
+                        <div>
+
+                            <strong>
+                                Flexible Decisions
+                            </strong>
+
+                            <span>
+                                Conditions come before
+                                the itinerary.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="peak-safety-item">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6">
+
+                            <path d="M12 3 4 6v6c0 5 3 8 8 10 4-2 8-5 8-10V6z"/>
+
+                        </svg>
+
+
+                        <div>
+
+                            <strong>
+                                Expedition Support
+                            </strong>
+
+                            <span>
+                                Coordination for permits,
+                                logistics and planning.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     HUMAN NEPAL STORY
+===================================================== -->
+
+<section class="peak-human">
+
+    <div class="peak-container">
+
+        <div class="peak-human-grid">
+
+
+            <div class="peak-human-image">
+
+
+                <img
+                    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Mera_Base_Camp.jpg"
+                    alt="Mera Base Camp in Nepal Himalaya"
+                    loading="lazy"
+                >
+
+
+                <div class="peak-human-caption">
+
+                    Mera Base Camp · Nepal Himalaya
+
+                </div>
+
+
+            </div>
+
+
+            <div class="peak-human-content">
+
+
+                <div class="peak-kicker">
+                    More Than The Summit
+                </div>
+
+
+                <h2>
+
+                    Come for the mountain.
+                    <br>
+
+                    <em>
+                        Remember the people.
+                    </em>
+
+                </h2>
+
+
+                <p>
+
+                    A Nepal climbing expedition is also a journey
+                    through mountain communities. Along the way
+                    there are villages, teahouses, prayer flags,
+                    Sherpa traditions and the people whose lives
+                    are deeply connected to these valleys.
+
+                </p>
+
+
+                <p>
+
+                    That human side of the Himalaya is often what
+                    stays with travellers longest. The summit may
+                    be one extraordinary morning. The journey
+                    becomes a story you carry home.
+
+                </p>
+
+
+                <div class="peak-human-quote">
+
+                    "The summit is the moment.
+                    The journey is the memory."
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     FINAL CTA
+===================================================== -->
+
+<section class="peak-final">
+
+    <div class="peak-container">
+
+        <div class="peak-final-inner">
+
+
+            <div class="peak-kicker">
+                Your Himalayan Chapter
+            </div>
+
+
+            <h2>
+
+                The mountain is waiting.
+
+                <span>
+                    Are you ready?
+                </span>
+
+            </h2>
+
+
+            <p>
+
+                Tell us what you want to climb, when you want
+                to go and the kind of experience you are looking
+                for. We will help shape a Nepal expedition around
+                your ambition and preparation.
+
+            </p>
+
+
+            <div class="peak-final-actions">
+
+
+                <a
+                    href="/all-trips/"
+                    class="peak-btn"
+                >
+
+                    Explore All Peak Expeditions
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2">
+
+                        <path d="M5 12h14M13 6l6 6-6 6"/>
+
+                    </svg>
+
+                </a>
+
+
+                <a
+                    href="/contact-us/"
+                    class="peak-btn peak-btn-outline"
+                >
+
+                    Start Planning
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     IMAGE ATTRIBUTION
+===================================================== -->
+
+<div class="peak-source-note">
+
+    Photography:
+    Island Peak summit photograph by Mountaineer · CC BY 3.0.
+    Mera Peak photograph by Ngtreks · CC BY-SA 4.0.
+    Ama Dablam photograph by KSszilas · CC BY-SA 3.0.
+    Everest photograph by AngeliSherpa · CC BY-SA 4.0.
+
+    <br>
+
+    <a
+        href="https://commons.wikimedia.org/"
+        target="_blank"
+        rel="noopener"
+    >
+        Wikimedia Commons
+    </a>
+
+</div>
+
+
+</section>
