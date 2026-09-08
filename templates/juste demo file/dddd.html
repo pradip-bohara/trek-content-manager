@@ -984,6 +984,7 @@
         overflow-x: hidden;
         overflow-y: visible;
         padding: 80px 0;
+        box-sizing: border-box;
     }
 
     .destinations *,
@@ -993,7 +994,7 @@
     }
 
     .destinations__inner {
-        width: min(1400px, calc(100% - 64px));
+        width: min(1400px);
         margin: 0 auto;
         display: grid;
         grid-template-columns: minmax(300px, 0.42fr) minmax(0, 1fr);
