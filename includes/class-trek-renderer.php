@@ -79,7 +79,9 @@ class Trek_Renderer {
         }
 
         $diff_terms = get_the_terms( $post_id, 'trek_difficulty' );
-        $difficulty = ( ! empty( $diff_terms ) && ! is_wp_error( $diff_terms ) ) ? $diff_terms[0]->name : 'Moderate to Demanding';
+        $diff_meta  = get_post_meta( $post_id, '_trek_difficulty', true );
+        $difficulty = ( ! empty( $diff_terms ) && ! is_wp_error( $diff_terms ) ) ? $diff_terms[0]->name : ( ! empty( $diff_meta ) ? $diff_meta : 'Moderate to Demanding' );
+        $diff_slug  = ( ! empty( $diff_terms ) && ! is_wp_error( $diff_terms ) ) ? $diff_terms[0]->slug : sanitize_title( $difficulty );
 
         $primary_cat_slug = get_post_meta( $post_id, '_trek_primary_category', true );
         $primary_cat_name = '';
@@ -92,6 +94,10 @@ class Trek_Renderer {
         if ( empty( $primary_cat_name ) && ! empty( $categories ) ) {
             $primary_cat_name = $categories[0];
         }
+
+        // Map region and district select fields
+        $map_region   = get_post_meta( $post_id, '_trek_map_region', true ) ?: '';
+        $map_district = get_post_meta( $post_id, '_trek_map_district', true ) ?: '';
 
         // 3. Hero & Card Meta Fields
         $script_title     = get_post_meta( $post_id, '_trek_script_title', true ) ?: $title;
@@ -118,6 +124,8 @@ class Trek_Renderer {
         $fact_trekking    = get_post_meta( $post_id, '_trek_fact_trekking', true ) ?: 'Usually 5–6 hours daily';
         $fact_accom       = get_post_meta( $post_id, '_trek_fact_accom', true ) ?: 'Hotel & local mountain lodges';
         $fact_style       = get_post_meta( $post_id, '_trek_fact_style', true ) ?: 'Privately Guided High-Altitude Trek';
+        $fact_season      = 'Autumn (Sep–Nov) & Spring (Mar–May)';
+        $fact_group_size  = '2–12 Travellers';
 
         // Stored structured quick facts if present
         $stored_facts     = get_post_meta( $post_id, '_trek_quick_facts', true );
@@ -127,6 +135,8 @@ class Trek_Renderer {
             $fact_trekking   = ! empty( $stored_facts['daily_walking'] ) ? $stored_facts['daily_walking'] : $fact_trekking;
             $fact_accom      = ! empty( $stored_facts['accommodation'] ) ? $stored_facts['accommodation'] : $fact_accom;
             $fact_style      = ! empty( $stored_facts['style'] ) ? $stored_facts['style'] : $fact_style;
+            $fact_season     = ! empty( $stored_facts['season'] ) ? $stored_facts['season'] : $fact_season;
+            $fact_group_size = ! empty( $stored_facts['group_size'] ) ? $stored_facts['group_size'] : $fact_group_size;
         }
 
         // 5. Overview Narrative, Highlights & Route Map
@@ -346,7 +356,11 @@ class Trek_Renderer {
         $review_heading      = get_post_meta( $post_id, '_trek_review_heading', true ) ?: 'Words from Fellow Adventurers';
         $review_subtext      = get_post_meta( $post_id, '_trek_review_subtext', true ) ?: 'Real feedback from travelers who have explored the Himalayas with Yeti Adventure.';
 
-        $curated_reviews = get_post_meta( $post_id, '_trek_reviews_list', true );
+        // Support both _trek_curated_reviews (CPT save) and _trek_reviews_list (importer/legacy)
+        $curated_reviews = get_post_meta( $post_id, '_trek_curated_reviews', true );
+        if ( empty( $curated_reviews ) || ! is_array( $curated_reviews ) ) {
+            $curated_reviews = get_post_meta( $post_id, '_trek_reviews_list', true );
+        }
         $all_reviews = array();
 
         // 11b. Also query approved reviews from database (`trek_review` post type)
@@ -439,20 +453,29 @@ class Trek_Renderer {
         // 13. Pricing / Offers
         $price               = get_post_meta( $post_id, '_trek_price', true ) ?: get_post_meta( $post_id, '_trek_cost', true );
         $currency            = get_post_meta( $post_id, '_trek_currency', true ) ?: 'USD';
+        $numeric_price       = ! empty( $price ) ? floatval( preg_replace( '/[^0-9.]/', '', $price ) ) : 0;
+        $formatted_price     = $numeric_price > 0 ? ( $currency . ' ' . number_format( $numeric_price ) ) : '';
+
+        // Parsed duration days integer
+        $days_num = intval( preg_replace( '/[^0-9]/', '', $hero_days ) ) ?: 15;
 
         return array(
-            'id'             => $post_id,
-            'title'          => $title,
-            'permalink'      => $permalink,
-            'slug'           => $post->post_name,
-            'categories'     => $categories,
-            'category_slugs' => $category_slugs,
-            'primary_category'=> $primary_cat_name,
-            'regions'        => $regions,
-            'region_slugs'   => $region_slugs,
+            'id'               => $post_id,
+            'title'            => $title,
+            'permalink'        => $permalink,
+            'slug'             => $post->post_name,
+            'categories'       => $categories,
+            'category_slugs'   => $category_slugs,
+            'primary_category' => $primary_cat_name,
+            'primary_category_slug' => $primary_cat_slug,
+            'regions'          => $regions,
+            'region_slugs'     => $region_slugs,
             'breadcrumb_region'=> $breadcrumb_reg,
-            'difficulty'     => $difficulty,
-            'featured'       => $is_featured,
+            'difficulty'       => $difficulty,
+            'difficulty_slug'  => $diff_slug,
+            'map_region'       => $map_region,
+            'map_district'     => $map_district,
+            'featured'         => $is_featured,
             
             // Hero section
             'hero' => array(
@@ -483,6 +506,8 @@ class Trek_Renderer {
                 'trekking'     => $fact_trekking,
                 'accom'        => $fact_accom,
                 'style'        => $fact_style,
+                'season'       => $fact_season,
+                'group_size'   => $fact_group_size,
             ),
 
             // Overview & Route
@@ -587,8 +612,33 @@ class Trek_Renderer {
             // Pricing
             'pricing' => array(
                 'price'        => $price,
+                'numeric_price'=> $numeric_price,
                 'currency'     => $currency,
+                'formatted'    => $formatted_price,
             ),
+
+            // Client Engine / JS Canonical Aliases
+            'keyFacts' => array(
+                'duration'     => $days_num,
+                'highestPoint' => $fact_high_point,
+                'region'       => $fact_region,
+                'destination'  => $fact_region,
+                'difficulty'   => $difficulty,
+                'accommodation'=> $fact_accom,
+                'dailyWalking' => $fact_trekking,
+                'tripStyle'    => $fact_style,
+                'bestSeason'   => $fact_season,
+                'groupSize'    => $fact_group_size,
+            ),
+            'geography' => array(
+                'country'      => $breadcrumb_reg,
+                'region'       => ! empty( $regions ) ? $regions[0] : $breadcrumb_reg,
+                'mapRegion'    => $map_region,
+                'mapDistrict'  => $map_district,
+            ),
+            'included' => $inclusions_full,
+            'excluded' => $exclusions_full,
+            'reviews'  => $all_reviews,
         );
     }
 
@@ -832,6 +882,7 @@ class Trek_Renderer {
         <?php endif; ?>
 
         <!-- SEO Meta Keywords & Location -->
+        <link rel="canonical" href="<?php echo esc_url( $permalink ); ?>">
         <meta name="keywords" content="<?php echo esc_attr( $title . ', ' . $category . ', ' . $region . ' trek, Himalayan adventure, Yeti Adventure' ); ?>">
         <meta name="geo.region" content="<?php echo esc_attr( $region ); ?>">
         <?php

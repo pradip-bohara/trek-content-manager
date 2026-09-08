@@ -836,6 +836,17 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_tag_label', $tag_val );
             }
 
+            if ( ! empty( $item['primary_category'] ) ) {
+                update_post_meta( $post_id, '_trek_primary_category', sanitize_text_field( $item['primary_category'] ) );
+            }
+
+            if ( ! empty( $item['map_region'] ) ) {
+                update_post_meta( $post_id, '_trek_map_region', sanitize_text_field( $item['map_region'] ) );
+            }
+            if ( ! empty( $item['map_district'] ) ) {
+                update_post_meta( $post_id, '_trek_map_district', sanitize_text_field( $item['map_district'] ) );
+            }
+
             if ( ! empty( $item['region'] ) || ! empty( $item['country'] ) ) {
                 $country_str = is_array( $item['region'] ?? $item['country'] ) ? implode( ', ', $item['region'] ?? $item['country'] ) : ( $item['region'] ?? $item['country'] );
                 update_post_meta( $post_id, '_trek_breadcrumb_region', sanitize_text_field( $country_str ) );
@@ -846,19 +857,64 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_is_featured', $is_feat );
             }
 
-            // 4. Quick Facts
-            if ( ! empty( $item['quick_facts'] ) && is_array( $item['quick_facts'] ) ) {
-                $facts = array(
-                    'max_altitude'  => sanitize_text_field( $item['quick_facts']['max_altitude'] ?? $item['quick_facts']['high_point'] ?? '' ),
-                    'destination'   => sanitize_text_field( $item['quick_facts']['destination'] ?? $item['quick_facts']['location'] ?? '' ),
-                    'daily_walking' => sanitize_text_field( $item['quick_facts']['daily_walking'] ?? $item['quick_facts']['walking_hours'] ?? '' ),
-                    'accommodation' => sanitize_text_field( $item['quick_facts']['accommodation'] ?? $item['quick_facts']['stay'] ?? '' ),
-                    'style'         => sanitize_text_field( $item['quick_facts']['style'] ?? $item['quick_facts']['travel_style'] ?? '' ),
-                    'season'        => sanitize_text_field( $item['quick_facts']['season'] ?? $item['quick_facts']['best_season'] ?? '' ),
-                    'group_size'    => sanitize_text_field( $item['quick_facts']['group_size'] ?? '' ),
-                );
-                update_post_meta( $post_id, '_trek_quick_facts', $facts );
+            // Difficulty & Taxonomy Term
+            $difficulty = ! empty( $item['difficulty'] ) ? sanitize_text_field( $item['difficulty'] ) : ( ! empty( $item['quick_facts']['difficulty'] ) ? sanitize_text_field( $item['quick_facts']['difficulty'] ) : '' );
+            if ( ! empty( $difficulty ) ) {
+                update_post_meta( $post_id, '_trek_difficulty', $difficulty );
+                $diff_term = term_exists( $difficulty, 'trek_difficulty' );
+                if ( ! $diff_term && $create_terms ) {
+                    $diff_term = wp_insert_term( $difficulty, 'trek_difficulty' );
+                }
+                if ( ! is_wp_error( $diff_term ) && ! empty( $diff_term['term_id'] ) ) {
+                    wp_set_object_terms( $post_id, array( (int) $diff_term['term_id'] ), 'trek_difficulty' );
+                } else {
+                    wp_set_object_terms( $post_id, array( $difficulty ), 'trek_difficulty' );
+                }
             }
+
+            // Pricing & Currency
+            $price = ! empty( $item['price'] ) ? sanitize_text_field( $item['price'] ) : ( ! empty( $item['quick_facts']['price'] ) ? sanitize_text_field( $item['quick_facts']['price'] ) : '' );
+            if ( ! empty( $price ) ) {
+                update_post_meta( $post_id, '_trek_price', $price );
+            }
+            $currency = ! empty( $item['currency'] ) ? sanitize_text_field( $item['currency'] ) : ( ! empty( $item['quick_facts']['currency'] ) ? sanitize_text_field( $item['quick_facts']['currency'] ) : 'USD' );
+            update_post_meta( $post_id, '_trek_currency', $currency );
+
+            // 4. Quick Facts
+            $high_pt = sanitize_text_field( $item['quick_facts']['max_altitude'] ?? $item['quick_facts']['high_point'] ?? '' );
+            $dest    = sanitize_text_field( $item['quick_facts']['destination'] ?? $item['quick_facts']['location'] ?? '' );
+            $walk    = sanitize_text_field( $item['quick_facts']['daily_walking'] ?? $item['quick_facts']['walking_hours'] ?? '' );
+            $accom   = sanitize_text_field( $item['quick_facts']['accommodation'] ?? $item['quick_facts']['stay'] ?? '' );
+            $style   = sanitize_text_field( $item['quick_facts']['style'] ?? $item['quick_facts']['travel_style'] ?? '' );
+            $season  = sanitize_text_field( $item['quick_facts']['season'] ?? $item['quick_facts']['best_season'] ?? '' );
+            $group   = sanitize_text_field( $item['quick_facts']['group_size'] ?? '' );
+
+            $facts = array(
+                'max_altitude'  => $high_pt,
+                'high_point'    => $high_pt,
+                'destination'   => $dest,
+                'region'        => $dest,
+                'duration'      => $days_clean,
+                'daily_walking' => $walk,
+                'trekking'      => $walk,
+                'accommodation' => $accom,
+                'accom'         => $accom,
+                'style'         => $style,
+                'season'        => $season,
+                'group_size'    => $group,
+                'difficulty'    => $difficulty,
+                'price'         => $price,
+                'currency'      => $currency,
+            );
+            update_post_meta( $post_id, '_trek_quick_facts', $facts );
+
+            if ( ! empty( $high_pt ) ) update_post_meta( $post_id, '_trek_fact_high_point', $high_pt );
+            if ( ! empty( $dest ) )    update_post_meta( $post_id, '_trek_fact_region', $dest );
+            if ( ! empty( $walk ) )    update_post_meta( $post_id, '_trek_fact_trekking', $walk );
+            if ( ! empty( $accom ) )   update_post_meta( $post_id, '_trek_fact_accom', $accom );
+            if ( ! empty( $style ) )   update_post_meta( $post_id, '_trek_fact_style', $style );
+            if ( ! empty( $season ) )  update_post_meta( $post_id, '_trek_fact_season', $season );
+            if ( ! empty( $group ) )   update_post_meta( $post_id, '_trek_fact_group_size', $group );
 
             // 5. Highlights Array
             if ( ! empty( $item['highlights'] ) && is_array( $item['highlights'] ) ) {
@@ -866,56 +922,120 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_highlights', $clean_hl );
             }
 
-            // 6. Day-by-Day Itinerary Array
+            // 6. Day-by-Day Itinerary Array (Sync dual keys: _trek_itinerary & _trek_itinerary_list)
             if ( ! empty( $item['itinerary'] ) && is_array( $item['itinerary'] ) ) {
                 $clean_itin = array();
+                $clean_itin_list = array();
+                $idx = 1;
                 foreach ( $item['itinerary'] as $day_data ) {
                     if ( ! is_array( $day_data ) ) continue;
+                    $d_num   = sanitize_text_field( $day_data['day'] ?? sprintf( '%02d', $idx ) );
+                    $d_title = sanitize_text_field( $day_data['title'] ?? '' );
+                    $d_stage = sanitize_text_field( $day_data['stage'] ?? $d_title );
+                    $d_desc  = wp_kses_post( $day_data['description'] ?? $day_data['desc'] ?? '' );
+                    $d_pills = sanitize_text_field( $day_data['pills'] ?? ( ! empty( $day_data['altitude'] ) ? $day_data['altitude'] : '' ) );
+
                     $clean_itin[] = array(
-                        'day'           => sanitize_text_field( $day_data['day'] ?? '' ),
-                        'title'         => sanitize_text_field( $day_data['title'] ?? '' ),
-                        'description'   => wp_kses_post( $day_data['description'] ?? '' ),
+                        'day'           => $d_num,
+                        'title'         => $d_title,
+                        'description'   => $d_desc,
                         'altitude'      => sanitize_text_field( $day_data['altitude'] ?? '' ),
                         'walking_hours' => sanitize_text_field( $day_data['walking_hours'] ?? '' ),
                         'stay'          => sanitize_text_field( $day_data['stay'] ?? $day_data['accommodation'] ?? '' ),
                         'meals'         => sanitize_text_field( $day_data['meals'] ?? '' ),
                     );
+
+                    $clean_itin_list[] = array(
+                        'day'   => $d_num,
+                        'stage' => $d_stage,
+                        'title' => $d_title,
+                        'pills' => $d_pills,
+                        'desc'  => $d_desc,
+                    );
+                    $idx++;
                 }
                 update_post_meta( $post_id, '_trek_itinerary', $clean_itin );
+                update_post_meta( $post_id, '_trek_itinerary_list', $clean_itin_list );
             }
 
-            // 7. Inclusions & Exclusions
+            // 7. Inclusions & Exclusions (Sync dual keys: _trek_inclusions & _trek_inclusions_full)
             if ( ! empty( $item['inclusions'] ) && is_array( $item['inclusions'] ) ) {
-                update_post_meta( $post_id, '_trek_inclusions', array_map( 'sanitize_text_field', $item['inclusions'] ) );
+                $clean_inc = array_map( 'sanitize_text_field', $item['inclusions'] );
+                update_post_meta( $post_id, '_trek_inclusions', $clean_inc );
+                update_post_meta( $post_id, '_trek_inclusions_full', $clean_inc );
             }
             if ( ! empty( $item['exclusions'] ) && is_array( $item['exclusions'] ) ) {
-                update_post_meta( $post_id, '_trek_exclusions', array_map( 'sanitize_text_field', $item['exclusions'] ) );
+                $clean_exc = array_map( 'sanitize_text_field', $item['exclusions'] );
+                update_post_meta( $post_id, '_trek_exclusions', $clean_exc );
+                update_post_meta( $post_id, '_trek_exclusions_full', $clean_exc );
             }
 
-            // 8. Gallery Images
+            // 8. Gallery Images (Sync dual keys: _trek_gallery_images & _trek_gallery_list)
             if ( ! empty( $item['gallery'] ) && is_array( $item['gallery'] ) ) {
                 $clean_gal = array();
+                $clean_gal_list = array();
                 foreach ( $item['gallery'] as $g_item ) {
                     $url = is_array( $g_item ) ? ( $g_item['url'] ?? '' ) : $g_item;
+                    $lbl = is_array( $g_item ) ? ( $g_item['label'] ?? $g_item['caption'] ?? '' ) : '';
                     if ( ! empty( $url ) ) {
                         $clean_gal[] = esc_url_raw( $url );
+                        $clean_gal_list[] = array(
+                            'url'   => esc_url_raw( $url ),
+                            'label' => sanitize_text_field( $lbl ),
+                        );
                     }
                 }
                 update_post_meta( $post_id, '_trek_gallery_images', $clean_gal );
+                update_post_meta( $post_id, '_trek_gallery_list', $clean_gal_list );
             }
 
-            // 9. FAQs
+            // 9. FAQs (Sync dual keys: _trek_faqs & _trek_essential_list)
             if ( ! empty( $item['faqs'] ) && is_array( $item['faqs'] ) ) {
                 $clean_faqs = array();
+                $clean_ess = array();
                 foreach ( $item['faqs'] as $faq ) {
                     if ( is_array( $faq ) && ! empty( $faq['question'] ) ) {
+                        $q = sanitize_text_field( $faq['question'] );
+                        $a = wp_kses_post( $faq['answer'] ?? '' );
                         $clean_faqs[] = array(
-                            'question' => sanitize_text_field( $faq['question'] ),
-                            'answer'   => wp_kses_post( $faq['answer'] ?? '' ),
+                            'question' => $q,
+                            'answer'   => $a,
+                        );
+                        $clean_ess[] = array(
+                            'title'   => $q,
+                            'content' => $a,
                         );
                     }
                 }
                 update_post_meta( $post_id, '_trek_faqs', $clean_faqs );
+                update_post_meta( $post_id, '_trek_essential_list', $clean_ess );
+            }
+
+            // 10. Curated Reviews (Sync dual keys: _trek_curated_reviews & _trek_reviews_list)
+            if ( ! empty( $item['reviews'] ) && is_array( $item['reviews'] ) ) {
+                $clean_revs = array();
+                foreach ( $item['reviews'] as $rev ) {
+                    if ( is_array( $rev ) ) {
+                        $clean_revs[] = array(
+                            'name'     => sanitize_text_field( $rev['name'] ?? 'Traveler' ),
+                            'location' => sanitize_text_field( $rev['location'] ?? $rev['country'] ?? '' ),
+                            'rating'   => sanitize_text_field( $rev['rating'] ?? '5' ),
+                            'quote'    => sanitize_textarea_field( $rev['quote'] ?? $rev['review'] ?? $rev['content'] ?? '' ),
+                        );
+                    }
+                }
+                if ( ! empty( $clean_revs ) ) {
+                    update_post_meta( $post_id, '_trek_curated_reviews', $clean_revs );
+                    update_post_meta( $post_id, '_trek_reviews_list', $clean_revs );
+                }
+            }
+
+            // 11. Compile & Save Master JSON Payload (_trek_structured_data)
+            if ( class_exists( 'Trek_Renderer' ) ) {
+                $full_data = Trek_Renderer::get_full_trek_data( $post_id );
+                if ( ! empty( $full_data ) ) {
+                    update_post_meta( $post_id, '_trek_structured_data', wp_slash( wp_json_encode( $full_data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) ) );
+                }
             }
         }
 
@@ -938,8 +1058,14 @@ class Trek_Importer {
                 "slug" => "everest-basecamp-trek",
                 "excerpt" => "Journey through Sherpa country, high mountain villages and the dramatic Khumbu landscape to the foot of Everest.",
                 "days" => 15,
+                "difficulty" => "Strenuous",
+                "price" => "2,850",
+                "currency" => "USD",
                 "category" => array("Trekking", "Himalayan"),
+                "primary_category" => "Trekking",
                 "region" => "Nepal",
+                "map_region" => "Khumbu",
+                "map_district" => "Solukhumbu",
                 "tag" => "Trekking · Everest",
                 "featured" => true,
                 "hero_image" => "https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/AERIAL-VIEW-OF-THE-EVEREST-BASE-CAMP.jpg",
@@ -952,13 +1078,24 @@ class Trek_Importer {
                     "accommodation" => "Comfortable Mountain Lodges & Teahouses",
                     "style" => "Privately Guided High-Altitude Trek",
                     "season" => "March to May & September to December",
-                    "group_size" => "2 - 12 Travelers"
+                    "group_size" => "2 - 12 Travelers",
+                    "difficulty" => "Strenuous",
+                    "price" => "2,850",
+                    "currency" => "USD"
                 ),
                 "highlights" => array(
                     "Stand at Everest Base Camp (5,364m) and the foot of the Khumbu Icefall",
                     "Sunrise panoramic views from Kala Patthar (5,545m)",
                     "Explore ancient monasteries in Tengboche and Khumjung",
                     "Walk through legendary Sherpa capitals Namche Bazaar and Dingboche"
+                ),
+                "reviews" => array(
+                    array(
+                        "name" => "Sarah Jenkins",
+                        "location" => "United Kingdom",
+                        "rating" => "5",
+                        "quote" => "An unforgettable, life-changing trek to Everest Base Camp. The guides and Sherpa team were exceptional."
+                    )
                 ),
                 "itinerary" => array(
                     array(

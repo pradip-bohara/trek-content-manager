@@ -356,6 +356,16 @@ class Trek_CPT {
             'high'
         );
 
+        // 11. Structured JSON Payload & API Data
+        add_meta_box(
+            'ya_trek_json_metabox',
+            __( '📦 11. Structured JSON Payload & REST API Data', 'trek-content-manager' ),
+            array( __CLASS__, 'render_json_metabox' ),
+            'trek_destination',
+            'normal',
+            'low'
+        );
+
         // Review Details Metabox for `trek_review` post type
         add_meta_box(
             'ya_trek_review_detail_metabox',
@@ -456,6 +466,12 @@ class Trek_CPT {
         $map_region     = get_post_meta( $post->ID, '_trek_map_region', true );
         $map_district   = get_post_meta( $post->ID, '_trek_map_district', true );
 
+        $current_diff   = get_post_meta( $post->ID, '_trek_difficulty', true );
+        $diff_terms     = wp_get_post_terms( $post->ID, 'trek_difficulty', array( 'fields' => 'names' ) );
+        if ( empty( $current_diff ) && ! empty( $diff_terms ) && ! is_wp_error( $diff_terms ) ) {
+            $current_diff = $diff_terms[0];
+        }
+
         // Retrieve taxonomies (Categories and Regions)
         $categories = get_terms( array(
             'taxonomy'   => 'trek_category',
@@ -540,8 +556,8 @@ class Trek_CPT {
                 </div>
             </div>
 
-            <!-- Row 2b: Primary Category & Custom Card Tag for Clean Home/Listing Display -->
-            <div class="ya-admin-row ya-admin-row--4" style="margin-top:10px; background:#f4f7f6; padding:12px; border-radius:6px; border:1px solid #d8e6e3;">
+            <!-- Row 2b: Taxonomies, Difficulty & Interactive Map Settings -->
+            <div class="ya-admin-row" style="margin-top:10px; background:#f4f7f6; padding:14px; border-radius:6px; border:1px solid #d8e6e3; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                 <div class="ya-admin-field">
                     <label for="trek_primary_category" style="font-weight:700; color:#022f2e; display:block; margin-bottom:5px;">
                         <?php esc_html_e( '⭐ Primary Category', 'trek-content-manager' ); ?>
@@ -555,6 +571,21 @@ class Trek_CPT {
                                 </option>
                             <?php endforeach; ?>
                         <?php endif; ?>
+                    </select>
+                </div>
+
+                <div class="ya-admin-field">
+                    <label for="trek_difficulty" style="font-weight:700; color:#022f2e; display:block; margin-bottom:5px;">
+                        <?php esc_html_e( '⚡ Trek Difficulty', 'trek-content-manager' ); ?>
+                    </label>
+                    <select name="trek_difficulty" id="trek_difficulty" style="width:100%; max-width:100%;">
+                        <option value=""><?php esc_html_e( '— Select Difficulty —', 'trek-content-manager' ); ?></option>
+                        <option value="Easy" <?php selected( $current_diff, 'Easy' ); ?>>Easy (Gentle trails & low elevation)</option>
+                        <option value="Moderate" <?php selected( $current_diff, 'Moderate' ); ?>>Moderate (Standard mountain walking)</option>
+                        <option value="Demanding" <?php selected( $current_diff, 'Demanding' ); ?>>Demanding (High passes & altitude)</option>
+                        <option value="Strenuous" <?php selected( $current_diff, 'Strenuous' ); ?>>Strenuous (Long days, rough terrain)</option>
+                        <option value="Challenging" <?php selected( $current_diff, 'Challenging' ); ?>>Challenging (Remote wilderness & high altitude)</option>
+                        <option value="Technical" <?php selected( $current_diff, 'Technical' ); ?>>Technical (Glacial travel & equipment)</option>
                     </select>
                 </div>
 
@@ -617,7 +648,7 @@ class Trek_CPT {
                         ?>
                     </select>
                     <span class="description" style="font-size:11px; color:#556c6a; display:block; margin-top:4px;">
-                        <?php esc_html_e( 'Places the destination point and label on this exact Nepal district.', 'trek-content-manager' ); ?>
+                        <?php esc_html_e( 'Places the destination point on this exact district.', 'trek-content-manager' ); ?>
                     </span>
                 </div>
             </div>
@@ -710,14 +741,19 @@ class Trek_CPT {
         $fact_trekking   = get_post_meta( $post->ID, '_trek_fact_trekking', true );
         $fact_accom      = get_post_meta( $post->ID, '_trek_fact_accom', true );
         $fact_style      = get_post_meta( $post->ID, '_trek_fact_style', true );
+        $fact_season     = get_post_meta( $post->ID, '_trek_fact_season', true ) ?: 'Autumn (Sep–Nov) & Spring (Mar–May)';
+        $fact_group_size = get_post_meta( $post->ID, '_trek_fact_group_size', true ) ?: '2–12 Travellers';
+        
+        $price           = get_post_meta( $post->ID, '_trek_price', true ) ?: get_post_meta( $post->ID, '_trek_cost', true );
+        $currency        = get_post_meta( $post->ID, '_trek_currency', true ) ?: 'USD';
         ?>
         <div class="ya-admin-row ya-admin-row--3">
             <div class="ya-admin-field">
-                <label><?php esc_html_e( '1. Highest Point', 'trek-content-manager' ); ?></label>
+                <label><?php esc_html_e( '1. Highest Point / Altitude', 'trek-content-manager' ); ?></label>
                 <input type="text" name="trek_fact_high_point" value="<?php echo esc_attr( $fact_high_point ); ?>" placeholder="5,550m · Kala Patthar">
             </div>
             <div class="ya-admin-field">
-                <label><?php esc_html_e( '2. Destination / Region', 'trek-content-manager' ); ?></label>
+                <label><?php esc_html_e( '2. Destination / Region Fact', 'trek-content-manager' ); ?></label>
                 <input type="text" name="trek_fact_region" value="<?php echo esc_attr( $fact_region ); ?>" placeholder="Everest Base Camp">
             </div>
             <div class="ya-admin-field">
@@ -725,7 +761,7 @@ class Trek_CPT {
                 <input type="text" name="trek_fact_trekking" value="<?php echo esc_attr( $fact_trekking ); ?>" placeholder="Usually 5–6 hours">
             </div>
         </div>
-        <div class="ya-admin-row">
+        <div class="ya-admin-row ya-admin-row--4">
             <div class="ya-admin-field">
                 <label><?php esc_html_e( '4. Accommodation Style', 'trek-content-manager' ); ?></label>
                 <input type="text" name="trek_fact_accom" value="<?php echo esc_attr( $fact_accom ); ?>" placeholder="Hotel & local lodges">
@@ -733,6 +769,34 @@ class Trek_CPT {
             <div class="ya-admin-field">
                 <label><?php esc_html_e( '5. Trip Style Fact', 'trek-content-manager' ); ?></label>
                 <input type="text" name="trek_fact_style" value="<?php echo esc_attr( $fact_style ); ?>" placeholder="High-altitude trek">
+            </div>
+            <div class="ya-admin-field">
+                <label><?php esc_html_e( '6. Best Season', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_fact_season" value="<?php echo esc_attr( $fact_season ); ?>" placeholder="Mar–May & Sep–Nov">
+            </div>
+            <div class="ya-admin-field">
+                <label><?php esc_html_e( '7. Group Size', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_fact_group_size" value="<?php echo esc_attr( $fact_group_size ); ?>" placeholder="2–12 Travellers">
+            </div>
+        </div>
+
+        <!-- Pricing & Commercial Details -->
+        <div class="ya-admin-row" style="margin-top:12px; background:#f0fdf4; border:1px solid #bbf7d0; padding:14px; border-radius:6px;">
+            <div class="ya-admin-field">
+                <label style="font-weight:700; color:#166534;"><?php esc_html_e( '💵 Starting Price / Person (Numeric)', 'trek-content-manager' ); ?></label>
+                <input type="number" step="any" name="trek_price" value="<?php echo esc_attr( $price ); ?>" placeholder="e.g. 2450">
+                <span class="description" style="font-size:11px; color:#15803d;"><?php esc_html_e( 'Used in Schema.org Product Offer & booking quotes.', 'trek-content-manager' ); ?></span>
+            </div>
+            <div class="ya-admin-field">
+                <label style="font-weight:700; color:#166534;"><?php esc_html_e( '💱 Currency Code', 'trek-content-manager' ); ?></label>
+                <select name="trek_currency" style="width:100%;">
+                    <option value="USD" <?php selected( $currency, 'USD' ); ?>>USD ($ - United States Dollar)</option>
+                    <option value="EUR" <?php selected( $currency, 'EUR' ); ?>>EUR (€ - Euro)</option>
+                    <option value="GBP" <?php selected( $currency, 'GBP' ); ?>>GBP (£ - British Pound)</option>
+                    <option value="AUD" <?php selected( $currency, 'AUD' ); ?>>AUD ($ - Australian Dollar)</option>
+                    <option value="CAD" <?php selected( $currency, 'CAD' ); ?>>CAD ($ - Canadian Dollar)</option>
+                    <option value="NPR" <?php selected( $currency, 'NPR' ); ?>>NPR (Rs - Nepalese Rupee)</option>
+                </select>
             </div>
         </div>
         <?php
@@ -1588,6 +1652,70 @@ class Trek_CPT {
     }
 
     /**
+     * 11. Structured JSON Payload & REST API Data Metabox
+     */
+    public static function render_json_metabox( $post ) {
+        $structured_data = get_post_meta( $post->ID, '_trek_structured_data', true );
+        if ( empty( $structured_data ) && class_exists( 'Trek_Renderer' ) ) {
+            $data_array = Trek_Renderer::get_full_trek_data( $post->ID );
+            $structured_data = wp_json_encode( $data_array, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        }
+        $rest_url = rest_url( 'trek-manager/v1/destinations/' . $post->ID );
+        ?>
+        <div class="ya-admin-box" style="background:#0f172a; color:#e2e8f0; border:1px solid #1e293b; border-radius:8px; padding:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <strong style="color:#38bdf8; font-size:14px;">⚡ Live Canonical JSON Payload (Synced with Database & REST API)</strong>
+                    <p style="margin:4px 0 0 0; color:#94a3b8; font-size:12px;">
+                        REST API Endpoint: <a href="<?php echo esc_url( $rest_url ); ?>" target="_blank" style="color:#7dd3fc; text-decoration:underline;"><?php echo esc_html( $rest_url ); ?></a>
+                    </p>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button type="button" class="button" id="ya-copy-cpt-json" style="background:#334155; color:#fff; border-color:#475569;">
+                        📋 <?php esc_html_e( 'Copy Full JSON', 'trek-content-manager' ); ?>
+                    </button>
+                    <button type="button" class="button" id="ya-download-cpt-json" style="background:#0284c7; color:#fff; border-color:#0369a1;">
+                        📥 <?php esc_html_e( 'Download .json', 'trek-content-manager' ); ?>
+                    </button>
+                </div>
+            </div>
+            <textarea id="ya_trek_structured_json_field" name="trek_structured_data_preview" readonly style="width:100%; height:260px; background:#090d16; color:#a5f3fc; font-family:Consolas,Monaco,monospace; font-size:12px; border:1px solid #334155; border-radius:6px; padding:12px; box-sizing:border-box;"><?php echo esc_textarea( $structured_data ); ?></textarea>
+            <span style="font-size:11px; color:#94a3b8; margin-top:6px; display:block;">
+                <?php esc_html_e( 'This JSON field is automatically updated with all metaboxes, repeaters, media URLs, pricing, and taxonomies whenever this destination is saved.', 'trek-content-manager' ); ?>
+            </span>
+        </div>
+        <script>
+            (function() {
+                const btnCopy = document.getElementById('ya-copy-cpt-json');
+                const btnDl = document.getElementById('ya-download-cpt-json');
+                const textarea = document.getElementById('ya_trek_structured_json_field');
+                if (btnCopy && textarea) {
+                    btnCopy.addEventListener('click', function() {
+                        navigator.clipboard.writeText(textarea.value).then(function() {
+                            btnCopy.textContent = '✔ Copied!';
+                            setTimeout(function() { btnCopy.textContent = '📋 Copy Full JSON'; }, 2000);
+                        });
+                    });
+                }
+                if (btnDl && textarea) {
+                    btnDl.addEventListener('click', function() {
+                        const blob = new Blob([textarea.value], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'trek-destination-' + <?php echo intval( $post->ID ); ?> + '.json';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    });
+                }
+            })();
+        </script>
+        <?php
+    }
+
+    /**
      * Metabox for `trek_review` Post Type (Admin View & Edit Review Submissions)
      */
     public static function render_review_detail_metabox( $post ) {
@@ -1742,10 +1870,15 @@ class Trek_CPT {
             'trek_breadcrumb_region',
             'trek_map_region',
             'trek_map_district',
+            'trek_difficulty',
+            'trek_price',
+            'trek_currency',
             // Note: trek_hero_subtitle is handled separately as textarea below
             'trek_hero_bg_img',
             'trek_fact_high_point',
             'trek_fact_region',
+            'trek_fact_season',
+            'trek_fact_group_size',
             'trek_fact_trekking',
             'trek_fact_accom',
             'trek_fact_style',
@@ -1834,6 +1967,16 @@ class Trek_CPT {
             }
         }
 
+        // Difficulty Taxonomy Term Sync
+        if ( isset( $_POST['trek_difficulty'] ) ) {
+            $diff_val = sanitize_text_field( $_POST['trek_difficulty'] );
+            if ( ! empty( $diff_val ) ) {
+                wp_set_object_terms( $post_id, array( $diff_val ), 'trek_difficulty' );
+            } else {
+                wp_set_object_terms( $post_id, array(), 'trek_difficulty' );
+            }
+        }
+
         // Home featured status checkbox
         $featured_home = isset( $_POST['trek_featured_home'] ) ? '1' : '0';
         update_post_meta( $post_id, '_trek_featured_home', $featured_home );
@@ -1885,7 +2028,7 @@ class Trek_CPT {
             delete_post_meta( $post_id, '_trek_itin_side_points' );
         }
 
-        // 5. Itinerary Repeater
+        // 5. Itinerary Repeater (Sync dual keys: _trek_itinerary_list & _trek_itinerary)
         if ( isset( $_POST['itin_title'] ) && is_array( $_POST['itin_title'] ) ) {
             $itinerary = array();
             $days   = $_POST['itin_day'] ?? array();
@@ -1905,28 +2048,49 @@ class Trek_CPT {
                     );
                 }
             }
-            empty( $itinerary ) ? delete_post_meta( $post_id, '_trek_itinerary_list' ) : update_post_meta( $post_id, '_trek_itinerary_list', $itinerary );
+            if ( empty( $itinerary ) ) {
+                delete_post_meta( $post_id, '_trek_itinerary_list' );
+                delete_post_meta( $post_id, '_trek_itinerary' );
+            } else {
+                update_post_meta( $post_id, '_trek_itinerary_list', $itinerary );
+                update_post_meta( $post_id, '_trek_itinerary', $itinerary );
+            }
         } else {
             delete_post_meta( $post_id, '_trek_itinerary_list' );
+            delete_post_meta( $post_id, '_trek_itinerary' );
         }
 
-        // 6. Full Inclusions & Exclusions
+        // 6. Full Inclusions & Exclusions (Sync dual keys: _trek_inclusions_full & _trek_inclusions)
         if ( isset( $_POST['inc_full_item'] ) && is_array( $_POST['inc_full_item'] ) ) {
             $incs = array_map( 'sanitize_text_field', array_filter( $_POST['inc_full_item'] ) );
             $incs = array_values( $incs );
-            empty( $incs ) ? delete_post_meta( $post_id, '_trek_inclusions_full' ) : update_post_meta( $post_id, '_trek_inclusions_full', $incs );
+            if ( empty( $incs ) ) {
+                delete_post_meta( $post_id, '_trek_inclusions_full' );
+                delete_post_meta( $post_id, '_trek_inclusions' );
+            } else {
+                update_post_meta( $post_id, '_trek_inclusions_full', $incs );
+                update_post_meta( $post_id, '_trek_inclusions', $incs );
+            }
         } else {
             delete_post_meta( $post_id, '_trek_inclusions_full' );
+            delete_post_meta( $post_id, '_trek_inclusions' );
         }
         if ( isset( $_POST['exc_full_item'] ) && is_array( $_POST['exc_full_item'] ) ) {
             $excs = array_map( 'sanitize_text_field', array_filter( $_POST['exc_full_item'] ) );
             $excs = array_values( $excs );
-            empty( $excs ) ? delete_post_meta( $post_id, '_trek_exclusions_full' ) : update_post_meta( $post_id, '_trek_exclusions_full', $excs );
+            if ( empty( $excs ) ) {
+                delete_post_meta( $post_id, '_trek_exclusions_full' );
+                delete_post_meta( $post_id, '_trek_exclusions' );
+            } else {
+                update_post_meta( $post_id, '_trek_exclusions_full', $excs );
+                update_post_meta( $post_id, '_trek_exclusions', $excs );
+            }
         } else {
             delete_post_meta( $post_id, '_trek_exclusions_full' );
+            delete_post_meta( $post_id, '_trek_exclusions' );
         }
 
-        // 7. Gallery Repeater
+        // 7. Gallery Repeater (Sync dual keys: _trek_gallery_list & _trek_gallery_images)
         if ( isset( $_POST['gal_url'] ) && is_array( $_POST['gal_url'] ) ) {
             $gallery = array();
             $urls   = $_POST['gal_url'];
@@ -1940,9 +2104,16 @@ class Trek_CPT {
                     );
                 }
             }
-            empty( $gallery ) ? delete_post_meta( $post_id, '_trek_gallery_list' ) : update_post_meta( $post_id, '_trek_gallery_list', $gallery );
+            if ( empty( $gallery ) ) {
+                delete_post_meta( $post_id, '_trek_gallery_list' );
+                delete_post_meta( $post_id, '_trek_gallery_images' );
+            } else {
+                update_post_meta( $post_id, '_trek_gallery_list', $gallery );
+                update_post_meta( $post_id, '_trek_gallery_images', $gallery );
+            }
         } else {
             delete_post_meta( $post_id, '_trek_gallery_list' );
+            delete_post_meta( $post_id, '_trek_gallery_images' );
         }
 
         // 8. Extensions Repeater
@@ -1966,7 +2137,7 @@ class Trek_CPT {
             delete_post_meta( $post_id, '_trek_extensions_list' );
         }
 
-        // 9. Essential Info Accordions
+        // 9. Essential Info Accordions (Sync dual keys: _trek_essential_list & _trek_faqs)
         if ( isset( $_POST['ess_title'] ) && is_array( $_POST['ess_title'] ) ) {
             $essential = array();
             $titles   = $_POST['ess_title'];
@@ -1980,12 +2151,19 @@ class Trek_CPT {
                     );
                 }
             }
-            empty( $essential ) ? delete_post_meta( $post_id, '_trek_essential_list' ) : update_post_meta( $post_id, '_trek_essential_list', $essential );
+            if ( empty( $essential ) ) {
+                delete_post_meta( $post_id, '_trek_essential_list' );
+                delete_post_meta( $post_id, '_trek_faqs' );
+            } else {
+                update_post_meta( $post_id, '_trek_essential_list', $essential );
+                update_post_meta( $post_id, '_trek_faqs', $essential );
+            }
         } else {
             delete_post_meta( $post_id, '_trek_essential_list' );
+            delete_post_meta( $post_id, '_trek_faqs' );
         }
 
-        // 10. Curated Reviews
+        // 10. Curated Reviews (Sync dual keys: _trek_curated_reviews & _trek_reviews_list)
         if ( isset( $_POST['rev_name'] ) && is_array( $_POST['rev_name'] ) ) {
             $reviews = array();
             $names   = $_POST['rev_name'];
@@ -2003,9 +2181,40 @@ class Trek_CPT {
                     );
                 }
             }
-            empty( $reviews ) ? delete_post_meta( $post_id, '_trek_curated_reviews' ) : update_post_meta( $post_id, '_trek_curated_reviews', $reviews );
+            if ( empty( $reviews ) ) {
+                delete_post_meta( $post_id, '_trek_curated_reviews' );
+                delete_post_meta( $post_id, '_trek_reviews_list' );
+            } else {
+                update_post_meta( $post_id, '_trek_curated_reviews', $reviews );
+                update_post_meta( $post_id, '_trek_reviews_list', $reviews );
+            }
         } else {
             delete_post_meta( $post_id, '_trek_curated_reviews' );
+            delete_post_meta( $post_id, '_trek_reviews_list' );
+        }
+
+        // 11. Sync Quick Facts Array (_trek_quick_facts)
+        $quick_facts = array(
+            'duration'    => get_post_meta( $post_id, '_trek_hero_days', true ),
+            'high_point'  => get_post_meta( $post_id, '_trek_fact_high_point', true ),
+            'region'      => get_post_meta( $post_id, '_trek_fact_region', true ),
+            'season'      => get_post_meta( $post_id, '_trek_fact_season', true ),
+            'group_size'  => get_post_meta( $post_id, '_trek_fact_group_size', true ),
+            'trekking'    => get_post_meta( $post_id, '_trek_fact_trekking', true ),
+            'accom'       => get_post_meta( $post_id, '_trek_fact_accom', true ),
+            'style'       => get_post_meta( $post_id, '_trek_fact_style', true ),
+            'difficulty'  => get_post_meta( $post_id, '_trek_difficulty', true ),
+            'price'       => get_post_meta( $post_id, '_trek_price', true ),
+            'currency'    => get_post_meta( $post_id, '_trek_currency', true ),
+        );
+        update_post_meta( $post_id, '_trek_quick_facts', $quick_facts );
+
+        // 12. Compile & Save Master JSON Payload (_trek_structured_data)
+        if ( class_exists( 'Trek_Renderer' ) ) {
+            $full_data = Trek_Renderer::get_full_trek_data( $post_id );
+            if ( ! empty( $full_data ) ) {
+                update_post_meta( $post_id, '_trek_structured_data', wp_slash( wp_json_encode( $full_data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) ) );
+            }
         }
     }
 

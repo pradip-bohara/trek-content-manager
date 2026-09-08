@@ -1345,7 +1345,7 @@ $related_query = new WP_Query( array(
         <div class="ya-breadcrumbs" aria-label="Breadcrumb">
           <a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-          <a href="<?php echo esc_url( home_url( '/all-trips/' ) ); ?>">Trips</a>
+          <a href="<?php echo esc_url( home_url( '/trips/' ) ); ?>">All-Trips</a>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           <a href="<?php echo esc_url( home_url( '/' . strtolower( sanitize_title( $breadcrumb_region ) ) . '/' ) ); ?>"><?php echo esc_html( $breadcrumb_region ); ?></a>
         </div>

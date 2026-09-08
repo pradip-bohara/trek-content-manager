@@ -1,0 +1,1501 @@
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+    .ya-hero,
+    .ya-hero *,
+    .ya-trust-strip,
+    .ya-trust-strip * {
+        box-sizing: border-box;
+    }
+
+    .ya-hero {
+        --forest: #022f2e;
+        --gold: #c7a767;
+        --gold-light: #f1dfb8;
+        --white: #ffffff;
+        --hero-height: 100svh;
+
+        position: relative;
+        width: 100vw;
+        height: var(--hero-height);
+        min-height: 680px;
+        margin-left: calc(50% - 50vw);
+        overflow: hidden;
+        isolation: isolate;
+        background: var(--forest);
+        color: var(--white);
+        font-family: "Open Sans", Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    .ya-hero-stage,
+    .ya-hero-slide,
+    .ya-hero-media {
+        position: absolute;
+        inset: 0;
+    }
+
+    .ya-hero-stage {
+        z-index: -3;
+        background: #021f1e;
+    }
+
+    .ya-hero-slide {
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(1.05) translateY(6px);
+        transition:
+            opacity 1.25s cubic-bezier(.22, .61, .36, 1),
+            transform 6s cubic-bezier(.22, .61, .36, 1),
+            visibility 0s linear 1.25s;
+    }
+
+    .ya-hero-slide.is-active {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1) translateY(0);
+        transition:
+            opacity 1.25s cubic-bezier(.22, .61, .36, 1),
+            transform 6s cubic-bezier(.22, .61, .36, 1),
+            visibility 0s linear 0s;
+    }
+
+    .ya-hero-media img,
+    .ya-hero-media video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .ya-hero-media video {
+        background: #021f1e;
+    }
+
+    .ya-hero-slide::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(180deg,
+                rgba(2, 47, 46, 0.42) 0%,
+                rgba(2, 47, 46, 0.12) 32%,
+                rgba(0, 18, 18, 0.5) 74%,
+                rgba(2, 47, 46, 0.88) 100%),
+            linear-gradient(90deg,
+                rgba(0, 18, 18, 0.55) 0%,
+                rgba(0, 18, 18, 0.18) 45%,
+                rgba(0, 18, 18, 0.55) 100%);
+        pointer-events: none;
+    }
+
+    .ya-hero-noise {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        opacity: .045;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
+        mix-blend-mode: soft-light;
+    }
+
+    .ya-hero-content {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: min(1360px, calc(100% - 64px));
+        height: 100%;
+        margin: 0 auto;
+        padding: 0 0 3vh;
+        text-align: center;
+    }
+
+    .ya-hero-copy {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .ya-hero h1 {
+        margin: 0 auto;
+        color: #ffffff;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: clamp(34px, 5.2vw, 68px);
+        font-weight: 500;
+        line-height: 1.12;
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+        text-shadow: 0 5px 35px rgba(0, 0, 0, 0.45);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .ya-hero-description {
+        max-width: 660px;
+        margin: 22px auto 0;
+        color: rgba(255, 255, 255, 0.92);
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: clamp(16px, 1.4vw, 20px);
+        line-height: 1.75;
+        letter-spacing: -0.01em;
+        text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .ya-hero-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        min-height: 54px;
+        margin-top: 32px;
+        padding: 0 32px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 3px;
+        background: var(--gold);
+        color: var(--forest);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 2px;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition:
+            transform 0.35s ease,
+            background 0.35s ease,
+            color 0.35s ease,
+            box-shadow 0.35s ease;
+    }
+
+    .ya-hero-cta svg {
+        width: 17px;
+        height: 17px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: transform 0.35s ease;
+    }
+
+    .ya-hero-cta:hover {
+        background: #e4c98f;
+        color: #012221;
+        transform: translateY(-2px);
+        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.35);
+    }
+
+    .ya-hero-cta:hover svg {
+        transform: translateX(4px);
+    }
+
+    .ya-hero-progress {
+        position: absolute;
+        left: 50%;
+        bottom: 36px;
+        z-index: 10;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ya-hero-progress-segments {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .ya-hero-progress-segment {
+        position: relative;
+        width: 50px;
+        height: 4px;
+        padding: 0;
+        margin: 0;
+        border: none;
+        outline: none;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.32);
+        cursor: pointer;
+        overflow: hidden;
+        transition: width 0.35s ease, background-color 0.3s ease;
+    }
+
+    .ya-hero-progress-segment:hover {
+        background: rgba(255, 255, 255, 0.55);
+    }
+
+    .ya-hero-progress-segment.is-active {
+        width: 72px;
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .ya-hero-progress-segment i {
+        display: block;
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: #d1ad54;
+        box-shadow: 0 0 10px rgba(209, 173, 84, 0.6);
+        pointer-events: none;
+    }
+
+    .ya-hero-video-indicator {
+        position: absolute;
+        right: 36px;
+        bottom: 36px;
+        z-index: 10;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        pointer-events: none;
+    }
+
+    .ya-hero-video-indicator::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #d1ad54;
+        box-shadow: 0 0 10px rgba(209, 173, 84, 0.75);
+    }
+
+    .ya-hero[data-video-ready="true"] .ya-hero-video-indicator {
+        display: flex;
+    }
+
+    @media (max-width: 900px) {
+        .ya-hero {
+            min-height: 600px;
+            height: 95vh;
+        }
+
+        .ya-hero-content {
+            width: calc(100% - 36px);
+            padding: 0 0 4vh;
+        }
+
+        .ya-hero h1 {
+            font-size: clamp(26px, 6vw, 44px);
+            white-space: normal;
+            line-height: 1.2;
+        }
+
+        .ya-hero-description {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+
+        .ya-hero-cta {
+            min-height: 50px;
+            margin-top: 24px;
+            padding: 0 26px;
+        }
+
+        .ya-hero-progress {
+            bottom: 26px;
+        }
+
+        .ya-hero-progress-segment {
+            width: 38px;
+            height: 3px;
+        }
+
+        .ya-hero-progress-segment.is-active {
+            width: 54px;
+        }
+
+        .ya-hero-video-indicator {
+            right: 20px;
+            bottom: 26px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .ya-hero h1 {
+            font-size: clamp(23px, 6.8vw, 32px);
+            letter-spacing: -0.02em;
+        }
+
+        .ya-hero-progress-segments {
+            gap: 8px;
+        }
+
+        .ya-hero-progress-segment {
+            width: 30px;
+        }
+
+        .ya-hero-progress-segment.is-active {
+            width: 44px;
+        }
+    }
+
+    .ya-trust-strip {
+        width: min(1400px, calc(100% - 64px));
+        margin: 0 auto;
+        border-top: 1px solid #e2ddd3;
+        border-bottom: 1px solid #e2ddd3;
+        background: #ffffff;
+        color: #617654;
+        font-family: "Open Sans", Arial, sans-serif;
+        opacity: 0;
+        transform: translateY(35px);
+        transition:
+            opacity 0.9s cubic-bezier(.22, .61, .36, 1),
+            transform 0.9s cubic-bezier(.22, .61, .36, 1);
+    }
+
+    .ya-trust-strip.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .ya-trust-inner {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        min-height: 158px;
+    }
+
+    .ya-trust-item {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 30px 36px;
+        opacity: 0;
+        transform: translateY(18px);
+        transition:
+            opacity 0.7s ease,
+            transform 0.7s ease,
+            background-color 0.35s ease;
+    }
+
+    .ya-trust-item+.ya-trust-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 38px;
+        bottom: 38px;
+        width: 1px;
+        background: #e2ddd3;
+    }
+
+    .ya-trust-strip.is-visible .ya-trust-item {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .ya-trust-strip.is-visible .ya-trust-item:nth-child(1) {
+        transition-delay: 0.08s;
+    }
+
+    .ya-trust-strip.is-visible .ya-trust-item:nth-child(2) {
+        transition-delay: 0.16s;
+    }
+
+    .ya-trust-strip.is-visible .ya-trust-item:nth-child(3) {
+        transition-delay: 0.24s;
+    }
+
+    .ya-trust-strip.is-visible .ya-trust-item:nth-child(4) {
+        transition-delay: 0.32s;
+    }
+
+    .ya-trust-item:hover {
+        background: #faf8f5;
+    }
+
+    .ya-trust-value {
+        margin: 0;
+        color: #111111;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: clamp(34px, 3vw, 48px);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.025em;
+        transition:
+            transform 0.4s cubic-bezier(.22, .61, .36, 1),
+            color 0.35s ease;
+    }
+
+    .ya-trust-item:hover .ya-trust-value {
+        transform: translateX(5px);
+        color: #617654;
+    }
+
+    .ya-trust-label {
+        margin: 16px 0 0;
+        color: #4a4f59;
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 1.5;
+        letter-spacing: -0.01em;
+        transition:
+            transform 0.4s cubic-bezier(.22, .61, .36, 1),
+            color 0.35s ease;
+    }
+
+    .ya-trust-item:hover .ya-trust-label {
+        transform: translateX(5px);
+        color: #617654;
+    }
+
+    @media (max-width: 900px) {
+        .ya-trust-strip {
+            width: 100%;
+        }
+
+        .ya-trust-inner {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .ya-trust-item {
+            min-height: 130px;
+            padding: 22px 14px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .ya-trust-item+.ya-trust-item::before {
+            top: 28px;
+            bottom: 28px;
+        }
+
+        .ya-trust-value {
+            font-size: clamp(22px, 4vw, 36px);
+        }
+
+        .ya-trust-label {
+            font-size: 13px;
+            margin-top: 8px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .ya-trust-inner {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .ya-trust-item {
+            min-height: 120px;
+            padding: 22px 16px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .ya-trust-item:nth-child(3),
+        .ya-trust-item:nth-child(4) {
+            border-top: 1px solid #e2ddd3;
+        }
+
+        .ya-trust-item:nth-child(3)::before,
+        .ya-trust-item:nth-child(4)::before {
+            display: none;
+        }
+
+        .ya-trust-value {
+            font-size: 30px;
+        }
+
+        .ya-trust-label {
+            margin-top: 8px;
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .ya-trust-item {
+            padding: 18px 10px;
+        }
+
+        .ya-trust-value {
+            font-size: 26px;
+        }
+
+        .ya-trust-label {
+            font-size: 12px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .ya-hero-slide,
+        .ya-hero-slide.is-active,
+        .ya-hero-cta,
+        .ya-hero-cta svg,
+        .ya-trust-strip,
+        .ya-trust-item,
+        .ya-trust-value,
+        .ya-trust-label {
+            transition: none !important;
+            transform: none !important;
+        }
+
+        .ya-trust-strip,
+        .ya-trust-item {
+            opacity: 1 !important;
+        }
+    }
+</style>
+
+<section class="ya-hero" id="ya-hero" data-video-url="">
+
+
+    <div class="ya-hero-stage" aria-hidden="true">
+
+
+        <div class="ya-hero-slide" data-type="video" data-index="0">
+            <div class="ya-hero-media">
+                <video id="ya-hero-video" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            </div>
+        </div>
+
+
+        <div class="ya-hero-slide is-active" data-type="photo" data-index="1">
+            <div class="ya-hero-media">
+                <img src="http://localhost/travling/wp-content/uploads/2026/09/sanjay-hona-n_Hm7MvQHYE-unsplash-scaled.jpg"
+                    alt="Scenic Nepal mountain peak" fetchpriority="high">
+            </div>
+        </div>
+
+        <div class="ya-hero-slide" data-type="photo" data-index="2">
+            <div class="ya-hero-media">
+                <img src="http://localhost/travling/wp-content/uploads/2026/09/jochen-van-wylick-CqVP3nk2JYI-unsplash-scaled.jpg"
+                    alt="Majestic Himalayan trekking trail" loading="lazy">
+            </div>
+        </div>
+
+        <div class="ya-hero-slide" data-type="photo" data-index="3">
+            <div class="ya-hero-media">
+                <img src="http://localhost/travling/wp-content/uploads/2026/09/avel-chuklanov-8__IZFB9AD8-unsplash-1-scaled.jpg"
+                    alt="High altitude mountain ridge in Nepal" loading="lazy">
+            </div>
+        </div>
+
+        <div class="ya-hero-slide" data-type="photo" data-index="4">
+            <div class="ya-hero-media">
+                <img src="http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg"
+                    alt="Vibrant mountain valley view" loading="lazy">
+            </div>
+        </div>
+
+        <div class="ya-hero-noise"></div>
+    </div>
+
+
+    <div class="ya-hero-content">
+        <div class="ya-hero-copy" aria-live="polite">
+            <h1 id="ya-hero-title">Your Nepal, Crafted Your Way</h1>
+
+            <p class="ya-hero-description" id="ya-hero-description">
+                Private journeys shaped around your pace, your passions, and the places you've always wanted to
+                discover.
+            </p>
+
+            <a class="ya-hero-cta" href="/contact-us/" id="ya-hero-cta">
+                Design your journey
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+
+    <div class="ya-hero-progress" id="ya-hero-progress" aria-label="Hero slide navigation">
+        <div class="ya-hero-progress-segments" id="ya-hero-progress-segments">
+
+        </div>
+    </div>
+
+    <div class="ya-hero-video-indicator" aria-hidden="true">Cinematic Film</div>
+
+</section>
+
+<section class="ya-trust-strip" id="ya-trust-strip">
+
+    <div class="ya-trust-inner">
+
+        <div class="ya-trust-item">
+            <p class="ya-trust-value">25+</p>
+            <p class="ya-trust-label">
+                Years in the Himalaya
+            </p>
+        </div>
+
+        <div class="ya-trust-item">
+            <p class="ya-trust-value">100%</p>
+            <p class="ya-trust-label">
+                Nepali owned and operated
+            </p>
+        </div>
+
+        <div class="ya-trust-item">
+            <p class="ya-trust-value">Private</p>
+            <p class="ya-trust-label">
+                Journeys made around you
+            </p>
+        </div>
+
+        <div class="ya-trust-item">
+            <p class="ya-trust-value">Local</p>
+            <p class="ya-trust-label">
+                Guides, stories and access
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<script>
+
+    (() => {
+        const root = document.getElementById('ya-hero');
+        if (!root) return;
+
+
+        const HERO_VIDEO_URL = root.getAttribute('data-video-url') || '';
+
+        const videoSlide = root.querySelector('.ya-hero-slide[data-type="video"]');
+        const video = root.querySelector('#ya-hero-video');
+        const photoSlides = [...root.querySelectorAll('.ya-hero-slide[data-type="photo"]')];
+        const titleEl = root.querySelector('#ya-hero-title');
+        const descEl = root.querySelector('#ya-hero-description');
+        const segmentsContainer = root.querySelector('#ya-hero-progress-segments');
+
+        const photoContents = [
+            {
+                title: 'Your Nepal, Crafted Your Way',
+                description: "Private journeys shaped around your pace, your passions, and the places you've always wanted to discover."
+            },
+            {
+                title: 'Journeys Beyond the Ordinary',
+                description: "Discover Nepal through extraordinary landscapes, hidden trails, and experiences shaped entirely around you."
+            },
+            {
+                title: 'Untamed Peaks, Timeless Trails',
+                description: "From intimate Himalayan trails to remarkable high-altitude adventures, every detail is made for your journey."
+            },
+            {
+                title: 'Moments High Above the Clouds',
+                description: "Venture beyond the familiar into remote valleys, ancient cultures, and landscapes few travelers ever reach."
+            }
+        ];
+
+        const videoContent = {
+            title: 'Experience Nepal in Motion',
+            description: 'Immerse yourself in cinematic Himalayan vistas and authentic journeys across the rooftop of the world.'
+        };
+
+        let activeSlides = [];
+        let slideContents = [];
+
+        if (HERO_VIDEO_URL && video) {
+            video.src = HERO_VIDEO_URL;
+            video.load();
+            root.dataset.videoReady = 'true';
+            activeSlides = [videoSlide, ...photoSlides];
+            slideContents = [videoContent, ...photoContents];
+        } else {
+            if (videoSlide) videoSlide.style.display = 'none';
+            activeSlides = photoSlides;
+            slideContents = photoContents;
+        }
+
+        segmentsContainer.innerHTML = '';
+        activeSlides.forEach((slide, index) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'ya-hero-progress-segment' + (index === 0 ? ' is-active' : '');
+            btn.setAttribute('aria-label', `Go to photo ${index + 1}`);
+            btn.innerHTML = '<i></i>';
+            btn.addEventListener('click', () => {
+                activate(index);
+            });
+            segmentsContainer.appendChild(btn);
+        });
+
+        const progressSegments = [...segmentsContainer.querySelectorAll('.ya-hero-progress-segment')];
+
+        const DURATION = 5000;
+        const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        let currentIndex = 0;
+        let startedAt = performance.now();
+        let animFrameId = null;
+
+        const setSlideContent = (index) => {
+            const item = slideContents[index];
+            if (!item) return;
+
+            titleEl.style.opacity = '0';
+            titleEl.style.transform = 'translateY(8px)';
+            descEl.style.opacity = '0';
+            descEl.style.transform = 'translateY(8px)';
+
+            setTimeout(() => {
+                titleEl.textContent = item.title;
+                descEl.textContent = item.description;
+                titleEl.style.opacity = '1';
+                titleEl.style.transform = 'translateY(0)';
+                descEl.style.opacity = '1';
+                descEl.style.transform = 'translateY(0)';
+            }, 220);
+        };
+
+        const updateProgress = (now = performance.now()) => {
+            if (REDUCED_MOTION) return;
+
+            const elapsed = now - startedAt;
+            const progress = Math.min(1, elapsed / DURATION);
+
+            progressSegments.forEach((segment, idx) => {
+                const fill = segment.querySelector('i');
+                if (!fill) return;
+
+                if (idx === currentIndex) {
+                    segment.classList.add('is-active');
+                    fill.style.width = `${progress * 100}%`;
+                } else {
+                    segment.classList.remove('is-active');
+                    fill.style.width = idx < currentIndex ? '100%' : '0%';
+                }
+            });
+
+            if (progress >= 1) {
+                next();
+                return;
+            }
+
+            animFrameId = requestAnimationFrame(updateProgress);
+        };
+
+        const activate = (index) => {
+            if (!activeSlides.length) return;
+            index = (index + activeSlides.length) % activeSlides.length;
+            currentIndex = index;
+
+            activeSlides.forEach((slide, i) => {
+                slide.classList.toggle('is-active', i === index);
+            });
+
+            setSlideContent(index);
+
+            if (video && HERO_VIDEO_URL) {
+                if (index === 0) {
+                    video.currentTime = 0;
+                    const playPromise = video.play();
+                    if (playPromise && typeof playPromise.catch === 'function') {
+                        playPromise.catch(() => { });
+                    }
+                } else {
+                    video.pause();
+                }
+            }
+
+            startedAt = performance.now();
+            cancelAnimationFrame(animFrameId);
+            if (!REDUCED_MOTION) {
+                animFrameId = requestAnimationFrame(updateProgress);
+            }
+        };
+
+        function next() {
+            activate(currentIndex + 1);
+        }
+
+        function prev() {
+            activate(currentIndex - 1);
+        }
+
+        root.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                next();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prev();
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !REDUCED_MOTION) {
+                startedAt = performance.now();
+                cancelAnimationFrame(animFrameId);
+                animFrameId = requestAnimationFrame(updateProgress);
+            }
+        });
+
+        activate(0);
+
+        window.addEventListener('pagehide', () => {
+            video?.pause();
+            cancelAnimationFrame(animFrameId);
+        });
+    })();
+
+
+    (() => {
+        const section = document.getElementById("ya-trust-strip");
+        if (!section) return;
+
+        const observer = new IntersectionObserver(
+            (entries, observerInstance) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        section.classList.add("is-visible");
+
+                        observerInstance.unobserve(section);
+                    }
+                });
+            },
+            {
+                threshold: 0.2
+            }
+        );
+
+        observer.observe(section);
+    })();
+</script>
+
+<section class="destination-section" id="destinations">
+    <div class="destination-container">
+        <div class="destination-intro">
+            <span class="destination-kicker">THE JOURNEY STARTS HERE</span>
+            <h2>
+                Discover the places
+                <em>that stay with you.</em>
+            </h2>
+            <p>
+                From the great Himalayan peaks to ancient kingdoms and
+                timeless cultures, we create journeys shaped around the
+                places that inspire you most.
+            </p>
+            <a href="/destinations/" class="destination-button">
+                Explore all destinations
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
+        </div>
+
+        <div class="destination-carousel-wrap">
+            <div class="destination-carousel">
+                <div class="destination-track" id="destinationTrack">
+                    <a href="/destinations/nepal/" class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1400&q=85"
+                            alt="Nepal Himalayas">
+                        <div class="destination-overlay"></div>
+                        <div class="destination-card-content">
+                            <span>01</span>
+                            <h3>Nepal</h3>
+                            <p>
+                                Where Himalayan landscapes meet ancient
+                                trails, living culture and unforgettable
+                                mountain journeys.
+                            </p>
+                            <strong>Discover Nepal <i>→</i></strong>
+                        </div>
+                    </a>
+
+                    <a href="/destinations/bhutan/" class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1400&q=85"
+                            alt="Bhutan mountain landscape">
+                        <div class="destination-overlay"></div>
+                        <div class="destination-card-content">
+                            <span>02</span>
+                            <h3>Bhutan</h3>
+                            <p>
+                                A hidden Himalayan kingdom of monasteries,
+                                forests, sacred valleys and quiet discovery.
+                            </p>
+                            <strong>Discover Bhutan <i>→</i></strong>
+                        </div>
+                    </a>
+
+                    <a href="/destinations/india/" class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1400&q=85"
+                            alt="India Taj Mahal">
+                        <div class="destination-overlay"></div>
+                        <div class="destination-card-content">
+                            <span>03</span>
+                            <h3>India</h3>
+                            <p>
+                                A world of extraordinary contrasts, from royal
+                                heritage and timeless cities to wild landscapes.
+                            </p>
+                            <strong>Discover India <i>→</i></strong>
+                        </div>
+                    </a>
+
+                    <a href="/destinations/tibet/" class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1400&q=85"
+                            alt="Tibet Himalayan landscape">
+                        <div class="destination-overlay"></div>
+                        <div class="destination-card-content">
+                            <span>04</span>
+                            <h3>Tibet</h3>
+                            <p>
+                                Journey across the roof of the world through
+                                sacred landscapes, ancient culture and vast skies.
+                            </p>
+                            <strong>Discover Tibet <i>→</i></strong>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="destination-controls">
+                <button class="destination-control" id="destinationPrev" aria-label="Previous destination">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </button>
+                <button class="destination-control" id="destinationNext" aria-label="Next destination">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+    .destination-section {
+        width: 100%;
+        overflow: hidden;
+        background: #f5f2ec;
+        padding: 120px 0;
+    }
+
+    .destination-container {
+        width: min(1500px, calc(100% - 80px));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(360px, 0.72fr) minmax(0, 1.8fr);
+        gap: 80px;
+        align-items: center;
+    }
+
+    .destination-intro {
+        position: relative;
+        z-index: 5;
+        max-width: 530px;
+    }
+
+    .destination-kicker {
+        display: block;
+        margin-bottom: 28px;
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #d1ad54;
+    }
+
+    .destination-intro h2 {
+        margin: 0;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: clamp(48px, 5vw, 82px);
+        font-weight: 400;
+        line-height: 0.98;
+        letter-spacing: -2px;
+        color: #617654;
+    }
+
+    .destination-intro h2 em {
+        display: block;
+        font-family: "Newsreader", Georgia, serif;
+        font-weight: 400;
+        font-style: italic;
+        color: #d1ad54;
+    }
+
+    .destination-intro>p {
+        max-width: 450px;
+        margin: 32px 0 38px;
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.75;
+        color: #617654;
+    }
+
+    .destination-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 26px;
+        padding: 16px 21px;
+        border: 1px solid #617654;
+        color: #617654;
+        text-decoration: none;
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        transition: background 0.35s ease, color 0.35s ease, gap 0.35s ease, border-color 0.35s ease;
+    }
+
+    .destination-button span {
+        font-size: 18px;
+        line-height: 1;
+        transition: transform 0.35s ease;
+    }
+
+    .destination-button:hover {
+        background: #617654;
+        border-color: #617654;
+        color: #fff;
+        gap: 32px;
+    }
+
+    .destination-button:hover span {
+        transform: translateX(4px);
+    }
+
+    .destination-carousel-wrap {
+        min-width: 0;
+        position: relative;
+    }
+
+    .destination-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    .destination-control {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 50%;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1.5px solid #617654;
+        background: transparent;
+        color: #617654;
+        cursor: pointer;
+        transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.25s ease;
+    }
+
+    .destination-control svg {
+        display: block;
+        transition: transform 0.25s ease;
+    }
+
+    .destination-control:hover {
+        border-color: #d1ad54;
+        background: #d1ad54;
+        color: #ffffff;
+        transform: scale(1.06);
+    }
+
+    .destination-carousel {
+        position: relative;
+        width: calc(100vw - 50%);
+        min-width: 0;
+        overflow: hidden;
+        cursor: grab;
+    }
+
+    .destination-carousel.is-dragging {
+        cursor: grabbing;
+    }
+
+    .destination-track {
+        display: flex;
+        gap: 18px;
+        width: max-content;
+        will-change: transform;
+        user-select: none;
+    }
+
+    .destination-card {
+        position: relative;
+        flex: 0 0 330px;
+        height: 550px;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #222;
+        color: #fff;
+        text-decoration: none;
+        isolation: isolate;
+    }
+
+    .destination-card img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        user-select: none;
+        pointer-events: none;
+        transform: scale(1.01);
+        transition: transform 0.9s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .destination-card:hover img {
+        transform: scale(1.07);
+    }
+
+    .destination-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 20%, rgba(0, 0, 0, 0.25) 45%, rgba(0, 0, 0, 0.82) 100%);
+    }
+
+    .destination-card-content {
+        position: absolute;
+        left: 30px;
+        right: 30px;
+        bottom: 34px;
+        z-index: 2;
+    }
+
+    .destination-card-content>span {
+        display: block;
+        margin-bottom: 14px;
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: #d1ad54;
+    }
+
+    .destination-card-content h3 {
+        margin: 0;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: 46px;
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: -1px;
+        color: #fff;
+    }
+
+    .destination-card-content p {
+        max-width: 270px;
+        margin: 18px 0 25px;
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 13px;
+        line-height: 1.65;
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .destination-card-content strong {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #d1ad54;
+    }
+
+    .destination-card-content strong i {
+        font-style: normal;
+        font-size: 16px;
+        transition: transform 0.3s ease;
+    }
+
+    .destination-card:hover .destination-card-content strong i {
+        transform: translateX(5px);
+    }
+
+    @media (max-width: 1200px) {
+        .destination-container {
+            width: min(100% - 50px, 1400px);
+            grid-template-columns: 0.7fr 1.5fr;
+            gap: 45px;
+        }
+
+        .destination-carousel {
+            width: calc(100vw - 43%);
+        }
+
+        .destination-card {
+            flex-basis: 300px;
+            height: 500px;
+        }
+
+        .destination-intro h2 {
+            font-size: clamp(44px, 5vw, 68px);
+        }
+    }
+
+    @media (max-width: 850px) {
+        .destination-section {
+            padding: 80px 0;
+        }
+
+        .destination-container {
+            display: block;
+            width: calc(100% - 36px);
+        }
+
+        .destination-intro {
+            max-width: 600px;
+            margin-bottom: 45px;
+        }
+
+        .destination-intro h2 {
+            font-size: clamp(44px, 11vw, 64px);
+            letter-spacing: -2px;
+        }
+
+        .destination-intro>p {
+            margin-top: 22px;
+        }
+
+        .destination-carousel {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .destination-card {
+            flex-basis: min(78vw, 360px);
+            height: 460px;
+        }
+
+        .destination-card-content {
+            left: 25px;
+            right: 25px;
+            bottom: 28px;
+        }
+
+        .destination-card-content h3 {
+            font-size: 40px;
+        }
+
+        .destination-controls {
+            margin-top: 24px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .destination-section {
+            padding: 65px 0;
+        }
+
+        .destination-container {
+            width: calc(100% - 28px);
+        }
+
+        .destination-kicker {
+            margin-bottom: 20px;
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        .destination-intro h2 {
+            font-size: 42px;
+        }
+
+        .destination-intro>p {
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .destination-button {
+            width: 100%;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+
+        .destination-card {
+            flex-basis: calc(100vw - 55px);
+            height: 420px;
+        }
+
+        .destination-card-content h3 {
+            font-size: 36px;
+        }
+    }
+</style>
+
+<script>
+    (function () {
+        const carousel = document.querySelector('.destination-carousel');
+        const track = document.querySelector('#destinationTrack');
+        const prevButton = document.querySelector('#destinationPrev');
+        const nextButton = document.querySelector('#destinationNext');
+
+        if (!carousel || !track) return;
+
+        const originalCards = Array.from(
+            track.querySelectorAll('.destination-card')
+        );
+
+        originalCards.forEach(card => {
+            const clone = card.cloneNode(true);
+            clone.setAttribute('aria-hidden', 'true');
+            track.appendChild(clone);
+        });
+
+        let position = 0;
+        let isPlaying = true;
+        let isDragging = false;
+        let startX = 0;
+        let dragStartPosition = 0;
+        let lastTime = performance.now();
+        const speed = 0.045;
+
+        function getCardWidth() {
+            const card = track.querySelector('.destination-card');
+            if (!card) return 348;
+            const styles = window.getComputedStyle(track);
+            const gap = parseFloat(styles.gap) || 18;
+            return card.offsetWidth + gap;
+        }
+
+        function getLoopWidth() {
+            return getCardWidth() * originalCards.length;
+        }
+
+        function render() {
+            track.style.transform = `translate3d(${-position}px, 0, 0)`;
+        }
+
+        function normalizePosition() {
+            const loopWidth = getLoopWidth();
+            if (loopWidth <= 0) return;
+            while (position >= loopWidth) {
+                position -= loopWidth;
+            }
+            while (position < 0) {
+                position += loopWidth;
+            }
+        }
+
+        function animate(time) {
+            const delta = time - lastTime;
+            lastTime = time;
+            if (isPlaying && !isDragging) {
+                position += speed * delta;
+                normalizePosition();
+                render();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+
+        if (nextButton) {
+            nextButton.addEventListener('click', function () {
+                position += getCardWidth();
+                normalizePosition();
+                render();
+            });
+        }
+
+        if (prevButton) {
+            prevButton.addEventListener('click', function () {
+                position -= getCardWidth();
+                normalizePosition();
+                render();
+            });
+        }
+
+        carousel.addEventListener('pointerdown', function (event) {
+            isDragging = true;
+            startX = event.clientX;
+            dragStartPosition = position;
+            carousel.classList.add('is-dragging');
+            carousel.setPointerCapture(event.pointerId);
+        });
+
+        carousel.addEventListener('pointermove', function (event) {
+            if (!isDragging) return;
+            const distance = event.clientX - startX;
+            position = dragStartPosition - distance;
+            normalizePosition();
+            render();
+        });
+
+        function stopDragging(event) {
+            if (!isDragging) return;
+            isDragging = false;
+            carousel.classList.remove('is-dragging');
+            if (event && carousel.hasPointerCapture(event.pointerId)) {
+                carousel.releasePointerCapture(event.pointerId);
+            }
+        }
+
+        carousel.addEventListener('pointerup', stopDragging);
+        carousel.addEventListener('pointercancel', stopDragging);
+
+        carousel.addEventListener('touchstart', function () {
+            isDragging = true;
+        }, { passive: true });
+
+        carousel.addEventListener('touchend', function () {
+            isDragging = false;
+        }, { passive: true });
+
+        let wasPlayingBeforeHover = false;
+
+        carousel.addEventListener('mouseenter', function () {
+            wasPlayingBeforeHover = isPlaying;
+            if (isPlaying) {
+                isPlaying = false;
+            }
+        });
+
+        carousel.addEventListener('mouseleave', function () {
+            if (wasPlayingBeforeHover) {
+                isPlaying = true;
+            }
+        });
+
+        carousel.setAttribute('tabindex', '0');
+
+        carousel.addEventListener('keydown', function (event) {
+            if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                position += getCardWidth();
+                normalizePosition();
+                render();
+            }
+            if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                position -= getCardWidth();
+                normalizePosition();
+                render();
+            }
+            if (event.key === ' ') {
+                event.preventDefault();
+                isPlaying = !isPlaying;
+            }
+        });
+
+        window.addEventListener('resize', function () {
+            normalizePosition();
+            render();
+        });
+    })();
+</script>
