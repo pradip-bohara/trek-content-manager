@@ -40,6 +40,7 @@ class Trek_Shortcodes {
         add_shortcode( 'nepal_tourism_map',          array( __CLASS__, 'render_nepal_map' ) );
         add_shortcode( 'ya_journal_posts',           array( __CLASS__, 'render_journal_posts' ) );
         add_shortcode( 'ya_home_notes',              array( __CLASS__, 'render_home_notes' ) );
+        add_shortcode( 'ya_trip_detail',             array( __CLASS__, 'render_trip_detail' ) );
 
         // Canonical aliases for full flexibility across themes and pages
         add_shortcode( 'trek_country_destinations', array( __CLASS__, 'render_country_destinations' ) );
@@ -55,7 +56,44 @@ class Trek_Shortcodes {
         add_shortcode( 'trek_tourism_map',          array( __CLASS__, 'render_nepal_map' ) );
         add_shortcode( 'trek_journal_posts',         array( __CLASS__, 'render_journal_posts' ) );
         add_shortcode( 'trek_home_notes',            array( __CLASS__, 'render_home_notes' ) );
+        add_shortcode( 'trek_trip_detail',           array( __CLASS__, 'render_trip_detail' ) );
         add_action( 'rest_api_init', array( __CLASS__, 'register_journal_comment_routes' ) );
+    }
+
+    /**
+     * Render the same data-driven destination detail template inside a page.
+     *
+     * Usage: [trek_trip_detail id="123"]
+     *
+     * @param array $atts Shortcode attributes.
+     * @return string
+     */
+    public static function render_trip_detail( $atts ) {
+        $atts = shortcode_atts(
+            array( 'id' => 0 ),
+            $atts,
+            'trek_trip_detail'
+        );
+
+        $post_id = absint( $atts['id'] );
+        $post    = $post_id ? get_post( $post_id ) : null;
+
+        if ( ! $post || 'trek_destination' !== $post->post_type ) {
+            return '';
+        }
+
+        if ( 'publish' !== $post->post_status && ! current_user_can( 'edit_post', $post_id ) ) {
+            return '';
+        }
+
+        $template = TREK_MANAGER_PLUGIN_DIR . 'templates/single-trek_destination.php';
+        if ( ! file_exists( $template ) ) {
+            return '';
+        }
+
+        ob_start();
+        include $template;
+        return ob_get_clean();
     }
 
     /**
@@ -675,11 +713,6 @@ class Trek_Shortcodes {
             }
         }
 
-        // Fallback demo data if no posts found yet
-        if ( empty( $cards ) ) {
-            $cards = self::get_fallback_country_trips( $country_raw );
-        }
-
         ob_start();
 
         if ( 'cards_only' === $atts['layout'] || 'cards' === $atts['layout'] ) :
@@ -1191,21 +1224,6 @@ class Trek_Shortcodes {
             wp_reset_postdata();
         }
 
-        // Fallbacks if no database posts found yet
-        if ( empty( $trips ) ) {
-            $trips = array_merge(
-                self::get_fallback_country_trips( 'nepal' ),
-                self::get_fallback_country_trips( 'india' ),
-                self::get_fallback_country_trips( 'bhutan' ),
-                self::get_fallback_country_trips( 'tibet' )
-            );
-            // Re-index
-            foreach ( $trips as $k => &$t ) {
-                $t['number'] = sprintf( '%02d', $k + 1 );
-            }
-            unset( $t );
-        }
-
         // Fetch dynamic categories from the database — only show categories that
         // have at least one published trip so filters are not shown empty.
         $categories = get_terms( array(
@@ -1434,21 +1452,6 @@ class Trek_Shortcodes {
                 }
             }
             wp_reset_postdata();
-        }
-
-        // Fallbacks
-        if ( empty( $cards ) ) {
-            $all_fallbacks = array_merge(
-                self::get_fallback_country_trips( 'nepal' ),
-                self::get_fallback_country_trips( 'india' )
-            );
-            $filtered_fallbacks = array();
-            foreach ( $all_fallbacks as $f ) {
-                if ( strpos( $f['category_slugs'], $category_slug ) !== false || 'trekking' === $category_slug || 'all' === $category_slug ) {
-                    $filtered_fallbacks[] = $f;
-                }
-            }
-            $cards = ! empty( $filtered_fallbacks ) ? array_slice( $filtered_fallbacks, 0, $posts_count ) : array_slice( $all_fallbacks, 0, $posts_count );
         }
 
         $cols = max( 1, min( 4, intval( $atts['columns'] ) ) );
@@ -1839,45 +1842,6 @@ class Trek_Shortcodes {
         }
 
         wp_reset_postdata();
-    }
-
-    /*
-     * ---------------------------------------------------------
-     * FALLBACK ONLY WHEN DATABASE HAS NOTHING
-     *
-     * IMPORTANT:
-     * Do NOT merge every country together.
-     * Use the requested region only.
-     * ---------------------------------------------------------
-     */
-    if ( empty( $cards ) ) {
-
-        // Fallback always uses $effective_region (defaults to 'nepal').
-        // Only merge all countries if shortcode explicitly passes region="all".
-        if ( 'all' === strtolower( $atts['region'] ) ) {
-
-            $cards = array_merge(
-                self::get_fallback_country_trips( 'nepal' ),
-                self::get_fallback_country_trips( 'india' ),
-                self::get_fallback_country_trips( 'bhutan' ),
-                self::get_fallback_country_trips( 'tibet' )
-            );
-
-        } else {
-
-            // Show only the effective region's fallback trips
-            $cards = self::get_fallback_country_trips( $effective_region );
-        }
-
-        $idx = 1;
-
-        foreach ( $cards as &$f ) {
-
-            $f['number'] = sprintf( '%02d', $idx );
-            $idx++;
-        }
-
-        unset( $f );
     }
 
     /*
@@ -2302,6 +2266,3 @@ class Trek_Shortcodes {
         return ob_get_clean();
     }
 }
-
-
-

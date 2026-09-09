@@ -31,6 +31,27 @@ $hero_subtitle       = get_post_meta( $post_id, '_trek_hero_subtitle', true ) ?:
 $featured_img        = get_the_post_thumbnail_url( $post_id, 'full' );
 $hero_bg_img         = get_post_meta( $post_id, '_trek_hero_bg_img', true ) ?: ( $featured_img ?: 'https://yetiadventure.com/wp-content/uploads/2022/02/15-Days_Everest-Base-Camp-trek-1024x682.jpg' );
 
+// Keep the primary hero image first, then add the dedicated Hero Slider Gallery.
+// Older destinations without that gallery continue to use their photo gallery as a fallback.
+$hero_slider_images  = array( esc_url_raw( $hero_bg_img ) );
+$hero_slider_gallery = get_post_meta( $post_id, '_trek_hero_slider_images', true );
+if ( empty( $hero_slider_gallery ) || ! is_array( $hero_slider_gallery ) ) {
+    $hero_slider_gallery = get_post_meta( $post_id, '_trek_gallery_list', true );
+}
+if ( empty( $hero_slider_gallery ) || ! is_array( $hero_slider_gallery ) ) {
+    $hero_slider_gallery = get_post_meta( $post_id, '_trek_gallery_images', true );
+}
+if ( ! empty( $hero_slider_gallery ) && is_array( $hero_slider_gallery ) ) {
+    foreach ( $hero_slider_gallery as $hero_slide ) {
+        $hero_slide_url = is_array( $hero_slide ) ? ( $hero_slide['url'] ?? '' ) : $hero_slide;
+        $hero_slide_url = esc_url_raw( $hero_slide_url );
+        if ( ! empty( $hero_slide_url ) ) {
+            $hero_slider_images[] = $hero_slide_url;
+        }
+    }
+}
+$hero_slider_images = array_values( array_unique( array_filter( $hero_slider_images ) ) );
+
 // 3. Quick Facts
 $fact_high_point     = get_post_meta( $post_id, '_trek_fact_high_point', true ) ?: '3,870m · Kyanjin Gompa';
 $fact_region         = get_post_meta( $post_id, '_trek_fact_region', true ) ?: ( $breadcrumb_region );
@@ -275,7 +296,7 @@ $related_query = new WP_Query( array(
 
 <section class="ya-ebc-page" id="ya-ebc-page">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Open+Sans:wght@400;500;600;700&display=swap');
 
     html:has(.ya-ebc-page),
     body:has(.ya-ebc-page){
@@ -1154,40 +1175,6 @@ $related_query = new WP_Query( array(
     .ya-review-alert--success{background:#e6f6ec;color:#0a7a3b;border:1px solid #a3e6be}
     .ya-review-alert--error{background:#fde8e8;color:#9b1c1c;border:1px solid #f8b4b4}
 
-    /* DEPARTURES */
-    .ya-ebc-page .ya-departure-box{
-      display:grid;
-      grid-template-columns:1fr .85fr;
-      overflow:hidden;
-      border-radius:32px;
-      background:var(--green);
-      color:#fff;
-      box-shadow:var(--shadow);
-    }
-
-    .ya-ebc-page .ya-departure-copy{padding:54px}
-    .ya-ebc-page .ya-departure-copy .ya-script{font-size:42px;line-height:1;color:#fff}
-    .ya-ebc-page .ya-departure-copy h3{margin:19px 0 18px;font-family:"Cormorant Garamond",serif;font-size:52px;line-height:.94;color:#fff}
-    .ya-ebc-page .ya-departure-copy p{margin:0 0 27px;color:rgba(255,255,255,.72);font-size:14.5px;line-height:1.8}
-    .ya-ebc-page .ya-departure-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .ya-ebc-page .ya-departure-form .ya-field label{color:rgba(255,255,255,.72)}
-    .ya-ebc-page .ya-departure-form .ya-field-full{grid-column:1/-1}
-    .ya-ebc-page .ya-departure-photo{
-      min-height:570px;
-      background:url("<?php echo esc_url( $box_photo ); ?>") center/cover no-repeat;
-    }
-
-    .ya-ebc-page .ya-departure-note{
-      margin-top:18px;
-      padding:17px 18px;
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:15px;
-      background:rgba(255,255,255,.07);
-      color:rgba(255,255,255,.73);
-      font-size:11.5px;
-      line-height:1.65;
-    }
-
     /* RELATED */
     .ya-ebc-page .ya-related{
       padding:115px 0 125px;
@@ -1253,8 +1240,7 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-fact:nth-child(n+4){border-top:1px solid var(--line)}
       .ya-ebc-page .ya-overview-grid,
       .ya-ebc-page .ya-extension-intro,
-      .ya-ebc-page .ya-review-layout,
-      .ya-ebc-page .ya-departure-box{grid-template-columns:1fr}
+      .ya-ebc-page .ya-review-layout{grid-template-columns:1fr}
       .ya-ebc-page .ya-map-card,
       .ya-ebc-page .ya-trip-note-card{position:relative;top:auto}
       .ya-ebc-page .ya-map-image{height:600px}
@@ -1262,7 +1248,6 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-essential-layout{grid-template-columns:1fr 330px}
       .ya-ebc-page .ya-extension-grid{grid-template-columns:repeat(2,1fr)}
       .ya-ebc-page .ya-related-grid{grid-template-columns:repeat(2,1fr)}
-      .ya-ebc-page .ya-departure-photo{min-height:430px;order:-1}
       .ya-ebc-page .ya-hero-badge{right:24px}
     }
 
@@ -1295,7 +1280,6 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-extension-photo{min-height:430px}
       .ya-ebc-page .ya-related-head{display:block}
       .ya-ebc-page .ya-related-head p{margin-top:18px}
-      .ya-ebc-page .ya-departure-copy{padding:35px 25px}
     }
 
     @media(max-width:560px){
@@ -1322,10 +1306,8 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-extension-photo{min-height:360px;border-radius:120px 120px 25px 25px}
       .ya-ebc-page .ya-info-content{padding:0 19px 22px}
       .ya-ebc-page .ya-review-form{padding:25px 18px}
-      .ya-ebc-page .ya-form-grid,
-      .ya-ebc-page .ya-departure-form{grid-template-columns:1fr}
-      .ya-ebc-page .ya-field-full,
-      .ya-ebc-page .ya-departure-form .ya-field-full{grid-column:auto}
+      .ya-ebc-page .ya-form-grid{grid-template-columns:1fr}
+      .ya-ebc-page .ya-field-full{grid-column:auto}
       .ya-ebc-page .ya-related-grid{grid-template-columns:1fr}
       .ya-ebc-page .ya-related-head .ya-script{font-size:36px}
       .ya-ebc-page .ya-related-head h2{font-size:43px}
@@ -1336,25 +1318,433 @@ $related_query = new WP_Query( array(
       .ya-ebc-page *{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
       .ya-ebc-page .ya-reveal{opacity:1;transform:none}
     }
+
+    /* Editorial refinement: presentation only — data, markup and interactions remain unchanged. */
+    .ya-ebc-page{
+      --green:#202821;
+      --green-2:#617654;
+      --green-3:#75896a;
+      --gold:#D1AD54;
+      --ivory:#f6f3ed;
+      --cream:#fbfaf7;
+      --ink:#20231f;
+      --muted:#677068;
+      --line:#dcdcd3;
+      --shadow:0 18px 50px rgba(27,35,28,.08);
+      font-family:"Open Sans",Arial,sans-serif;
+      background:var(--cream);
+    }
+    .ya-ebc-page .ya-script,
+    .ya-ebc-page .ya-serif,
+    .ya-ebc-page .ya-hero h1,
+    .ya-ebc-page .ya-section-heading h2,
+    .ya-ebc-page .ya-overview-copy h3,
+    .ya-ebc-page .ya-itinerary-side h3,
+    .ya-ebc-page .ya-day-number,
+    .ya-ebc-page .ya-day-title strong,
+    .ya-ebc-page .ya-extension-copy h3,
+    .ya-ebc-page .ya-extension-card h4,
+    .ya-ebc-page .ya-info-head span,
+    .ya-ebc-page .ya-trip-note-copy h3,
+    .ya-ebc-page .ya-review-card blockquote,
+    .ya-ebc-page .ya-review-form h3,
+    .ya-ebc-page .ya-related-head h2,
+    .ya-ebc-page .ya-related-copy h3,
+    .ya-ebc-page .ya-gallery-label strong{font-family:"Newsreader",Georgia,serif}
+
+    .ya-ebc-page .ya-inner{width:min(1240px,calc(100% - 80px))}
+    .ya-ebc-page .ya-kicker{color:var(--gold);font-size:10px;letter-spacing:2.3px}
+    .ya-ebc-page .ya-kicker:before{width:28px}
+    .ya-ebc-page .ya-btn{min-height:50px;border-radius:2px;padding:0 24px;font-size:10px;letter-spacing:1.45px}
+    .ya-ebc-page .ya-btn-primary{background:var(--green-2)}
+    .ya-ebc-page .ya-btn-primary:hover{background:#4f6246}
+    .ya-ebc-page .ya-btn-light{color:var(--green);background:#fff}
+    .ya-ebc-page .ya-btn-light:hover{background:var(--gold);color:var(--green)}
+    .ya-ebc-page .ya-btn-outline{border-color:rgba(255,255,255,.7);background:transparent}
+    .ya-ebc-page .ya-btn-outline:hover{background:#fff;color:var(--green)}
+
+    .ya-ebc-page .ya-hero{
+      min-height:98vh;min-height:98svh;padding:170px 0 112px;align-items:flex-end;
+      background-position:center;background-color:#252b25;
+    }
+    .ya-ebc-page .ya-hero:before{background:linear-gradient(90deg,rgba(5,10,7,.72) 0%,rgba(5,10,7,.37) 56%,rgba(5,10,7,.16) 100%)}
+    .ya-ebc-page .ya-hero-content{max-width:820px}
+    .ya-ebc-page .ya-breadcrumbs{margin-bottom:38px;font-size:9px;letter-spacing:1.5px}
+    .ya-ebc-page .ya-hero .ya-script{margin-bottom:14px;font-size:clamp(34px,4.1vw,58px);font-weight:500}
+    .ya-ebc-page .ya-hero h1{max-width:820px;font-size:clamp(57px,7vw,104px);line-height:.88;letter-spacing:-.045em}
+    .ya-ebc-page .ya-hero-subtitle{max-width:650px;margin:30px 0 36px;font-size:15px;line-height:1.9}
+    .ya-ebc-page .ya-hero-badge{width:154px;height:154px;right:36px;background:var(--green);border-radius:0;box-shadow:none}
+    .ya-ebc-page .ya-hero-badge strong{font-family:"Newsreader",Georgia,serif;color:var(--gold);font-size:48px}
+
+    .ya-ebc-page .ya-facts{margin-top:0;background:#fff;border-bottom:1px solid var(--line)}
+    .ya-ebc-page .ya-facts-grid{grid-template-columns:repeat(5,1fr);border-radius:0;box-shadow:none;background:transparent}
+    .ya-ebc-page .ya-fact{min-height:138px;padding:27px 20px;border-right:1px solid var(--line)}
+    .ya-ebc-page .ya-fact-icon{width:38px;height:38px;flex-basis:38px;border-radius:0;background:transparent;color:var(--green-2)}
+    .ya-ebc-page .ya-fact small{margin-bottom:6px;color:#7a7c75;font-size:9px;letter-spacing:1.35px}
+    .ya-ebc-page .ya-fact strong{font-size:13px;line-height:1.45;color:var(--ink)}
+
+    .ya-ebc-page .ya-tabs-wrap{top:0;margin-top:0;border-top:0;box-shadow:0 8px 22px rgba(28,34,28,.05)}
+    .ya-ebc-page .ya-tab{min-height:66px;padding:0 21px;color:#646960;font-size:9px;background:transparent}
+    .ya-ebc-page .ya-tab:hover{background:transparent;color:var(--green)}
+    .ya-ebc-page .ya-tab:after{content:"";position:absolute;right:21px;bottom:0;left:21px;height:2px;background:transparent;transition:background .25s ease}
+    .ya-ebc-page .ya-tab.is-active{background:transparent;color:var(--green)}
+    .ya-ebc-page .ya-tab.is-active:after{background:var(--gold)}
+    .ya-ebc-page .ya-tab.is-active svg{color:var(--gold)}
+    .ya-ebc-page .ya-panel{padding:128px 0;background:var(--cream)}
+    .ya-ebc-page .ya-panel:nth-child(even){background:#fff}
+    .ya-ebc-page .ya-section-heading{max-width:760px;margin:0 0 60px}
+    .ya-ebc-page .ya-section-heading .ya-script{font-size:clamp(39px,4.4vw,64px);line-height:.9}
+    .ya-ebc-page .ya-section-heading h2{margin-top:13px;font-size:clamp(46px,5.3vw,74px);line-height:.91;letter-spacing:-.035em}
+    .ya-ebc-page .ya-section-heading p{max-width:620px;margin-top:21px;font-size:15px;line-height:1.9}
+
+    .ya-ebc-page .ya-overview-grid{gap:9vw;align-items:start}
+    .ya-ebc-page .ya-overview-copy h3{font-size:clamp(29px,3vw,43px);line-height:1.06;color:var(--ink)}
+    .ya-ebc-page .ya-overview-text{font-size:16px;line-height:1.95;color:#4f564e}
+    .ya-ebc-page .ya-highlight-box{margin:35px 0;padding:24px 0 24px 28px;border-left:2px solid var(--gold);border-radius:0;background:transparent;font:500 25px/1.35 "Newsreader",Georgia,serif;color:var(--ink)}
+    .ya-ebc-page .ya-inclusions{gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .ya-ebc-page .ya-inclusion{padding:15px 5px;border-bottom:1px solid var(--line);font-size:12px}
+    .ya-ebc-page .ya-inclusion:last-child{border-bottom:0}
+    .ya-ebc-page .ya-map-card{border-radius:0;box-shadow:none;background:transparent}
+    .ya-ebc-page .ya-map-image{height:620px;border-radius:0}
+    .ya-ebc-page .ya-map-caption{padding:18px 0;background:transparent}
+    .ya-ebc-page .ya-map-caption h3{font:600 29px/1.05 "Newsreader",Georgia,serif;color:var(--ink)}
+
+    .ya-ebc-page .ya-itinerary-shell{grid-template-columns:300px 1fr;gap:80px}
+    .ya-ebc-page .ya-itinerary-side{top:142px;padding:33px 0;border-top:1px solid var(--gold);border-radius:0;background:transparent;color:var(--ink)}
+    .ya-ebc-page .ya-itinerary-side .ya-script,.ya-ebc-page .ya-itinerary-side h3{color:var(--ink)}
+    .ya-ebc-page .ya-itinerary-side p,.ya-ebc-page .ya-itinerary-side li{color:#626a61}
+    .ya-ebc-page .ya-days{gap:0;border-top:1px solid var(--line)}
+    .ya-ebc-page .ya-day{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none}
+    .ya-ebc-page .ya-day-head{padding:25px 0;background:transparent}
+    .ya-ebc-page .ya-day-number{width:auto;height:auto;display:block;border-radius:0;background:transparent;color:var(--gold);font-size:26px}
+    .ya-ebc-page .ya-day-title strong{font-size:30px;color:var(--ink)}
+    .ya-ebc-page .ya-day-toggle{width:38px;height:38px;border-radius:0;background:transparent;color:var(--green);border:1px solid var(--line)}
+    .ya-ebc-page .ya-day.is-open .ya-day-toggle{background:var(--green-2);border-color:var(--green-2);color:#fff}
+    .ya-ebc-page .ya-day-content{padding:0 0 29px 92px}
+    .ya-ebc-page .ya-day-content p{max-width:680px;color:#5c645c}
+    .ya-ebc-page .ya-meta-pill{border-radius:0;background:#ebeae3;color:#525a51}
+
+    .ya-ebc-page .ya-gallery-grid{gap:12px;grid-template-columns:1.15fr .85fr .85fr}
+    .ya-ebc-page .ya-gallery-item{border-radius:0;background:#ddd}
+    .ya-ebc-page .ya-gallery-label{right:0;bottom:0;left:0;padding:19px 20px;border-radius:0;background:linear-gradient(transparent,rgba(18,24,19,.78));align-items:flex-end}
+    .ya-ebc-page .ya-gallery-label strong{font-size:24px}
+
+    .ya-ebc-page .ya-extension-intro{gap:9vw;margin-bottom:74px}
+    .ya-ebc-page .ya-extension-photo{min-height:560px;border-radius:0;box-shadow:none}
+    .ya-ebc-page .ya-extension-copy h3{font-size:clamp(48px,5vw,74px);color:var(--ink)}
+    .ya-ebc-page .ya-extension-grid{gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+    .ya-ebc-page .ya-extension-card{min-height:270px;padding:28px;border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none}
+    .ya-ebc-page .ya-extension-icon{width:38px;height:38px;border-radius:0;background:transparent;color:var(--green-2)}
+    .ya-ebc-page .ya-extension-card h4{font-size:30px;color:var(--ink)}
+
+    .ya-ebc-page .ya-essential-layout{gap:70px}
+    .ya-ebc-page .ya-info-list{gap:0;border-top:1px solid var(--line)}
+    .ya-ebc-page .ya-info-item{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+    .ya-ebc-page .ya-info-head{padding:25px 0;background:transparent}
+    .ya-ebc-page .ya-info-head span{font-size:28px;color:var(--ink)}
+    .ya-ebc-page .ya-info-content{padding:0 0 26px 34px;color:#5b635b}
+    .ya-ebc-page .ya-trip-note-card{border-radius:0;box-shadow:none;background:var(--green)}
+    .ya-ebc-page .ya-trip-note-image{height:260px}
+
+    .ya-ebc-page .ya-review-layout{gap:90px}
+    .ya-ebc-page .ya-review-cards{gap:0;border-top:1px solid var(--line)}
+    .ya-ebc-page .ya-review-card{padding:34px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none}
+    .ya-ebc-page .ya-review-card blockquote{font-size:31px;line-height:1.3;color:var(--ink)}
+    .ya-ebc-page .ya-review-form{padding:34px;border:1px solid var(--line);border-radius:0;background:#fff;box-shadow:none}
+    .ya-ebc-page .ya-field input,.ya-ebc-page .ya-field select,.ya-ebc-page .ya-field textarea{border-radius:0;background:#fff}
+
+    .ya-ebc-page .ya-related{padding:132px 0;background:#e9e6dd}
+    .ya-ebc-page .ya-related-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+    .ya-ebc-page .ya-related-card{border-radius:0;background:transparent;box-shadow:none}
+    .ya-ebc-page .ya-related-image{height:290px}
+    .ya-ebc-page .ya-related-copy{padding:21px 0}
+    .ya-ebc-page .ya-related-copy h3{font-size:31px;color:var(--ink)}
+
+    @media(max-width:1100px){
+      .ya-ebc-page .ya-inner{width:min(100% - 56px,1240px)}
+      .ya-ebc-page .ya-facts-grid{grid-template-columns:repeat(3,1fr)}
+      .ya-ebc-page .ya-itinerary-shell{grid-template-columns:240px 1fr;gap:42px}
+      .ya-ebc-page .ya-essential-layout,.ya-ebc-page .ya-review-layout{gap:42px}
+    }
+    @media(max-width:820px){
+      .ya-ebc-page .ya-inner{width:min(100% - 32px,1240px)}
+      .ya-ebc-page .ya-hero{min-height:92svh;padding:135px 0 70px}
+      .ya-ebc-page .ya-hero:before{background:linear-gradient(0deg,rgba(4,9,6,.75),rgba(4,9,6,.25))}
+      .ya-ebc-page .ya-hero h1{font-size:clamp(52px,13vw,76px)}
+      .ya-ebc-page .ya-facts-grid{grid-template-columns:repeat(2,1fr)}
+      .ya-ebc-page .ya-fact{min-height:112px;padding:18px 12px;border-top:1px solid var(--line)}
+      .ya-ebc-page .ya-fact:nth-child(odd){border-right:1px solid var(--line)!important}
+      .ya-ebc-page .ya-fact:nth-child(even){border-right:0!important}
+      .ya-ebc-page .ya-fact:first-child,.ya-ebc-page .ya-fact:nth-child(2){border-top:0}
+      .ya-ebc-page .ya-panel{padding:88px 0}
+      .ya-ebc-page .ya-section-heading{margin-bottom:42px}
+      .ya-ebc-page .ya-overview-grid,.ya-ebc-page .ya-itinerary-shell,.ya-ebc-page .ya-essential-layout,.ya-ebc-page .ya-review-layout{grid-template-columns:1fr;gap:42px}
+      .ya-ebc-page .ya-itinerary-side{position:static;padding-top:22px}
+      .ya-ebc-page .ya-day-content{padding-left:0}
+      .ya-ebc-page .ya-extension-intro{grid-template-columns:1fr;gap:35px}
+      .ya-ebc-page .ya-extension-grid{grid-template-columns:1fr}
+      .ya-ebc-page .ya-extension-photo{min-height:420px}
+      .ya-ebc-page .ya-gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:390px 260px 260px}
+      .ya-ebc-page .ya-gallery-item:first-child{grid-column:1/3;grid-row:auto}
+      .ya-ebc-page .ya-related-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:560px){
+      .ya-ebc-page .ya-hero-actions{display:grid;gap:10px}
+      .ya-ebc-page .ya-btn{width:100%}
+      .ya-ebc-page .ya-fact-icon{display:none}
+      .ya-ebc-page .ya-fact strong{font-size:12px}
+      .ya-ebc-page .ya-tab{padding:0 15px}
+      .ya-ebc-page .ya-tab:after{right:15px;left:15px}
+      .ya-ebc-page .ya-map-image{height:430px}
+      .ya-ebc-page .ya-day-head{grid-template-columns:50px minmax(0,1fr) 34px;gap:12px}
+      .ya-ebc-page .ya-day-title strong{font-size:23px}
+      .ya-ebc-page .ya-day-number{font-size:22px}
+      .ya-ebc-page .ya-gallery-grid{grid-template-columns:1fr;grid-template-rows:none}
+      .ya-ebc-page .ya-gallery-item,.ya-ebc-page .ya-gallery-item:first-child{grid-column:auto;height:300px}
+      .ya-ebc-page .ya-extension-photo{min-height:330px}
+      .ya-ebc-page .ya-related-grid{grid-template-columns:1fr}
+    }
+
+    /* Long-form editorial reading: all existing panels remain in the scrolling story. */
+    .ya-ebc-page .ya-tab-stage .ya-panel{
+      display:block;
+      scroll-margin-top:112px;
+    }
+    .ya-ebc-page .ya-tab-stage .ya-panel.is-active{animation:none}
+    .ya-ebc-page .ya-reading-progress{height:3px;margin-top:18px;overflow:hidden;background:#dcdcd3}
+    .ya-ebc-page .ya-reading-progress-bar{display:block;width:0;height:100%;background:#d1ad54;transition:width .18s linear}
+
+    /* Desktop trip navigation: quiet sticky rail at left, editorial content at right. */
+    @media(min-width:1101px){
+      .ya-ebc-page .ya-tabs-wrap{
+        position:sticky;
+        top:112px;
+        z-index:70;
+        float:left;
+        width:250px;
+        margin:72px 0 0 max(40px,calc((100vw - 1240px) / 2));
+        background:transparent;
+        border:0;
+        box-shadow:none;
+      }
+      .ya-ebc-page .ya-tabs{
+        width:auto;
+        display:flex;
+        align-items:stretch;
+        overflow:visible;
+        flex-direction:column;
+        border-top:1px solid var(--line);
+      }
+      .ya-ebc-page .ya-tab{
+        width:100%;
+        min-height:0;
+        justify-content:flex-start;
+        padding:17px 10px 17px 0;
+        border-bottom:1px solid var(--line);
+        color:#73786f;
+        font-size:12px;
+        text-align:left;
+      }
+      .ya-ebc-page .ya-tab svg{width:16px;height:16px;color:#8a8c83}
+      .ya-ebc-page .ya-tab:after{right:auto;bottom:-1px;left:0;width:30px;height:1px}
+      .ya-ebc-page .ya-tab.is-active{color:var(--ink)}
+      .ya-ebc-page .ya-tab.is-active:after{height:2px}
+      .ya-ebc-page .ya-tab.is-active svg{color:var(--green-2)}
+      .ya-ebc-page .ya-tab-stage{
+        min-width:0;
+        min-height:900px;
+        margin-left:calc(250px + max(80px,calc((100vw - 1240px) / 2)));
+      }
+      .ya-ebc-page .ya-tab-stage .ya-panel{padding-right:max(40px,calc((100vw - 1240px) / 2))}
+      .ya-ebc-page .ya-related{clear:both}
+    }
+
+    /* Centred destination hero with a CPT-managed, cross-fading image slideshow. */
+    .ya-ebc-page .ya-hero{
+      min-height:100vh;
+      min-height:100svh;
+      padding:0;
+      overflow:hidden;
+      background-image:none!important;
+    }
+    .ya-ebc-page .ya-section-heading h2{font-size:52px}
+    .ya-ebc-page .ya-hero > .ya-inner{
+      width:min(1400px,calc(100% - 80px));
+      min-height:inherit;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .ya-ebc-page .ya-hero-background,
+    .ya-ebc-page .ya-hero-background::after,
+    .ya-ebc-page .ya-hero-background-slide{
+      position:absolute;
+      inset:0;
+    }
+    .ya-ebc-page .ya-hero-background{z-index:-2;background:#252b25}
+    .ya-ebc-page .ya-hero-background::after{
+      z-index:1;
+      content:"";
+      background:linear-gradient(180deg,rgba(4,10,7,.54) 0%,rgba(4,10,7,.4) 45%,rgba(4,10,7,.65) 100%);
+    }
+    .ya-ebc-page .ya-hero-background-slide{
+      z-index:0;
+      opacity:0;
+      background:center / cover no-repeat;
+      transform:translate3d(4%,0,0) scale(1.04);
+      transition:opacity 950ms ease,transform 1200ms cubic-bezier(.22,.61,.36,1);
+    }
+    .ya-ebc-page .ya-hero-background-slide.is-active{opacity:1;transform:translate3d(0,0,0) scale(1.02)}
+    .ya-ebc-page .ya-hero-background-slide.is-exiting{opacity:0;transform:translate3d(-4%,0,0) scale(1.02)}
+    .ya-ebc-page .ya-hero-slider-dots{
+      position:absolute;
+      z-index:3;
+      bottom:30px;
+      left:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      transform:translateX(-50%);
+    }
+    .ya-ebc-page .ya-hero-slider-dot{
+      width:8px;
+      height:8px;
+      margin:0;
+      padding:0;
+      border:1px solid rgba(255,255,255,.92);
+      border-radius:999px;
+      background:rgba(255,255,255,.18);
+      box-shadow:0 2px 10px rgba(0,0,0,.3);
+      cursor:pointer;
+      transition:width .3s ease,background .3s ease,transform .3s ease;
+    }
+    .ya-ebc-page .ya-hero-slider-dot:hover{transform:scale(1.2)}
+    .ya-ebc-page .ya-hero-slider-dot.is-active{width:30px;background:#fff}
+    .ya-ebc-page .ya-hero-slider-dot:focus-visible{outline:2px solid #fff;outline-offset:4px}
+
+    /* Brand interaction system: sage #617654, gold #d1ad54. */
+    .ya-ebc-page .ya-btn{
+      border-color:#617654;
+      background:#617654;
+      color:#fff;
+      box-shadow:0 8px 20px rgba(32,40,33,.18);
+      transition:transform .22s ease,background .22s ease,color .22s ease,border-color .22s ease,box-shadow .22s ease;
+    }
+    .ya-ebc-page .ya-btn-light,
+    .ya-ebc-page .ya-btn-secondary{border-color:#617654;background:#fff;color:#617654}
+    .ya-ebc-page .ya-btn-outline{border-color:#d1ad54;background:transparent;color:#fff}
+    .ya-ebc-page .ya-btn:hover,
+    .ya-ebc-page .ya-btn:focus-visible{
+      border-color:#d1ad54;
+      background:#d1ad54;
+      color:#202821;
+      box-shadow:0 12px 25px rgba(209,173,84,.32);
+      transform:translateY(-3px);
+    }
+    .ya-ebc-page .ya-btn:active{background:#617654;color:#fff;box-shadow:0 3px 9px rgba(32,40,33,.22);transform:translateY(1px) scale(.98)}
+    .ya-ebc-page .ya-btn:focus-visible{outline:2px solid #617654;outline-offset:3px}
+
+    .ya-ebc-page .ya-tab{transition:background .22s ease,color .22s ease,transform .22s ease}
+    .ya-ebc-page .ya-tab:hover{background:rgba(209,173,84,.14);color:#617654}
+    .ya-ebc-page .ya-tab.is-active{background:#617654;color:#fff}
+    .ya-ebc-page .ya-tab:active{background:#d1ad54;color:#202821;transform:scale(.98)}
+    .ya-ebc-page .ya-tab:focus-visible{outline:2px solid #d1ad54;outline-offset:-3px}
+
+    .ya-ebc-page .ya-day-head,
+    .ya-ebc-page .ya-info-head{transition:background .22s ease,color .22s ease}
+    .ya-ebc-page .ya-day-head:hover,
+    .ya-ebc-page .ya-info-head:hover{background:rgba(209,173,84,.12);color:#617654}
+    .ya-ebc-page .ya-day-head:active,
+    .ya-ebc-page .ya-info-head:active{background:rgba(97,118,84,.16);color:#202821}
+    .ya-ebc-page .ya-day-head:focus-visible,
+    .ya-ebc-page .ya-info-head:focus-visible{outline:2px solid #d1ad54;outline-offset:-3px}
+
+    .ya-ebc-page .ya-hero-slider-dot{border-color:#d1ad54;background:rgba(209,173,84,.28)}
+    .ya-ebc-page .ya-hero-slider-dot:hover,
+    .ya-ebc-page .ya-hero-slider-dot.is-active{background:#d1ad54}
+    .ya-ebc-page .ya-hero-slider-dot:active{background:#617654;transform:scale(.9)}
+    .ya-ebc-page .ya-lightbox-close{transition:background .22s ease,color .22s ease,border-color .22s ease,transform .22s ease}
+    .ya-ebc-page .ya-lightbox-close:hover{border-color:#d1ad54;background:#d1ad54;color:#202821;transform:rotate(90deg)}
+    .ya-ebc-page .ya-lightbox-close:active{background:#617654;color:#fff;transform:rotate(90deg) scale(.92)}
+    .ya-ebc-page .ya-hero > .ya-inner > .ya-breadcrumbs{
+      position:absolute;
+      top:clamp(110px,1vw,170px);
+      left:0;
+      z-index:1;
+      margin:0;
+    }
+    .ya-ebc-page .ya-hero-content{
+      width:min(820px,100%);
+      max-width:none;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      color:#fff;
+      text-align:center;
+      gap:2em;
+    }
+    .ya-ebc-page .ya-hero .ya-script{font-size:clamp(30px,3.2vw,46px)}
+    .ya-ebc-page .ya-hero h1{
+      max-width:1100px;
+      font-size:56px;
+      line-height:.95;
+    }
+    .ya-ebc-page .ya-hero-subtitle{margin:24px auto 30px}
+    .ya-ebc-page .ya-hero-actions{justify-content:center}
+    .ya-ebc-page .ya-breadcrumbs [aria-current="page"]{color:#fff}
+
+    @media(max-width:820px){
+      .ya-ebc-page .ya-hero{min-height:100vh;min-height:100svh}
+      .ya-ebc-page .ya-hero > .ya-inner{width:min(100% - 32px,1400px)}
+      .ya-ebc-page .ya-hero > .ya-inner > .ya-breadcrumbs{top:112px}
+      .ya-ebc-page .ya-hero h1{font-size:clamp(40px,10vw,56px)}
+      .ya-ebc-page .ya-hero-subtitle{font-size:14px}
+    }
+    @media(max-width:560px){
+      .ya-ebc-page .ya-hero{min-height:100vh;min-height:100svh}
+      .ya-ebc-page .ya-hero > .ya-inner > .ya-breadcrumbs{top:98px;gap:5px;font-size:8px;letter-spacing:1px}
+      .ya-ebc-page .ya-breadcrumbs svg{width:11px;height:11px}
+      .ya-ebc-page .ya-hero .ya-script{font-size:30px}
+      .ya-ebc-page .ya-hero h1{font-size:clamp(38px,11vw,48px)}
+      .ya-ebc-page .ya-hero-subtitle{margin:18px auto 25px;line-height:1.7}
+      .ya-ebc-page .ya-hero-slider-dots{bottom:20px}
+    }
+    @media(prefers-reduced-motion:reduce){
+      .ya-ebc-page .ya-hero-background-slide{transition:none}
+    }
   </style>
 
   <!-- 1. Hero Section -->
   <div class="ya-hero">
+    <div class="ya-hero-background" aria-hidden="true">
+      <div class="ya-hero-background-slide is-active" style="background-image:url('<?php echo esc_url( $hero_slider_images[0] ?? $hero_bg_img ); ?>');"></div>
+      <div class="ya-hero-background-slide"></div>
+    </div>
+    <?php if ( count( $hero_slider_images ) > 1 ) : ?>
+      <div class="ya-hero-slider-dots" role="group" aria-label="<?php esc_attr_e( 'Hero image slideshow', 'trek-content-manager' ); ?>">
+        <?php foreach ( $hero_slider_images as $slide_index => $hero_slider_image ) : ?>
+          <button class="ya-hero-slider-dot<?php echo 0 === $slide_index ? ' is-active' : ''; ?>" type="button" data-hero-slide="<?php echo esc_attr( $slide_index ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Show hero image %d', 'trek-content-manager' ), $slide_index + 1 ) ); ?>" aria-current="<?php echo 0 === $slide_index ? 'true' : 'false'; ?>"></button>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
     <div class="ya-inner">
+      <!-- <div class="ya-breadcrumbs" aria-label="Breadcrumb">
+        <a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        <a href="<?php echo esc_url( home_url( '/trips/' ) ); ?>">All-Trips</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        <a href="<?php echo esc_url( home_url( '/' . strtolower( sanitize_title( $breadcrumb_region ) ) . '/' ) ); ?>"><?php echo esc_html( $breadcrumb_region ); ?></a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        <span aria-current="page"><?php echo esc_html( $title ); ?></span>
+      </div> -->
       <div class="ya-hero-content ya-reveal">
-        <div class="ya-breadcrumbs" aria-label="Breadcrumb">
-          <a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-          <a href="<?php echo esc_url( home_url( '/trips/' ) ); ?>">All-Trips</a>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-          <a href="<?php echo esc_url( home_url( '/' . strtolower( sanitize_title( $breadcrumb_region ) ) . '/' ) ); ?>"><?php echo esc_html( $breadcrumb_region ); ?></a>
-        </div>
         <div class="ya-script"><?php echo esc_html( $script_title ); ?></div>
         <h1><?php echo esc_html( $hero_title ); ?></h1>
-        <p class="ya-hero-subtitle"><?php echo esc_html( $hero_subtitle ); ?></p>
+
         <div class="ya-hero-actions">
           <button class="ya-btn ya-btn-light ya-jump-tab" type="button" data-target="itinerary">View Itinerary</button>
-          <button class="ya-btn ya-btn-outline ya-jump-tab" type="button" data-target="fixed-departure">Check Departures</button>
+          <button class="ya-btn ya-btn-outline" type="button" id="ya-open-enquiry-modal">Start Planning Your Trip</button>
         </div>
       </div>
       <div class="ya-hero-badge" aria-hidden="true">
@@ -1410,10 +1800,8 @@ $related_query = new WP_Query( array(
       <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-review" data-tab="review">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v12H8l-4 3V5z"/></svg>Review
       </button>
-      <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-fixed-departure" data-tab="fixed-departure">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Join Fixed Departure
-      </button>
     </div>
+    <div class="ya-reading-progress" aria-hidden="true"><span class="ya-reading-progress-bar"></span></div>
   </nav>
 
   <div class="ya-tab-stage">
@@ -1701,69 +2089,6 @@ $related_query = new WP_Query( array(
       </div>
     </section>
 
-    <!-- Panel 7: Join Fixed Departure -->
-    <section class="ya-panel" id="ya-panel-fixed-departure" role="tabpanel" data-panel="fixed-departure">
-      <div class="ya-inner">
-        <div class="ya-section-heading ya-reveal">
-          <span class="ya-kicker"><?php echo esc_html( $dep_kicker ); ?></span>
-          <div class="ya-script"><?php echo esc_html( $dep_script ); ?></div>
-          <h2><?php echo esc_html( $dep_heading ); ?></h2>
-          <p><?php echo esc_html( $dep_subtext ); ?></p>
-        </div>
-
-        <div class="ya-departure-box ya-reveal">
-          <div class="ya-departure-copy">
-            <div class="ya-script"><?php echo esc_html( $box_script ); ?></div>
-            <h3><?php echo esc_html( $box_title ); ?></h3>
-            <p><?php echo esc_html( $box_desc ); ?></p>
-
-            <form class="ya-departure-form" id="ya-departure-form">
-              <div class="ya-field">
-                <label for="ya-departure-month">Preferred Month *</label>
-                <select id="ya-departure-month" required>
-                  <option value="" selected disabled>Select month</option>
-                  <option>January</option><option>February</option><option>March</option>
-                  <option>April</option><option>May</option><option>June</option>
-                  <option>July</option><option>August</option><option>September</option>
-                  <option>October</option><option>November</option><option>December</option>
-                </select>
-              </div>
-              <div class="ya-field">
-                <label for="ya-departure-year">Preferred Year *</label>
-                <select id="ya-departure-year" required></select>
-              </div>
-              <div class="ya-field">
-                <label for="ya-departure-name">Full Name *</label>
-                <input id="ya-departure-name" type="text" required placeholder="Your full name">
-              </div>
-              <div class="ya-field">
-                <label for="ya-departure-people">Number of Travellers *</label>
-                <select id="ya-departure-people" required>
-                  <option>1 traveller</option><option>2 travellers</option><option>3–5 travellers</option>
-                  <option>6–10 travellers</option><option>10+ travellers</option>
-                </select>
-              </div>
-              <div class="ya-field ya-field-full">
-                <label for="ya-departure-email">Email *</label>
-                <input id="ya-departure-email" type="email" required placeholder="your.email@example.com">
-              </div>
-              <div class="ya-field ya-field-full">
-                <label for="ya-departure-message">Message</label>
-                <textarea id="ya-departure-message" placeholder="Tell us about your preferred timing, fitness or trip requirements."></textarea>
-              </div>
-              <div class="ya-field ya-field-full">
-                <button class="ya-btn ya-btn-light" type="submit">Send WhatsApp Enquiry</button>
-              </div>
-            </form>
-
-            <div class="ya-departure-note">
-              <?php echo esc_html( $box_note ); ?>
-            </div>
-          </div>
-          <div class="ya-departure-photo" role="img" aria-label="<?php echo esc_attr( $title ); ?> departure"></div>
-        </div>
-      </div>
-    </section>
   </div>
 
   <!-- Related Journeys -->
@@ -1820,6 +2145,68 @@ $related_query = new WP_Query( array(
     <img src="" alt="Expanded trip image">
   </div>
 
+  <style>
+    .ya-ebc-page .ya-enquiry-modal{position:fixed;inset:0;z-index:100001;display:none;place-items:center;padding:28px;background:rgba(15,25,18,.72);backdrop-filter:blur(8px)}
+    .ya-ebc-page .ya-enquiry-modal.is-open{display:grid}
+    .ya-ebc-page .ya-enquiry-dialog{position:relative;display:grid;grid-template-columns:minmax(330px,.9fr) minmax(460px,1.1fr);width:min(1100px,100%);max-height:calc(100svh - 56px);overflow:auto;background:#fff;border-radius:16px;box-shadow:0 32px 90px rgba(0,0,0,.35)}
+    .ya-ebc-page .ya-enquiry-image{position:relative;min-height:620px;background:center / cover no-repeat;color:#fff}
+    .ya-ebc-page .ya-enquiry-image:after{position:absolute;inset:0;content:"";background:linear-gradient(180deg,rgba(12,22,16,.05) 25%,rgba(12,22,16,.8) 100%)}
+    .ya-ebc-page .ya-enquiry-image-copy{position:absolute;z-index:1;right:32px;bottom:30px;left:32px}
+    .ya-ebc-page .ya-enquiry-image-copy small{display:block;margin-bottom:8px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#d1ad54}
+    .ya-ebc-page .ya-enquiry-image-copy strong{font:600 clamp(32px,3.4vw,48px)/.95 "Newsreader",Georgia,serif}
+    .ya-ebc-page .ya-enquiry-content{padding:46px 46px 40px;color:#202821}
+    .ya-ebc-page .ya-enquiry-close{position:absolute;z-index:2;top:16px;right:16px;width:38px;height:38px;display:grid;place-items:center;border:1px solid #d7dfd4;border-radius:50%;background:#fff;color:#617654;cursor:pointer;transition:background .2s ease,color .2s ease,transform .2s ease}
+    .ya-ebc-page .ya-enquiry-close:hover{background:#d1ad54;color:#202821;transform:rotate(90deg)}
+    .ya-ebc-page .ya-enquiry-close:active{background:#617654;color:#fff;transform:rotate(90deg) scale(.92)}
+    .ya-ebc-page .ya-enquiry-close svg{width:19px;height:19px}
+    .ya-ebc-page .ya-enquiry-meta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;color:#617654;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .ya-ebc-page .ya-enquiry-meta span{display:inline-flex;align-items:center;gap:6px}
+    .ya-ebc-page .ya-enquiry-meta svg{width:16px;height:16px;color:#d1ad54}
+    .ya-ebc-page .ya-enquiry-content h2{margin:0;font:600 clamp(34px,4vw,50px)/.96 "Newsreader",Georgia,serif;color:#202821}
+    .ya-ebc-page .ya-enquiry-intro{margin:12px 0 25px;color:#667068;font-size:14px;line-height:1.65}
+    .ya-ebc-page .ya-enquiry-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 17px}
+    .ya-ebc-page .ya-enquiry-form .ya-field{margin:0}
+    .ya-ebc-page .ya-enquiry-form .ya-field-full{grid-column:1/-1}
+    .ya-ebc-page .ya-enquiry-form label{display:block;margin:0 0 6px;color:#435045;font-size:11px;font-weight:700}
+    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select,.ya-ebc-page .ya-enquiry-form textarea{width:100%;border:1px solid #d7dfd4;border-radius:7px;background:#fff;color:#202821;font-size:13px;transition:border-color .2s ease,box-shadow .2s ease}
+    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select{height:45px;padding:0 12px}
+    .ya-ebc-page .ya-enquiry-form textarea{min-height:92px;padding:11px 12px;resize:vertical}
+    .ya-ebc-page .ya-enquiry-form input:focus,.ya-ebc-page .ya-enquiry-form select:focus,.ya-ebc-page .ya-enquiry-form textarea:focus{border-color:#617654;outline:0;box-shadow:0 0 0 3px rgba(97,118,84,.14)}
+    .ya-ebc-page .ya-enquiry-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+    .ya-ebc-page .ya-enquiry-actions .ya-btn{flex:1;min-width:180px}
+    .ya-ebc-page .ya-enquiry-actions .ya-btn-whatsapp{border-color:#617654;background:#fff;color:#617654}
+    .ya-ebc-page .ya-enquiry-alert{display:none;grid-column:1/-1;padding:11px 13px;border-radius:7px;font-size:13px;line-height:1.45}
+    .ya-ebc-page .ya-enquiry-alert.is-success{display:block;background:#edf4ea;color:#315336}
+    .ya-ebc-page .ya-enquiry-alert.is-error{display:block;background:#fff1ee;color:#a34231}
+    .ya-ebc-page .ya-enquiry-honeypot{position:absolute!important;left:-9999px!important}
+    @media(max-width:760px){.ya-ebc-page .ya-enquiry-modal{padding:14px}.ya-ebc-page .ya-enquiry-dialog{grid-template-columns:1fr;max-height:calc(100svh - 28px)}.ya-ebc-page .ya-enquiry-image{min-height:210px}.ya-ebc-page .ya-enquiry-image-copy{right:24px;bottom:22px;left:24px}.ya-ebc-page .ya-enquiry-content{padding:30px 24px}.ya-ebc-page .ya-enquiry-form{grid-template-columns:1fr}.ya-ebc-page .ya-enquiry-form .ya-field-full{grid-column:auto}}
+  </style>
+
+  <div class="ya-enquiry-modal" id="ya-enquiry-modal" role="dialog" aria-modal="true" aria-labelledby="ya-enquiry-heading" aria-hidden="true">
+    <div class="ya-enquiry-dialog" role="document">
+      <button class="ya-enquiry-close" type="button" aria-label="Close enquiry form"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="ya-enquiry-image" style="background-image:url('<?php echo esc_url( $hero_slider_images[0] ?? $hero_bg_img ); ?>');">
+        <div class="ya-enquiry-image-copy"><small><?php echo esc_html( $breadcrumb_region ); ?></small><strong><?php echo esc_html( $title ); ?></strong></div>
+      </div>
+      <div class="ya-enquiry-content">
+        <div class="ya-enquiry-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg><?php echo esc_html( $breadcrumb_region ); ?></span><span><?php echo esc_html( $hero_days ); ?> Days</span></div>
+        <h2 id="ya-enquiry-heading">Plan Your <?php echo esc_html( $title ); ?> Trip</h2>
+        <p class="ya-enquiry-intro">Tell us a little about your travel plans and our local team will tailor this journey for you.</p>
+        <form class="ya-enquiry-form" id="ya-enquiry-form">
+          <input type="hidden" id="ya-enquiry-trek-id" value="<?php echo esc_attr( $post_id ); ?>">
+          <div class="ya-enquiry-honeypot" aria-hidden="true"><label>Website<input id="ya-enquiry-website" type="text" tabindex="-1" autocomplete="off"></label></div>
+          <div class="ya-field"><label for="ya-enquiry-name">Full Name *</label><input id="ya-enquiry-name" type="text" required placeholder="Your full name"></div>
+          <div class="ya-field"><label for="ya-enquiry-people">Number of Travellers *</label><select id="ya-enquiry-people" required><option value="" selected disabled>Select travellers</option><option>1 traveller</option><option>2 travellers</option><option>3–5 travellers</option><option>6–10 travellers</option><option>10+ travellers</option></select></div>
+          <div class="ya-field"><label for="ya-enquiry-email">Email *</label><input id="ya-enquiry-email" type="email" required placeholder="you@email.com"></div>
+          <div class="ya-field"><label for="ya-enquiry-phone">Phone / WhatsApp <em>(optional)</em></label><input id="ya-enquiry-phone" type="tel" placeholder="Your phone number"></div>
+          <div class="ya-field ya-field-full"><label for="ya-enquiry-message">Message</label><textarea id="ya-enquiry-message" placeholder="Tell us about your travel plans, fitness, dates or any special requests."></textarea></div>
+          <div class="ya-enquiry-alert" id="ya-enquiry-alert" role="status" aria-live="polite"></div>
+          <div class="ya-field ya-field-full ya-enquiry-actions"><button class="ya-btn ya-btn-primary" type="submit" data-enquiry-action="save">Send Enquiry</button><button class="ya-btn ya-btn-whatsapp" type="submit" data-enquiry-action="whatsapp">Save &amp; Send WhatsApp</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
     (()=>{
       const root = document.querySelector('.ya-ebc-page');
@@ -1830,7 +2217,131 @@ $related_query = new WP_Query( array(
       const salesEmailTarget = '<?php echo esc_js( $sales_email ); ?>';
       const tripTitle = '<?php echo esc_js( $title ); ?>';
 
-      // 1. Reveal on scroll animations
+      // Planning enquiry modal: save every enquiry to WordPress, with WhatsApp as an optional follow-up.
+      const enquiryModal = root.querySelector('#ya-enquiry-modal');
+      const enquiryForm = root.querySelector('#ya-enquiry-form');
+      const enquiryAlert = root.querySelector('#ya-enquiry-alert');
+      const closeEnquiryModal = () => {
+        enquiryModal?.classList.remove('is-open');
+        enquiryModal?.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+      root.querySelector('#ya-open-enquiry-modal')?.addEventListener('click', () => {
+        enquiryModal?.classList.add('is-open');
+        enquiryModal?.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        window.setTimeout(() => root.querySelector('#ya-enquiry-name')?.focus(), 50);
+      });
+      enquiryModal?.querySelector('.ya-enquiry-close')?.addEventListener('click', closeEnquiryModal);
+      enquiryModal?.addEventListener('click', event => { if (event.target === enquiryModal) closeEnquiryModal(); });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape' && enquiryModal?.classList.contains('is-open')) closeEnquiryModal(); });
+
+      enquiryForm?.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!enquiryForm.reportValidity()) return;
+        const submitter = event.submitter;
+        const action = submitter?.dataset.enquiryAction || 'save';
+        const submitButtons = [...enquiryForm.querySelectorAll('button[type="submit"]')];
+        const payload = {
+          trek_id: root.querySelector('#ya-enquiry-trek-id')?.value || '',
+          name: getValue('#ya-enquiry-name'),
+          email: getValue('#ya-enquiry-email'),
+          phone: getValue('#ya-enquiry-phone'),
+          travellers: getValue('#ya-enquiry-people'),
+          message: getValue('#ya-enquiry-message') || 'No additional message provided.',
+          website_hp: root.querySelector('#ya-enquiry-website')?.value || '',
+          source: 'single-destination-planning-popup'
+        };
+        if (enquiryAlert) enquiryAlert.className = 'ya-enquiry-alert';
+        submitButtons.forEach(button => button.disabled = true);
+        const originalText = submitter?.textContent;
+        if (submitter) submitter.textContent = 'Saving your enquiry…';
+        try {
+          const response = await fetch(`${restUrl}enquiries`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await response.json();
+          if (!response.ok || !data.success) throw new Error(data.message || 'We could not save your enquiry. Please try again.');
+          if (enquiryAlert) {
+            enquiryAlert.textContent = 'Thank you — your enquiry has been saved. Our team will be in touch shortly.';
+            enquiryAlert.className = 'ya-enquiry-alert is-success';
+          }
+          enquiryForm.reset();
+          if (action === 'whatsapp' && whatsappTarget) {
+            const whatsappMessage = [
+              `Hello Yeti Adventure, I would like to plan ${tripTitle}.`,
+              `Name: ${payload.name}`,
+              `Travellers: ${payload.travellers}`,
+              `Email: ${payload.email}`,
+              payload.phone ? `Phone / WhatsApp: ${payload.phone}` : '',
+              `Message: ${payload.message}`
+            ].filter(Boolean).join('\n');
+            window.open(`https://wa.me/${whatsappTarget}?text=${encodeURIComponent(whatsappMessage)}`, '_blank', 'noopener');
+          }
+        } catch (error) {
+          if (enquiryAlert) {
+            enquiryAlert.textContent = error.message || 'We could not save your enquiry. Please try again.';
+            enquiryAlert.className = 'ya-enquiry-alert is-error';
+          }
+        } finally {
+          submitButtons.forEach(button => button.disabled = false);
+          if (submitter && originalText) submitter.textContent = originalText;
+        }
+      });
+
+      // 1. Hero background slideshow — image order comes from the destination Hero Slider Gallery.
+      const heroSlides = <?php echo wp_json_encode( $hero_slider_images ); ?>;
+      const heroBackgrounds = [...root.querySelectorAll('.ya-hero-background-slide')];
+      const heroDots = [...root.querySelectorAll('.ya-hero-slider-dot')];
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      if (heroSlides.length > 1 && heroBackgrounds.length === 2) {
+        let heroSlideIndex = 0;
+        let activeBackground = 0;
+        let heroTimer;
+        const updateHeroDots = () => {
+          heroDots.forEach((dot, index) => {
+            const active = index === heroSlideIndex;
+            dot.classList.toggle('is-active', active);
+            dot.setAttribute('aria-current', String(active));
+          });
+        };
+        const showHeroSlide = nextIndex => {
+          const targetIndex = typeof nextIndex === 'number'
+            ? nextIndex
+            : (heroSlideIndex + 1) % heroSlides.length;
+          if (targetIndex === heroSlideIndex) return;
+          const nextBackground = activeBackground === 0 ? 1 : 0;
+          const outgoingBackground = heroBackgrounds[activeBackground];
+          const incomingBackground = heroBackgrounds[nextBackground];
+          heroSlideIndex = targetIndex;
+          incomingBackground.classList.remove('is-active', 'is-exiting');
+          incomingBackground.style.backgroundImage = `url(${JSON.stringify(heroSlides[heroSlideIndex])})`;
+          void incomingBackground.offsetWidth;
+          incomingBackground.classList.add('is-active');
+          outgoingBackground.classList.remove('is-active');
+          outgoingBackground.classList.add('is-exiting');
+          window.setTimeout(() => outgoingBackground.classList.remove('is-exiting'), 1250);
+          activeBackground = nextBackground;
+          updateHeroDots();
+        };
+        const startHeroTimer = () => {
+          window.clearInterval(heroTimer);
+          if (!reduceMotion) heroTimer = window.setInterval(showHeroSlide, 4000);
+        };
+        heroDots.forEach(dot => dot.addEventListener('click', () => {
+          showHeroSlide(Number(dot.dataset.heroSlide));
+          startHeroTimer();
+        }));
+        startHeroTimer();
+        document.addEventListener('visibilitychange', () => {
+          window.clearInterval(heroTimer);
+          if (!document.hidden) startHeroTimer();
+        });
+      }
+
+      // 2. Reveal on scroll animations
       const revealItems = root.querySelectorAll('.ya-reveal');
       if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver(entries => {
@@ -1852,9 +2363,8 @@ $related_query = new WP_Query( array(
       // 2. Tab navigation
       const tabs = [...root.querySelectorAll('.ya-tab')];
       const panels = [...root.querySelectorAll('.ya-panel')];
-      const tabsWrap = root.querySelector('.ya-tabs-wrap');
 
-      const activateTab = (name, scroll = true) => {
+      const setActiveTab = name => {
         const targetTab = tabs.find(tab => tab.dataset.tab === name);
         const targetPanel = panels.find(panel => panel.dataset.panel === name);
         if (!targetTab || !targetPanel) return;
@@ -1865,13 +2375,18 @@ $related_query = new WP_Query( array(
           tab.setAttribute('aria-selected', String(active));
         });
         panels.forEach(panel => panel.classList.toggle('is-active', panel === targetPanel));
+        return { targetTab, targetPanel };
+      };
+
+      const activateTab = (name, scroll = true) => {
+        const active = setActiveTab(name);
+        if (!active) return;
+        const { targetTab, targetPanel } = active;
         targetTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
         try { history.replaceState(null, '', `#${name}`); } catch (error) {}
         if (scroll) {
-          const offset = (tabsWrap?.offsetHeight || 70) + 90;
-          const top = (tabsWrap?.getBoundingClientRect().top || 0) + window.scrollY - offset + 1;
-          window.scrollTo({ top, behavior: 'smooth' });
+          targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       };
 
@@ -1880,6 +2395,40 @@ $related_query = new WP_Query( array(
 
       const initialHash = window.location.hash.replace('#', '');
       if (tabs.some(tab => tab.dataset.tab === initialHash)) activateTab(initialHash, false);
+
+      // Keep the visual navigation state aligned with the visible long-form section.
+      if ('IntersectionObserver' in window) {
+        const sectionObserver = new IntersectionObserver(entries => {
+          const visible = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+          if (visible?.target?.dataset?.panel) {
+            setActiveTab(visible.target.dataset.panel);
+          }
+        }, { rootMargin: '-18% 0px -65% 0px', threshold: 0.01 });
+        panels.forEach(panel => sectionObserver.observe(panel));
+      }
+
+      // Reading progress for the long-form content, shown directly below the fixed left navigation.
+      const readingProgress = root.querySelector('.ya-reading-progress-bar');
+      if (readingProgress && panels.length) {
+        let progressFrame;
+        const updateReadingProgress = () => {
+          progressFrame = undefined;
+          const firstPanelTop = panels[0].getBoundingClientRect().top + window.scrollY;
+          const lastPanelBottom = panels[panels.length - 1].getBoundingClientRect().bottom + window.scrollY;
+          const viewportMarker = window.scrollY + window.innerHeight * .45;
+          const distance = Math.max(1, lastPanelBottom - firstPanelTop);
+          const progress = Math.min(100, Math.max(0, ((viewportMarker - firstPanelTop) / distance) * 100));
+          readingProgress.style.width = `${progress}%`;
+        };
+        const requestProgressUpdate = () => {
+          if (!progressFrame) progressFrame = window.requestAnimationFrame(updateReadingProgress);
+        };
+        window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+        window.addEventListener('resize', requestProgressUpdate);
+        requestProgressUpdate();
+      }
 
       // 3. Day-by-Day Accordion
       root.querySelectorAll('.ya-day-head').forEach(button => {
@@ -1918,37 +2467,9 @@ $related_query = new WP_Query( array(
       lightbox?.addEventListener('click', event => { if (event.target === lightbox) closeLightbox(); });
       document.addEventListener('keydown', event => { if (event.key === 'Escape') closeLightbox(); });
 
-      // 6. Preferred Year Generation
-      const yearSelect = root.querySelector('#ya-departure-year');
-      if (yearSelect) {
-        const year = new Date().getFullYear();
-        for (let i = 0; i < 4; i++) {
-          const option = document.createElement('option');
-          option.value = String(year + i);
-          option.textContent = String(year + i);
-          yearSelect.appendChild(option);
-        }
-      }
-
       const getValue = selector => root.querySelector(selector)?.value?.trim() || 'Not provided';
 
-      // 7. Fixed Departure Form (WhatsApp)
-      root.querySelector('#ya-departure-form')?.addEventListener('submit', event => {
-        event.preventDefault();
-        if (!event.currentTarget.reportValidity()) return;
-        const message = [
-          `Hello Yeti Adventure, I would like to ask about a fixed departure for ${tripTitle}.`,
-          '',
-          `Preferred month: ${getValue('#ya-departure-month')} ${getValue('#ya-departure-year')}`,
-          `Name: ${getValue('#ya-departure-name')}`,
-          `Travellers: ${getValue('#ya-departure-people')}`,
-          `Email: ${getValue('#ya-departure-email')}`,
-          `Message: ${getValue('#ya-departure-message')}`
-        ].join('\n');
-        window.open(`https://wa.me/${whatsappTarget}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
-      });
-
-      // 8. Review Submission (Save to Database via REST API & AJAX)
+      // 6. Review Submission (Save to Database via REST API & AJAX)
       const reviewForm = root.querySelector('#ya-review-form');
       const alertSuccess = root.querySelector('#ya-rev-alert-success');
       const alertError = root.querySelector('#ya-rev-alert-error');

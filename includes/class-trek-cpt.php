@@ -28,6 +28,9 @@ class Trek_CPT {
         add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_assets' ) );
         add_filter( 'manage_trek_review_posts_columns', array( __CLASS__, 'set_review_columns' ) );
         add_action( 'manage_trek_review_posts_custom_column', array( __CLASS__, 'render_review_column' ), 10, 2 );
+        add_filter( 'manage_trek_enquiry_posts_columns', array( __CLASS__, 'set_enquiry_columns' ) );
+        add_action( 'manage_trek_enquiry_posts_custom_column', array( __CLASS__, 'render_enquiry_column' ), 10, 2 );
+        add_action( 'admin_post_trek_export_enquiries', array( __CLASS__, 'export_enquiries_csv' ) );
     }
 
     /**
@@ -198,6 +201,14 @@ class Trek_CPT {
             'trek-manager-guide',
             array( __CLASS__, 'render_guide_page' )
         );
+        add_submenu_page(
+            'edit.php?post_type=trek_destination',
+            __( 'Export Enquiries', 'trek-content-manager' ),
+            __( 'Export Enquiries', 'trek-content-manager' ),
+            'edit_posts',
+            'trek-export-enquiries',
+            array( __CLASS__, 'render_enquiry_export_page' )
+        );
     }
 
     public static function enqueue_admin_assets( $hook ) {
@@ -255,6 +266,95 @@ class Trek_CPT {
         }
     }
 
+    /** Custom dashboard columns for enquiries saved by the trip planning popup. */
+    public static function set_enquiry_columns( $columns ) {
+        return array(
+            'cb'               => $columns['cb'],
+            'title'            => __( 'Traveller', 'trek-content-manager' ),
+            'enquiry_trek'     => __( 'Trip', 'trek-content-manager' ),
+            'enquiry_email'    => __( 'Email', 'trek-content-manager' ),
+            'enquiry_phone'    => __( 'Phone / WhatsApp', 'trek-content-manager' ),
+            'enquiry_people'   => __( 'Travellers', 'trek-content-manager' ),
+            'enquiry_source'   => __( 'Source', 'trek-content-manager' ),
+            'date'             => $columns['date'],
+        );
+    }
+
+    public static function render_enquiry_column( $column, $post_id ) {
+        switch ( $column ) {
+            case 'enquiry_trek':
+                $trek_id = absint( get_post_meta( $post_id, '_trek_enquiry_trek_id', true ) );
+                echo $trek_id && get_post( $trek_id )
+                    ? '<a href="' . esc_url( get_edit_post_link( $trek_id ) ) . '"><strong>' . esc_html( get_the_title( $trek_id ) ) . '</strong></a>'
+                    : '—';
+                break;
+            case 'enquiry_email':
+                $email = get_post_meta( $post_id, '_trek_enquiry_email', true );
+                echo $email ? '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>' : '—';
+                break;
+            case 'enquiry_phone':
+                echo esc_html( get_post_meta( $post_id, '_trek_enquiry_phone', true ) ?: '—' );
+                break;
+            case 'enquiry_people':
+                echo esc_html( get_post_meta( $post_id, '_trek_enquiry_travellers', true ) ?: '—' );
+                break;
+            case 'enquiry_source':
+                echo esc_html( get_post_meta( $post_id, '_trek_enquiry_source', true ) ?: 'frontend' );
+                break;
+        }
+    }
+
+    /** Dashboard page used to download all stored WordPress enquiries as a CSV file. */
+    public static function render_enquiry_export_page() {
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_die( esc_html__( 'You do not have permission to export enquiries.', 'trek-content-manager' ) );
+        }
+        $export_url = wp_nonce_url( admin_url( 'admin-post.php?action=trek_export_enquiries' ), 'trek_export_enquiries' );
+        $count = wp_count_posts( 'trek_enquiry' );
+        $total = intval( $count->private ?? 0 ) + intval( $count->publish ?? 0 );
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'Export Trek Enquiries', 'trek-content-manager' ); ?></h1>
+            <p><?php printf( esc_html__( '%d enquiry records are currently stored in WordPress.', 'trek-content-manager' ), $total ); ?></p>
+            <p><a class="button button-primary" href="<?php echo esc_url( $export_url ); ?>"><?php esc_html_e( 'Download Enquiries CSV', 'trek-content-manager' ); ?></a></p>
+            <p><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=trek_enquiry' ) ); ?>"><?php esc_html_e( 'View and manage enquiries', 'trek-content-manager' ); ?></a></p>
+        </div>
+        <?php
+    }
+
+    public static function export_enquiries_csv() {
+        if ( ! current_user_can( 'edit_posts' ) || ! check_admin_referer( 'trek_export_enquiries' ) ) {
+            wp_die( esc_html__( 'You do not have permission to export enquiries.', 'trek-content-manager' ) );
+        }
+        $enquiries = get_posts( array(
+            'post_type'      => 'trek_enquiry',
+            'post_status'    => array( 'private', 'publish' ),
+            'posts_per_page' => -1,
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+        ) );
+        nocache_headers();
+        header( 'Content-Type: text/csv; charset=utf-8' );
+        header( 'Content-Disposition: attachment; filename=trek-enquiries-' . gmdate( 'Y-m-d' ) . '.csv' );
+        $output = fopen( 'php://output', 'w' );
+        fputcsv( $output, array( 'Date', 'Name', 'Trip', 'Email', 'Phone / WhatsApp', 'Travellers', 'Message', 'Source' ) );
+        foreach ( $enquiries as $enquiry ) {
+            $trek_id = absint( get_post_meta( $enquiry->ID, '_trek_enquiry_trek_id', true ) );
+            fputcsv( $output, array(
+                get_the_date( 'Y-m-d H:i', $enquiry ),
+                $enquiry->post_title,
+                $trek_id ? get_the_title( $trek_id ) : '',
+                get_post_meta( $enquiry->ID, '_trek_enquiry_email', true ),
+                get_post_meta( $enquiry->ID, '_trek_enquiry_phone', true ),
+                get_post_meta( $enquiry->ID, '_trek_enquiry_travellers', true ),
+                wp_strip_all_tags( $enquiry->post_content ),
+                get_post_meta( $enquiry->ID, '_trek_enquiry_source', true ),
+            ) );
+        }
+        fclose( $output );
+        exit;
+    }
+
     public static function add_meta_boxes() {
         // 1. Unified Hero Section, Card Display & Media Settings
         add_meta_box(
@@ -269,7 +369,7 @@ class Trek_CPT {
         // 2. Quick Facts
         add_meta_box(
             'ya_trek_facts_metabox',
-            __( '📊 2. Quick Facts Grid (High Point, Destination, Daily Walking, Accommodation, Style)', 'trek-content-manager' ),
+            __( '📊 2. Trip Facts Grid (Duration, Route, Difficulty, Group Size & More)', 'trek-content-manager' ),
             array( __CLASS__, 'render_facts_metabox' ),
             'trek_destination',
             'normal',
@@ -375,6 +475,15 @@ class Trek_CPT {
             'normal',
             'high'
         );
+
+        add_meta_box(
+            'ya_trek_enquiry_detail_metabox',
+            __( 'Enquiry Details', 'trek-content-manager' ),
+            array( __CLASS__, 'render_enquiry_detail_metabox' ),
+            'trek_enquiry',
+            'normal',
+            'high'
+        );
     }
 
     /**
@@ -456,6 +565,10 @@ class Trek_CPT {
         
         $card_image     = get_post_meta( $post->ID, '_trek_card_image_url', true );
         $hero_bg_img    = get_post_meta( $post->ID, '_trek_hero_bg_img', true );
+        $hero_slider_images = get_post_meta( $post->ID, '_trek_hero_slider_images', true );
+        if ( empty( $hero_slider_images ) || ! is_array( $hero_slider_images ) ) {
+            $hero_slider_images = array();
+        }
         
         $featured_home  = get_post_meta( $post->ID, '_trek_featured_home', true );
         if ( '' === $featured_home && ! metadata_exists( 'post', $post->ID, '_trek_featured_home' ) ) {
@@ -721,7 +834,44 @@ class Trek_CPT {
                 </div>
             </div>
 
-            <!-- Row 6: Feature in Home Page Signature Journeys Slider -->
+            <!-- Row 6: Dedicated Hero Slider Gallery -->
+            <div style="background:#f4f8f7; border:1px solid #cfe1dc; border-radius:6px; padding:14px; margin:14px 0;">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px;">
+                    <div>
+                        <strong style="color:#022f2e;"><?php esc_html_e( '🎞️ Hero Slider Gallery', 'trek-content-manager' ); ?></strong>
+                        <span class="description" style="display:block; margin-top:3px;"><?php esc_html_e( 'Add multiple wide images for the single destination hero. The first image remains the main hero image; these slides follow every 3 seconds.', 'trek-content-manager' ); ?></span>
+                    </div>
+                    <button type="button" class="button button-primary button-small" id="ya-add-hero-slider-image"><?php esc_html_e( '+ Add Slide Image', 'trek-content-manager' ); ?></button>
+                </div>
+                <div id="ya-hero-slider-image-rows">
+                    <?php foreach ( $hero_slider_images as $index => $hero_slider_image ) : ?>
+                        <div class="ya-rep-item" style="display:flex; gap:10px; align-items:center; margin:8px 0;">
+                            <img id="ya_hero_slide_preview_<?php echo esc_attr( $index ); ?>" class="ya-img-preview" src="<?php echo esc_url( $hero_slider_image ); ?>" style="width:100px; height:64px; margin:0; object-fit:cover;">
+                            <input type="text" name="hero_slider_image[]" id="ya_hero_slide_image_<?php echo esc_attr( $index ); ?>" value="<?php echo esc_attr( $hero_slider_image ); ?>" placeholder="Upload or enter wide hero image URL" style="flex-grow:1;">
+                            <button type="button" class="button button-secondary" onclick="yaOpenMediaUploader(this, 'ya_hero_slide_image_<?php echo esc_attr( $index ); ?>', 'ya_hero_slide_preview_<?php echo esc_attr( $index ); ?>')"><?php esc_html_e( 'Choose Image', 'trek-content-manager' ); ?></button>
+                            <button type="button" class="ya-btn-delete" onclick="this.closest('.ya-rep-item').remove()" aria-label="<?php esc_attr_e( 'Remove slide image', 'trek-content-manager' ); ?>">✕</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <script>
+                document.getElementById('ya-add-hero-slider-image')?.addEventListener('click', function() {
+                    const container = document.getElementById('ya-hero-slider-image-rows');
+                    const index = Date.now();
+                    const row = document.createElement('div');
+                    row.className = 'ya-rep-item';
+                    row.style.cssText = 'display:flex; gap:10px; align-items:center; margin:8px 0;';
+                    row.innerHTML = `
+                        <img id="ya_hero_slide_preview_${index}" class="ya-img-preview" style="width:100px; height:64px; margin:0; object-fit:cover; display:none;">
+                        <input type="text" name="hero_slider_image[]" id="ya_hero_slide_image_${index}" placeholder="Upload or enter wide hero image URL" style="flex-grow:1;">
+                        <button type="button" class="button button-secondary" onclick="yaOpenMediaUploader(this, 'ya_hero_slide_image_${index}', 'ya_hero_slide_preview_${index}')">Choose Image</button>
+                        <button type="button" class="ya-btn-delete" onclick="this.closest('.ya-rep-item').remove()" aria-label="Remove slide image">✕</button>
+                    `;
+                    container.appendChild(row);
+                });
+            </script>
+
+            <!-- Row 7: Feature in Home Page Signature Journeys Slider -->
             <div style="background:#eef6f5; padding:12px 14px; border-radius:6px; border:1px solid #c2e2de;">
                 <label style="font-weight:700; color:#022f2e; display:flex; align-items:center; gap:8px; cursor:pointer;">
                     <input type="checkbox" name="trek_featured_home" value="1" <?php checked( $featured_home, '1' ); ?>>
@@ -741,6 +891,9 @@ class Trek_CPT {
         $fact_trekking   = get_post_meta( $post->ID, '_trek_fact_trekking', true );
         $fact_accom      = get_post_meta( $post->ID, '_trek_fact_accom', true );
         $fact_style      = get_post_meta( $post->ID, '_trek_fact_style', true );
+        $fact_distance   = get_post_meta( $post->ID, '_trek_fact_distance', true );
+        $fact_start      = get_post_meta( $post->ID, '_trek_fact_start', true );
+        $fact_end        = get_post_meta( $post->ID, '_trek_fact_end', true );
         $fact_season     = get_post_meta( $post->ID, '_trek_fact_season', true ) ?: 'Autumn (Sep–Nov) & Spring (Mar–May)';
         $fact_group_size = get_post_meta( $post->ID, '_trek_fact_group_size', true ) ?: '2–12 Travellers';
         
@@ -777,6 +930,20 @@ class Trek_CPT {
             <div class="ya-admin-field">
                 <label><?php esc_html_e( '7. Group Size', 'trek-content-manager' ); ?></label>
                 <input type="text" name="trek_fact_group_size" value="<?php echo esc_attr( $fact_group_size ); ?>" placeholder="2–12 Travellers">
+            </div>
+        </div>
+        <div class="ya-admin-row ya-admin-row--3">
+            <div class="ya-admin-field">
+                <label><?php esc_html_e( '8. Total Distance', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_fact_distance" value="<?php echo esc_attr( $fact_distance ); ?>" placeholder="e.g. 130 km">
+            </div>
+            <div class="ya-admin-field">
+                <label><?php esc_html_e( '9. Starting Point', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_fact_start" value="<?php echo esc_attr( $fact_start ); ?>" placeholder="e.g. Kathmandu">
+            </div>
+            <div class="ya-admin-field">
+                <label><?php esc_html_e( '10. Ending Point', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_fact_end" value="<?php echo esc_attr( $fact_end ); ?>" placeholder="e.g. Lukla">
             </div>
         </div>
 
@@ -1715,6 +1882,25 @@ class Trek_CPT {
         <?php
     }
 
+    /** Read-only details for enquiries saved from the trip planning popup. */
+    public static function render_enquiry_detail_metabox( $post ) {
+        $trek_id    = absint( get_post_meta( $post->ID, '_trek_enquiry_trek_id', true ) );
+        $email      = get_post_meta( $post->ID, '_trek_enquiry_email', true );
+        $phone      = get_post_meta( $post->ID, '_trek_enquiry_phone', true );
+        $travellers = get_post_meta( $post->ID, '_trek_enquiry_travellers', true );
+        $source     = get_post_meta( $post->ID, '_trek_enquiry_source', true );
+        ?>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;">
+            <div><strong><?php esc_html_e( 'Trip', 'trek-content-manager' ); ?></strong><br><?php echo $trek_id ? '<a href="' . esc_url( get_edit_post_link( $trek_id ) ) . '">' . esc_html( get_the_title( $trek_id ) ) . '</a>' : '—'; ?></div>
+            <div><strong><?php esc_html_e( 'Email', 'trek-content-manager' ); ?></strong><br><?php echo $email ? '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>' : '—'; ?></div>
+            <div><strong><?php esc_html_e( 'Phone / WhatsApp', 'trek-content-manager' ); ?></strong><br><?php echo esc_html( $phone ?: '—' ); ?></div>
+            <div><strong><?php esc_html_e( 'Travellers', 'trek-content-manager' ); ?></strong><br><?php echo esc_html( $travellers ?: '—' ); ?></div>
+            <div><strong><?php esc_html_e( 'Source', 'trek-content-manager' ); ?></strong><br><?php echo esc_html( $source ?: 'frontend' ); ?></div>
+        </div>
+        <p style="margin:18px 0 0;color:#646970;"><?php esc_html_e( 'The traveller’s message is stored in the main WordPress editor above.', 'trek-content-manager' ); ?></p>
+        <?php
+    }
+
     /**
      * Metabox for `trek_review` Post Type (Admin View & Edit Review Submissions)
      */
@@ -1882,6 +2068,9 @@ class Trek_CPT {
             'trek_fact_trekking',
             'trek_fact_accom',
             'trek_fact_style',
+            'trek_fact_distance',
+            'trek_fact_start',
+            'trek_fact_end',
             'trek_overview_kicker',
             'trek_overview_script',
             'trek_overview_heading',
@@ -2090,7 +2279,29 @@ class Trek_CPT {
             delete_post_meta( $post_id, '_trek_exclusions' );
         }
 
-        // 7. Gallery Repeater (Sync dual keys: _trek_gallery_list & _trek_gallery_images)
+        // 7. Dedicated Hero Slider Gallery
+        if ( isset( $_POST['hero_slider_image'] ) && is_array( $_POST['hero_slider_image'] ) ) {
+            $hero_slider_images = array();
+            foreach ( $_POST['hero_slider_image'] as $hero_slider_image ) {
+                if ( ! is_string( $hero_slider_image ) ) {
+                    continue;
+                }
+                $hero_slider_image = esc_url_raw( trim( $hero_slider_image ) );
+                if ( ! empty( $hero_slider_image ) ) {
+                    $hero_slider_images[] = $hero_slider_image;
+                }
+            }
+            $hero_slider_images = array_values( array_unique( $hero_slider_images ) );
+            if ( empty( $hero_slider_images ) ) {
+                delete_post_meta( $post_id, '_trek_hero_slider_images' );
+            } else {
+                update_post_meta( $post_id, '_trek_hero_slider_images', $hero_slider_images );
+            }
+        } else {
+            delete_post_meta( $post_id, '_trek_hero_slider_images' );
+        }
+
+        // 8. Gallery Repeater (Sync dual keys: _trek_gallery_list & _trek_gallery_images)
         if ( isset( $_POST['gal_url'] ) && is_array( $_POST['gal_url'] ) ) {
             $gallery = array();
             $urls   = $_POST['gal_url'];
@@ -2203,6 +2414,9 @@ class Trek_CPT {
             'trekking'    => get_post_meta( $post_id, '_trek_fact_trekking', true ),
             'accom'       => get_post_meta( $post_id, '_trek_fact_accom', true ),
             'style'       => get_post_meta( $post_id, '_trek_fact_style', true ),
+            'distance'    => get_post_meta( $post_id, '_trek_fact_distance', true ),
+            'start'       => get_post_meta( $post_id, '_trek_fact_start', true ),
+            'end'         => get_post_meta( $post_id, '_trek_fact_end', true ),
             'difficulty'  => get_post_meta( $post_id, '_trek_difficulty', true ),
             'price'       => get_post_meta( $post_id, '_trek_price', true ),
             'currency'    => get_post_meta( $post_id, '_trek_currency', true ),
@@ -2227,9 +2441,8 @@ class Trek_CPT {
             return null;
         }
 
-        $hero_days = get_post_meta( $post_id, '_trek_hero_days', true ) ?: '15';
-        $breadcrumb_region = get_post_meta( $post_id, '_trek_breadcrumb_region', true ) ?: 'Nepal';
-        $tag_label = get_post_meta( $post_id, '_trek_tag_label', true ) ?: 'Trekking';
+        $hero_days = get_post_meta( $post_id, '_trek_hero_days', true );
+        $breadcrumb_region = get_post_meta( $post_id, '_trek_breadcrumb_region', true );
 
         // 1. Title
         $card_title = get_post_meta( $post_id, '_trek_card_title', true );
@@ -2260,15 +2473,13 @@ class Trek_CPT {
                 $card_tag = $cat_name;
             } elseif ( ! empty( $region_name ) ) {
                 $card_tag = $region_name;
-            } else {
-                $card_tag = 'Nepal & India · Spiritual';
             }
         }
 
         // 4. Card Description (<p>)
         $card_excerpt = get_post_meta( $post_id, '_trek_card_excerpt', true );
         if ( empty( $card_excerpt ) ) {
-            $card_excerpt = 'Follow the sacred footsteps of Buddha from Kathmandu and Lumbini to Bodhgaya, Varanasi and Sarnath.';
+            $card_excerpt = has_excerpt( $post_id ) ? get_the_excerpt( $post_id ) : wp_trim_words( $post_obj->post_content, 22, '…' );
         }
 
         // 5. Image
@@ -2278,9 +2489,6 @@ class Trek_CPT {
         }
         if ( empty( $card_image ) ) {
             $card_image = get_post_meta( $post_id, '_trek_hero_bg_img', true );
-        }
-        if ( empty( $card_image ) ) {
-            $card_image = 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=85';
         }
 
         // 6. Featured

@@ -161,9 +161,11 @@ class Trek_REST_API {
             return new WP_Error( 'invalid_email', __( 'Valid email is required', 'trek-content-manager' ), array( 'status' => 400 ) );
         }
 
-        $name    = sanitize_text_field( $params['name'] ?? '' );
-        $message = sanitize_textarea_field( $params['message'] ?? '' );
-        $trek_id = absint( $params['trek_id'] ?? 0 );
+        $name       = sanitize_text_field( $params['name'] ?? '' );
+        $message    = sanitize_textarea_field( $params['message'] ?? '' );
+        $trek_id    = absint( $params['trek_id'] ?? 0 );
+        $phone      = sanitize_text_field( $params['phone'] ?? '' );
+        $travellers = sanitize_text_field( $params['travellers'] ?? '' );
 
         if ( empty( $name ) || empty( $message ) ) {
             return new WP_Error( 'missing_fields', __( 'Please provide your name and message.', 'trek-content-manager' ), array( 'status' => 400 ) );
@@ -182,6 +184,8 @@ class Trek_REST_API {
 
         update_post_meta( $post_id, '_trek_enquiry_email', $email );
         update_post_meta( $post_id, '_trek_enquiry_trek_id', $trek_id );
+        update_post_meta( $post_id, '_trek_enquiry_phone', $phone );
+        update_post_meta( $post_id, '_trek_enquiry_travellers', $travellers );
         update_post_meta( $post_id, '_trek_enquiry_source', sanitize_text_field( $params['source'] ?? 'frontend' ) );
 
         return rest_ensure_response( array(
