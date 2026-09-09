@@ -302,7 +302,8 @@ $related_query = new WP_Query( array(
     body:has(.ya-ebc-page){
       margin:0!important;
       padding:0!important;
-      overflow-x:hidden!important;
+      overflow-x:clip!important;
+      overflow-y:visible!important;
     }
 
     body:has(.ya-ebc-page) #page,
@@ -320,6 +321,7 @@ $related_query = new WP_Query( array(
       padding-top:0!important;
       padding-bottom:0!important;
       border-top:0!important;
+      overflow:visible!important;
     }
 
     body:has(.ya-ebc-page) h1.entry-title,
@@ -362,6 +364,7 @@ $related_query = new WP_Query( array(
       margin:0!important;
       padding-top:0!important;
       padding-bottom:0!important;
+      overflow:visible!important;
     }
 
     .ya-ebc-page,
@@ -382,7 +385,7 @@ $related_query = new WP_Query( array(
       max-width:100vw;
       margin:-1px 0 0 calc(50% - 50vw)!important;
       padding:0!important;
-      overflow:hidden;
+      overflow:visible;
       background:#fff;
       color:var(--ink);
       font-family:Inter,Arial,sans-serif;
@@ -621,6 +624,14 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-fact strong{font-size:13px;color:var(--green)}
 
     /* TABS */
+
+    .ya-tab-mman-section{
+      width:100%;
+      display:grid;
+      justify-content:center;
+      align-items:center;
+      margin:0 auto;
+    }
     .ya-ebc-page .ya-tabs-wrap{
       position:sticky;
       top:78px;
@@ -1511,8 +1522,8 @@ $related_query = new WP_Query( array(
       scroll-margin-top:112px;
     }
     .ya-ebc-page .ya-tab-stage .ya-panel.is-active{animation:none}
-    .ya-ebc-page .ya-reading-progress{height:3px;margin-top:18px;overflow:hidden;background:#dcdcd3}
-    .ya-ebc-page .ya-reading-progress-bar{display:block;width:0;height:100%;background:#d1ad54;transition:width .18s linear}
+    .ya-ebc-page .ya-reading-progress{--ya-reading-progress:0%;height:3px;margin-top:18px;overflow:hidden;background:#dcdcd3}
+    .ya-ebc-page .ya-reading-progress-bar{display:block;width:var(--ya-reading-progress);height:100%;background:#d1ad54;transition:width .18s linear,height .18s linear}
 
     /* Desktop trip navigation: quiet sticky rail at left, editorial content at right. */
     @media(min-width:1101px){
@@ -1713,6 +1724,168 @@ $related_query = new WP_Query( array(
     @media(prefers-reduced-motion:reduce){
       .ya-ebc-page .ya-hero-background-slide{transition:none}
     }
+
+    /* Trip information: one vertical content flow with compact display type. */
+    .ya-ebc-page .ya-tab-stage .ya-overview-grid,
+    .ya-ebc-page .ya-tab-stage .ya-itinerary-shell,
+    .ya-ebc-page .ya-tab-stage .ya-gallery-grid,
+    .ya-ebc-page .ya-tab-stage .ya-extension-intro,
+    .ya-ebc-page .ya-tab-stage .ya-extension-grid,
+    .ya-ebc-page .ya-tab-stage .ya-essential-layout,
+    .ya-ebc-page .ya-tab-stage .ya-review-layout,
+    .ya-ebc-page .ya-tab-stage .ya-form-grid{
+      grid-template-columns:minmax(0,1fr);
+    }
+    .ya-ebc-page .ya-tab-stage .ya-gallery-grid{grid-template-rows:none}
+    .ya-ebc-page .ya-tab-stage .ya-gallery-item:first-child{grid-column:auto;grid-row:auto}
+    .ya-ebc-page .ya-tab-stage .ya-map-card,
+    .ya-ebc-page .ya-tab-stage .ya-itinerary-side,
+    .ya-ebc-page .ya-tab-stage .ya-trip-note-card{position:static}
+    .ya-ebc-page .ya-tab-stage .ya-section-heading h2,
+    .ya-ebc-page .ya-tab-stage .ya-overview-copy h3,
+    .ya-ebc-page .ya-tab-stage .ya-itinerary-side h3,
+    .ya-ebc-page .ya-tab-stage .ya-extension-copy h3,
+    .ya-ebc-page .ya-tab-stage .ya-trip-note-copy h3,
+    .ya-ebc-page .ya-tab-stage .ya-review-form h3{
+      font-size:clamp(28px,3vw,36px);
+    }
+    .ya-ebc-page .ya-tab-stage .ya-extension-card h4,
+    .ya-ebc-page .ya-tab-stage .ya-map-caption h3,
+    .ya-ebc-page .ya-tab-stage .ya-day-title strong,
+    .ya-ebc-page .ya-tab-stage .ya-info-head span,
+    .ya-ebc-page .ya-tab-stage .ya-review-card blockquote{
+      font-size:min(30px,8vw);
+    }
+
+    @media(min-width:1101px){
+      .ya-ebc-page .ya-tab-mman-section{
+        display:grid;
+        grid-template-columns:240px minmax(0,1400px);
+        column-gap:56px;
+        align-items:flex-start;
+        width:min(calc(100% - 80px),1696px);
+        margin:0 auto;
+      }
+      .ya-ebc-page .ya-tabs-wrap{
+        --ya-sidebar-offset:20vh;
+        position:sticky;
+        top:var(--ya-sidebar-offset);
+        z-index:70;
+        grid-column:1;
+        width:240px;
+        max-height:calc(100vh - var(--ya-sidebar-offset) - 24px);
+        max-height:calc(100svh - var(--ya-sidebar-offset) - 24px);
+        margin:72px 0 0;
+        align-self:start;
+        float:none;
+        overflow-x:hidden;
+        overflow-y:auto;
+        overscroll-behavior:contain;
+        scrollbar-gutter:stable;
+      }
+      .ya-ebc-page .ya-tab-stage{
+        grid-column:2;
+        min-width:0;
+        margin-left:0;
+      }
+      .ya-ebc-page .ya-tab-stage .ya-panel{padding-right:0}
+      .ya-ebc-page .ya-tab-stage .ya-inner{width:100%;max-width:1400px}
+      .ya-ebc-page .ya-reading-progress{
+        --ya-reading-progress:0%;
+        position:absolute;
+        top:0;
+        right:0;
+        bottom:0;
+        width:3px;
+        height:auto;
+        margin:0;
+      }
+      .ya-ebc-page .ya-reading-progress-bar{
+        position:absolute;
+        right:0;
+        bottom:0;
+        width:100%;
+        height:var(--ya-reading-progress);
+        transition:height .18s linear;
+      }
+    }
+
+    /* Mobile trip navigation becomes an accordion; Overview is open by default. */
+    @media(max-width:1100px){
+      .ya-ebc-page .ya-tab-mman-section{display:block;width:100%}
+      .ya-ebc-page .ya-tabs-wrap{
+        position:static;
+        width:100%;
+        margin:0;
+        border:0;
+        background:#fff;
+        box-shadow:none;
+      }
+      .ya-ebc-page .ya-tabs{
+        width:100%;
+        display:block;
+        overflow:visible;
+        border-top:1px solid var(--line);
+      }
+      .ya-ebc-page .ya-tab{
+        width:100%;
+        min-height:63px;
+        display:flex;
+        justify-content:space-between;
+        padding:0 24px;
+        border-bottom:1px solid var(--line);
+        background:#fff;
+        color:var(--ink);
+        font:500 18px/1.25 "Newsreader",Georgia,serif;
+        letter-spacing:0;
+        text-align:left;
+        text-transform:none;
+      }
+      .ya-ebc-page .ya-tab svg{display:none}
+      .ya-ebc-page .ya-tab:after{
+        position:static;
+        width:auto;
+        height:auto;
+        content:"›";
+        background:transparent;
+        color:#5a5d56;
+        font:400 32px/1 Arial,sans-serif;
+        transform:rotate(0deg);
+        transition:transform .2s ease;
+      }
+      .ya-ebc-page .ya-tab.is-active{background:#fff;color:var(--green-2)}
+      .ya-ebc-page .ya-tab.is-active:after{background:transparent;transform:rotate(90deg)}
+      .ya-ebc-page .ya-reading-progress{display:none}
+      .ya-ebc-page .ya-tab-stage{display:none}
+      .ya-ebc-page .ya-tab-stage .ya-panel,
+      .ya-ebc-page .ya-tabs > .ya-panel{display:none}
+      .ya-ebc-page .ya-tab-stage .ya-panel.is-active,
+      .ya-ebc-page .ya-tabs > .ya-panel.is-active{
+        display:block;
+        padding:42px 24px 56px;
+        background:var(--cream);
+      }
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-inner{width:100%;max-width:none}
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-overview-grid,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-itinerary-shell,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-gallery-grid,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-extension-intro,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-extension-grid,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-essential-layout,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-review-layout,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-form-grid{grid-template-columns:minmax(0,1fr)}
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-gallery-grid{grid-template-rows:none}
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-gallery-item:first-child{grid-column:auto;grid-row:auto}
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-map-card,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-itinerary-side,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-trip-note-card{position:static}
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-section-heading h2,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-overview-copy h3,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-itinerary-side h3,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-extension-copy h3,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-trip-note-copy h3,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-review-form h3{font-size:clamp(28px,8vw,36px)}
+    }
   </style>
 
   <!-- 1. Hero Section -->
@@ -1780,7 +1953,8 @@ $related_query = new WP_Query( array(
   </div>
 
   <!-- 3. Sticky Navigation Tabs -->
-  <nav class="ya-tabs-wrap" aria-label="Trip information tabs">
+ <section class="ya-tab-mman-section">
+    <nav class="ya-tabs-wrap" aria-label="Trip information tabs">
     <div class="ya-inner ya-tabs" role="tablist">
       <button class="ya-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="ya-panel-overview" data-tab="overview">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h8"/></svg>Overview
@@ -2090,6 +2264,7 @@ $related_query = new WP_Query( array(
     </section>
 
   </div>
+ </section>
 
   <!-- Related Journeys -->
   <section class="ya-related">
@@ -2363,6 +2538,33 @@ $related_query = new WP_Query( array(
       // 2. Tab navigation
       const tabs = [...root.querySelectorAll('.ya-tab')];
       const panels = [...root.querySelectorAll('.ya-panel')];
+      const tabsList = root.querySelector('.ya-tabs');
+      const tabStage = root.querySelector('.ya-tab-stage');
+      const mobileTabs = window.matchMedia('(max-width: 1100px)');
+
+      // On mobile, place each panel directly below its matching navigation row.
+      // Desktop restores every panel to the main reading column.
+      const syncMobileTabLayout = () => {
+        if (!tabsList || !tabStage) return;
+
+        if (mobileTabs.matches) {
+          tabsList.removeAttribute('role');
+          panels.forEach(panel => {
+            const tab = tabs.find(item => item.dataset.tab === panel.dataset.panel);
+            if (tab && panel.previousElementSibling !== tab) tab.insertAdjacentElement('afterend', panel);
+          });
+        } else {
+          tabsList.setAttribute('role', 'tablist');
+          panels.forEach(panel => tabStage.appendChild(panel));
+        }
+      };
+
+      syncMobileTabLayout();
+      if (mobileTabs.addEventListener) {
+        mobileTabs.addEventListener('change', syncMobileTabLayout);
+      } else {
+        mobileTabs.addListener(syncMobileTabLayout);
+      }
 
       const setActiveTab = name => {
         const targetTab = tabs.find(tab => tab.dataset.tab === name);
@@ -2382,10 +2584,12 @@ $related_query = new WP_Query( array(
         const active = setActiveTab(name);
         if (!active) return;
         const { targetTab, targetPanel } = active;
-        targetTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        if (!mobileTabs.matches) {
+          targetTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
 
         try { history.replaceState(null, '', `#${name}`); } catch (error) {}
-        if (scroll) {
+        if (scroll && !mobileTabs.matches) {
           targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       };
@@ -2420,7 +2624,7 @@ $related_query = new WP_Query( array(
           const viewportMarker = window.scrollY + window.innerHeight * .45;
           const distance = Math.max(1, lastPanelBottom - firstPanelTop);
           const progress = Math.min(100, Math.max(0, ((viewportMarker - firstPanelTop) / distance) * 100));
-          readingProgress.style.width = `${progress}%`;
+          readingProgress.style.setProperty('--ya-reading-progress', `${progress}%`);
         };
         const requestProgressUpdate = () => {
           if (!progressFrame) progressFrame = window.requestAnimationFrame(updateReadingProgress);
