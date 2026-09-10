@@ -1053,8 +1053,8 @@ class Trek_Shortcodes {
     }
 
     /**
-     * Render dynamic Field Notes cards for the homepage.
-     * Usage: [ya_home_notes count="6"]
+     * Render dynamic inspiration cards for the homepage.
+     * Usage: [ya_home_notes count="6" view_all_url="/journal/"]
      *
      * @param array $atts Shortcode attributes.
      * @return string
@@ -1062,8 +1062,20 @@ class Trek_Shortcodes {
     public static function render_home_notes( $atts = array() ) {
         self::$instance_counter++;
         $uid = 'ya_home_notes_' . self::$instance_counter;
-        $atts = shortcode_atts( array( 'count' => 6 ), $atts, 'ya_home_notes' );
+        $atts = shortcode_atts(
+            array(
+                'count'          => 6,
+                'view_all_url'   => get_permalink( get_option( 'page_for_posts' ) ),
+                'view_all_label' => 'View All',
+            ),
+            $atts,
+            'ya_home_notes'
+        );
         $count = max( 1, min( 30, absint( $atts['count'] ) ) );
+
+        if ( empty( $atts['view_all_url'] ) ) {
+            $atts['view_all_url'] = home_url( '/' );
+        }
 
         $query = new WP_Query(
             array(
@@ -1085,58 +1097,54 @@ class Trek_Shortcodes {
 
         ob_start();
         ?>
-        <div id="<?php echo esc_attr( $uid ); ?>" class="ya-note-carousel <?php echo count( $query->posts ) > 3 ? 'is-scrollable' : 'is-static'; ?>">
-            <div class="ya-note-track">
-                <?php foreach ( $query->posts as $index => $post ) :
+        <div id="<?php echo esc_attr( $uid ); ?>" class="ya-inspiration-cards">
+            <style>
+                #<?php echo esc_attr( $uid ); ?>,
+                #<?php echo esc_attr( $uid ); ?> * { box-sizing: border-box; }
+                #<?php echo esc_attr( $uid ); ?> { color: #333; font-family: "Open Sans", Arial, sans-serif; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card { display: flex; min-width: 0; flex-direction: column; padding: 0 14px 20px; border-left: 1px solid #e8e8e8; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card:first-child { border-left: 0; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-image { display: block; aspect-ratio: 1.48 / 1; overflow: hidden; background: #e9e5de; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-image img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card:hover .ya-inspiration-image img { transform: scale(1.045); }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-body { display: flex; flex: 1; flex-direction: column; padding: 16px 0 0; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-meta { display: flex; flex-wrap: wrap; gap: 0; margin: 0 0 16px; color: #999; font-size: 11px; line-height: 1.35; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-meta span + span::before { padding: 0 4px; color: #b7b7b7; content: "|"; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-title { margin: 0; color: #3d3d3d; font-family: "Newsreader", Georgia, serif; font-size: clamp(20px, 1.7vw, 25px); font-weight: 400; line-height: 1.18; letter-spacing: -.025em; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-excerpt { display: -webkit-box; margin: 14px 0 0; overflow: hidden; color: #5f5f5f; font-size: 13px; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link { margin-top: auto; padding-top: 28px; color: #444; font-size: 14px; line-height: 1.2; text-decoration: none; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link:hover { color: #022f2e; text-decoration: underline; text-underline-offset: 4px; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link span { margin-left: 4px; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-all { display: table; margin: 44px auto 0; padding: 11px 19px; border: 1px solid #858585; color: #022f2e; font-size: 14px; line-height: 1.2; text-decoration: none; transition: background-color .25s ease, color .25s ease; }
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-all:hover { background: #022f2e; color: #fff; }
+                @media (max-width: 760px) { #<?php echo esc_attr( $uid ); ?> .ya-inspiration-grid { grid-template-columns: 1fr; gap: 30px; } #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card { padding: 0 0 30px; border-top: 1px solid #e8e8e8; border-left: 0; } #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card:first-child { border-top: 0; } }
+            </style>
+            <div class="ya-inspiration-grid">
+                <?php foreach ( $query->posts as $post ) :
                     $categories = get_the_category( $post->ID );
                     $category   = ! empty( $categories ) ? $categories[0]->name : 'Journal';
                     $content    = has_excerpt( $post->ID ) ? get_the_excerpt( $post->ID ) : $post->post_content;
-                    $words      = str_word_count( wp_strip_all_tags( $post->post_content ) );
-                    $minutes    = max( 1, (int) ceil( $words / 200 ) );
+                    $excerpt    = wp_trim_words( wp_strip_all_tags( $content ), 28, '...' );
                     $image      = get_the_post_thumbnail_url( $post->ID, 'large' );
                     ?>
-                    <a class="ya-note ya-reveal" href="<?php echo esc_url( get_permalink( $post->ID ) ); ?>">
-                        <div class="ya-note-img">
+                    <article class="ya-inspiration-card ya-reveal">
+                        <a class="ya-inspiration-image" href="<?php echo esc_url( get_permalink( $post->ID ) ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Read %s', 'trek-content-manager' ), get_the_title( $post->ID ) ) ); ?>">
                             <?php if ( $image ) : ?>
                                 <img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( get_the_title( $post->ID ) ); ?>" loading="lazy">
                             <?php endif; ?>
+                        </a>
+                        <div class="ya-inspiration-body">
+                            <div class="ya-inspiration-meta"><span><?php echo esc_html( get_the_date( 'M j, Y', $post->ID ) ); ?></span><span><?php echo esc_html( $category ); ?></span></div>
+                            <h3 class="ya-inspiration-title"><?php echo esc_html( get_the_title( $post->ID ) ); ?></h3>
+                            <p class="ya-inspiration-excerpt"><?php echo esc_html( $excerpt ); ?></p>
+                            <a class="ya-inspiration-link" href="<?php echo esc_url( get_permalink( $post->ID ) ); ?>"><?php esc_html_e( 'Read More', 'trek-content-manager' ); ?><span aria-hidden="true">↗</span></a>
                         </div>
-                        <div class="ya-note-body">
-                            <div class="ya-note-meta"><span><?php echo esc_html( $category ); ?></span><span><?php echo esc_html( $minutes . ' min read' ); ?></span></div>
-                            <h3><?php echo esc_html( get_the_title( $post->ID ) ); ?></h3>
-                            <div class="ya-note-link">Read story <span aria-hidden="true">-></span></div>
-                        </div>
-                    </a>
+                    </article>
                 <?php endforeach; ?>
             </div>
+            <a class="ya-inspiration-all" href="<?php echo esc_url( $atts['view_all_url'] ); ?>"><?php echo esc_html( $atts['view_all_label'] ); ?></a>
         </div>
-        <?php if ( count( $query->posts ) > 3 ) : ?>
-            <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var root = document.getElementById(<?php echo wp_json_encode( $uid ); ?>);
-                if (!root) return;
-                var track = root.querySelector('.ya-note-track');
-                var direction = 1;
-                var paused = false;
-                var frame;
-                function move() {
-                    if (!paused) {
-                        var end = track.scrollWidth - track.clientWidth;
-                        if (track.scrollLeft >= end - 1) direction = -1;
-                        if (track.scrollLeft <= 1) direction = 1;
-                        track.scrollLeft += direction * 0.45;
-                    }
-                    frame = requestAnimationFrame(move);
-                }
-                root.addEventListener('mouseenter', function () { paused = true; });
-                root.addEventListener('mouseleave', function () { paused = false; });
-                root.addEventListener('touchstart', function () { paused = true; }, { passive: true });
-                root.addEventListener('touchend', function () { paused = false; });
-                frame = requestAnimationFrame(move);
-                window.addEventListener('pagehide', function () { cancelAnimationFrame(frame); }, { once: true });
-            });
-            </script>
-        <?php endif; ?>
         <?php
         wp_reset_postdata();
         return ob_get_clean();

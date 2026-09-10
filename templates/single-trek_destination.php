@@ -2323,34 +2323,36 @@ $related_query = new WP_Query( array(
   <style>
     .ya-ebc-page .ya-enquiry-modal{position:fixed;inset:0;z-index:100001;display:none;place-items:center;padding:28px;background:rgba(15,25,18,.72);backdrop-filter:blur(8px)}
     .ya-ebc-page .ya-enquiry-modal.is-open{display:grid}
-    .ya-ebc-page .ya-enquiry-dialog{position:relative;display:grid;grid-template-columns:minmax(330px,.9fr) minmax(460px,1.1fr);width:min(1100px,100%);max-height:calc(100svh - 56px);overflow:auto;background:#fff;border-radius:16px;box-shadow:0 32px 90px rgba(0,0,0,.35)}
+    .ya-ebc-page .ya-enquiry-dialog{position:relative;display:grid;grid-template-columns:minmax(330px,.9fr) minmax(460px,1.1fr);width:min(1040px,100%);max-height:calc(100svh - 56px);overflow:auto;background:#fff;border-radius:20px;box-shadow:0 32px 90px rgba(0,0,0,.35)}
     .ya-ebc-page .ya-enquiry-image{position:relative;min-height:620px;background:center / cover no-repeat;color:#fff}
     .ya-ebc-page .ya-enquiry-image:after{position:absolute;inset:0;content:"";background:linear-gradient(180deg,rgba(12,22,16,.05) 25%,rgba(12,22,16,.8) 100%)}
     .ya-ebc-page .ya-enquiry-image-copy{position:absolute;z-index:1;right:32px;bottom:30px;left:32px}
-    .ya-ebc-page .ya-enquiry-image-copy small{display:block;margin-bottom:8px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#d1ad54}
-    .ya-ebc-page .ya-enquiry-image-copy strong{font:600 clamp(32px,3.4vw,48px)/.95 "Newsreader",Georgia,serif}
-    .ya-ebc-page .ya-enquiry-content{padding:46px 46px 40px;color:#202821}
+    .ya-ebc-page .ya-enquiry-image-copy small{display:block;margin-bottom:8px;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;color:#f5dd9c}
+    .ya-ebc-page .ya-enquiry-image-copy strong{font:600 16px/1.35 "Newsreader",Georgia,serif}
+    .ya-ebc-page .ya-enquiry-content{padding:44px 46px 40px;color:#202821}
     .ya-ebc-page .ya-enquiry-close{position:absolute;z-index:2;top:16px;right:16px;width:38px;height:38px;display:grid;place-items:center;border:1px solid #d7dfd4;border-radius:50%;background:#fff;color:#617654;cursor:pointer;transition:background .2s ease,color .2s ease,transform .2s ease}
     .ya-ebc-page .ya-enquiry-close:hover{background:#d1ad54;color:#202821;transform:rotate(90deg)}
     .ya-ebc-page .ya-enquiry-close:active{background:#617654;color:#fff;transform:rotate(90deg) scale(.92)}
     .ya-ebc-page .ya-enquiry-close svg{width:19px;height:19px}
-    .ya-ebc-page .ya-enquiry-meta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;color:#617654;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .ya-ebc-page .ya-enquiry-meta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;color:#617654;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none}
     .ya-ebc-page .ya-enquiry-meta span{display:inline-flex;align-items:center;gap:6px}
     .ya-ebc-page .ya-enquiry-meta svg{width:16px;height:16px;color:#d1ad54}
-    .ya-ebc-page .ya-enquiry-content h2{margin:0;font:600 clamp(34px,4vw,50px)/.96 "Newsreader",Georgia,serif;color:#202821}
-    .ya-ebc-page .ya-enquiry-intro{margin:12px 0 25px;color:#667068;font-size:14px;line-height:1.65}
-    .ya-ebc-page .ya-enquiry-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 17px}
+    .ya-ebc-page .ya-enquiry-content h2{margin:0;font:600 16px/1.4 "Newsreader",Georgia,serif;color:#202821;text-transform:none}
+    .ya-ebc-page .ya-enquiry-intro{margin:10px 0 25px;color:#667068;font-size:14px;line-height:1.65}
+    .ya-ebc-page .ya-enquiry-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
     .ya-ebc-page .ya-enquiry-form .ya-field{margin:0}
     .ya-ebc-page .ya-enquiry-form .ya-field-full{grid-column:1/-1}
-    .ya-ebc-page .ya-enquiry-form label{display:block;margin:0 0 6px;color:#435045;font-size:11px;font-weight:700}
-    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select,.ya-ebc-page .ya-enquiry-form textarea{width:100%;border:1px solid #d7dfd4;border-radius:7px;background:#fff;color:#202821;font-size:13px;transition:border-color .2s ease,box-shadow .2s ease}
-    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select{height:45px;padding:0 12px}
-    .ya-ebc-page .ya-enquiry-form textarea{min-height:92px;padding:11px 12px;resize:vertical}
-    .ya-ebc-page .ya-enquiry-form input:focus,.ya-ebc-page .ya-enquiry-form select:focus,.ya-ebc-page .ya-enquiry-form textarea:focus{border-color:#617654;outline:0;box-shadow:0 0 0 3px rgba(97,118,84,.14)}
-    .ya-ebc-page .ya-enquiry-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
-    .ya-ebc-page .ya-enquiry-actions .ya-btn{flex:1;min-width:180px}
-    .ya-ebc-page .ya-enquiry-actions .ya-btn-whatsapp{border-color:#617654;background:#fff;color:#617654}
-    .ya-ebc-page .ya-enquiry-alert{display:none;grid-column:1/-1;padding:11px 13px;border-radius:7px;font-size:13px;line-height:1.45}
+    .ya-ebc-page .ya-enquiry-form label{display:block;margin:0 0 7px;color:#435045;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none}
+    .ya-ebc-page .ya-enquiry-form label em{font-weight:400}
+    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select,.ya-ebc-page .ya-enquiry-form textarea{width:100%;border:1px solid #d7dfd4;border-radius:10px;background:#fbfcfa;color:#202821;font-size:14px;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
+    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select{height:48px;padding:0 14px}
+    .ya-ebc-page .ya-enquiry-form textarea{min-height:108px;padding:13px 14px;resize:vertical}
+    .ya-ebc-page .ya-enquiry-form input:focus,.ya-ebc-page .ya-enquiry-form select:focus,.ya-ebc-page .ya-enquiry-form textarea:focus{border-color:#617654;outline:0;background:#fff;box-shadow:0 0 0 3px rgba(97,118,84,.14)}
+    .ya-ebc-page .ya-enquiry-form [aria-invalid="true"]{border-color:#a34231;background:#fff7f5}
+    .ya-ebc-page .ya-enquiry-actions{display:block;margin-top:2px}
+    .ya-ebc-page .ya-enquiry-actions .ya-btn{width:100%;min-height:50px;justify-content:center;border-radius:10px;text-transform:none}
+    .ya-ebc-page .ya-enquiry-note{margin:10px 0 0;color:#667068;font-size:12px;line-height:1.5;text-align:center}
+    .ya-ebc-page .ya-enquiry-alert{display:none;grid-column:1/-1;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.45}
     .ya-ebc-page .ya-enquiry-alert.is-success{display:block;background:#edf4ea;color:#315336}
     .ya-ebc-page .ya-enquiry-alert.is-error{display:block;background:#fff1ee;color:#a34231}
     .ya-ebc-page .ya-enquiry-honeypot{position:absolute!important;left:-9999px!important}
@@ -2365,18 +2367,21 @@ $related_query = new WP_Query( array(
       </div>
       <div class="ya-enquiry-content">
         <div class="ya-enquiry-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg><?php echo esc_html( $breadcrumb_region ); ?></span><span><?php echo esc_html( $hero_days ); ?> Days</span></div>
-        <h2 id="ya-enquiry-heading">Plan Your <?php echo esc_html( $title ); ?> Trip</h2>
+        <h2 id="ya-enquiry-heading">Plan your <?php echo esc_html( $title ); ?> trip</h2>
         <p class="ya-enquiry-intro">Tell us a little about your travel plans and our local team will tailor this journey for you.</p>
-        <form class="ya-enquiry-form" id="ya-enquiry-form">
+        <form class="ya-enquiry-form" id="ya-enquiry-form" novalidate>
           <input type="hidden" id="ya-enquiry-trek-id" value="<?php echo esc_attr( $post_id ); ?>">
           <div class="ya-enquiry-honeypot" aria-hidden="true"><label>Website<input id="ya-enquiry-website" type="text" tabindex="-1" autocomplete="off"></label></div>
-          <div class="ya-field"><label for="ya-enquiry-name">Full Name *</label><input id="ya-enquiry-name" type="text" required placeholder="Your full name"></div>
-          <div class="ya-field"><label for="ya-enquiry-people">Number of Travellers *</label><select id="ya-enquiry-people" required><option value="" selected disabled>Select travellers</option><option>1 traveller</option><option>2 travellers</option><option>3–5 travellers</option><option>6–10 travellers</option><option>10+ travellers</option></select></div>
-          <div class="ya-field"><label for="ya-enquiry-email">Email *</label><input id="ya-enquiry-email" type="email" required placeholder="you@email.com"></div>
-          <div class="ya-field"><label for="ya-enquiry-phone">Phone / WhatsApp <em>(optional)</em></label><input id="ya-enquiry-phone" type="tel" placeholder="Your phone number"></div>
+          <div class="ya-field"><label for="ya-enquiry-name">Full name *</label><input id="ya-enquiry-name" type="text" required minlength="2" autocomplete="name" placeholder="Your full name"></div>
+          <div class="ya-field"><label for="ya-enquiry-people">Number of travellers *</label><select id="ya-enquiry-people" required><option value="" selected disabled>Select travellers</option><option>1 traveller</option><option>2 travellers</option><option>3–5 travellers</option><option>6–10 travellers</option><option>10+ travellers</option></select></div>
+          <div class="ya-field"><label for="ya-enquiry-email">Email *</label><input id="ya-enquiry-email" type="email" required autocomplete="email" placeholder="you@email.com"></div>
+          <div class="ya-field"><label for="ya-enquiry-phone">Phone / WhatsApp <em>(optional)</em></label><input id="ya-enquiry-phone" type="tel" autocomplete="tel" placeholder="Your phone number"></div>
           <div class="ya-field ya-field-full"><label for="ya-enquiry-message">Message</label><textarea id="ya-enquiry-message" placeholder="Tell us about your travel plans, fitness, dates or any special requests."></textarea></div>
           <div class="ya-enquiry-alert" id="ya-enquiry-alert" role="status" aria-live="polite"></div>
-          <div class="ya-field ya-field-full ya-enquiry-actions"><button class="ya-btn ya-btn-primary" type="submit" data-enquiry-action="save">Send Enquiry</button><button class="ya-btn ya-btn-whatsapp" type="submit" data-enquiry-action="whatsapp">Save &amp; Send WhatsApp</button></div>
+          <div class="ya-field ya-field-full ya-enquiry-actions">
+            <button class="ya-btn ya-btn-primary" type="submit" data-enquiry-action="whatsapp">Send enquiry and continue to WhatsApp</button>
+            <p class="ya-enquiry-note">Your enquiry is saved before WhatsApp opens.</p>
+          </div>
         </form>
       </div>
     </div>
@@ -2411,9 +2416,39 @@ $related_query = new WP_Query( array(
       enquiryModal?.addEventListener('click', event => { if (event.target === enquiryModal) closeEnquiryModal(); });
       document.addEventListener('keydown', event => { if (event.key === 'Escape' && enquiryModal?.classList.contains('is-open')) closeEnquiryModal(); });
 
+      const validateEnquiryForm = () => {
+        if (!enquiryForm) return false;
+        const fields = [...enquiryForm.querySelectorAll('[required]')];
+        let firstInvalidField;
+
+        fields.forEach(field => {
+          const valid = field.checkValidity();
+          field.setAttribute('aria-invalid', String(!valid));
+          if (!valid && !firstInvalidField) firstInvalidField = field;
+        });
+
+        if (!firstInvalidField) return true;
+        const label = firstInvalidField.closest('.ya-field')?.querySelector('label')?.textContent.replace('*', '').trim() || 'required field';
+        if (enquiryAlert) {
+          enquiryAlert.textContent = `Please enter a valid ${label}.`;
+          enquiryAlert.className = 'ya-enquiry-alert is-error';
+        }
+        firstInvalidField.focus();
+        return false;
+      };
+
+      enquiryForm?.querySelectorAll('[required]').forEach(field => {
+        field.addEventListener('input', () => {
+          if (field.checkValidity()) field.setAttribute('aria-invalid', 'false');
+        });
+        field.addEventListener('change', () => {
+          if (field.checkValidity()) field.setAttribute('aria-invalid', 'false');
+        });
+      });
+
       enquiryForm?.addEventListener('submit', async event => {
         event.preventDefault();
-        if (!enquiryForm.reportValidity()) return;
+        if (!validateEnquiryForm()) return;
         const submitter = event.submitter;
         const action = submitter?.dataset.enquiryAction || 'save';
         const submitButtons = [...enquiryForm.querySelectorAll('button[type="submit"]')];
@@ -2453,7 +2488,7 @@ $related_query = new WP_Query( array(
               payload.phone ? `Phone / WhatsApp: ${payload.phone}` : '',
               `Message: ${payload.message}`
             ].filter(Boolean).join('\n');
-            window.open(`https://wa.me/${whatsappTarget}?text=${encodeURIComponent(whatsappMessage)}`, '_blank', 'noopener');
+            window.location.assign(`https://wa.me/${whatsappTarget}?text=${encodeURIComponent(whatsappMessage)}`);
           }
         } catch (error) {
           if (enquiryAlert) {
