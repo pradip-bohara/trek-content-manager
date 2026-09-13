@@ -51,6 +51,7 @@ class Trek_Shortcodes {
         add_shortcode( 'trek_signature_journeys',   array( __CLASS__, 'render_signature_journeys' ) );
         add_shortcode( 'trek_home',                 array( __CLASS__, 'render_signature_journeys' ) );
         add_shortcode( 'trek_journey_finder',       array( __CLASS__, 'render_journey_finder' ) );
+        add_shortcode( 'journey_finder',            array( __CLASS__, 'render_journey_finder' ) );
         add_shortcode( 'trek_nepal_map',            array( __CLASS__, 'render_nepal_map' ) );
         add_shortcode( 'ya_tourism_map',            array( __CLASS__, 'render_nepal_map' ) );
         add_shortcode( 'trek_tourism_map',          array( __CLASS__, 'render_nepal_map' ) );
@@ -58,6 +59,8 @@ class Trek_Shortcodes {
         add_shortcode( 'trek_home_notes',            array( __CLASS__, 'render_home_notes' ) );
         add_shortcode( 'trek_trip_detail',           array( __CLASS__, 'render_trip_detail' ) );
         add_action( 'rest_api_init', array( __CLASS__, 'register_journal_comment_routes' ) );
+        add_action( 'wp_ajax_ya_submit_journey_lead',        array( __CLASS__, 'ajax_submit_journey_lead' ) );
+        add_action( 'wp_ajax_nopriv_ya_submit_journey_lead', array( __CLASS__, 'ajax_submit_journey_lead' ) );
     }
 
     /**
@@ -1990,122 +1993,910 @@ class Trek_Shortcodes {
      */
     public static function render_journey_finder( $atts ) {
         self::$instance_counter++;
-        $uid = 'ya_finder_' . self::$instance_counter;
+        $instance_id = self::$instance_counter;
+        $uid         = 'ya_finder_' . $instance_id;
 
-        $atts = shortcode_atts( array(
-            'title'    => 'Find Your Ideal Journey',
-            'subtitle' => 'Select your preferred region, feeling, and pace to discover the journey that fits you best.',
-        ), $atts, 'trek_journey_finder' );
+        $atts = shortcode_atts(
+            array(
+                'id'       => ( 1 === $instance_id ) ? 'journey-finder' : 'journey-finder-' . $instance_id,
+                'title'    => "Let's choose your next story.",
+                'subtitle' => 'Pick the landscape, feeling and pace that draw you in. We will point you toward a journey worth considering—then shape it properly around you.',
+                'class'    => '',
+            ),
+            $atts,
+            'trek_journey_finder'
+        );
 
-        // Fetch published regions from database
-        $regions = get_terms( array(
-            'taxonomy'   => 'trek_region',
-            'hide_empty' => true,
+        $section_id = sanitize_html_class( $atts['id'] );
+
+        // Map published destinations if available to provide direct links
+        $published_treks = get_posts( array(
+            'post_type'      => 'trek_destination',
+            'post_status'    => 'publish',
+            'posts_per_page' => 100,
+            'fields'         => 'ids',
         ) );
+        $trek_links_map = array();
+        if ( ! empty( $published_treks ) ) {
+            foreach ( $published_treks as $tid ) {
+                $t_title = get_the_title( $tid );
+                if ( ! empty( $t_title ) ) {
+                    $trek_links_map[ trim( mb_strtolower( $t_title ) ) ] = get_permalink( $tid );
+                }
+            }
+        }
+
+        $ajax_url = admin_url( 'admin-ajax.php' );
+        $nonce    = wp_create_nonce( 'trek_journey_lead_nonce' );
 
         ob_start();
         ?>
-        <div class="ya-selector-wrap" id="<?php echo esc_attr( $uid ); ?>" style="max-width:1100px; margin:40px auto; font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+        <section class="ya-selector <?php echo esc_attr( $atts['class'] ); ?>" id="<?php echo esc_attr( $section_id ); ?>" data-uid="<?php echo esc_attr( $uid ); ?>">
             <style>
-                #<?php echo esc_attr( $uid ); ?> * { box-sizing: border-box; }
-                #<?php echo esc_attr( $uid ); ?> .ya-choice-box { padding: 34px; border-radius: 24px; background: #fff; box-shadow: 0 24px 70px rgba(2,47,46,.10); border: 1px solid rgba(17,17,17,.08); }
-                #<?php echo esc_attr( $uid ); ?> .ya-choice-row { display: grid; grid-template-columns: 200px 1fr; align-items: center; gap: 25px; padding: 18px 0; border-bottom: 1px solid rgba(17,17,17,.10); }
-                #<?php echo esc_attr( $uid ); ?> .ya-choice-row:first-child { padding-top: 0; }
-                #<?php echo esc_attr( $uid ); ?> .ya-choice-row label { font-size: 14px; color: #4a5568; font-weight: 600; }
-                #<?php echo esc_attr( $uid ); ?> .ya-choice-row select { width: 100%; appearance: none; border: 0; outline: 0; background: linear-gradient(45deg,transparent 50%,#022f2e 50%) calc(100% - 16px) 53%/6px 6px no-repeat,linear-gradient(135deg,#022f2e 50%,transparent 50%) calc(100% - 11px) 53%/6px 6px no-repeat; color: #022f2e; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; font-weight: 600; padding: 8px 35px 8px 0; cursor: pointer; border-bottom: 2px solid transparent; transition: border-color 0.2s; }
-                #<?php echo esc_attr( $uid ); ?> .ya-choice-row select:focus { border-bottom-color: #045857; }
-                #<?php echo esc_attr( $uid ); ?> .ya-match { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-top: 24px; padding: 24px 28px; border-radius: 18px; background: #022f2e; color: #fff; }
-                #<?php echo esc_attr( $uid ); ?> .ya-match small { display: block; margin-bottom: 5px; color: #c7a767; font: 700 10px/1 'Plus Jakarta Sans', sans-serif; letter-spacing: 2px; text-transform: uppercase; }
-                #<?php echo esc_attr( $uid ); ?> .ya-match strong { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; line-height: 1.15; font-weight: 600; color: #fff; }
-                #<?php echo esc_attr( $uid ); ?> .ya-match a { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; background: #fff; color: #022f2e; text-decoration: none; transition: transform .3s ease, background-color .3s ease; }
-                #<?php echo esc_attr( $uid ); ?> .ya-match a:hover { background: #c7a767; color: #fff; transform: rotate(-35deg) scale(1.05); }
-                @media(max-width: 768px) {
-                    #<?php echo esc_attr( $uid ); ?> .ya-choice-row { grid-template-columns: 1fr; gap: 8px; }
-                    #<?php echo esc_attr( $uid ); ?> .ya-match { grid-template-columns: 1fr; }
-                    #<?php echo esc_attr( $uid ); ?> .ya-match a { width: 100%; border-radius: 999px; height: 46px; }
+                #<?php echo esc_attr( $section_id ); ?>,
+                #<?php echo esc_attr( $section_id ); ?> * {
+                    box-sizing: border-box;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> {
+                    --forest: #022f2e;
+                    --gold: #c7a767;
+                    --paper: #fbf9f4;
+                    --text: #111111;
+                    --muted: #666666;
+                    --line: rgba(17, 17, 17, .14);
+                    --font-display: "Newsreader", "Cormorant Garamond", Georgia, serif;
+                    --font-sans: "Open Sans", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+                    width: 100%;
+                    padding: 100px 0;
+                    background: var(--paper);
+                    color: var(--text);
+                    font-family: var(--font-sans);
+                    overflow: hidden;
+                    position: relative;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-inner {
+                    position: relative;
+                    width: min(1240px, calc(100% - 56px));
+                    margin: 0 auto;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-selector-grid {
+                    display: grid;
+                    grid-template-columns: .85fr 1.15fr;
+                    gap: 70px;
+                    align-items: center;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> h2 {
+                    margin: 0;
+                    color: var(--text);
+                    font-family: var(--font-display);
+                    font-size: clamp(38px, 4.8vw, 68px);
+                    font-weight: 400;
+                    line-height: 1.05;
+                    letter-spacing: -.035em;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-selector-copy p {
+                    max-width: 540px;
+                    margin: 22px 0 0;
+                    color: var(--muted);
+                    font-size: 15.5px;
+                    line-height: 1.8;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-choice-box {
+                    padding: 34px;
+                    border-radius: 28px;
+                    background: #ffffff;
+                    box-shadow: 0 24px 70px rgba(2, 47, 46, .10);
+                    border: 1px solid rgba(17, 17, 17, .08);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row {
+                    display: grid;
+                    grid-template-columns: 180px 1fr;
+                    gap: 25px;
+                    align-items: center;
+                    padding: 18px 0;
+                    border-bottom: 1px solid var(--line);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row:first-child {
+                    padding-top: 0;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row label {
+                    color: var(--muted);
+                    font-size: 13px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row select {
+                    width: 100%;
+                    padding: 6px 35px 6px 0;
+                    border: 0;
+                    outline: 0;
+                    appearance: none;
+                    background:
+                        linear-gradient(45deg, transparent 50%, var(--forest) 50%) calc(100% - 16px) 53% / 6px 6px no-repeat,
+                        linear-gradient(135deg, var(--forest) 50%, transparent 50%) calc(100% - 11px) 53% / 6px 6px no-repeat;
+                    color: var(--text);
+                    cursor: pointer;
+                    font-family: var(--font-display);
+                    font-size: 24px;
+                    font-weight: 500;
+                    border-bottom: 2px solid transparent;
+                    transition: border-color .2s;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row select:focus {
+                    border-bottom-color: var(--gold);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match {
+                    display: grid;
+                    grid-template-columns: 1fr auto;
+                    gap: 24px;
+                    align-items: center;
+                    margin-top: 26px;
+                    padding: 24px;
+                    border-radius: 20px;
+                    background: var(--forest);
+                    color: #ffffff;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match small {
+                    display: block;
+                    margin-bottom: 6px;
+                    color: rgba(255, 255, 255, .72);
+                    font: 700 9.5px/1 var(--font-sans);
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match strong {
+                    display: block;
+                    font-family: var(--font-display);
+                    font-size: clamp(22px, 2.3vw, 29px);
+                    font-weight: 500;
+                    line-height: 1.15;
+                    color: #ffffff;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match a {
+                    display: grid;
+                    width: 50px;
+                    height: 50px;
+                    place-items: center;
+                    border-radius: 50%;
+                    background: #ffffff;
+                    color: var(--forest);
+                    text-decoration: none;
+                    transition: background .3s ease, transform .3s ease, color .3s ease;
+                    flex-shrink: 0;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match a:hover {
+                    background: var(--gold);
+                    color: #ffffff;
+                    transform: rotate(-35deg) scale(1.05);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-icon-arrow {
+                    width: 20px;
+                    height: 20px;
+                    fill: none;
+                    stroke: currentColor;
+                    stroke-linecap: round;
+                    stroke-linejoin: round;
+                    stroke-width: 2;
+                }
+
+                /* Email Collection Box */
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-collect {
+                    margin-top: 22px;
+                    padding-top: 22px;
+                    border-top: 1px solid var(--line);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-bottom: 12px;
+                    color: var(--forest);
+                    font-size: 13px;
+                    font-weight: 600;
+                    letter-spacing: 0.2px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-icon {
+                    width: 16px;
+                    height: 16px;
+                    color: var(--gold);
+                    flex-shrink: 0;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-group {
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-input {
+                    flex: 1;
+                    height: 48px;
+                    padding: 0 18px;
+                    border: 1px solid rgba(2, 47, 46, .20);
+                    border-radius: 999px;
+                    background: #fdfdfd;
+                    color: var(--text);
+                    font-family: var(--font-sans);
+                    font-size: 14px;
+                    outline: none;
+                    transition: border-color .25s ease, box-shadow .25s ease, background-color .25s ease;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-input:focus {
+                    border-color: var(--forest);
+                    box-shadow: 0 0 0 3px rgba(2, 47, 46, .08);
+                    background: #ffffff;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-btn {
+                    height: 48px;
+                    padding: 0 24px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    border: 0;
+                    border-radius: 999px;
+                    background: var(--forest);
+                    color: #ffffff;
+                    font-family: var(--font-sans);
+                    font-size: 13.5px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    transition: background-color .3s ease, transform .2s ease, opacity .2s ease;
+                    flex-shrink: 0;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-btn:hover {
+                    background: var(--gold);
+                    transform: translateY(-1px);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-btn:disabled {
+                    opacity: 0.65;
+                    cursor: not-allowed;
+                    transform: none;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-btn-loader {
+                    width: 14px;
+                    height: 14px;
+                    border: 2px solid rgba(255, 255, 255, .3);
+                    border-top-color: #ffffff;
+                    border-radius: 50%;
+                    animation: yaFinderSpin 0.7s infinite linear;
+                }
+
+                @keyframes yaFinderSpin {
+                    to { transform: rotate(360deg); }
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-feedback {
+                    margin-top: 12px;
+                    padding: 12px 16px;
+                    border-radius: 12px;
+                    font-size: 13.5px;
+                    line-height: 1.5;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-feedback.is-success {
+                    background: #eef8f2;
+                    color: #0b5d38;
+                    border: 1px solid #c3e7d1;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-feedback.is-error {
+                    background: #fdf2f2;
+                    color: #a51d24;
+                    border: 1px solid #f8d7da;
+                }
+
+                /* Reveal animations */
+                #<?php echo esc_attr( $section_id ); ?> .ya-reveal {
+                    opacity: 0;
+                    transform: translateY(30px);
+                    transition: opacity .85s cubic-bezier(.2, .7, .2, 1), transform .85s cubic-bezier(.2, .7, .2, 1);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-reveal.is-visible {
+                    opacity: 1;
+                    transform: none;
+                }
+
+                @media (max-width: 1100px) {
+                    #<?php echo esc_attr( $section_id ); ?> .ya-selector-grid {
+                        grid-template-columns: 1fr;
+                        gap: 50px;
+                    }
+                }
+
+                @media (max-width: 820px) {
+                    #<?php echo esc_attr( $section_id ); ?> {
+                        padding: 70px 0;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-inner {
+                        width: min(100% - 30px, 1240px);
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-choice-row {
+                        grid-template-columns: 1fr;
+                        gap: 8px;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-choice-row select {
+                        font-size: 22px;
+                    }
+                }
+
+                @media (max-width: 560px) {
+                    #<?php echo esc_attr( $section_id ); ?> .ya-choice-box {
+                        padding: 24px 18px;
+                        border-radius: 20px;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-match {
+                        grid-template-columns: 1fr;
+                        padding: 20px 18px;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-match a {
+                        width: 100%;
+                        border-radius: 999px;
+                        height: 44px;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-email-group {
+                        flex-direction: column;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-email-btn {
+                        width: 100%;
+                    }
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    #<?php echo esc_attr( $section_id ); ?> *,
+                    #<?php echo esc_attr( $section_id ); ?> .ya-reveal {
+                        transition-duration: .01ms !important;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-reveal {
+                        opacity: 1;
+                        transform: none;
+                    }
                 }
             </style>
-            <div class="ya-choice-box">
-                <div class="ya-choice-row">
-                    <label for="<?php echo esc_attr( $uid ); ?>_region"><?php esc_html_e( 'I want to explore', 'trek-content-manager' ); ?></label>
-                    <select id="<?php echo esc_attr( $uid ); ?>_region">
-                        <?php if ( ! empty( $regions ) && ! is_wp_error( $regions ) ) : ?>
-                            <?php foreach ( $regions as $r ) : ?>
-                                <option value="<?php echo esc_attr( $r->slug ); ?>"><?php echo esc_html( $r->name ); ?></option>
-                            <?php endforeach; ?>
-                        <?php else : ?>
+
+            <div class="ya-inner ya-selector-grid">
+                <div class="ya-selector-copy ya-reveal">
+                    <h2><?php echo esc_html( $atts['title'] ); ?></h2>
+                    <p>
+                        <?php echo esc_html( $atts['subtitle'] ); ?>
+                    </p>
+                </div>
+
+                <div class="ya-choice-box ya-reveal">
+                    <div class="ya-choice-row">
+                        <label for="<?php echo esc_attr( $uid ); ?>_region"><?php esc_html_e( 'I want to explore', 'trek-content-manager' ); ?></label>
+                        <select id="<?php echo esc_attr( $uid ); ?>_region" class="ya-select-region">
                             <option value="everest"><?php esc_html_e( 'Everest Region', 'trek-content-manager' ); ?></option>
                             <option value="annapurna"><?php esc_html_e( 'Annapurna Region', 'trek-content-manager' ); ?></option>
                             <option value="mustang"><?php esc_html_e( 'Upper Mustang', 'trek-content-manager' ); ?></option>
                             <option value="chitwan"><?php esc_html_e( 'Chitwan & the Lowlands', 'trek-content-manager' ); ?></option>
                             <option value="culture"><?php esc_html_e( 'Kathmandu Valley', 'trek-content-manager' ); ?></option>
-                        <?php endif; ?>
-                    </select>
-                </div>
-                <div class="ya-choice-row">
-                    <label for="<?php echo esc_attr( $uid ); ?>_feeling"><?php esc_html_e( 'I want to feel', 'trek-content-manager' ); ?></label>
-                    <select id="<?php echo esc_attr( $uid ); ?>_feeling">
-                        <option value="challenged"><?php esc_html_e( 'Challenged & Inspired', 'trek-content-manager' ); ?></option>
-                        <option value="restored"><?php esc_html_e( 'Restored & Peaceful', 'trek-content-manager' ); ?></option>
-                        <option value="curious"><?php esc_html_e( 'Culturally Immersed', 'trek-content-manager' ); ?></option>
-                        <option value="remote"><?php esc_html_e( 'Far From Ordinary', 'trek-content-manager' ); ?></option>
-                    </select>
-                </div>
-                <div class="ya-choice-row">
-                    <label for="<?php echo esc_attr( $uid ); ?>_pace"><?php esc_html_e( 'My ideal pace', 'trek-content-manager' ); ?></label>
-                    <select id="<?php echo esc_attr( $uid ); ?>_pace">
-                        <option value="active"><?php esc_html_e( 'Active (5-6 hrs / day)', 'trek-content-manager' ); ?></option>
-                        <option value="balanced"><?php esc_html_e( 'Balanced (4-5 hrs / day)', 'trek-content-manager' ); ?></option>
-                        <option value="slow"><?php esc_html_e( 'Unhurried & Gentle', 'trek-content-manager' ); ?></option>
-                        <option value="intense"><?php esc_html_e( 'Expedition-Style (6-8 hrs / day)', 'trek-content-manager' ); ?></option>
-                    </select>
-                </div>
-                <div class="ya-match">
-                    <div>
-                        <small><?php esc_html_e( 'Your Curated Starting Point', 'trek-content-manager' ); ?></small>
-                        <strong id="<?php echo esc_attr( $uid ); ?>_match_title"><?php esc_html_e( 'The Ultimate Everest Base Camp Trek', 'trek-content-manager' ); ?></strong>
+                        </select>
                     </div>
-                    <a id="<?php echo esc_attr( $uid ); ?>_match_link" href="<?php echo esc_url( home_url( '/all-trips/' ) ); ?>" aria-label="<?php esc_attr_e( 'View suggested journey', 'trek-content-manager' ); ?>">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
-                    </a>
+
+                    <div class="ya-choice-row">
+                        <label for="<?php echo esc_attr( $uid ); ?>_feeling"><?php esc_html_e( 'I want to feel', 'trek-content-manager' ); ?></label>
+                        <select id="<?php echo esc_attr( $uid ); ?>_feeling" class="ya-select-feeling">
+                            <option value="challenged"><?php esc_html_e( 'Challenged', 'trek-content-manager' ); ?></option>
+                            <option value="restored"><?php esc_html_e( 'Restored', 'trek-content-manager' ); ?></option>
+                            <option value="curious"><?php esc_html_e( 'Culturally immersed', 'trek-content-manager' ); ?></option>
+                            <option value="remote"><?php esc_html_e( 'Far from ordinary', 'trek-content-manager' ); ?></option>
+                        </select>
+                    </div>
+
+                    <div class="ya-choice-row">
+                        <label for="<?php echo esc_attr( $uid ); ?>_pace"><?php esc_html_e( 'My ideal pace', 'trek-content-manager' ); ?></label>
+                        <select id="<?php echo esc_attr( $uid ); ?>_pace" class="ya-select-pace">
+                            <option value="active"><?php esc_html_e( 'Active', 'trek-content-manager' ); ?></option>
+                            <option value="balanced"><?php esc_html_e( 'Balanced', 'trek-content-manager' ); ?></option>
+                            <option value="slow"><?php esc_html_e( 'Unhurried', 'trek-content-manager' ); ?></option>
+                            <option value="intense"><?php esc_html_e( 'Expedition-style', 'trek-content-manager' ); ?></option>
+                        </select>
+                    </div>
+
+                    <div class="ya-match">
+                        <div>
+                            <small><?php esc_html_e( 'Your starting point', 'trek-content-manager' ); ?></small>
+                            <strong id="<?php echo esc_attr( $uid ); ?>_match_title" class="ya-match-title" aria-live="polite"><?php esc_html_e( 'The Ultimate Everest Base Camp Trek', 'trek-content-manager' ); ?></strong>
+                        </div>
+                        <a id="<?php echo esc_attr( $uid ); ?>_match_link" class="ya-match-link" href="<?php echo esc_url( home_url( '/contact-us/?journey=' . rawurlencode( 'The Ultimate Everest Base Camp Trek' ) ) ); ?>" aria-label="<?php esc_attr_e( 'View suggested journey', 'trek-content-manager' ); ?>">
+                            <svg class="ya-icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M7 17L17 7M9 7h8v8" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- EMAIL COLLECTION / SEND ITINERARY -->
+                    <div class="ya-email-collect">
+                        <div class="ya-email-header">
+                            <svg class="ya-email-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            <span><?php esc_html_e( 'Email me this customized route itinerary & trip guide', 'trek-content-manager' ); ?></span>
+                        </div>
+                        <form class="ya-journey-email-form" id="<?php echo esc_attr( $uid ); ?>_email_form" data-ajax-url="<?php echo esc_url( $ajax_url ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>" onsubmit="return false;">
+                            <div class="ya-email-group">
+                                <input type="email" id="<?php echo esc_attr( $uid ); ?>_email_input" name="email" class="ya-email-input" placeholder="<?php esc_attr_e( 'Enter your email address...', 'trek-content-manager' ); ?>" required autocomplete="email" />
+                                <button type="submit" id="<?php echo esc_attr( $uid ); ?>_submit_btn" class="ya-email-btn" aria-label="<?php esc_attr_e( 'Send Itinerary to Email', 'trek-content-manager' ); ?>">
+                                    <span class="ya-btn-text"><?php esc_html_e( 'Send Itinerary', 'trek-content-manager' ); ?></span>
+                                    <span class="ya-btn-loader" style="display:none;" aria-hidden="true"></span>
+                                    <svg class="ya-btn-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="<?php echo esc_attr( $uid ); ?>_feedback" class="ya-email-feedback" style="display:none;" role="alert"></div>
+                        </form>
+                    </div>
                 </div>
             </div>
+
             <script>
-                (function(){
-                    const box = document.getElementById('<?php echo esc_js( $uid ); ?>');
-                    if(!box) return;
-                    const rEl = box.querySelector('#<?php echo esc_js( $uid ); ?>_region');
-                    const fEl = box.querySelector('#<?php echo esc_js( $uid ); ?>_feeling');
-                    const pEl = box.querySelector('#<?php echo esc_js( $uid ); ?>_pace');
-                    const titleEl = box.querySelector('#<?php echo esc_js( $uid ); ?>_match_title');
-                    const linkEl = box.querySelector('#<?php echo esc_js( $uid ); ?>_match_link');
+                (function() {
+                    const section = document.getElementById('<?php echo esc_js( $section_id ); ?>');
+                    if (!section) return;
 
-                    const recs = {
-                        everest:{active:'The Ultimate Everest Base Camp Trek',balanced:'Everest in Comfort',slow:'Everest Monasteries & Mountain Lodges',intense:'Everest Three Passes Expedition'},
-                        annapurna:{active:'A Himalayan Sanctuary',balanced:'Annapurna Villages & Mountain Views',slow:'A Gentle Annapurna Escape',intense:'Annapurna Circuit Adventure'},
-                        mustang:{active:'Sky Caves & Ancient Trails',balanced:'The Kingdom of Lo',slow:'Mustang Culture in Comfort',intense:'Remote Mustang Traverse'},
-                        chitwan:{active:'Jungle Trails & River Life',balanced:'Where Culture Meets the Wild',slow:'A Restorative Lowland Escape',intense:'Nepal Multi-Adventure'},
-                        culture:{active:'Kathmandu Valley on Foot',balanced:'Living Heritage of Nepal',slow:'Courtyards, Craft & Cuisine',intense:'Culture and Mountain Adventure'}
+                    const rEl = section.querySelector('.ya-select-region');
+                    const fEl = section.querySelector('.ya-select-feeling');
+                    const pEl = section.querySelector('.ya-select-pace');
+                    const titleEl = section.querySelector('.ya-match-title');
+                    const linkEl = section.querySelector('.ya-match-link');
+
+                    const formEl = section.querySelector('.ya-journey-email-form');
+                    const emailInput = section.querySelector('.ya-email-input');
+                    const submitBtn = section.querySelector('.ya-email-btn');
+                    const btnText = submitBtn ? submitBtn.querySelector('.ya-btn-text') : null;
+                    const btnLoader = submitBtn ? submitBtn.querySelector('.ya-btn-loader') : null;
+                    const btnIcon = submitBtn ? submitBtn.querySelector('.ya-btn-icon') : null;
+                    const feedbackEl = section.querySelector('.ya-email-feedback');
+
+                    // Known trip links published in WordPress database
+                    const tripLinks = <?php echo wp_json_encode( $trek_links_map ); ?> || {};
+                    const contactBase = '<?php echo esc_url( home_url( '/contact-us/?journey=' ) ); ?>';
+
+                    const recommendations = {
+                        everest: {
+                            active: 'The Ultimate Everest Base Camp Trek',
+                            balanced: 'Everest in Comfort',
+                            slow: 'Everest Monasteries & Mountain Lodges',
+                            intense: 'Everest Three Passes Expedition'
+                        },
+                        annapurna: {
+                            active: 'A Himalayan Sanctuary',
+                            balanced: 'Annapurna Villages & Mountain Views',
+                            slow: 'A Gentle Annapurna Escape',
+                            intense: 'Annapurna Circuit Adventure'
+                        },
+                        mustang: {
+                            active: 'Sky Caves & Ancient Trails',
+                            balanced: 'The Kingdom of Lo',
+                            slow: 'Mustang Culture in Comfort',
+                            intense: 'Remote Mustang Traverse'
+                        },
+                        chitwan: {
+                            active: 'Jungle Trails & River Life',
+                            balanced: 'Where Culture Meets the Wild',
+                            slow: 'A Restorative Lowland Escape',
+                            intense: 'Nepal Multi-Adventure'
+                        },
+                        culture: {
+                            active: 'Kathmandu Valley on Foot',
+                            balanced: 'Living Heritage of Nepal',
+                            slow: 'Courtyards, Craft & Cuisine',
+                            intense: 'Culture and Mountain Adventure'
+                        }
                     };
 
-                    const updateFinder = () => {
-                        const r = rEl?.value || 'everest';
-                        const p = pEl?.value || 'active';
-                        const f = fEl?.value || 'challenged';
-                        let t = recs[r]?.[p] || recs['everest']?.[p] || 'The Ultimate Everest Base Camp Trek';
-                        if (f === 'restored' && p !== 'slow') t = recs[r]?.slow || t;
-                        if (f === 'remote' && r !== 'mustang') t = r === 'everest' ? 'Remote Khumbu Lodges & Trails' : 'The Road Less Travelled';
-                        if (titleEl) titleEl.textContent = t;
-                        if (linkEl) linkEl.href = '<?php echo esc_url( home_url( "/contact-us/?journey=" ) ); ?>' + encodeURIComponent(t);
+                    const updateMatch = () => {
+                        const selectedRegion = rEl ? rEl.value : 'everest';
+                        const selectedPace = pEl ? pEl.value : 'active';
+                        const selectedFeeling = fEl ? fEl.value : 'challenged';
+
+                        let title = recommendations[selectedRegion]?.[selectedPace] ||
+                            recommendations[selectedRegion]?.active ||
+                            'The Ultimate Everest Base Camp Trek';
+
+                        if (selectedFeeling === 'restored' && selectedPace !== 'slow') {
+                            title = recommendations[selectedRegion]?.slow || title;
+                        }
+
+                        if (selectedFeeling === 'remote' && selectedRegion !== 'mustang') {
+                            title = (selectedRegion === 'everest')
+                                ? 'Remote Khumbu Lodges & Trails'
+                                : 'The Road Less Travelled';
+                        }
+
+                        if (titleEl) {
+                            titleEl.textContent = title;
+                        }
+
+                        if (linkEl) {
+                            const key = title.trim().toLowerCase();
+                            if (tripLinks[key]) {
+                                linkEl.href = tripLinks[key];
+                            } else {
+                                linkEl.href = contactBase + encodeURIComponent(title);
+                            }
+                        }
                     };
 
-                    [rEl, fEl, pEl].forEach(el => el?.addEventListener('change', updateFinder));
-                    updateFinder();
+                    [rEl, fEl, pEl].forEach(field => {
+                        if (field) {
+                            field.addEventListener('change', updateMatch);
+                        }
+                    });
+                    updateMatch();
+
+                    // Scroll reveal animation
+                    const revealItems = section.querySelectorAll('.ya-reveal');
+                    if (!('IntersectionObserver' in window)) {
+                        revealItems.forEach(item => item.classList.add('is-visible'));
+                    } else {
+                        const observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                    entry.target.classList.add('is-visible');
+                                    observer.unobserve(entry.target);
+                                }
+                            });
+                        }, { threshold: 0.1, rootMargin: '0px 0px -35px' });
+                        revealItems.forEach(item => observer.observe(item));
+                    }
+
+                    // Email Form Submission
+                    if (formEl && submitBtn && emailInput) {
+                        formEl.addEventListener('submit', function(e) {
+                            e.preventDefault();
+
+                            const email = emailInput.value.trim();
+                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (!email || !emailRegex.test(email)) {
+                                showFeedback('<?php echo esc_js( __( 'Please enter a valid email address.', 'trek-content-manager' ) ); ?>', 'error');
+                                emailInput.focus();
+                                return;
+                            }
+
+                            const region = rEl ? rEl.value : 'everest';
+                            const feeling = fEl ? fEl.value : 'challenged';
+                            const pace = pEl ? pEl.value : 'active';
+                            const trekTitle = titleEl ? titleEl.textContent.trim() : 'The Ultimate Everest Base Camp Trek';
+
+                            const ajaxUrl = formEl.getAttribute('data-ajax-url') || '<?php echo esc_url( $ajax_url ); ?>';
+                            const nonce = formEl.getAttribute('data-nonce') || '<?php echo esc_js( $nonce ); ?>';
+
+                            setLoading(true);
+
+                            const formData = new FormData();
+                            formData.append('action', 'ya_submit_journey_lead');
+                            formData.append('nonce', nonce);
+                            formData.append('email', email);
+                            formData.append('region', region);
+                            formData.append('feeling', feeling);
+                            formData.append('pace', pace);
+                            formData.append('trek_title', trekTitle);
+
+                            fetch(ajaxUrl, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                setLoading(false);
+                                if (data && data.success) {
+                                    showFeedback(data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( '✓ Thank you! Your personalized itinerary has been sent to your email.', 'trek-content-manager' ) ); ?>', 'success');
+                                    emailInput.value = '';
+                                } else {
+                                    const errMsg = (data && data.data && data.data.message) ? data.data.message : '<?php echo esc_js( __( 'Could not send itinerary. Please try again.', 'trek-content-manager' ) ); ?>';
+                                    showFeedback(errMsg, 'error');
+                                }
+                            })
+                            .catch(err => {
+                                setLoading(false);
+                                showFeedback('<?php echo esc_js( __( 'Network error. Please try again later.', 'trek-content-manager' ) ); ?>', 'error');
+                            });
+                        });
+                    }
+
+                    function setLoading(isLoading) {
+                        if (!submitBtn) return;
+                        submitBtn.disabled = isLoading;
+                        if (btnText) btnText.textContent = isLoading ? '<?php echo esc_js( __( 'Sending...', 'trek-content-manager' ) ); ?>' : '<?php echo esc_js( __( 'Send Itinerary', 'trek-content-manager' ) ); ?>';
+                        if (btnLoader) btnLoader.style.display = isLoading ? 'inline-block' : 'none';
+                        if (btnIcon) btnIcon.style.display = isLoading ? 'none' : 'inline-block';
+                    }
+
+                    function showFeedback(msg, type) {
+                        if (!feedbackEl) return;
+                        feedbackEl.textContent = msg;
+                        feedbackEl.className = 'ya-email-feedback ' + (type === 'success' ? 'is-success' : 'is-error');
+                        feedbackEl.style.display = 'block';
+                    }
                 })();
             </script>
-        </div>
+        </section>
         <?php
         return ob_get_clean();
+    }
+
+    /**
+     * AJAX Handler for Journey Selector Lead Submissions
+     * Stores lead in `trek_enquiry` post type and sends custom HTML itinerary email.
+     */
+    public static function ajax_submit_journey_lead() {
+        check_ajax_referer( 'trek_journey_lead_nonce', 'nonce' );
+
+        $email      = sanitize_email( $_POST['email'] ?? '' );
+        $region     = sanitize_text_field( $_POST['region'] ?? 'everest' );
+        $feeling    = sanitize_text_field( $_POST['feeling'] ?? 'challenged' );
+        $pace       = sanitize_text_field( $_POST['pace'] ?? 'active' );
+        $trek_title = sanitize_text_field( $_POST['trek_title'] ?? 'The Ultimate Everest Base Camp Trek' );
+
+        if ( empty( $email ) || ! is_email( $email ) ) {
+            wp_send_json_error( array( 'message' => __( 'Please provide a valid email address.', 'trek-content-manager' ) ) );
+        }
+
+        // Region label map
+        $region_labels = array(
+            'everest'   => __( 'Everest Region', 'trek-content-manager' ),
+            'annapurna' => __( 'Annapurna Region', 'trek-content-manager' ),
+            'mustang'   => __( 'Upper Mustang', 'trek-content-manager' ),
+            'chitwan'   => __( 'Chitwan & the Lowlands', 'trek-content-manager' ),
+            'culture'   => __( 'Kathmandu Valley', 'trek-content-manager' ),
+        );
+        $region_name = $region_labels[ $region ] ?? ucwords( str_replace( array( '-', '_' ), ' ', $region ) );
+
+        // Feeling label map
+        $feeling_labels = array(
+            'challenged' => __( 'Challenged & Inspired', 'trek-content-manager' ),
+            'restored'   => __( 'Restored & Peaceful', 'trek-content-manager' ),
+            'curious'    => __( 'Culturally Immersed', 'trek-content-manager' ),
+            'remote'     => __( 'Far From Ordinary', 'trek-content-manager' ),
+        );
+        $feeling_name = $feeling_labels[ $feeling ] ?? ucwords( $feeling );
+
+        // Pace label map
+        $pace_labels = array(
+            'active'   => __( 'Active', 'trek-content-manager' ),
+            'balanced' => __( 'Balanced', 'trek-content-manager' ),
+            'slow'     => __( 'Unhurried', 'trek-content-manager' ),
+            'intense'  => __( 'Expedition-Style', 'trek-content-manager' ),
+        );
+        $pace_name = $pace_labels[ $pace ] ?? ucwords( $pace );
+
+        // Check if matching destination exists in WordPress database
+        $matched_post_id   = 0;
+        $destination_url   = home_url( '/contact-us/?journey=' . rawurlencode( $trek_title ) );
+        $destination_intro = '';
+
+        $lookup = get_page_by_title( $trek_title, OBJECT, 'trek_destination' );
+        if ( $lookup && 'publish' === $lookup->post_status ) {
+            $matched_post_id   = $lookup->ID;
+            $destination_url   = get_permalink( $matched_post_id );
+            $destination_intro = wp_strip_all_tags( $lookup->post_excerpt ?: wp_trim_words( $lookup->post_content, 35 ) );
+        }
+
+        if ( empty( $destination_intro ) ) {
+            // Default rich curated blurbs for selected journey
+            $blurbs = array(
+                'The Ultimate Everest Base Camp Trek'     => 'A high-altitude classic leading into the heart of the Khumbu, crossing legendary suspension bridges, Sherpa villages, and ancient monasteries beneath the world’s greatest peaks.',
+                'Everest in Comfort'                      => 'Experience the majestic Khumbu valley staying at comfortable luxury lodges with heated blankets, local gourmet dining, and panoramic views of Ama Dablam.',
+                'Everest Monasteries & Mountain Lodges'   => 'An unhurried spiritual and cultural journey through Tengboche and Thame monasteries, taking gentle acclimatization days in alpine forests.',
+                'Everest Three Passes Expedition'         => 'A demanding expedition crossing Kongma La, Cho La, and Renjo La passes for seasoned trekkers seeking raw Himalayan wilderness.',
+                'A Himalayan Sanctuary'                   => 'Trek into the glacial amphitheatre of Annapurna Sanctuary, surrounded 360 degrees by 7,000 and 8,000-metre snow peaks.',
+                'Annapurna Villages & Mountain Views'     => 'Gentle terraced hillsides, vibrant Gurung hospitality, and sunrise panoramas over Dhaulagiri and Machapuchare.',
+                'A Gentle Annapurna Escape'               => 'Unhurried walks between charming heritage lodges with peaceful forest walks and riverside relaxation.',
+                'Annapurna Circuit Adventure'             => 'An epic circumnavigation crossing the 5,416m Thorong La pass from lush subtropical valleys into Tibetan-influenced high desert.',
+                'Sky Caves & Ancient Trails'              => 'Venture into Upper Mustang’s wind-sculpted sandstone canyons, 800-year-old cliff caves, and fortified medieval villages.',
+                'The Kingdom of Lo'                       => 'Journey to the walled capital of Lo Manthang, experiencing pure Tibetan Buddhist traditions, royal palaces, and ancient chortens.',
+                'Mustang Culture in Comfort'              => 'Discover Upper Mustang staying in heritage boutique guest houses and luxury lodges surrounded by dramatic trans-Himalayan landscapes.',
+                'Remote Mustang Traverse'                 => 'A rugged, seldom-trodden route across high passes connecting hidden gompas and deep desert river gorges.',
+                'Jungle Trails & River Life'              => 'Canoeing down mist-shrouded rivers, walking safaris in Chitwan National Park, and tracking one-horned rhinos and Bengal tigers.',
+                'Where Culture Meets the Wild'            => 'A harmonious balance of Tharu indigenous traditions, organic culinary experiences, and peaceful wildlife encounters.',
+                'A Restorative Lowland Escape'            => 'Lush luxury jungle lodges, sunset river decks, and gentle nature walks designed for rest and regeneration.',
+                'Nepal Multi-Adventure'                   => 'From white-water river rafting to elephant conservation sanctuaries and deep jungle expeditions.',
+                'Kathmandu Valley on Foot'                => 'Ridge walks connecting medieval hill stations, pine forests, and timeless Newari brick towns.',
+                'Living Heritage of Nepal'                => 'Centuries of artistry, bronze casting, wood carving, and pagoda architecture across Kathmandu, Patan, and Bhaktapur.',
+                'Courtyards, Craft & Cuisine'             => 'An intimate slow-travel exploration of traditional culinary secrets, monastic chanting, and artisan pottery studios.',
+                'Culture and Mountain Adventure'          => 'Combine ancient UNESCO World Heritage sanctuaries with scenic Himalayan foothills and sunrise viewpoints.',
+                'Remote Khumbu Lodges & Trails'           => 'Trek away from the main Everest highway into pristine side valleys, tranquil glacial lakes, and secluded Sherpa settlements.',
+                'The Road Less Travelled'                 => 'Off-the-beaten-path paths revealing untouched wilderness, raw mountain hospitality, and deep wilderness tranquility.',
+            );
+            $destination_intro = $blurbs[ $trek_title ] ?? 'An extraordinary Himalayan journey curated to immerse you in breathtaking mountain scenery, rich cultural heritage, and pristine trails.';
+        }
+
+        // 1. Store Lead in WordPress Database as `trek_enquiry`
+        $post_title = sprintf( 'Journey Lead: %s (%s)', $trek_title, $email );
+        $post_content = sprintf(
+            "Traveller Email: %s\nSuggested Journey: %s\nRegion: %s\nDesired Feeling: %s\nIdeal Pace: %s\nSource: Journey Selector\nTimestamp: %s\nIP: %s",
+            $email,
+            $trek_title,
+            $region_name,
+            $feeling_name,
+            $pace_name,
+            current_time( 'mysql' ),
+            sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' )
+        );
+
+        $enquiry_id = wp_insert_post( array(
+            'post_type'    => 'trek_enquiry',
+            'post_title'   => $post_title,
+            'post_content' => $post_content,
+            'post_status'  => 'private',
+        ), true );
+
+        if ( ! is_wp_error( $enquiry_id ) ) {
+            update_post_meta( $enquiry_id, '_trek_enquiry_email', $email );
+            update_post_meta( $enquiry_id, '_trek_enquiry_trek_title', $trek_title );
+            update_post_meta( $enquiry_id, '_trek_enquiry_trek_id', $matched_post_id );
+            update_post_meta( $enquiry_id, '_trek_enquiry_source', 'Journey Selector' );
+            update_post_meta( $enquiry_id, '_trek_enquiry_region', $region );
+            update_post_meta( $enquiry_id, '_trek_enquiry_feeling', $feeling );
+            update_post_meta( $enquiry_id, '_trek_enquiry_pace', $pace );
+            update_post_meta( $enquiry_id, '_trek_enquiry_date', current_time( 'mysql' ) );
+        }
+
+        // 2. Prepare and Send Customer Itinerary Email via wp_mail()
+        $site_name   = get_bloginfo( 'name' ) ?: 'Yeti Adventure';
+        $admin_email = get_option( 'admin_email' );
+
+        $email_subject = sprintf( __( 'Your Curated Nepal Journey: %s | %s', 'trek-content-manager' ), $trek_title, $site_name );
+
+        $email_headers = array(
+            'Content-Type: text/html; charset=UTF-8',
+            sprintf( 'From: %s <%s>', $site_name, $admin_email ),
+        );
+
+        // Build HTML Email
+        ob_start();
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title><?php echo esc_html( $email_subject ); ?></title>
+        </head>
+        <body style="margin:0;padding:0;background-color:#fbf9f4;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#111111;">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#fbf9f4;padding:30px 15px;">
+                <tr>
+                    <td align="center">
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 10px 40px rgba(2,47,46,0.08);border:1px solid #e7e5e0;">
+                            <!-- Brand Header -->
+                            <tr>
+                                <td style="background-color:#022f2e;padding:35px 35px 30px;text-align:center;">
+                                    <span style="display:inline-block;color:#c7a767;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">HIMALAYAN EXPEDITIONS &amp; BESPOKE TRAVEL</span>
+                                    <h1 style="margin:0;color:#ffffff;font-family:Georgia,serif;font-size:28px;font-weight:400;letter-spacing:-0.5px;"><?php echo esc_html( $site_name ); ?></h1>
+                                </td>
+                            </tr>
+                            <!-- Intro Copy -->
+                            <tr>
+                                <td style="padding:35px 35px 25px;">
+                                    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#333333;">Dear Explorer,</p>
+                                    <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#555555;">
+                                        Thank you for using our interactive Journey Selector. Based on the landscape, feeling, and pace that draw you in, our mountain planners have curated this starting point for your next Himalayan adventure:
+                                    </p>
+
+                                    <!-- Recommended Trek Card -->
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#f5f8f7;border-left:4px solid #c7a767;border-radius:8px;margin-bottom:28px;">
+                                        <tr>
+                                            <td style="padding:22px 24px;">
+                                                <span style="display:block;color:#c7a767;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">CURATED STARTING POINT</span>
+                                                <h2 style="margin:0 0 12px;font-family:Georgia,serif;font-size:24px;color:#022f2e;line-height:1.25;"><?php echo esc_html( $trek_title ); ?></h2>
+                                                <p style="margin:0 0 16px;font-size:14.5px;line-height:1.7;color:#444444;"><?php echo esc_html( $destination_intro ); ?></p>
+                                                
+                                                <!-- Meta Pills -->
+                                                <table border="0" cellpadding="0" cellspacing="0" style="margin-top:10px;">
+                                                    <tr>
+                                                        <td style="padding-right:12px;padding-bottom:6px;">
+                                                            <span style="display:inline-block;background:#ffffff;padding:5px 12px;border-radius:999px;font-size:12px;color:#022f2e;border:1px solid #d8e5e2;"><strong>Region:</strong> <?php echo esc_html( $region_name ); ?></span>
+                                                        </td>
+                                                        <td style="padding-right:12px;padding-bottom:6px;">
+                                                            <span style="display:inline-block;background:#ffffff;padding:5px 12px;border-radius:999px;font-size:12px;color:#022f2e;border:1px solid #d8e5e2;"><strong>Pace:</strong> <?php echo esc_html( $pace_name ); ?></span>
+                                                        </td>
+                                                        <td style="padding-bottom:6px;">
+                                                            <span style="display:inline-block;background:#ffffff;padding:5px 12px;border-radius:999px;font-size:12px;color:#022f2e;border:1px solid #d8e5e2;"><strong>Feeling:</strong> <?php echo esc_html( $feeling_name ); ?></span>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- CTA Button -->
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:30px;">
+                                        <tr>
+                                            <td align="center">
+                                                <a href="<?php echo esc_url( $destination_url ); ?>" style="display:inline-block;background-color:#022f2e;color:#ffffff;text-decoration:none;padding:15px 32px;border-radius:999px;font-size:14px;font-weight:700;letter-spacing:0.5px;">
+                                                    Explore This Journey &amp; Route Details &rarr;
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#666666;">
+                                        Every Yeti Adventure itinerary is completely customizable. We can adjust the route, pacing, lodge standards, and acclimatization days to shape the perfect experience around you.
+                                    </p>
+                                    <p style="margin:0;font-size:14px;line-height:1.7;color:#333333;">
+                                        Warm regards,<br>
+                                        <strong>The Mountain Expedition Team</strong><br>
+                                        <span style="color:#777777;font-size:13px;"><?php echo esc_html( $site_name ); ?></span>
+                                    </p>
+                                </td>
+                            </tr>
+                            <!-- Footer -->
+                            <tr>
+                                <td style="background-color:#faf8f5;padding:20px 35px;border-top:1px solid #ece8e1;text-align:center;">
+                                    <p style="margin:0;font-size:12px;color:#888888;line-height:1.5;">
+                                        You received this email because you requested route information from the Journey Selector on <?php echo esc_html( home_url() ); ?>.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        <?php
+        $customer_email_body = ob_get_clean();
+
+        // Dispatch email to customer
+        wp_mail( $email, $email_subject, $customer_email_body, $email_headers );
+
+        // 3. Dispatch Notification to Site Admin
+        $admin_subject = sprintf( '[New Journey Lead] %s - %s', $trek_title, $email );
+        $admin_body = sprintf(
+            "A new traveller has requested an itinerary from the Journey Selector:\n\n" .
+            "Email: %s\n" .
+            "Suggested Journey: %s\n" .
+            "Region: %s\n" .
+            "Feeling: %s\n" .
+            "Pace: %s\n" .
+            "Date: %s\n\n" .
+            "View in WordPress Dashboard:\n%s\n",
+            $email,
+            $trek_title,
+            $region_name,
+            $feeling_name,
+            $pace_name,
+            current_time( 'mysql' ),
+            admin_url( 'post.php?post=' . $enquiry_id . '&action=edit' )
+        );
+        wp_mail( $admin_email, $admin_subject, $admin_body );
+
+        wp_send_json_success( array(
+            'message' => sprintf( __( '✓ Thank you! We have sent your personalized itinerary for %s to %s. Please check your inbox.', 'trek-content-manager' ), $trek_title, $email ),
+        ) );
     }
 
     /**

@@ -964,18 +964,13 @@
         width: 100%;
         padding: 124px 0 136px;
         overflow: hidden;
-        background:
-            linear-gradient(90deg, rgba(0, 25, 24, .78), rgba(0, 37, 35, .45)),
-            url("https://images.unsplash.com/photo-1544442069-97dded965a9f?auto=format&fit=crop&w=2800&q=92") center / cover;
-        color: #ffffff;
-        font-family: var(--collection-sans);
+
     }
 
     .ya-collection::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(2, 47, 46, .16), rgba(2, 47, 46, .64));
         pointer-events: none;
     }
 
@@ -1002,9 +997,8 @@
 
     .ya-collection h2 {
         margin: 0;
-        color: #ffffff;
-        font-family: var(--collection-display);
-        font-size: clamp(48px, 5.8vw, 82px);
+        color: #000000;
+        font-size: clamp(48px, 5.8vw, 48px);
         font-weight: 400;
         letter-spacing: -.04em;
         line-height: .96;
@@ -2169,383 +2163,337 @@
 
 <!-- YETI ADVENTURE / ABOUT SECTION -->
 <section class="ya-about" id="about">
-  <!-- LEFT SIDE: MEDIA / IMAGE (OUTSIDE EDGE, HEIGHT CAPPED) -->
-  <div class="ya-about__media">
-    <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/Jomsom2-1024x583-1.jpg"
-         alt="Himalayan landscape in Nepal" loading="lazy">
+    <!-- LEFT SIDE: MEDIA / IMAGE (OUTSIDE EDGE, HEIGHT CAPPED) -->
+    <div class="ya-about__media">
+        <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/Jomsom2-1024x583-1.jpg"
+            alt="Himalayan landscape in Nepal" loading="lazy">
 
-    <div class="ya-about__media-overlay"></div>
+        <div class="ya-about__media-overlay"></div>
 
-    <!-- LOGO CONTAINER USING ACCURATE YETI ADVENTURE LOGO URL -->
-    <div class="ya-about__brand">
-      <img src="https://yetiadventure.com/wp-content/uploads/2023/06/yeti-adventure-logo.png" 
-           alt="Yeti Adventure Logo" 
-           class="ya-about__logo-img">
-    </div>
-  </div>
-
-  <!-- RIGHT SIDE: CONTENT AREA (90VH MAX CONTAINER) -->
-  <div class="ya-about__content">
-    <div class="ya-about__header">
-      <span class="ya-about__eyebrow">ABOUT YETI ADVENTURE</span>
-      <h2 class="ya-about__title">
-        Welcome to <em>Yeti Adventure!</em>
-      </h2>
-      <p class="ya-about__lead">
-        Founded in 1999 as Himalayan Society Pvt. Ltd., we rebranded to Yeti Adventure Pvt. Ltd. in 2011. As a leading government-registered trekking and tour operator based in Kathmandu, we operate proudly under the Yeti World banner—employing over 1,500 dedicated staff across Nepal.
-      </p>
+        <!-- LOGO CONTAINER USING ACCURATE YETI ADVENTURE LOGO URL -->
+        <div class="ya-about__brand">
+            <img src="https://yetiadventure.com/wp-content/uploads/2023/06/yeti-adventure-logo.png"
+                alt="Yeti Adventure Logo" class="ya-about__logo-img">
+        </div>
     </div>
 
-    <!-- WHY TRAVEL WITH US SECTION (UPDATED CONTENT) -->
-    <div class="ya-about__why">
-      <h3 class="ya-about__why-title">Why Travel with Yeti Adventure</h3>
-
-      <div class="ya-about__grid">
-        <div class="ya-about__card">
-          <span class="ya-about__card-num">01</span>
-          <h4>Decades Of Experience</h4>
-          <p>
-            Over 20 years in trekking and tours. Our focus on client safety and authentic experiences keeps travelers returning year after year.
-          </p>
-        </div>
-
-        <div class="ya-about__card">
-          <span class="ya-about__card-num">02</span>
-          <h4>Value Of Money</h4>
-          <p>
-            Suitable pricing for all treks and tours without compromising safety or service quality for adventurous, memorable holidays.
-          </p>
-        </div>
-
-        <div class="ya-about__card">
-          <span class="ya-about__card-num">03</span>
-          <h4>Custom Made Itineraries</h4>
-          <p>
-            Private group travel tailored to your exact pace and preferences, giving you complete freedom to explore where and when you want.
-          </p>
-        </div>
-
-        <div class="ya-about__card">
-          <span class="ya-about__card-num">04</span>
-          <h4>Experienced Leaders</h4>
-          <p>
-            Passionate, expert local guides supported by respected adventurers, photographers, and mountaineers at every step.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="ya-about__footer">
-      <a class="ya-about__cta" href="/about/">
-        Discover The Difference
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M5 12h14M13 6l6 6-6 6"></path>
-        </svg>
-      </a>
-    </div>
-  </div>
-</section>
-
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Open+Sans:wght@400;500;600;700&display=swap');
-
-  .ya-about,
-  .ya-about * {
-    box-sizing: border-box;
-  }
-
-  .ya-about {
-    --forest: #022f2e;
-    --gold: #c7a767;
-    --ink: #111111;
-    --muted: #555555;
-    --border-light: #eaeaea;
-
-    width: 100%;
-    height: 90vh; /* Main section constrained strictly under 90vh */
-    max-height: 90vh;
-    min-height: 650px;
-    display: grid;
-    grid-template-columns: minmax(0, 44%) minmax(0, 56%); /* Image Left, Content Right */
-    background: #ffffff;
-    color: var(--ink);
-    overflow: hidden;
-    font-family: "Open Sans", Arial, sans-serif;
-  }
-
-  /* LEFT SIDE: MEDIA & LOGO */
-  .ya-about__media {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: var(--forest);
-  }
-
-  .ya-about__media img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    transition: transform 1.2s cubic-bezier(.2, .7, .2, 1);
-  }
-
-  .ya-about:hover .ya-about__media img {
-    transform: scale(1.04);
-  }
-
-  .ya-about__media-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg,
-        rgba(2, 47, 46, .1) 30%,
-        rgba(0, 18, 18, .65) 100%);
-    pointer-events: none;
-  }
-
-  .ya-about__brand {
-    position: absolute;
-    left: 36px;
-    bottom: 32px;
-    z-index: 2;
-    max-width: 200px;
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
-  }
-
-  .ya-about__logo-img {
-    width: 100%;
-    height: auto;
-    object-fit: contain !important;
-  }
-
-  /* RIGHT SIDE: CONTENT */
-  .ya-about__content {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: clamp(24px, 3.5vh, 48px) clamp(28px, 4vw, 64px);
-    height: 100%;
-    overflow-y: auto; /* Enables smooth internal scroll if viewport height gets too small */
-  }
-
-  .ya-about__eyebrow {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2.5px;
-  }
-
-  .ya-about__title {
-    margin: 0;
-    font-family: "Newsreader", Georgia, serif;
-    font-size: clamp(30px, 3.2vw, 44px); /* Maximum font size strictly controlled */
-    font-weight: 400;
-    line-height: 1.1;
-    letter-spacing: -0.8px;
-    color: var(--ink);
-  }
-
-  .ya-about__title em {
-    font-style: italic;
-    color: var(--ink);
-  }
-
-  .ya-about__lead {
-    margin: 10px 0 0;
-    color: #444444;
-    font-size: 13px;
-    line-height: 1.6;
-    max-width: 720px;
-  }
-
-  /* WHY TRAVEL WITH US GRID */
-  .ya-about__why {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-light);
-  }
-
-  .ya-about__why-title {
-    margin: 0 0 16px;
-    font-family: "Newsreader", Georgia, serif;
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--ink);
-    letter-spacing: -0.3px;
-  }
-
-  .ya-about__grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px 28px;
-  }
-
-  .ya-about__card {
-    position: relative;
-  }
-
-  .ya-about__card-num {
-    display: block;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 1.5px;
-    margin-bottom: 2px;
-  }
-
-  .ya-about__card h4 {
-    margin: 0 0 4px;
-    font-family: "Newsreader", Georgia, serif;
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--ink);
-    line-height: 1.2;
-  }
-
-  .ya-about__card p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.55;
-  }
-
-  /* FOOTER & BUTTON */
-  .ya-about__footer {
-    margin-top: 20px;
-  }
-
-  .ya-about__cta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    min-height: 44px;
-    padding: 0 24px;
-    border: 1px solid var(--forest);
-    border-radius: 2px;
-    background: var(--forest);
-    color: #ffffff;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: transform .3s ease, background .3s ease, color .3s ease;
-  }
-
-  .ya-about__cta svg {
-    width: 14px;
-    height: 14px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transition: transform .3s ease;
-  }
-
-  .ya-about__cta:hover {
-    background: var(--gold);
-    border-color: var(--gold);
-    color: var(--forest);
-    transform: translateY(-2px);
-  }
-
-  .ya-about__cta:hover svg {
-    transform: translateX(4px);
-  }
-
-  /* RESPONSIVE BREAKPOINTS */
-  @media (max-width: 992px) {
-    .ya-about {
-      height: auto;
-      max-height: none;
-      grid-template-columns: 1fr;
-    }
-
-    .ya-about__media {
-      height: 360px;
-      min-height: 360px;
-    }
-
-    .ya-about__content {
-      padding: 36px 24px;
-    }
-  }
-
-  @media (max-width: 560px) {
-    .ya-about__grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .ya-about__cta {
-      width: 100%;
-    }
-  }
-</style>
-
-
-<!-- FEELING SELECTOR -->
-<section class="ya-selector" id="journey-finder">
-    <div class="ya-inner ya-selector-grid">
-        <div class="ya-selector-copy ya-reveal">
-            <h2>Let's choose your next story.</h2>
-            <p>
-                Pick the landscape, feeling and pace that draw you in. We will point you toward a journey worth
-                considering—then shape it properly around you.
+    <!-- RIGHT SIDE: CONTENT AREA (90VH MAX CONTAINER) -->
+    <div class="ya-about__content">
+        <div class="ya-about__header">
+            <span class="ya-about__eyebrow">ABOUT YETI ADVENTURE</span>
+            <h2 class="ya-about__title">
+                Welcome to <em>Yeti Adventure!</em>
+            </h2>
+            <p class="ya-about__lead">
+                Founded in 1999 as Himalayan Society Pvt. Ltd., we rebranded to Yeti Adventure Pvt. Ltd. in 2011. As a
+                leading government-registered trekking and tour operator based in Kathmandu, we operate proudly under
+                the Yeti World banner—employing over 1,500 dedicated staff across Nepal.
             </p>
         </div>
 
-        <div class="ya-choice-box ya-reveal">
-            <div class="ya-choice-row">
-                <label for="ya-region">I want to explore</label>
-                <select id="ya-region">
-                    <option value="everest">Everest Region</option>
-                    <option value="annapurna">Annapurna Region</option>
-                    <option value="mustang">Upper Mustang</option>
-                    <option value="chitwan">Chitwan &amp; the Lowlands</option>
-                    <option value="culture">Kathmandu Valley</option>
-                </select>
-            </div>
+        <!-- WHY TRAVEL WITH US SECTION (UPDATED CONTENT) -->
+        <div class="ya-about__why">
+            <h3 class="ya-about__why-title">Why Travel with Yeti Adventure</h3>
 
-            <div class="ya-choice-row">
-                <label for="ya-feeling">I want to feel</label>
-                <select id="ya-feeling">
-                    <option value="challenged">Challenged</option>
-                    <option value="restored">Restored</option>
-                    <option value="curious">Culturally immersed</option>
-                    <option value="remote">Far from ordinary</option>
-                </select>
-            </div>
-
-            <div class="ya-choice-row">
-                <label for="ya-pace">My ideal pace</label>
-                <select id="ya-pace">
-                    <option value="active">Active</option>
-                    <option value="balanced">Balanced</option>
-                    <option value="slow">Unhurried</option>
-                    <option value="intense">Expedition-style</option>
-                </select>
-            </div>
-
-            <div class="ya-match">
-                <div>
-                    <small>Your starting point</small>
-                    <strong id="ya-match-title" aria-live="polite">The Ultimate Everest Base Camp Trek</strong>
+            <div class="ya-about__grid">
+                <div class="ya-about__card">
+                    <span class="ya-about__card-num">01</span>
+                    <h4>Decades Of Experience</h4>
+                    <p>
+                        Over 20 years in trekking and tours. Our focus on client safety and authentic experiences keeps
+                        travelers returning year after year.
+                    </p>
                 </div>
-                <a id="ya-match-link" href="/contact-us/" aria-label="View suggested journey">
-                    <svg class="ya-icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="M7 17L17 7M9 7h8v8" />
-                    </svg>
-                </a>
+
+                <div class="ya-about__card">
+                    <span class="ya-about__card-num">02</span>
+                    <h4>Value Of Money</h4>
+                    <p>
+                        Suitable pricing for all treks and tours without compromising safety or service quality for
+                        adventurous, memorable holidays.
+                    </p>
+                </div>
+
+                <div class="ya-about__card">
+                    <span class="ya-about__card-num">03</span>
+                    <h4>Custom Made Itineraries</h4>
+                    <p>
+                        Private group travel tailored to your exact pace and preferences, giving you complete freedom to
+                        explore where and when you want.
+                    </p>
+                </div>
+
+                <div class="ya-about__card">
+                    <span class="ya-about__card-num">04</span>
+                    <h4>Experienced Leaders</h4>
+                    <p>
+                        Passionate, expert local guides supported by respected adventurers, photographers, and
+                        mountaineers at every step.
+                    </p>
+                </div>
             </div>
+        </div>
+
+        <div class="ya-about__footer">
+            <a class="ya-about__cta" href="/about/">
+                Discover The Difference
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6"></path>
+                </svg>
+            </a>
         </div>
     </div>
 </section>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Open+Sans:wght@400;500;600;700&display=swap');
+
+    .ya-about,
+    .ya-about * {
+        box-sizing: border-box;
+    }
+
+    .ya-about {
+        --forest: #022f2e;
+        --gold: #c7a767;
+        --ink: #111111;
+        --muted: #555555;
+        --border-light: #eaeaea;
+
+        width: 100%;
+        height: 90vh;
+        /* Main section constrained strictly under 90vh */
+        max-height: 90vh;
+        min-height: 650px;
+        display: grid;
+        grid-template-columns: minmax(0, 44%) minmax(0, 56%);
+        /* Image Left, Content Right */
+        background: #ffffff;
+        color: var(--ink);
+        overflow: hidden;
+        font-family: "Open Sans", Arial, sans-serif;
+    }
+
+    /* LEFT SIDE: MEDIA & LOGO */
+    .ya-about__media {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--forest);
+    }
+
+    .ya-about__media img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 1.2s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .ya-about:hover .ya-about__media img {
+        transform: scale(1.04);
+    }
+
+    .ya-about__media-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg,
+                rgba(2, 47, 46, .1) 30%,
+                rgba(0, 18, 18, .65) 100%);
+        pointer-events: none;
+    }
+
+    .ya-about__brand {
+        position: absolute;
+        left: 36px;
+        bottom: 32px;
+        z-index: 2;
+        max-width: 200px;
+        filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+    }
+
+    .ya-about__logo-img {
+        width: 100%;
+        height: auto;
+        object-fit: contain !important;
+    }
+
+    /* RIGHT SIDE: CONTENT */
+    .ya-about__content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: clamp(24px, 3.5vh, 48px) clamp(28px, 4vw, 64px);
+        height: 100%;
+        overflow-y: auto;
+        /* Enables smooth internal scroll if viewport height gets too small */
+    }
+
+    .ya-about__eyebrow {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+    }
+
+    .ya-about__title {
+        margin: 0;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: clamp(30px, 3.2vw, 44px);
+        /* Maximum font size strictly controlled */
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: -0.8px;
+        color: var(--ink);
+    }
+
+    .ya-about__title em {
+        font-style: italic;
+        color: var(--ink);
+    }
+
+    .ya-about__lead {
+        margin: 10px 0 0;
+        color: #444444;
+        font-size: 13px;
+        line-height: 1.6;
+        max-width: 720px;
+    }
+
+    /* WHY TRAVEL WITH US GRID */
+    .ya-about__why {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-light);
+    }
+
+    .ya-about__why-title {
+        margin: 0 0 16px;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: 22px;
+        font-weight: 500;
+        color: var(--ink);
+        letter-spacing: -0.3px;
+    }
+
+    .ya-about__grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px 28px;
+    }
+
+    .ya-about__card {
+        position: relative;
+    }
+
+    .ya-about__card-num {
+        display: block;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--gold);
+        letter-spacing: 1.5px;
+        margin-bottom: 2px;
+    }
+
+    .ya-about__card h4 {
+        margin: 0 0 4px;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--ink);
+        line-height: 1.2;
+    }
+
+    .ya-about__card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+    }
+
+    /* FOOTER & BUTTON */
+    .ya-about__footer {
+        margin-top: 20px;
+    }
+
+    .ya-about__cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 44px;
+        padding: 0 24px;
+        border: 1px solid var(--forest);
+        border-radius: 2px;
+        background: var(--forest);
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: transform .3s ease, background .3s ease, color .3s ease;
+    }
+
+    .ya-about__cta svg {
+        width: 14px;
+        height: 14px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: transform .3s ease;
+    }
+
+    .ya-about__cta:hover {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: var(--forest);
+        transform: translateY(-2px);
+    }
+
+    .ya-about__cta:hover svg {
+        transform: translateX(4px);
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 992px) {
+        .ya-about {
+            height: auto;
+            max-height: none;
+            grid-template-columns: 1fr;
+        }
+
+        .ya-about__media {
+            height: 360px;
+            min-height: 360px;
+        }
+
+        .ya-about__content {
+            padding: 36px 24px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .ya-about__grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .ya-about__cta {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<!-- FEELING SELECTOR (Interactive shortcode with live matching, email capture, and itinerary delivery) -->
+[ya_journey_finder]
 
 <!-- 2027 TRIP COLLECTION -->
 <section class="ya-collection" id="signature-journeys" aria-labelledby="ya-collection-title">
@@ -2560,294 +2508,295 @@
 
 
 <section class="travel-section">
-  <div class="travel-section__inner">
+    <div class="travel-section__inner">
 
-    <!-- LEFT SIDE -->
-    <div class="travel-section__left">
-      <div class="travel-section__heading">
-        <span class="travel-section__eyebrow">OUR PHILOSOPHY</span>
-        <h2>
-          Designed here.<br>
-          <em>Felt forever.</em>
-        </h2>
+        <!-- LEFT SIDE -->
+        <div class="travel-section__left">
+            <div class="travel-section__heading">
+                <span class="travel-section__eyebrow">OUR PHILOSOPHY</span>
+                <h2>
+                    Designed here.<br>
+                    <em>Felt forever.</em>
+                </h2>
 
-        <p>
-          Safe and experiential journeys are not produced by adding luxury
-          words to an itinerary. They come from good decisions, local
-          intelligence, and operational discipline.
-        </p>
-      </div>
+                <p>
+                    Safe and experiential journeys are not produced by adding luxury
+                    words to an itinerary. They come from good decisions, local
+                    intelligence, and operational discipline.
+                </p>
+            </div>
 
-      <div class="travel-section__image-frame">
-        <div class="travel-section__image">
-          <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/Jomsom2-1024x583-1.jpg"
-               alt="Remote Himalayan village and mountains in Nepal" loading="lazy">
+            <div class="travel-section__image-frame">
+                <div class="travel-section__image">
+                    <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/Jomsom2-1024x583-1.jpg"
+                        alt="Remote Himalayan village and mountains in Nepal" loading="lazy">
+                </div>
+            </div>
         </div>
-      </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="travel-section__points">
+
+            <div class="travel-section__point">
+                <div class="travel-section__number">01</div>
+                <div class="travel-section__copy">
+                    <h3>Local intelligence</h3>
+                    <p>
+                        Our guides understand the rhythm of the mountains, the weather,
+                        the villages, and the moments worth slowing down for.
+                    </p>
+                </div>
+            </div>
+
+            <div class="travel-section__point">
+                <div class="travel-section__number">02</div>
+                <div class="travel-section__copy">
+                    <h3>Itineraries with breathing room</h3>
+                    <p>
+                        We do not confuse speed with value. Smart pacing protects your
+                        body and leaves space for unexpected encounters.
+                    </p>
+                </div>
+            </div>
+
+            <div class="travel-section__point">
+                <div class="travel-section__number">03</div>
+                <div class="travel-section__copy">
+                    <h3>Comfort where it matters</h3>
+                    <p>
+                        Carefully chosen stays, dependable logistics, and thoughtful
+                        details make demanding journeys feel beautifully supported.
+                    </p>
+                </div>
+            </div>
+
+            <div class="travel-section__point">
+                <div class="travel-section__number">04</div>
+                <div class="travel-section__copy">
+                    <h3>A lighter footprint</h3>
+                    <p>
+                        We keep value in local communities and make practical choices
+                        that reduce waste without turning responsibility into a slogan.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-
-    <!-- RIGHT SIDE -->
-    <div class="travel-section__points">
-
-      <div class="travel-section__point">
-        <div class="travel-section__number">01</div>
-        <div class="travel-section__copy">
-          <h3>Local intelligence</h3>
-          <p>
-            Our guides understand the rhythm of the mountains, the weather,
-            the villages, and the moments worth slowing down for.
-          </p>
-        </div>
-      </div>
-
-      <div class="travel-section__point">
-        <div class="travel-section__number">02</div>
-        <div class="travel-section__copy">
-          <h3>Itineraries with breathing room</h3>
-          <p>
-            We do not confuse speed with value. Smart pacing protects your
-            body and leaves space for unexpected encounters.
-          </p>
-        </div>
-      </div>
-
-      <div class="travel-section__point">
-        <div class="travel-section__number">03</div>
-        <div class="travel-section__copy">
-          <h3>Comfort where it matters</h3>
-          <p>
-            Carefully chosen stays, dependable logistics, and thoughtful
-            details make demanding journeys feel beautifully supported.
-          </p>
-        </div>
-      </div>
-
-      <div class="travel-section__point">
-        <div class="travel-section__number">04</div>
-        <div class="travel-section__copy">
-          <h3>A lighter footprint</h3>
-          <p>
-            We keep value in local communities and make practical choices
-            that reduce waste without turning responsibility into a slogan.
-          </p>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
 </section>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Open+Sans:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Open+Sans:wght@400;500;600&display=swap');
 
-  /* =========================================
+    /* =========================================
      VARIABLES & BASE STYLES
      ========================================= */
-  .travel-section {
-    --ink: #0f1412;
-    --body-color: #58615e;
-    --accent: #c7a767;
-    --accent-muted: #8fa3a3;
-    --border-color: #e5e8e6;
-    --bg-light: #f9fbfa;
+    .travel-section {
+        --ink: #0f1412;
+        --body-color: #58615e;
+        --accent: #c7a767;
+        --accent-muted: #8fa3a3;
+        --border-color: #e5e8e6;
+        --bg-light: #f9fbfa;
 
-    width: 100%;
-    background: #ffffff;
-    overflow: hidden;
-    padding: clamp(40px, 6vh, 80px) 0;
-    font-family: "Open Sans", Arial, sans-serif;
-  }
+        width: 100%;
+        background: #ffffff;
+        overflow: hidden;
+        padding: clamp(40px, 6vh, 80px) 0;
+        font-family: "Open Sans", Arial, sans-serif;
+    }
 
-  .travel-section__inner {
-    width: min(1360px, calc(100% - 48px));
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    gap: clamp(40px, 6vw, 88px);
-    align-items: start;
-  }
+    .travel-section__inner {
+        width: min(1360px, calc(100% - 48px));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+        gap: clamp(40px, 6vw, 88px);
+        align-items: start;
+    }
 
-  /* =========================================
+    /* =========================================
      LEFT COLUMN
      ========================================= */
-  .travel-section__left {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .travel-section__eyebrow {
-    display: block;
-    margin-bottom: 12px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--accent-muted);
-  }
-
-  .travel-section__heading h2 {
-    margin: 0;
-    font-family: "Newsreader", Georgia, serif;
-    font-size: clamp(38px, 4vw, 54px);
-    line-height: 1.02;
-    font-weight: 400;
-    letter-spacing: -0.03em;
-    color: var(--ink);
-  }
-
-  .travel-section__heading h2 em {
-    font-style: italic;
-    font-weight: 400;
-  }
-
-  .travel-section__heading p {
-    max-width: 460px;
-    margin: 24px 0 0;
-    font-size: 15px;
-    line-height: 1.75;
-    color: var(--body-color);
-  }
-
-  /* IMAGE CONTAINER */
-  .travel-section__image-frame {
-    margin-top: 36px;
-    position: relative;
-  }
-
-  .travel-section__image {
-    width: 100%;
-    height: 340px;
-    overflow: hidden;
-    border-radius: 0 80px 0 0;
-    position: relative;
-    background: #f0f2f1;
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
-  }
-
-  .travel-section__image img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .travel-section__image:hover img {
-    transform: scale(1.05);
-  }
-
-  /* =========================================
-     RIGHT POINTS
-     ========================================= */
-  .travel-section__points {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .travel-section__point {
-    display: grid;
-    grid-template-columns: 64px minmax(0, 1fr);
-    border-top: 1px solid var(--border-color);
-    padding: 32px 16px 32px 8px;
-    transition: background-color 0.3s ease, padding 0.3s ease;
-    border-radius: 4px;
-  }
-
-  .travel-section__point:last-child {
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .travel-section__point:hover {
-    background-color: var(--bg-light);
-    padding-left: 16px;
-  }
-
-  /* NUMBER */
-  .travel-section__number {
-    padding-top: 2px;
-    font-family: "Newsreader", Georgia, serif;
-    font-size: 24px;
-    line-height: 1;
-    font-weight: 400;
-    color: var(--accent);
-    transition: color 0.3s ease;
-  }
-
-  /* COPY */
-  .travel-section__copy h3 {
-    margin: 0 0 8px;
-    font-family: "Newsreader", Georgia, serif;
-    font-size: 26px;
-    line-height: 1.15;
-    font-weight: 500;
-    letter-spacing: -0.015em;
-    color: var(--ink);
-  }
-
-  .travel-section__copy p {
-    max-width: 580px;
-    margin: 0;
-    font-size: 13.5px;
-    line-height: 1.7;
-    color: var(--body-color);
-  }
-
-  /* =========================================
-     RESPONSIVE BREAKPOINTS
-     ========================================= */
-  @media (max-width: 992px) {
-    .travel-section__inner {
-      grid-template-columns: 1fr;
-      gap: 48px;
+    .travel-section__left {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
     }
 
-    .travel-section__image {
-      height: 380px;
-      border-radius: 0 60px 0 0;
-    }
-  }
-
-  @media (max-width: 576px) {
-    .travel-section__inner {
-      width: calc(100% - 32px);
+    .travel-section__eyebrow {
+        display: block;
+        margin-bottom: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--accent-muted);
     }
 
     .travel-section__heading h2 {
-      font-size: 38px;
+        margin: 0;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: clamp(38px, 4vw, 54px);
+        line-height: 1.02;
+        font-weight: 400;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+    }
+
+    .travel-section__heading h2 em {
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    .travel-section__heading p {
+        max-width: 460px;
+        margin: 24px 0 0;
+        font-size: 15px;
+        line-height: 1.75;
+        color: var(--body-color);
+    }
+
+    /* IMAGE CONTAINER */
+    .travel-section__image-frame {
+        margin-top: 36px;
+        position: relative;
     }
 
     .travel-section__image {
-      height: 280px;
-      border-radius: 0 40px 0 0;
+        width: 100%;
+        height: 340px;
+        overflow: hidden;
+        border-radius: 0 80px 0 0;
+        position: relative;
+        background: #f0f2f1;
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+    }
+
+    .travel-section__image img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .travel-section__image:hover img {
+        transform: scale(1.05);
+    }
+
+    /* =========================================
+     RIGHT POINTS
+     ========================================= */
+    .travel-section__points {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .travel-section__point {
-      grid-template-columns: 44px minmax(0, 1fr);
-      padding: 24px 0;
+        display: grid;
+        grid-template-columns: 64px minmax(0, 1fr);
+        border-top: 1px solid var(--border-color);
+        padding: 32px 16px 32px 8px;
+        transition: background-color 0.3s ease, padding 0.3s ease;
+        border-radius: 4px;
+    }
+
+    .travel-section__point:last-child {
+        border-bottom: 1px solid var(--border-color);
     }
 
     .travel-section__point:hover {
-      padding-left: 0;
-      background-color: transparent;
+        background-color: var(--bg-light);
+        padding-left: 16px;
     }
 
+    /* NUMBER */
+    .travel-section__number {
+        padding-top: 2px;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: 24px;
+        line-height: 1;
+        font-weight: 400;
+        color: var(--accent);
+        transition: color 0.3s ease;
+    }
+
+    /* COPY */
     .travel-section__copy h3 {
-      font-size: 22px;
+        margin: 0 0 8px;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: 26px;
+        line-height: 1.15;
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        color: var(--ink);
     }
-  }
 
-  @media (prefers-reduced-motion: reduce) {
-    .travel-section__image img {
-      transition: none;
+    .travel-section__copy p {
+        max-width: 580px;
+        margin: 0;
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: var(--body-color);
     }
-    .travel-section__point {
-      transition: none;
+
+    /* =========================================
+     RESPONSIVE BREAKPOINTS
+     ========================================= */
+    @media (max-width: 992px) {
+        .travel-section__inner {
+            grid-template-columns: 1fr;
+            gap: 48px;
+        }
+
+        .travel-section__image {
+            height: 380px;
+            border-radius: 0 60px 0 0;
+        }
     }
-  }
+
+    @media (max-width: 576px) {
+        .travel-section__inner {
+            width: calc(100% - 32px);
+        }
+
+        .travel-section__heading h2 {
+            font-size: 38px;
+        }
+
+        .travel-section__image {
+            height: 280px;
+            border-radius: 0 40px 0 0;
+        }
+
+        .travel-section__point {
+            grid-template-columns: 44px minmax(0, 1fr);
+            padding: 24px 0;
+        }
+
+        .travel-section__point:hover {
+            padding-left: 0;
+            background-color: transparent;
+        }
+
+        .travel-section__copy h3 {
+            font-size: 22px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .travel-section__image img {
+            transition: none;
+        }
+
+        .travel-section__point {
+            transition: none;
+        }
+    }
 </style>
 
 
@@ -2870,7 +2819,8 @@
         <!-- Left Arrow Button -->
         <button class="ways-to-go__nav-btn ways-to-go__nav-btn--prev" id="prevBtn" aria-label="Previous">
             <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
             </svg>
         </button>
 
@@ -2930,7 +2880,8 @@
         <!-- Right Arrow Button -->
         <button class="ways-to-go__nav-btn ways-to-go__nav-btn--next" id="nextBtn" aria-label="Next">
             <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
             </svg>
         </button>
     </div>
@@ -2945,7 +2896,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Open+Sans:wght@400;500;600&display=swap');
 
     /* Box Model Safety Reset for WordPress Themes */
-    .ways-to-go, 
+    .ways-to-go,
     .ways-to-go * {
         box-sizing: border-box;
     }
@@ -3048,10 +2999,10 @@
         right: 0;
         bottom: 0;
         height: 50%;
-        background: linear-gradient(to top, 
-            rgba(0, 0, 0, 0.85) 0%, 
-            rgba(0, 0, 0, 0.35) 60%, 
-            rgba(0, 0, 0, 0) 100%);
+        background: linear-gradient(to top,
+                rgba(0, 0, 0, 0.85) 0%,
+                rgba(0, 0, 0, 0.35) 60%,
+                rgba(0, 0, 0, 0) 100%);
         z-index: 1;
         pointer-events: none;
     }
@@ -3095,8 +3046,13 @@
         transition: all 0.3s ease;
     }
 
-    .ways-to-go__nav-btn--prev { left: -15px; }
-    .ways-to-go__nav-btn--next { right: -15px; }
+    .ways-to-go__nav-btn--prev {
+        left: -15px;
+    }
+
+    .ways-to-go__nav-btn--next {
+        right: -15px;
+    }
 
     .ways-to-go__nav-btn svg {
         width: 20px;
@@ -3155,18 +3111,34 @@
 
     /* Responsive Layout Adaptations */
     @media (max-width: 1024px) {
-        .ways-to-go__card { flex: 0 0 calc(33.333% - 16px); }
-        .ways-to-go__nav-btn--prev { left: 5px; }
-        .ways-to-go__nav-btn--next { right: 5px; }
+        .ways-to-go__card {
+            flex: 0 0 calc(33.333% - 16px);
+        }
+
+        .ways-to-go__nav-btn--prev {
+            left: 5px;
+        }
+
+        .ways-to-go__nav-btn--next {
+            right: 5px;
+        }
     }
 
     @media (max-width: 768px) {
-        .ways-to-go__card { flex: 0 0 calc(50% - 12px); height: 350px; }
-        .ways-to-go__nav-btn { display: none; }
+        .ways-to-go__card {
+            flex: 0 0 calc(50% - 12px);
+            height: 350px;
+        }
+
+        .ways-to-go__nav-btn {
+            display: none;
+        }
     }
 
     @media (max-width: 480px) {
-        .ways-to-go__card { flex: 0 0 85%; }
+        .ways-to-go__card {
+            flex: 0 0 85%;
+        }
     }
 </style>
 
@@ -3403,771 +3375,809 @@
 
 <!-- TESTIMONIAL SLIDER SECTION -->
 <section class="testimonial-section">
-  <div class="testimonial-section__overlay"></div>
-  <div class="testimonial-section__inner">
-    
-    <div class="testimonial-slider">
-      <!-- Slide 1 -->
-      <div class="testimonial-slide active">
-        <h2 class="testimonial-quote">"The guides really bring the destinations to life."</h2>
-        <p class="testimonial-body">
-          We connected well with our Nepalese guide, Sonam, who spoke fluent English and was both professional and friendly. The trek itself was phenomenal... magnificent scenery, peaceful, physically challenging.
-        </p>
-        <span class="testimonial-author">— Leslie & Cheyenne (New York, USA)</span>
-      </div>
+    <div class="testimonial-section__overlay"></div>
+    <div class="testimonial-section__inner">
 
-      <!-- Slide 2 -->
-      <div class="testimonial-slide">
-        <h2 class="testimonial-quote">"Service that far exceeded all of our expectations."</h2>
-        <p class="testimonial-body">
-          One of the most memorable trekking trips I have had with my sons. Annapurna Base Camp is so rewarding in every aspect. Also, the service provided was excellent and far exceeded expectations.
-        </p>
-        <span class="testimonial-author">— John Graham (California, USA)</span>
-      </div>
+        <div class="testimonial-slider">
+            <!-- Slide 1 -->
+            <div class="testimonial-slide active">
+                <h2 class="testimonial-quote">"The guides really bring the destinations to life."</h2>
+                <p class="testimonial-body">
+                    We connected well with our Nepalese guide, Sonam, who spoke fluent English and was both professional
+                    and friendly. The trek itself was phenomenal... magnificent scenery, peaceful, physically
+                    challenging.
+                </p>
+                <span class="testimonial-author">— Leslie & Cheyenne (New York, USA)</span>
+            </div>
 
-      <!-- Slide 3 -->
-      <div class="testimonial-slide">
-        <h2 class="testimonial-quote">"An ultimate adventure trek to the mountains."</h2>
-        <p class="testimonial-body">
-          Rinji Furba Sherpa was excellent! The best trek manager we have ever had. He gave us a wonderful experience and we enjoyed every minute! It was an ultimate adventure trek to the mountains.
-        </p>
-        <span class="testimonial-author">— Jo & Laurie Prowse (London, UK)</span>
-      </div>
+            <!-- Slide 2 -->
+            <div class="testimonial-slide">
+                <h2 class="testimonial-quote">"Service that far exceeded all of our expectations."</h2>
+                <p class="testimonial-body">
+                    One of the most memorable trekking trips I have had with my sons. Annapurna Base Camp is so
+                    rewarding in every aspect. Also, the service provided was excellent and far exceeded expectations.
+                </p>
+                <span class="testimonial-author">— John Graham (California, USA)</span>
+            </div>
 
-      <!-- Slide 4 -->
-      <div class="testimonial-slide">
-        <h2 class="testimonial-quote">"Utmost importance to comfort, safety, and detail."</h2>
-        <p class="testimonial-body">
-          Lhawang is a very cheerful young man. He is well informed and well acquainted with the various needs and demands of the clients. A reliable person who gives utmost importance to safety and comfort.
-        </p>
-        <span class="testimonial-author">— Mike & Margaret Algar (Glasgow, UK)</span>
-      </div>
+            <!-- Slide 3 -->
+            <div class="testimonial-slide">
+                <h2 class="testimonial-quote">"An ultimate adventure trek to the mountains."</h2>
+                <p class="testimonial-body">
+                    Rinji Furba Sherpa was excellent! The best trek manager we have ever had. He gave us a wonderful
+                    experience and we enjoyed every minute! It was an ultimate adventure trek to the mountains.
+                </p>
+                <span class="testimonial-author">— Jo & Laurie Prowse (London, UK)</span>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="testimonial-slide">
+                <h2 class="testimonial-quote">"Utmost importance to comfort, safety, and detail."</h2>
+                <p class="testimonial-body">
+                    Lhawang is a very cheerful young man. He is well informed and well acquainted with the various needs
+                    and demands of the clients. A reliable person who gives utmost importance to safety and comfort.
+                </p>
+                <span class="testimonial-author">— Mike & Margaret Algar (Glasgow, UK)</span>
+            </div>
+        </div>
+
+        <!-- Pagination Dots -->
+        <div class="testimonial-dots">
+            <button class="dot active" aria-label="Go to slide 1"></button>
+            <button class="dot" aria-label="Go to slide 2"></button>
+            <button class="dot" aria-label="Go to slide 3"></button>
+            <button class="dot" aria-label="Go to slide 4"></button>
+        </div>
+
     </div>
-
-    <!-- Pagination Dots -->
-    <div class="testimonial-dots">
-      <button class="dot active" aria-label="Go to slide 1"></button>
-      <button class="dot" aria-label="Go to slide 2"></button>
-      <button class="dot" aria-label="Go to slide 3"></button>
-      <button class="dot" aria-label="Go to slide 4"></button>
-    </div>
-
-  </div>
 </section>
 
 <style>
-  /* SECTION STYLES WITH BACKGROUND IMAGE & BLACK OVERLAY */
-  .testimonial-section {
-    position: relative;
-    width: 100%;
-    height: 75vh;
-    min-height: 480px;
-    background-image: url("https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/Jomsom2-1024x583-1.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    color: #ffffff;
-    text-align: center;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* DARK BLACK OVERLAY */
-  .testimonial-section__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.68) 100%);
-    z-index: 1;
-  }
-
-  .testimonial-section__inner {
-    position: relative;
-    z-index: 2;
-    width: min(960px, calc(100% - 48px));
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* SLIDER & RIGHT-TO-LEFT TRANSITION */
-  .testimonial-slider {
-    position: relative;
-    width: 100%;
-    min-height: 240px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-
-  .testimonial-slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(100%);
-    transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.7s ease, visibility 0.7s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .testimonial-slide.active {
-    position: relative;
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-  }
-
-  .testimonial-slide.exit-left {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-100%);
-  }
-
-  /* TYPOGRAPHY */
-  .testimonial-quote {
-    margin: 0 0 20px 0;
-    font-family: "Newsreader", Georgia, serif;
-    font-size: clamp(28px, 3.8vw, 42px);
-    font-style: italic;
-    font-weight: 400;
-    line-height: 1.25;
-    letter-spacing: -0.02em;
-    color: #ffffff;
-    max-width: 820px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  }
-
-  .testimonial-body {
-    margin: 0 auto 24px auto;
-    max-width: 720px;
-    font-family: "Open Sans", Arial, sans-serif;
-    font-size: 14.5px;
-    line-height: 1.75;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.9);
-  }
-
-  .testimonial-author {
-    font-family: "Open Sans", Arial, sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    color: rgba(255, 255, 255, 0.8);
-    text-transform: uppercase;
-  }
-
-  /* PAGINATION DOTS */
-  .testimonial-dots {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 32px;
-  }
-
-  .testimonial-dots .dot {
-    width: 8px;
-    height: 8px;
-    padding: 0;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.4);
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-  }
-
-  .testimonial-dots .dot.active {
-    background-color: #ffffff;
-    transform: scale(1.3);
-  }
-
-  /* RESPONSIVE DESIGN */
-  @media (max-width: 768px) {
-    .testimonial-body {
-      font-size: 13.5px;
+    /* SECTION STYLES WITH BACKGROUND IMAGE & BLACK OVERLAY */
+    .testimonial-section {
+        position: relative;
+        width: 100%;
+        height: 75vh;
+        min-height: 480px;
+        background-image: url("https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/Jomsom2-1024x583-1.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: #ffffff;
+        text-align: center;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-  }
+
+    /* DARK BLACK OVERLAY */
+    .testimonial-section__overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.68) 100%);
+        z-index: 1;
+    }
+
+    .testimonial-section__inner {
+        position: relative;
+        z-index: 2;
+        width: min(960px, calc(100% - 48px));
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* SLIDER & RIGHT-TO-LEFT TRANSITION */
+    .testimonial-slider {
+        position: relative;
+        width: 100%;
+        min-height: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .testimonial-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(100%);
+        transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.7s ease, visibility 0.7s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .testimonial-slide.active {
+        position: relative;
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+    }
+
+    .testimonial-slide.exit-left {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-100%);
+    }
+
+    /* TYPOGRAPHY */
+    .testimonial-quote {
+        margin: 0 0 20px 0;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: clamp(28px, 3.8vw, 42px);
+        font-style: italic;
+        font-weight: 400;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+        color: #ffffff;
+        max-width: 820px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .testimonial-body {
+        margin: 0 auto 24px auto;
+        max-width: 720px;
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 14.5px;
+        line-height: 1.75;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .testimonial-author {
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        color: rgba(255, 255, 255, 0.8);
+        text-transform: uppercase;
+    }
+
+    /* PAGINATION DOTS */
+    .testimonial-dots {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 32px;
+    }
+
+    .testimonial-dots .dot {
+        width: 8px;
+        height: 8px;
+        padding: 0;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.4);
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .testimonial-dots .dot.active {
+        background-color: #ffffff;
+        transform: scale(1.3);
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+        .testimonial-body {
+            font-size: 13.5px;
+        }
+    }
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const slides = document.querySelectorAll(".testimonial-slide");
-    const dots = document.querySelectorAll(".testimonial-dots .dot");
-    let currentIndex = 0;
-    const intervalTime = 3500; // 3.5 seconds auto-scroll
-    let slideInterval;
+    document.addEventListener("DOMContentLoaded", function () {
+        const slides = document.querySelectorAll(".testimonial-slide");
+        const dots = document.querySelectorAll(".testimonial-dots .dot");
+        let currentIndex = 0;
+        const intervalTime = 3500; // 3.5 seconds auto-scroll
+        let slideInterval;
 
-    function showSlide(nextIndex) {
-      if (nextIndex === currentIndex) return;
+        function showSlide(nextIndex) {
+            if (nextIndex === currentIndex) return;
 
-      const currentSlide = slides[currentIndex];
-      const nextSlide = slides[nextIndex];
+            const currentSlide = slides[currentIndex];
+            const nextSlide = slides[nextIndex];
 
-      slides.forEach((slide) => {
-        slide.classList.remove("exit-left");
-      });
+            slides.forEach((slide) => {
+                slide.classList.remove("exit-left");
+            });
 
-      currentSlide.classList.remove("active");
-      currentSlide.classList.add("exit-left");
+            currentSlide.classList.remove("active");
+            currentSlide.classList.add("exit-left");
 
-      nextSlide.classList.add("active");
+            nextSlide.classList.add("active");
 
-      dots[currentIndex].classList.remove("active");
-      dots[nextIndex].classList.add("active");
+            dots[currentIndex].classList.remove("active");
+            dots[nextIndex].classList.add("active");
 
-      currentIndex = nextIndex;
-    }
+            currentIndex = nextIndex;
+        }
 
-    function nextSlide() {
-      const targetIndex = (currentIndex + 1) % slides.length;
-      showSlide(targetIndex);
-    }
+        function nextSlide() {
+            const targetIndex = (currentIndex + 1) % slides.length;
+            showSlide(targetIndex);
+        }
 
-    function startAutoScroll() {
-      slideInterval = setInterval(nextSlide, intervalTime);
-    }
+        function startAutoScroll() {
+            slideInterval = setInterval(nextSlide, intervalTime);
+        }
 
-    function stopAutoScroll() {
-      clearInterval(slideInterval);
-    }
+        function stopAutoScroll() {
+            clearInterval(slideInterval);
+        }
 
-    dots.forEach((dot, index) => {
-      dot.addEventListener("click", () => {
-        showSlide(index);
-        stopAutoScroll();
+        dots.forEach((dot, index) => {
+            dot.addEventListener("click", () => {
+                showSlide(index);
+                stopAutoScroll();
+                startAutoScroll();
+            });
+        });
+
+        const container = document.querySelector(".testimonial-section");
+        if (container) {
+            container.addEventListener("mouseenter", stopAutoScroll);
+            container.addEventListener("mouseleave", startAutoScroll);
+        }
+
         startAutoScroll();
-      });
     });
-
-    const container = document.querySelector(".testimonial-section");
-    if (container) {
-      container.addEventListener("mouseenter", stopAutoScroll);
-      container.addEventListener("mouseleave", startAutoScroll);
-    }
-
-    startAutoScroll();
-  });
 </script>
 
 <section class="traveller-lead-section">
-  
-  <!-- LEFT SIDE: Single Dynamic Hero Background Image -->
-  <div class="traveller-lead__visual">
-    <!-- Active background images that fade smoothly based on selection -->
-    <div class="hero-bg-image active" id="bg-backpacker" style="background-image: url('https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=80');"></div>
-    <div class="hero-bg-image" id="bg-explorer" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80');"></div>
-    <div class="hero-bg-image" id="bg-luxury" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80');"></div>
-    <div class="hero-bg-image" id="bg-soul_searcher" style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=80');"></div>
-    <div class="hero-bg-image" id="bg-adventurer" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1600&q=80');"></div>
 
-    <!-- Black Overlay -->
-    <div class="dark-overlay"></div>
+    <!-- LEFT SIDE: Single Dynamic Hero Background Image -->
+    <div class="traveller-lead__visual">
+        <!-- Active background images that fade smoothly based on selection -->
+        <div class="hero-bg-image active" id="bg-backpacker"
+            style="background-image: url('https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=80');">
+        </div>
+        <div class="hero-bg-image" id="bg-explorer"
+            style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80');">
+        </div>
+        <div class="hero-bg-image" id="bg-luxury"
+            style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80');">
+        </div>
+        <div class="hero-bg-image" id="bg-soul_searcher"
+            style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=80');">
+        </div>
+        <div class="hero-bg-image" id="bg-adventurer"
+            style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1600&q=80');">
+        </div>
 
-    <!-- Floating Email Input Over Left Image -->
-    <div class="left-overlay-input desktop-only">
-      <input type="email" class="travellerEmailInput" placeholder="Enter your email ...." required />
-      <span class="email-error-msg">Please enter a valid email address</span>
+        <!-- Black Overlay -->
+        <div class="dark-overlay"></div>
+
+        <!-- Floating Email Input Over Left Image -->
+        <div class="left-overlay-input desktop-only">
+            <input type="email" class="travellerEmailInput" placeholder="Enter your email ...." required />
+            <span class="email-error-msg">Please enter a valid email address</span>
+        </div>
     </div>
-  </div>
 
-  <!-- RIGHT SIDE: Content & Interactive Form -->
-  <div class="traveller-lead__content">
-    
-    <div class="content-header">
-      <h2 class="traveller-title">Tell us, What kind of traveller are you?</h2>
+    <!-- RIGHT SIDE: Content & Interactive Form -->
+    <div class="traveller-lead__content">
+
+        <div class="content-header">
+            <h2 class="traveller-title">Tell us, What kind of traveller are you?</h2>
+        </div>
+
+        <form id="travellerLeadForm" class="traveller-form" novalidate>
+            <input type="hidden" id="travellerType" name="traveller_type" value="backpacker" required />
+
+            <!-- Mobile Email Field -->
+            <div class="mobile-email-wrapper mobile-only">
+                <input type="email" class="travellerEmailInput" placeholder="Enter your email ...." required />
+                <span class="email-error-msg">Please enter a valid email address</span>
+            </div>
+
+            <!-- Selection List options -->
+            <ul class="traveller-list-options" id="travellerList">
+                <li class="option-item active" data-value="backpacker" data-bg="bg-backpacker">
+                    <span class="option-text">The Backpacker</span>
+                    <span class="option-num">01</span>
+                </li>
+                <li class="option-item" data-value="explorer" data-bg="bg-explorer">
+                    <span class="option-text">The Explorer</span>
+                    <span class="option-num">02</span>
+                </li>
+                <li class="option-item" data-value="luxury" data-bg="bg-luxury">
+                    <span class="option-text">The Luxury Traveller</span>
+                    <span class="option-num">03</span>
+                </li>
+                <li class="option-item" data-value="soul_searcher" data-bg="bg-soul_searcher">
+                    <span class="option-text">The Soul Searcher</span>
+                    <span class="option-num">04</span>
+                </li>
+                <li class="option-item" data-value="adventurer" data-bg="bg-adventurer">
+                    <span class="option-text">The Adventurer</span>
+                    <span class="option-num">05</span>
+                </li>
+            </ul>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span>Get Details</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </button>
+
+            <div id="formResponse" class="form-response"></div>
+        </form>
     </div>
-
-    <form id="travellerLeadForm" class="traveller-form" novalidate>
-      <input type="hidden" id="travellerType" name="traveller_type" value="backpacker" required />
-
-      <!-- Mobile Email Field -->
-      <div class="mobile-email-wrapper mobile-only">
-        <input type="email" class="travellerEmailInput" placeholder="Enter your email ...." required />
-        <span class="email-error-msg">Please enter a valid email address</span>
-      </div>
-
-      <!-- Selection List options -->
-      <ul class="traveller-list-options" id="travellerList">
-        <li class="option-item active" data-value="backpacker" data-bg="bg-backpacker">
-          <span class="option-text">The Backpacker</span>
-          <span class="option-num">01</span>
-        </li>
-        <li class="option-item" data-value="explorer" data-bg="bg-explorer">
-          <span class="option-text">The Explorer</span>
-          <span class="option-num">02</span>
-        </li>
-        <li class="option-item" data-value="luxury" data-bg="bg-luxury">
-          <span class="option-text">The Luxury Traveller</span>
-          <span class="option-num">03</span>
-        </li>
-        <li class="option-item" data-value="soul_searcher" data-bg="bg-soul_searcher">
-          <span class="option-text">The Soul Searcher</span>
-          <span class="option-num">04</span>
-        </li>
-        <li class="option-item" data-value="adventurer" data-bg="bg-adventurer">
-          <span class="option-text">The Adventurer</span>
-          <span class="option-num">05</span>
-        </li>
-      </ul>
-
-      <!-- Submit Button -->
-      <button type="submit" class="submit-btn" id="submitBtn">
-        <span>Get Details</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-
-      <div id="formResponse" class="form-response"></div>
-    </form>
-  </div>
 
 </section>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Open+Sans:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Open+Sans:wght@400;500;600&display=swap');
 
-  /* MAIN 100VH SECTION CONTAINER */
-  .traveller-lead-section {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    min-height: 650px;
-    background: #ffffff;
-    font-family: "Open Sans", Arial, sans-serif;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    align-items: center;
-  }
-
-  /* LEFT SIDE CONTAINER FOR SINGLE IMAGE */
-  .traveller-lead__visual {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #111111;
-  }
-
-  /* BACKGROUND IMAGE STYLES & CROSSFADE TRANSITION */
-  .hero-bg-image {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    opacity: 0;
-    transform: scale(1.05);
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .hero-bg-image.active {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* BLACK OVERLAY FOR BETTER EMAIL FIELD VISIBILITY */
-  .dark-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.28);
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  /* FLOATING EMAIL INPUT OVER LEFT IMAGE */
-  .left-overlay-input {
-    position: absolute;
-    z-index: 10;
-    width: min(380px, 85%);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .travellerEmailInput {
-    width: 100%;
-    padding: 16px 22px;
-    font-size: 15px;
-    font-family: "Open Sans", Arial, sans-serif;
-    color: #111111;
-    background: #ffffff;
-    border: 1.5px solid #111111;
-    border-radius: 0px;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
-    outline: none;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-  }
-
-  .travellerEmailInput:focus {
-    background: #ffffff;
-    border-color: #d1ad54;
-    box-shadow: 0 0 0 3px rgba(209, 173, 84, 0.3);
-  }
-
-  .email-error-msg {
-    display: none;
-    font-size: 12px;
-    color: #ff5252;
-    margin-top: 6px;
-    font-weight: 500;
-  }
-
-  /* RIGHT SIDE CONTENT */
-  .traveller-lead__content {
-    padding: 40px clamp(24px, 5vw, 60px);
-    max-width: 480px;
-    z-index: 5;
-  }
-
-  .traveller-title {
-    margin: 0 0 32px;
-    font-family: "Newsreader", Georgia, serif;
-    font-size: clamp(34px, 3.8vw, 50px);
-    line-height: 1.15;
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    color: #111111;
-  }
-
-  /* FORM & LIST STYLING */
-  .traveller-form {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .traveller-list-options {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .option-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid #e1e7e2;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .option-text {
-    font-family: "Newsreader", Georgia, serif;
-    font-size: 21px;
-    color: #777777;
-    transition: color 0.3s ease;
-  }
-
-  .option-num {
-    font-size: 13px;
-    color: #aaaaaa;
-    font-family: "Open Sans", Arial, sans-serif;
-  }
-
-  .option-item:hover .option-text {
-    color: #617654;
-  }
-
-  .option-item.active {
-    border-bottom: 1.5px solid #d1ad54;
-  }
-
-  .option-item.active .option-text {
-    color: #111111;
-    font-weight: 500;
-  }
-
-  .option-item.active .option-num {
-    color: #111111;
-  }
-
-  /* SUBMIT BUTTON */
-  .submit-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 16px 28px;
-    background-color: #617654;
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 600;
-    border: none;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .submit-btn:hover {
-    background-color: #4d5e43;
-    box-shadow: 0 6px 18px rgba(97, 118, 84, 0.25);
-  }
-
-  .form-response {
-    font-size: 14px;
-    display: none;
-  }
-
-  .form-response.success {
-    display: block;
-    color: #2e7d32;
-  }
-
-  .form-response.error {
-    display: block;
-    color: #c62828;
-  }
-
-  .mobile-only { display: none; }
-  .desktop-only { display: block; }
-
-  /* MOBILE RESPONSIVE LAYOUT */
-  @media (max-width: 992px) {
-    .desktop-only { display: none !important; }
-    .mobile-only { display: block !important; }
-
+    /* MAIN 100VH SECTION CONTAINER */
     .traveller-lead-section {
-      grid-template-columns: 1fr;
-      height: auto;
-      min-height: 100vh;
-      position: relative;
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        min-height: 650px;
+        background: #ffffff;
+        font-family: "Open Sans", Arial, sans-serif;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        align-items: center;
     }
 
+    /* LEFT SIDE CONTAINER FOR SINGLE IMAGE */
     .traveller-lead__visual {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #111111;
     }
 
+    /* BACKGROUND IMAGE STYLES & CROSSFADE TRANSITION */
+    .hero-bg-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transform: scale(1.05);
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hero-bg-image.active {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* BLACK OVERLAY FOR BETTER EMAIL FIELD VISIBILITY */
     .dark-overlay {
-      background: rgba(255, 255, 255, 0.88); /* Lighter background for readability on mobile */
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.28);
+        z-index: 2;
+        pointer-events: none;
     }
 
-    .traveller-lead__content {
-      position: relative;
-      z-index: 5;
-      padding: 60px 24px;
-      max-width: 100%;
-      box-sizing: border-box;
+    /* FLOATING EMAIL INPUT OVER LEFT IMAGE */
+    .left-overlay-input {
+        position: absolute;
+        z-index: 10;
+        width: min(380px, 85%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
-    .traveller-title {
-      font-size: 34px;
-      margin-bottom: 20px;
+    .travellerEmailInput {
+        width: 100%;
+        padding: 16px 22px;
+        font-size: 15px;
+        font-family: "Open Sans", Arial, sans-serif;
+        color: #111111;
+        background: #ffffff;
+        border: 1.5px solid #111111;
+        border-radius: 0px;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
+        outline: none;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
     }
 
-    .mobile-email-wrapper {
-      margin-bottom: 8px;
+    .travellerEmailInput:focus {
+        background: #ffffff;
+        border-color: #d1ad54;
+        box-shadow: 0 0 0 3px rgba(209, 173, 84, 0.3);
     }
 
     .email-error-msg {
-      color: #d32f2f;
+        display: none;
+        font-size: 12px;
+        color: #ff5252;
+        margin-top: 6px;
+        font-weight: 500;
     }
-  }
+
+    /* RIGHT SIDE CONTENT */
+    .traveller-lead__content {
+        padding: 40px clamp(24px, 5vw, 60px);
+        max-width: 480px;
+        z-index: 5;
+    }
+
+    .traveller-title {
+        margin: 0 0 32px;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: clamp(34px, 3.8vw, 50px);
+        line-height: 1.15;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        color: #111111;
+    }
+
+    /* FORM & LIST STYLING */
+    .traveller-form {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .traveller-list-options {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .option-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #e1e7e2;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .option-text {
+        font-family: "Newsreader", Georgia, serif;
+        font-size: 21px;
+        color: #777777;
+        transition: color 0.3s ease;
+    }
+
+    .option-num {
+        font-size: 13px;
+        color: #aaaaaa;
+        font-family: "Open Sans", Arial, sans-serif;
+    }
+
+    .option-item:hover .option-text {
+        color: #617654;
+    }
+
+    .option-item.active {
+        border-bottom: 1.5px solid #d1ad54;
+    }
+
+    .option-item.active .option-text {
+        color: #111111;
+        font-weight: 500;
+    }
+
+    .option-item.active .option-num {
+        color: #111111;
+    }
+
+    /* SUBMIT BUTTON */
+    .submit-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 16px 28px;
+        background-color: #617654;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        border: none;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background-color: #4d5e43;
+        box-shadow: 0 6px 18px rgba(97, 118, 84, 0.25);
+    }
+
+    .form-response {
+        font-size: 14px;
+        display: none;
+    }
+
+    .form-response.success {
+        display: block;
+        color: #2e7d32;
+    }
+
+    .form-response.error {
+        display: block;
+        color: #c62828;
+    }
+
+    .mobile-only {
+        display: none;
+    }
+
+    .desktop-only {
+        display: block;
+    }
+
+    /* MOBILE RESPONSIVE LAYOUT */
+    @media (max-width: 992px) {
+        .desktop-only {
+            display: none !important;
+        }
+
+        .mobile-only {
+            display: block !important;
+        }
+
+        .traveller-lead-section {
+            grid-template-columns: 1fr;
+            height: auto;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .traveller-lead__visual {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .dark-overlay {
+            background: rgba(255, 255, 255, 0.88);
+            /* Lighter background for readability on mobile */
+        }
+
+        .traveller-lead__content {
+            position: relative;
+            z-index: 5;
+            padding: 60px 24px;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .traveller-title {
+            font-size: 34px;
+            margin-bottom: 20px;
+        }
+
+        .mobile-email-wrapper {
+            margin-bottom: 8px;
+        }
+
+        .email-error-msg {
+            color: #d32f2f;
+        }
+    }
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // 1. Interactive Selection & Dynamic Image Swap
-    const listItems = document.querySelectorAll("#travellerList .option-item");
-    const hiddenInput = document.getElementById("travellerType");
-    const bgImages = document.querySelectorAll(".hero-bg-image");
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Interactive Selection & Dynamic Image Swap
+        const listItems = document.querySelectorAll("#travellerList .option-item");
+        const hiddenInput = document.getElementById("travellerType");
+        const bgImages = document.querySelectorAll(".hero-bg-image");
 
-    function changeBackgroundImage(bgId) {
-      bgImages.forEach(img => {
-        if (img.id === bgId) {
-          img.classList.add("active");
-        } else {
-          img.classList.remove("active");
+        function changeBackgroundImage(bgId) {
+            bgImages.forEach(img => {
+                if (img.id === bgId) {
+                    img.classList.add("active");
+                } else {
+                    img.classList.remove("active");
+                }
+            });
         }
-      });
-    }
 
-    listItems.forEach((item) => {
-      // Hover event to preview image
-      item.addEventListener("mouseenter", function () {
-        const bgId = this.getAttribute("data-bg");
-        changeBackgroundImage(bgId);
-      });
+        listItems.forEach((item) => {
+            // Hover event to preview image
+            item.addEventListener("mouseenter", function () {
+                const bgId = this.getAttribute("data-bg");
+                changeBackgroundImage(bgId);
+            });
 
-      // Click event to confirm selection
-      item.addEventListener("click", function () {
-        listItems.forEach((li) => li.classList.remove("active"));
-        this.classList.add("active");
-        
-        const val = this.getAttribute("data-value");
-        const bgId = this.getAttribute("data-bg");
-        
-        hiddenInput.value = val;
-        changeBackgroundImage(bgId);
-      });
-    });
+            // Click event to confirm selection
+            item.addEventListener("click", function () {
+                listItems.forEach((li) => li.classList.remove("active"));
+                this.classList.add("active");
 
-    // Reset to active option image when mouse leaves the list container
-    const listContainer = document.getElementById("travellerList");
-    listContainer.addEventListener("mouseleave", function () {
-      const activeItem = document.querySelector("#travellerList .option-item.active");
-      if (activeItem) {
-        changeBackgroundImage(activeItem.getAttribute("data-bg"));
-      }
-    });
+                const val = this.getAttribute("data-value");
+                const bgId = this.getAttribute("data-bg");
 
-    // 2. Email Validation Logic
-    function validateEmail(email) {
-      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(String(email).toLowerCase());
-    }
-
-    const emailInputs = document.querySelectorAll(".travellerEmailInput");
-
-    // Sync email inputs across views & validate dynamically
-    emailInputs.forEach(input => {
-      input.addEventListener("input", function() {
-        const val = this.value;
-        const parent = this.parentElement;
-        const errSpan = parent.querySelector(".email-error-msg");
-        
-        emailInputs.forEach(otherInput => {
-          if(otherInput !== this) otherInput.value = val;
+                hiddenInput.value = val;
+                changeBackgroundImage(bgId);
+            });
         });
 
-        if (validateEmail(val.trim())) {
-          if (errSpan) errSpan.style.display = "none";
-          this.style.borderColor = "#617654";
+        // Reset to active option image when mouse leaves the list container
+        const listContainer = document.getElementById("travellerList");
+        listContainer.addEventListener("mouseleave", function () {
+            const activeItem = document.querySelector("#travellerList .option-item.active");
+            if (activeItem) {
+                changeBackgroundImage(activeItem.getAttribute("data-bg"));
+            }
+        });
+
+        // 2. Email Validation Logic
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(String(email).toLowerCase());
         }
-      });
-    });
 
-    // 3. Form Submission Handling
-    const form = document.getElementById("travellerLeadForm");
-    const responseDiv = document.getElementById("formResponse");
-    const submitBtn = document.getElementById("submitBtn");
+        const emailInputs = document.querySelectorAll(".travellerEmailInput");
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+        // Sync email inputs across views & validate dynamically
+        emailInputs.forEach(input => {
+            input.addEventListener("input", function () {
+                const val = this.value;
+                const parent = this.parentElement;
+                const errSpan = parent.querySelector(".email-error-msg");
 
-      let activeEmailInput = Array.from(emailInputs).find(input => input.offsetWidth > 0 && input.offsetHeight > 0);
-      if (!activeEmailInput) activeEmailInput = emailInputs[0];
+                emailInputs.forEach(otherInput => {
+                    if (otherInput !== this) otherInput.value = val;
+                });
 
-      const emailValue = activeEmailInput.value.trim();
-      const parent = activeEmailInput.parentElement;
-      const errSpan = parent.querySelector(".email-error-msg");
+                if (validateEmail(val.trim())) {
+                    if (errSpan) errSpan.style.display = "none";
+                    this.style.borderColor = "#617654";
+                }
+            });
+        });
 
-      // Frontend Email Validation
-      if (!validateEmail(emailValue)) {
-        if (errSpan) errSpan.style.display = "block";
-        activeEmailInput.style.borderColor = "#d32f2f";
-        activeEmailInput.focus();
-        return;
-      } else {
-        if (errSpan) errSpan.style.display = "none";
-      }
+        // 3. Form Submission Handling
+        const form = document.getElementById("travellerLeadForm");
+        const responseDiv = document.getElementById("formResponse");
+        const submitBtn = document.getElementById("submitBtn");
 
-      const travellerType = hiddenInput.value;
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
 
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Sending...";
+            let activeEmailInput = Array.from(emailInputs).find(input => input.offsetWidth > 0 && input.offsetHeight > 0);
+            if (!activeEmailInput) activeEmailInput = emailInputs[0];
 
-      const formData = new FormData();
-      formData.append("action", "handle_traveller_lead");
-      formData.append("traveller_type", travellerType);
-      formData.append("email", emailValue);
+            const emailValue = activeEmailInput.value.trim();
+            const parent = activeEmailInput.parentElement;
+            const errSpan = parent.querySelector(".email-error-msg");
 
-      const ajaxUrl = typeof wp_ajax_obj !== "undefined" ? wp_ajax_obj.ajax_url : "/wp-admin/admin-ajax.php";
+            // Frontend Email Validation
+            if (!validateEmail(emailValue)) {
+                if (errSpan) errSpan.style.display = "block";
+                activeEmailInput.style.borderColor = "#d32f2f";
+                activeEmailInput.focus();
+                return;
+            } else {
+                if (errSpan) errSpan.style.display = "none";
+            }
 
-      fetch(ajaxUrl, {
-        method: "POST",
-        body: formData,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = `<span>Get Details</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+            const travellerType = hiddenInput.value;
 
-          if (data.success) {
-            responseDiv.className = "form-response success";
-            responseDiv.innerText = "Thank you! Your trip details have been emailed.";
-            form.reset();
-            emailInputs.forEach(i => i.value = "");
-          } else {
-            responseDiv.className = "form-response error";
-            responseDiv.innerText = data.data || "Something went wrong. Please try again.";
-          }
-        })
-        .catch(() => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = `<span>Get Details</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
-          responseDiv.className = "form-response error";
-          responseDiv.innerText = "Server connection error. Please try again later.";
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Sending...";
+
+            const formData = new FormData();
+            formData.append("action", "handle_traveller_lead");
+            formData.append("traveller_type", travellerType);
+            formData.append("email", emailValue);
+
+            const ajaxUrl = typeof wp_ajax_obj !== "undefined" ? wp_ajax_obj.ajax_url : "/wp-admin/admin-ajax.php";
+
+            fetch(ajaxUrl, {
+                method: "POST",
+                body: formData,
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span>Get Details</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+
+                    if (data.success) {
+                        responseDiv.className = "form-response success";
+                        responseDiv.innerText = "Thank you! Your trip details have been emailed.";
+                        form.reset();
+                        emailInputs.forEach(i => i.value = "");
+                    } else {
+                        responseDiv.className = "form-response error";
+                        responseDiv.innerText = data.data || "Something went wrong. Please try again.";
+                    }
+                })
+                .catch(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span>Get Details</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+                    responseDiv.className = "form-response error";
+                    responseDiv.innerText = "Server connection error. Please try again later.";
+                });
         });
     });
-  });
 </script>
 
 <!-- FIND INSPIRATION -->
 <section class="ya-notes ya-find-inspiration">
-  <div class="ya-inner">
-    <div class="ya-notes-head ya-reveal">
-      <h2>Find inspiration</h2>
+    <div class="ya-inner">
+        <div class="ya-notes-head ya-reveal">
+            <h2>Find inspiration</h2>
+        </div>
+        [ya_home_notes count="6"]
     </div>
-    [ya_home_notes count="6"]
-  </div>
 </section>
 
 <style>
-  .ya-find-inspiration,
-  .ya-find-inspiration * { box-sizing: border-box; }
+    .ya-find-inspiration,
+    .ya-find-inspiration * {
+        box-sizing: border-box;
+    }
 
-  .ya-find-inspiration {
-    padding: 112px 0 96px;
-    background: #ffffff;
-    color: #333333;
-    font-family: "Open Sans", Arial, sans-serif;
-  }
+    .ya-find-inspiration {
+        padding: 112px 0 96px;
+        background: #ffffff;
+        color: #333333;
+        font-family: "Open Sans", Arial, sans-serif;
+    }
 
-  .ya-find-inspiration .ya-inner {
-    width: min(1025px, calc(100% - 40px));
-    margin: 0 auto;
-  }
+    .ya-find-inspiration .ya-inner {
+        width: min(1025px, calc(100% - 40px));
+        margin: 0 auto;
+    }
 
-  .ya-find-inspiration .ya-notes-head {
-    margin: 0 0 40px;
-    text-align: center;
-  }
+    .ya-find-inspiration .ya-notes-head {
+        margin: 0 0 40px;
+        text-align: center;
+    }
 
-  .ya-find-inspiration h2 {
-    margin: 0;
-    color: #202a35;
-    font-family: "Newsreader", Georgia, serif;
-    font-size: clamp(34px, 4vw, 48px);
-    font-weight: 400;
-    line-height: 1.08;
-    letter-spacing: -.035em;
-  }
+    .ya-find-inspiration h2 {
+        margin: 0;
+        color: #202a35;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: clamp(34px, 4vw, 48px);
+        font-weight: 400;
+        line-height: 1.08;
+        letter-spacing: -.035em;
+    }
 
-  @media (max-width: 760px) {
-    .ya-find-inspiration { padding: 76px 0 62px; }
-    .ya-find-inspiration .ya-inner { width: min(100% - 30px, 1025px); }
-    .ya-find-inspiration .ya-notes-head { margin-bottom: 30px; }
-  }
+    @media (max-width: 760px) {
+        .ya-find-inspiration {
+            padding: 76px 0 62px;
+        }
+
+        .ya-find-inspiration .ya-inner {
+            width: min(100% - 30px, 1025px);
+        }
+
+        .ya-find-inspiration .ya-notes-head {
+            margin-bottom: 30px;
+        }
+    }
 </style>

@@ -284,9 +284,14 @@ class Trek_CPT {
         switch ( $column ) {
             case 'enquiry_trek':
                 $trek_id = absint( get_post_meta( $post_id, '_trek_enquiry_trek_id', true ) );
-                echo $trek_id && get_post( $trek_id )
-                    ? '<a href="' . esc_url( get_edit_post_link( $trek_id ) ) . '"><strong>' . esc_html( get_the_title( $trek_id ) ) . '</strong></a>'
-                    : '—';
+                $trek_title = get_post_meta( $post_id, '_trek_enquiry_trek_title', true );
+                if ( $trek_id && get_post( $trek_id ) ) {
+                    echo '<a href="' . esc_url( get_edit_post_link( $trek_id ) ) . '"><strong>' . esc_html( get_the_title( $trek_id ) ) . '</strong></a>';
+                } elseif ( ! empty( $trek_title ) ) {
+                    echo '<strong>' . esc_html( $trek_title ) . '</strong>';
+                } else {
+                    echo '—';
+                }
                 break;
             case 'enquiry_email':
                 $email = get_post_meta( $post_id, '_trek_enquiry_email', true );
@@ -299,7 +304,12 @@ class Trek_CPT {
                 echo esc_html( get_post_meta( $post_id, '_trek_enquiry_travellers', true ) ?: '—' );
                 break;
             case 'enquiry_source':
-                echo esc_html( get_post_meta( $post_id, '_trek_enquiry_source', true ) ?: 'frontend' );
+                $source = get_post_meta( $post_id, '_trek_enquiry_source', true ) ?: 'frontend';
+                if ( 'journey_finder' === $source || 'Journey Selector' === $source ) {
+                    echo '<span style="display:inline-block;color:#022f2e;background:#e2f2e9;padding:3px 9px;border-radius:6px;font-weight:600;font-size:11px;border:1px solid #b7dfc8;">🗺️ ' . esc_html__( 'Journey Selector', 'trek-content-manager' ) . '</span>';
+                } else {
+                    echo esc_html( $source );
+                }
                 break;
         }
     }
@@ -340,10 +350,11 @@ class Trek_CPT {
         fputcsv( $output, array( 'Date', 'Name', 'Trip', 'Email', 'Phone / WhatsApp', 'Travellers', 'Message', 'Source' ) );
         foreach ( $enquiries as $enquiry ) {
             $trek_id = absint( get_post_meta( $enquiry->ID, '_trek_enquiry_trek_id', true ) );
+            $trek_title = $trek_id ? get_the_title( $trek_id ) : ( get_post_meta( $enquiry->ID, '_trek_enquiry_trek_title', true ) ?: '' );
             fputcsv( $output, array(
                 get_the_date( 'Y-m-d H:i', $enquiry ),
                 $enquiry->post_title,
-                $trek_id ? get_the_title( $trek_id ) : '',
+                $trek_title,
                 get_post_meta( $enquiry->ID, '_trek_enquiry_email', true ),
                 get_post_meta( $enquiry->ID, '_trek_enquiry_phone', true ),
                 get_post_meta( $enquiry->ID, '_trek_enquiry_travellers', true ),
@@ -1882,22 +1893,77 @@ class Trek_CPT {
         <?php
     }
 
-    /** Read-only details for enquiries saved from the trip planning popup. */
+    /** Read-only details for enquiries saved from the trip planning popup or journey finder. */
     public static function render_enquiry_detail_metabox( $post ) {
         $trek_id    = absint( get_post_meta( $post->ID, '_trek_enquiry_trek_id', true ) );
+        $trek_title = get_post_meta( $post->ID, '_trek_enquiry_trek_title', true );
         $email      = get_post_meta( $post->ID, '_trek_enquiry_email', true );
         $phone      = get_post_meta( $post->ID, '_trek_enquiry_phone', true );
         $travellers = get_post_meta( $post->ID, '_trek_enquiry_travellers', true );
         $source     = get_post_meta( $post->ID, '_trek_enquiry_source', true );
+        $region     = get_post_meta( $post->ID, '_trek_enquiry_region', true );
+        $feeling    = get_post_meta( $post->ID, '_trek_enquiry_feeling', true );
+        $pace       = get_post_meta( $post->ID, '_trek_enquiry_pace', true );
         ?>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;">
-            <div><strong><?php esc_html_e( 'Trip', 'trek-content-manager' ); ?></strong><br><?php echo $trek_id ? '<a href="' . esc_url( get_edit_post_link( $trek_id ) ) . '">' . esc_html( get_the_title( $trek_id ) ) . '</a>' : '—'; ?></div>
-            <div><strong><?php esc_html_e( 'Email', 'trek-content-manager' ); ?></strong><br><?php echo $email ? '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>' : '—'; ?></div>
-            <div><strong><?php esc_html_e( 'Phone / WhatsApp', 'trek-content-manager' ); ?></strong><br><?php echo esc_html( $phone ?: '—' ); ?></div>
-            <div><strong><?php esc_html_e( 'Travellers', 'trek-content-manager' ); ?></strong><br><?php echo esc_html( $travellers ?: '—' ); ?></div>
-            <div><strong><?php esc_html_e( 'Source', 'trek-content-manager' ); ?></strong><br><?php echo esc_html( $source ?: 'frontend' ); ?></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;background:#fcfcfc;padding:16px;border-radius:8px;border:1px solid #e2e4e7;">
+            <div>
+                <strong style="color:#2c3338;"><?php esc_html_e( 'Matched Journey / Trip', 'trek-content-manager' ); ?></strong><br>
+                <?php
+                if ( $trek_id && get_post( $trek_id ) ) {
+                    echo '<a href="' . esc_url( get_edit_post_link( $trek_id ) ) . '"><strong>' . esc_html( get_the_title( $trek_id ) ) . '</strong></a>';
+                } elseif ( ! empty( $trek_title ) ) {
+                    echo '<strong style="color:#022f2e;">' . esc_html( $trek_title ) . '</strong>';
+                } else {
+                    echo '—';
+                }
+                ?>
+            </div>
+            <div>
+                <strong style="color:#2c3338;"><?php esc_html_e( 'Email', 'trek-content-manager' ); ?></strong><br>
+                <?php echo $email ? '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>' : '—'; ?>
+            </div>
+            <div>
+                <strong style="color:#2c3338;"><?php esc_html_e( 'Source', 'trek-content-manager' ); ?></strong><br>
+                <?php
+                if ( 'journey_finder' === $source || 'Journey Selector' === $source ) {
+                    echo '<span style="display:inline-block;color:#022f2e;background:#e2f2e9;padding:3px 9px;border-radius:6px;font-weight:600;font-size:11px;border:1px solid #b7dfc8;">🗺️ ' . esc_html__( 'Journey Selector', 'trek-content-manager' ) . '</span>';
+                } else {
+                    echo esc_html( $source ?: 'frontend' );
+                }
+                ?>
+            </div>
+            <?php if ( ! empty( $phone ) ) : ?>
+                <div>
+                    <strong style="color:#2c3338;"><?php esc_html_e( 'Phone / WhatsApp', 'trek-content-manager' ); ?></strong><br>
+                    <?php echo esc_html( $phone ); ?>
+                </div>
+            <?php endif; ?>
+            <?php if ( ! empty( $travellers ) ) : ?>
+                <div>
+                    <strong style="color:#2c3338;"><?php esc_html_e( 'Travellers', 'trek-content-manager' ); ?></strong><br>
+                    <?php echo esc_html( $travellers ); ?>
+                </div>
+            <?php endif; ?>
         </div>
-        <p style="margin:18px 0 0;color:#646970;"><?php esc_html_e( 'The traveller’s message is stored in the main WordPress editor above.', 'trek-content-manager' ); ?></p>
+
+        <?php if ( ! empty( $region ) || ! empty( $feeling ) || ! empty( $pace ) ) : ?>
+            <div style="margin-top:16px;padding:14px;background:#f0f7f6;border-radius:8px;border:1px solid #cce5e3;">
+                <strong style="color:#022f2e;display:block;margin-bottom:8px;">🧭 <?php esc_html_e( 'Selected Travel Preferences', 'trek-content-manager' ); ?>:</strong>
+                <div style="display:flex;gap:15px;flex-wrap:wrap;">
+                    <?php if ( ! empty( $region ) ) : ?>
+                        <div><span style="color:#646970;font-size:11px;text-transform:uppercase;font-weight:700;"><?php esc_html_e( 'Region', 'trek-content-manager' ); ?>:</span> <strong><?php echo esc_html( ucwords( str_replace( array( '-', '_' ), ' ', $region ) ) ); ?></strong></div>
+                    <?php endif; ?>
+                    <?php if ( ! empty( $feeling ) ) : ?>
+                        <div><span style="color:#646970;font-size:11px;text-transform:uppercase;font-weight:700;"><?php esc_html_e( 'Feeling', 'trek-content-manager' ); ?>:</span> <strong><?php echo esc_html( ucwords( $feeling ) ); ?></strong></div>
+                    <?php endif; ?>
+                    <?php if ( ! empty( $pace ) ) : ?>
+                        <div><span style="color:#646970;font-size:11px;text-transform:uppercase;font-weight:700;"><?php esc_html_e( 'Pace', 'trek-content-manager' ); ?>:</span> <strong><?php echo esc_html( ucwords( $pace ) ); ?></strong></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <p style="margin:18px 0 0;color:#646970;"><?php esc_html_e( 'The traveller’s itinerary request details are stored in the main WordPress editor above.', 'trek-content-manager' ); ?></p>
         <?php
     }
 

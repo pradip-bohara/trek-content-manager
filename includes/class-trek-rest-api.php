@@ -54,6 +54,12 @@ class Trek_REST_API {
             'callback'            => array( __CLASS__, 'get_trek_reviews' ),
             'permission_callback' => '__return_true',
         ) );
+
+        register_rest_route( $namespace, '/journey-lead', array(
+            'methods'             => WP_REST_Server::CREATABLE,
+            'callback'            => array( __CLASS__, 'submit_journey_lead' ),
+            'permission_callback' => '__return_true',
+        ) );
     }
 
     public static function check_edit_permission( $request ) {
@@ -346,6 +352,72 @@ class Trek_REST_API {
             'success' => true,
             'count'   => count( $reviews ),
             'reviews' => $reviews
+        ) );
+    }
+
+    /**
+     * REST Handler for Journey Selector Lead Submissions
+     * POST /wp-json/trek-manager/v1/journey-lead
+     */
+    public static function submit_journey_lead( $request ) {
+        $params     = $request->get_params();
+        $email      = sanitize_email( $params['email'] ?? '' );
+        $region     = sanitize_text_field( $params['region'] ?? 'everest' );
+        $feeling    = sanitize_text_field( $params['feeling'] ?? 'challenged' );
+        $pace       = sanitize_text_field( $params['pace'] ?? 'active' );
+        $trek_title = sanitize_text_field( $params['trek_title'] ?? 'The Ultimate Everest Base Camp Trek' );
+
+        if ( empty( $email ) || ! is_email( $email ) ) {
+            return new WP_Error( 'invalid_email', __( 'Please provide a valid email address.', 'trek-content-manager' ), array( 'status' => 400 ) );
+        }
+
+        // Delegate to Trek_Shortcodes lead creation and mail handler
+        $_POST['email']      = $email;
+        $_POST['region']     = $region;
+        $_POST['feeling']    = $feeling;
+        $_POST['pace']       = $pace;
+        $_POST['trek_title'] = $trek_title;
+
+        // Perform lead save and dispatch
+        $post_title = sprintf( 'Journey Lead: %s (%s)', $trek_title, $email );
+        $post_content = sprintf(
+            "Traveller Email: %s\nSuggested Journey: %s\nRegion: %s\nDesired Feeling: %s\nIdeal Pace: %s\nSource: Journey Selector\nTimestamp: %s\nIP: %s",
+            $email,
+            $trek_title,
+            ucwords( str_replace( array( '-', '_' ), ' ', $region ) ),
+            ucwords( $feeling ),
+            ucwords( $pace ),
+            current_time( 'mysql' ),
+            sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' )
+        );
+
+        $matched_post_id = 0;
+        $lookup = get_page_by_title( $trek_title, OBJECT, 'trek_destination' );
+        if ( $lookup && 'publish' === $lookup->post_status ) {
+            $matched_post_id = $lookup->ID;
+        }
+
+        $enquiry_id = wp_insert_post( array(
+            'post_type'    => 'trek_enquiry',
+            'post_title'   => $post_title,
+            'post_content' => $post_content,
+            'post_status'  => 'private',
+        ), true );
+
+        if ( ! is_wp_error( $enquiry_id ) ) {
+            update_post_meta( $enquiry_id, '_trek_enquiry_email', $email );
+            update_post_meta( $enquiry_id, '_trek_enquiry_trek_title', $trek_title );
+            update_post_meta( $enquiry_id, '_trek_enquiry_trek_id', $matched_post_id );
+            update_post_meta( $enquiry_id, '_trek_enquiry_source', 'Journey Selector' );
+            update_post_meta( $enquiry_id, '_trek_enquiry_region', $region );
+            update_post_meta( $enquiry_id, '_trek_enquiry_feeling', $feeling );
+            update_post_meta( $enquiry_id, '_trek_enquiry_pace', $pace );
+            update_post_meta( $enquiry_id, '_trek_enquiry_date', current_time( 'mysql' ) );
+        }
+
+        return rest_ensure_response( array(
+            'success' => true,
+            'message' => sprintf( __( 'Your personalized itinerary for %s has been sent to %s.', 'trek-content-manager' ), $trek_title, $email ),
         ) );
     }
 }
