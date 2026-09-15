@@ -104,10 +104,7 @@
       // 15. Render Gallery
       this.renderGallery(data);
 
-      // 16. Render Extensions
-      this.renderExtensions(data);
-
-      // 17. Render Fixed Departures
+      // 16. Render Fixed Departures
       this.renderDepartures(data);
 
       // 18. Render Reviews
@@ -323,7 +320,6 @@
         { id: 'packing', label: 'Packing List', condition: Array.isArray(data.packingList) && data.packingList.length > 0 },
         { id: 'essential-info', label: 'Essential Info', condition: Array.isArray(data.essentialInfo) && data.essentialInfo.length > 0 },
         { id: 'gallery', label: 'Gallery', condition: Array.isArray(data.gallery) && data.gallery.length > 0 },
-        { id: 'extensions', label: 'Extensions', condition: Array.isArray(data.extensions) && data.extensions.length > 0 },
         { id: 'departures', label: 'Departures & Booking', condition: true },
         { id: 'reviews', label: 'Reviews', condition: Array.isArray(data.reviews) && data.reviews.length > 0 }
       ];
@@ -671,31 +667,7 @@
     },
 
     /**
-     * 16. Extensions / Add-ons
-     */
-    renderExtensions: function(data) {
-      const container = document.getElementById('trek-extensions-container');
-      if (!container) return;
-
-      const exts = data.extensions || [];
-      container.innerHTML = exts.map(ext => `
-        <div class="trek-extension-card">
-          <img src="${ext.image}" alt="${ext.title}" class="trek-extension-card__img" loading="lazy">
-          <div class="trek-extension-card__body">
-            <div class="trek-extension-card__duration">${ext.duration}</div>
-            <h3 class="trek-extension-card__title">${ext.title}</h3>
-            <p class="trek-extension-card__desc">${ext.description}</p>
-            <div class="trek-extension-card__footer">
-              <div class="trek-extension-card__price">+$${ext.price} <span style="font-size:0.75rem; font-weight:normal;">${ext.currency || 'USD'}</span></div>
-              <a href="#enquiry" class="trek-btn-admin trek-btn-admin--outline">Add to Enquiry</a>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    },
-
-    /**
-     * 17. Fixed Departures Table
+     * 16. Fixed Departures Table
      */
     renderDepartures: function(data) {
       const container = document.getElementById('trek-departures-container');

@@ -120,6 +120,8 @@ class Trek_Renderer {
 
         // 4. Quick Facts Grid
         $fact_high_point  = get_post_meta( $post_id, '_trek_fact_high_point', true ) ?: '5,550m · Kala Patthar';
+        $fact_low_point   = get_post_meta( $post_id, '_trek_fact_low_point', true ) ?: '1,400m · Kathmandu';
+        $trip_status      = get_post_meta( $post_id, '_trek_trip_status', true ) ?: 'open';
         $fact_region      = get_post_meta( $post_id, '_trek_fact_region', true ) ?: $breadcrumb_reg;
         $fact_trekking    = get_post_meta( $post_id, '_trek_fact_trekking', true ) ?: 'Usually 5–6 hours daily';
         $fact_accom       = get_post_meta( $post_id, '_trek_fact_accom', true ) ?: 'Hotel & local mountain lodges';
@@ -130,10 +132,12 @@ class Trek_Renderer {
         // Stored structured quick facts if present
         $stored_facts     = get_post_meta( $post_id, '_trek_quick_facts', true );
         if ( is_array( $stored_facts ) ) {
-            $fact_high_point = ! empty( $stored_facts['max_altitude'] ) ? $stored_facts['max_altitude'] : $fact_high_point;
-            $fact_region     = ! empty( $stored_facts['destination'] ) ? $stored_facts['destination'] : $fact_region;
-            $fact_trekking   = ! empty( $stored_facts['daily_walking'] ) ? $stored_facts['daily_walking'] : $fact_trekking;
-            $fact_accom      = ! empty( $stored_facts['accommodation'] ) ? $stored_facts['accommodation'] : $fact_accom;
+            $fact_high_point = ! empty( $stored_facts['max_altitude'] ) ? $stored_facts['max_altitude'] : ( ! empty( $stored_facts['high_point'] ) ? $stored_facts['high_point'] : $fact_high_point );
+            $fact_low_point  = ! empty( $stored_facts['low_point'] ) ? $stored_facts['low_point'] : $fact_low_point;
+            $trip_status     = ! empty( $stored_facts['status'] ) ? $stored_facts['status'] : $trip_status;
+            $fact_region     = ! empty( $stored_facts['destination'] ) ? $stored_facts['destination'] : ( ! empty( $stored_facts['region'] ) ? $stored_facts['region'] : $fact_region );
+            $fact_trekking   = ! empty( $stored_facts['daily_walking'] ) ? $stored_facts['daily_walking'] : ( ! empty( $stored_facts['trekking'] ) ? $stored_facts['trekking'] : $fact_trekking );
+            $fact_accom      = ! empty( $stored_facts['accommodation'] ) ? $stored_facts['accommodation'] : ( ! empty( $stored_facts['accom'] ) ? $stored_facts['accom'] : $fact_accom );
             $fact_style      = ! empty( $stored_facts['style'] ) ? $stored_facts['style'] : $fact_style;
             $fact_season     = ! empty( $stored_facts['season'] ) ? $stored_facts['season'] : $fact_season;
             $fact_group_size = ! empty( $stored_facts['group_size'] ) ? $stored_facts['group_size'] : $fact_group_size;
@@ -172,7 +176,10 @@ class Trek_Renderer {
             );
         }
 
+        $overview_img        = get_post_meta( $post_id, '_trek_overview_img', true ) ?: ( $featured_image ?: '' );
         $route_img           = get_post_meta( $post_id, '_trek_route_img', true ) ?: ( $featured_image ?: '' );
+        $map_embed_code      = get_post_meta( $post_id, '_trek_map_embed_code', true ) ?: '';
+        $map_file_url        = get_post_meta( $post_id, '_trek_map_file_url', true ) ?: '';
         $route_caption_sub   = get_post_meta( $post_id, '_trek_route_caption_sub', true ) ?: 'Route Map';
         $route_caption_h3    = get_post_meta( $post_id, '_trek_route_caption_h3', true ) ?: ( 'Kathmandu to ' . $title );
 
@@ -181,19 +188,6 @@ class Trek_Renderer {
         $itin_script         = get_post_meta( $post_id, '_trek_itin_script', true ) ?: 'Your Journey';
         $itin_heading        = get_post_meta( $post_id, '_trek_itin_heading', true ) ?: ( $hero_days . ' Days Through ' . $breadcrumb_reg );
         $itin_subtext        = get_post_meta( $post_id, '_trek_itin_subtext', true ) ?: 'Open each day to view the walking plan, meals, accommodation and approximate duration.';
-
-        $side_script         = get_post_meta( $post_id, '_trek_itin_side_script', true ) ?: ( $hero_days . ' Days' );
-        $side_title          = get_post_meta( $post_id, '_trek_itin_side_title', true ) ?: ( 'Kathmandu to ' . $script_title . ' and Back' );
-        $side_desc           = get_post_meta( $post_id, '_trek_itin_side_desc', true ) ?: 'The route includes acclimatisation days and a gradual ascent before reaching key high-altitude landmarks.';
-        $side_points         = get_post_meta( $post_id, '_trek_itin_side_points', true );
-        if ( empty( $side_points ) || ! is_array( $side_points ) ) {
-            $side_points = array(
-                '2 nights in Kathmandu before the trek',
-                'Acclimatisation and rest days scheduled for safety',
-                "{$title} landmark and scenic excursions",
-                'Sunrise ascent to panoramic viewpoints'
-            );
-        }
 
         $itinerary = get_post_meta( $post_id, '_trek_itinerary_list', true );
         if ( empty( $itinerary ) || ! is_array( $itinerary ) ) {
@@ -218,16 +212,24 @@ class Trek_Renderer {
             );
         }
 
-        // Normalize itinerary items
+        // Normalize itinerary items with day multi-image gallery
         $normalized_itinerary = array();
         foreach ( $itinerary as $idx => $day_item ) {
             if ( ! is_array( $day_item ) ) continue;
+            $day_gal = $day_item['gallery'] ?? ( $day_item['images'] ?? array() );
+            if ( is_string( $day_gal ) ) {
+                $day_gal = array_values( array_filter( array_map( 'trim', explode( ',', $day_gal ) ) ) );
+            } elseif ( ! is_array( $day_gal ) ) {
+                $day_gal = array();
+            }
             $normalized_itinerary[] = array(
                 'day'           => $day_item['day'] ?? sprintf( '%02d', $idx + 1 ),
                 'stage'         => $day_item['stage'] ?? ( $day_item['altitude'] ?? '' ),
                 'title'         => $day_item['title'] ?? ( 'Day ' . ( $idx + 1 ) ),
                 'description'   => $day_item['desc'] ?? ( $day_item['description'] ?? '' ),
                 'pills'         => $day_item['pills'] ?? ( $day_item['meals'] ?? '' ),
+                'gallery'       => $day_gal,
+                'images'        => $day_gal,
                 'altitude'      => $day_item['altitude'] ?? ( $day_item['stage'] ?? '' ),
                 'stay'          => $day_item['stay'] ?? ( $day_item['accommodation'] ?? '' ),
                 'walking_hours' => $day_item['walking_hours'] ?? ''
@@ -254,6 +256,16 @@ class Trek_Renderer {
                 'Comprehensive first aid medical kit and pulse oximeter monitoring'
             );
         }
+        // Normalize to {title, description} shape for JS engine compatibility
+        $inclusions_full = array_map( function( $item ) {
+            if ( is_array( $item ) ) {
+                return array(
+                    'title'       => $item['title'] ?? ( $item['heading'] ?? '' ),
+                    'description' => wp_strip_all_tags( $item['desc'] ?? ( $item['description'] ?? ( $item['content'] ?? '' ) ) ),
+                );
+            }
+            return array( 'title' => (string) $item, 'description' => '' );
+        }, $inclusions_full );
 
         $exclusions_full = get_post_meta( $post_id, '_trek_exclusions_full', true );
         if ( empty( $exclusions_full ) || ! is_array( $exclusions_full ) ) {
@@ -268,6 +280,16 @@ class Trek_Renderer {
                 'Gratuities and tips for guides, porters and drivers'
             );
         }
+        // Normalize to {title, description} shape for JS engine compatibility
+        $exclusions_full = array_map( function( $item ) {
+            if ( is_array( $item ) ) {
+                return array(
+                    'title'       => $item['title'] ?? ( $item['heading'] ?? '' ),
+                    'description' => wp_strip_all_tags( $item['desc'] ?? ( $item['description'] ?? ( $item['content'] ?? '' ) ) ),
+                );
+            }
+            return array( 'title' => (string) $item, 'description' => '' );
+        }, $exclusions_full );
 
         // 8. Photo Gallery
         $gallery_kicker      = get_post_meta( $post_id, '_trek_gallery_kicker', true ) ?: 'Visual Moments';
@@ -292,21 +314,7 @@ class Trek_Renderer {
             $clean_gallery = array_filter( array( $hero_bg_img, $card_image_url, $route_img ) );
         }
 
-        // 9. Extensions & Add-ons
-        $ext_kicker          = get_post_meta( $post_id, '_trek_ext_kicker', true ) ?: 'Enhance Your Journey';
-        $ext_script          = get_post_meta( $post_id, '_trek_ext_script', true ) ?: 'Recommended Extensions';
-        $ext_heading         = get_post_meta( $post_id, '_trek_ext_heading', true ) ?: 'Combine Your Trek with Nepal’s Other Wonders';
-        $ext_content         = get_post_meta( $post_id, '_trek_ext_content', true );
-        $ext_photo           = get_post_meta( $post_id, '_trek_ext_photo', true ) ?: $hero_bg_img;
-        $ext_btn_text        = get_post_meta( $post_id, '_trek_ext_btn_text', true ) ?: 'Inquire About Extensions';
-        $ext_btn_url         = get_post_meta( $post_id, '_trek_ext_btn_url', true ) ?: '#ya-contact';
-
-        $extensions_list = get_post_meta( $post_id, '_trek_extensions_list', true );
-        if ( empty( $extensions_list ) || ! is_array( $extensions_list ) ) {
-            $extensions_list = get_post_meta( $post_id, '_trek_extensions', true );
-        }
-
-        // 10. Essential Info & FAQs (Accordions)
+        // 9. Essential Info & FAQs (Accordions)
         $ess_kicker          = get_post_meta( $post_id, '_trek_ess_kicker', true ) ?: 'Travel Advice';
         $ess_script          = get_post_meta( $post_id, '_trek_ess_script', true ) ?: 'Good to Know';
         $ess_heading         = get_post_meta( $post_id, '_trek_ess_heading', true ) ?: 'Essential Information';
@@ -350,7 +358,7 @@ class Trek_Renderer {
             );
         }
 
-        // 11. Traveller Reviews & Rating
+        // 10. Traveller Reviews & Rating
         $review_kicker       = get_post_meta( $post_id, '_trek_review_kicker', true ) ?: 'Guest Stories';
         $review_script       = get_post_meta( $post_id, '_trek_review_script', true ) ?: 'Traveller Feedback';
         $review_heading      = get_post_meta( $post_id, '_trek_review_heading', true ) ?: 'Words from Fellow Adventurers';
@@ -363,7 +371,7 @@ class Trek_Renderer {
         }
         $all_reviews = array();
 
-        // 11b. Also query approved reviews from database (`trek_review` post type)
+        // 10b. Also query approved reviews from database (`trek_review` post type)
         $db_reviews_query = new WP_Query( array(
             'post_type'      => 'trek_review',
             'post_status'    => array( 'publish', 'private' ),
@@ -436,7 +444,7 @@ class Trek_Renderer {
         }
         $avg_rating = ! empty( $all_reviews ) ? round( $total_ratings / count( $all_reviews ), 1 ) : 5.0;
 
-        // 12. Fixed Departure, WhatsApp & Contact Settings
+        // 11. Fixed Departure, WhatsApp & Contact Settings
         $dep_kicker          = get_post_meta( $post_id, '_trek_dep_kicker', true ) ?: 'Travel Together';
         $dep_script          = get_post_meta( $post_id, '_trek_dep_script', true ) ?: 'Choose Your Month';
         $dep_heading         = get_post_meta( $post_id, '_trek_dep_heading', true ) ?: 'Join a Fixed Departure';
@@ -450,7 +458,7 @@ class Trek_Renderer {
         $whatsapp_number     = get_post_meta( $post_id, '_trek_whatsapp_number', true ) ?: '9779803197006';
         $sales_email         = get_post_meta( $post_id, '_trek_sales_email', true ) ?: 'sales@yetiadventure.com';
 
-        // 13. Pricing / Offers
+        // 12. Pricing / Offers
         $price               = get_post_meta( $post_id, '_trek_price', true ) ?: get_post_meta( $post_id, '_trek_cost', true );
         $currency            = get_post_meta( $post_id, '_trek_currency', true ) ?: 'USD';
         $numeric_price       = ! empty( $price ) ? floatval( preg_replace( '/[^0-9.]/', '', $price ) ) : 0;
@@ -476,6 +484,7 @@ class Trek_Renderer {
             'map_region'       => $map_region,
             'map_district'     => $map_district,
             'featured'         => $is_featured,
+            'status'           => $trip_status,
             
             // Hero section
             'hero' => array(
@@ -502,6 +511,8 @@ class Trek_Renderer {
             // Quick Facts
             'quick_facts' => array(
                 'high_point'   => $fact_high_point,
+                'low_point'    => $fact_low_point,
+                'status'       => $trip_status,
                 'region'       => $fact_region,
                 'trekking'     => $fact_trekking,
                 'accom'        => $fact_accom,
@@ -512,16 +523,19 @@ class Trek_Renderer {
 
             // Overview & Route
             'overview' => array(
-                'kicker'       => $overview_kicker,
-                'script'       => $overview_script,
-                'heading'      => $overview_heading,
-                'subheading'   => $overview_subheading,
-                'content'      => $overview_content,
-                'highlight'    => $overview_highlight,
-                'highlights'   => $highlights,
-                'route_img'    => $route_img,
-                'route_sub'    => $route_caption_sub,
-                'route_heading'=> $route_caption_h3,
+                'kicker'        => $overview_kicker,
+                'script'        => $overview_script,
+                'heading'       => $overview_heading,
+                'subheading'    => $overview_subheading,
+                'content'       => $overview_content,
+                'highlight'     => $overview_highlight,
+                'highlights'    => $highlights,
+                'image'         => $overview_img,
+                'route_img'     => $route_img,
+                'map_embed_code'=> $map_embed_code,
+                'map_file_url'  => $map_file_url,
+                'route_sub'     => $route_caption_sub,
+                'route_heading' => $route_caption_h3,
             ),
 
             // Itinerary
@@ -530,10 +544,6 @@ class Trek_Renderer {
                 'script'       => $itin_script,
                 'heading'      => $itin_heading,
                 'subtext'      => $itin_subtext,
-                'side_script'  => $side_script,
-                'side_title'   => $side_title,
-                'side_desc'    => $side_desc,
-                'side_points'  => $side_points,
             ),
             'itinerary'        => $normalized_itinerary,
 
@@ -554,18 +564,6 @@ class Trek_Renderer {
                 'heading'      => $gallery_heading,
                 'subtext'      => $gallery_subtext,
                 'images'       => $clean_gallery,
-            ),
-
-            // Extensions
-            'extensions' => array(
-                'kicker'       => $ext_kicker,
-                'script'       => $ext_script,
-                'heading'      => $ext_heading,
-                'content'      => $ext_content,
-                'photo'        => $ext_photo,
-                'btn_text'     => $ext_btn_text,
-                'btn_url'      => $ext_btn_url,
-                'items'        => $extensions_list,
             ),
 
             // Essential Info & FAQs
@@ -613,14 +611,28 @@ class Trek_Renderer {
             'pricing' => array(
                 'price'        => $price,
                 'numeric_price'=> $numeric_price,
-                'currency'     => $currency,
                 'formatted'    => $formatted_price,
+                'currency'     => $currency,
+            ),
+
+            // SEO & Structured Metadata Helper
+            'seo' => array(
+                'meta_title'       => $hero_title . ' | ' . $hero_days . ' Days Himalayan Journey | Yeti Adventure',
+                'meta_description' => wp_strip_all_tags( $hero_subtitle ),
+                'canonical_url'    => $permalink,
+                'og_type'          => 'article',
+                'og_image'         => $hero_bg_img,
+                'twitter_card'     => 'summary_large_image',
+                'duration_days'    => $days_num,
+                'duration_iso'     => 'P' . $days_num . 'D',
             ),
 
             // Client Engine / JS Canonical Aliases
             'keyFacts' => array(
                 'duration'     => $days_num,
                 'highestPoint' => $fact_high_point,
+                'lowestPoint'  => $fact_low_point,
+                'status'       => $trip_status,
                 'region'       => $fact_region,
                 'destination'  => $fact_region,
                 'difficulty'   => $difficulty,

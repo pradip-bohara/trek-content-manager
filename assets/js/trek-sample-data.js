@@ -561,33 +561,7 @@
       }
     ],
 
-    // 18. Extensions & Add-ons
-    extensions: [
-      {
-        id: "ext-1",
-        title: "Gosaikunda Holy Lakes Extension",
-        shortTitle: "Gosaikunda Add-on",
-        duration: "4 Additional Days",
-        destination: "Gosaikunda Sacred Lakes (4,380m)",
-        description: "Branch south from Bamboo to explore the sacred turquoise glacial lakes of Gosaikunda and cross the high Laurebina Pass.",
-        price: 390,
-        currency: "USD",
-        image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
-      },
-      {
-        id: "ext-2",
-        title: "Kathmandu Valley Cultural Heritage Tour",
-        shortTitle: "Kathmandu Heritage",
-        duration: "2 Additional Days",
-        destination: "UNESCO World Heritage Sites",
-        description: "Explore Patan Durbar Square, Bhaktapur ancient royal city, and the sacred stupas of Boudhanath and Swayambhunath.",
-        price: 240,
-        currency: "USD",
-        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80"
-      }
-    ],
-
-    // 19. Fixed Departures
+    // 18. Fixed Departures
     departures: [
       {
         id: "dep-2026-001",
@@ -871,7 +845,6 @@
         category: "Mountain"
       }
     ],
-    extensions: [],
     departures: [
       {
         id: "dep-abc-001",

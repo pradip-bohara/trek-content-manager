@@ -26,7 +26,6 @@ define( 'TREK_MANAGER_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
  * Autoload Required Classes
  */
 require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-cpt.php';
-require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-roles.php';
 require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-rest-api.php';
 require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-renderer.php';
 require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-shortcodes.php';
@@ -71,7 +70,6 @@ class Trek_Content_Manager_Plugin {
      * Plugin Activation Handler
      */
     public static function activate_plugin() {
-        Trek_Roles::register_capabilities();
         Trek_CPT::register_post_types();
         Trek_CPT::register_taxonomies();
         flush_rewrite_rules();
@@ -147,10 +145,12 @@ class Trek_Content_Manager_Plugin {
 
             // Inject WordPress context data into the page for the JS engine
             $current_user = wp_get_current_user();
-            $user_role    = ! empty( $current_user->roles ) ? $current_user->roles[0] : 'public';
+            $user_roles   = (array) ( $current_user->roles ?? array() );
+            $is_admin     = in_array( 'administrator', $user_roles, true ) || current_user_can( 'manage_options' );
+            $mapped_role  = $is_admin ? 'admin' : ( current_user_can( 'edit_posts' ) ? 'editor' : 'public' );
 
             $page_context = array(
-                'userRole'     => Trek_Roles::map_wp_role_to_trek_role( $user_role ),
+                'userRole'     => $mapped_role,
                 'userId'       => get_current_user_id(),
                 'nonce'        => wp_create_nonce( 'wp_rest' ),
                 'restUrl'      => esc_url_raw( rest_url( 'trek-manager/v1/' ) ),
@@ -235,7 +235,6 @@ class Trek_Content_Manager_Plugin {
 // during activation/deactivation — calling them inside __construct() means they never
 // fire because the constructor runs AFTER the activation action already completed.
 register_activation_hook( __FILE__, array( 'Trek_Content_Manager_Plugin', 'activate_plugin' ) );
-register_deactivation_hook( __FILE__, array( 'Trek_Roles', 'remove_capabilities' ) );
 
 // Bootstrap Plugin
 Trek_Content_Manager_Plugin::get_instance();

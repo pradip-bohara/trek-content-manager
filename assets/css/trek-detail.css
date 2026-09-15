@@ -1531,76 +1531,7 @@
 }
 
 /* ==========================================================================
-   16. Extensions & Add-ons
-   ========================================================================== */
-.trek-extensions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--trek-space-xl);
-  margin-top: var(--trek-space-xl);
-}
-
-.trek-extension-card {
-  background-color: var(--trek-color-surface);
-  border: 1px solid var(--trek-color-border);
-  border-radius: var(--trek-radius-lg);
-  overflow: hidden;
-  box-shadow: var(--trek-shadow-sm);
-  display: flex;
-  flex-direction: column;
-}
-
-.trek-extension-card__img {
-  height: 190px;
-  width: 100%;
-  object-fit: cover;
-}
-
-.trek-extension-card__body {
-  padding: var(--trek-space-lg);
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.trek-extension-card__duration {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--trek-color-accent);
-  letter-spacing: 0.08em;
-}
-
-.trek-extension-card__title {
-  font-family: var(--trek-font-display);
-  font-size: 1.375rem;
-  color: var(--trek-color-primary);
-  margin: 4px 0 8px 0;
-}
-
-.trek-extension-card__desc {
-  font-size: 0.9375rem;
-  color: var(--trek-color-text-muted);
-  flex-grow: 1;
-  margin-bottom: var(--trek-space-md);
-}
-
-.trek-extension-card__footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid var(--trek-color-border-subtle);
-  padding-top: var(--trek-space-md);
-}
-
-.trek-extension-card__price {
-  font-weight: 700;
-  color: var(--trek-color-primary);
-  font-size: 1.125rem;
-}
-
-/* ==========================================================================
-   17. Fixed Departures Table & Enquiry
+   16. Fixed Departures Table & Enquiry
    ========================================================================== */
 .trek-departures-table {
   width: 100%;

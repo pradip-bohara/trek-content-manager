@@ -58,6 +58,27 @@ class Trek_Shortcodes {
         add_shortcode( 'trek_journal_posts',         array( __CLASS__, 'render_journal_posts' ) );
         add_shortcode( 'trek_home_notes',            array( __CLASS__, 'render_home_notes' ) );
         add_shortcode( 'trek_trip_detail',           array( __CLASS__, 'render_trip_detail' ) );
+
+        // Granular Field Shortcode: [trek_field id="123" field="price"]
+        add_shortcode( 'trek_field',                 array( __CLASS__, 'render_trek_field' ) );
+
+        // Modular Section Shortcodes
+        add_shortcode( 'trek_hero',                  array( __CLASS__, 'render_trek_hero_section' ) );
+        add_shortcode( 'trek_facts',                 array( __CLASS__, 'render_trek_facts_section' ) );
+        add_shortcode( 'trek_quick_facts',           array( __CLASS__, 'render_trek_facts_section' ) );
+        add_shortcode( 'trek_overview',              array( __CLASS__, 'render_trek_overview_section' ) );
+        add_shortcode( 'trek_itinerary',             array( __CLASS__, 'render_trek_itinerary_section' ) );
+        add_shortcode( 'trek_inclusions',            array( __CLASS__, 'render_trek_inclusions_section' ) );
+        add_shortcode( 'trek_inex',                  array( __CLASS__, 'render_trek_inclusions_section' ) );
+        add_shortcode( 'trek_gallery',               array( __CLASS__, 'render_trek_gallery_section' ) );
+        add_shortcode( 'trek_essentials',            array( __CLASS__, 'render_trek_essentials_section' ) );
+        add_shortcode( 'trek_faqs',                  array( __CLASS__, 'render_trek_essentials_section' ) );
+        add_shortcode( 'trek_reviews',               array( __CLASS__, 'render_trek_reviews_section' ) );
+        add_shortcode( 'trek_departures',            array( __CLASS__, 'render_trek_departures_section' ) );
+        add_shortcode( 'trek_contact',               array( __CLASS__, 'render_trek_departures_section' ) );
+        add_shortcode( 'trek_map',                   array( __CLASS__, 'render_trek_map_section' ) );
+        add_shortcode( 'trek_card',                  array( __CLASS__, 'render_trek_card_shortcode' ) );
+
         add_action( 'rest_api_init', array( __CLASS__, 'register_journal_comment_routes' ) );
         add_action( 'wp_ajax_ya_submit_journey_lead',        array( __CLASS__, 'ajax_submit_journey_lead' ) );
         add_action( 'wp_ajax_nopriv_ya_submit_journey_lead', array( __CLASS__, 'ajax_submit_journey_lead' ) );
@@ -3062,6 +3083,537 @@ class Trek_Shortcodes {
         } else {
             echo '<p style="color:#d4af37; text-align:center; padding:30px;">' . esc_html__( 'Nepal Tourism Map template file not found.', 'trek-content-manager' ) . '</p>';
         }
+        return ob_get_clean();
+    }
+
+    /**
+     * Render individual field value via shortcode
+     * Usage: [trek_field id="123" field="price"]
+     */
+    public static function render_trek_field( $atts ) {
+        $atts = shortcode_atts( array(
+            'id'    => 0,
+            'key'   => '',
+            'field' => '',
+            'raw'   => '0',
+        ), $atts, 'trek_field' );
+
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) {
+            return '';
+        }
+
+        $key = ! empty( $atts['field'] ) ? sanitize_key( $atts['field'] ) : sanitize_key( $atts['key'] );
+        if ( empty( $key ) ) {
+            $key = 'title';
+        }
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) ) {
+            return '';
+        }
+
+        $output = '';
+        switch ( $key ) {
+            case 'title':
+            case 'name':
+                $output = $data['title'] ?? get_the_title( $post_id );
+                break;
+            case 'hero_title':
+                $output = $data['hero']['title'] ?? ( $data['title'] ?? '' );
+                break;
+            case 'script_title':
+                $output = $data['hero']['script_title'] ?? '';
+                break;
+            case 'subtitle':
+            case 'hero_subtitle':
+                $output = $data['hero']['subtitle'] ?? '';
+                break;
+            case 'days':
+            case 'duration':
+            case 'hero_days':
+                $output = $data['hero']['days'] ?? '';
+                break;
+            case 'price':
+                $output = $data['pricing']['price'] ?? '';
+                break;
+            case 'formatted_price':
+                $output = $data['pricing']['formatted'] ?? ( $data['pricing']['price'] ?? '' );
+                break;
+            case 'currency':
+                $output = $data['pricing']['currency'] ?? 'USD';
+                break;
+            case 'difficulty':
+                $output = $data['difficulty'] ?? '';
+                break;
+            case 'high_point':
+            case 'highest_point':
+            case 'max_altitude':
+                $output = $data['quick_facts']['high_point'] ?? '';
+                break;
+            case 'low_point':
+                $output = $data['quick_facts']['low_point'] ?? '';
+                break;
+            case 'region':
+            case 'breadcrumb_region':
+                $output = $data['breadcrumb_region'] ?? ( ! empty( $data['regions'] ) ? $data['regions'][0] : '' );
+                break;
+            case 'season':
+            case 'best_season':
+                $output = $data['quick_facts']['season'] ?? '';
+                break;
+            case 'group_size':
+                $output = $data['quick_facts']['group_size'] ?? '';
+                break;
+            case 'accommodation':
+            case 'accom':
+                $output = $data['quick_facts']['accom'] ?? '';
+                break;
+            case 'trekking':
+            case 'daily_walking':
+                $output = $data['quick_facts']['trekking'] ?? '';
+                break;
+            case 'style':
+                $output = $data['quick_facts']['style'] ?? '';
+                break;
+            case 'status':
+                $output = $data['status'] ?? 'open';
+                break;
+            case 'whatsapp':
+            case 'whatsapp_number':
+                $output = $data['contact']['whatsapp'] ?? '';
+                break;
+            case 'email':
+            case 'sales_email':
+                $output = $data['contact']['email'] ?? '';
+                break;
+            case 'overview':
+            case 'overview_content':
+                $output = $data['overview']['content'] ?? '';
+                break;
+            case 'highlight':
+            case 'overview_highlight':
+                $output = $data['overview']['highlight'] ?? '';
+                break;
+            case 'hero_image':
+            case 'image':
+                $output = $data['hero']['image'] ?? '';
+                break;
+            case 'card_image':
+                $output = $data['card']['image'] ?? '';
+                break;
+            case 'route_img':
+                $output = $data['overview']['route_img'] ?? '';
+                break;
+            case 'map_file_url':
+                $output = $data['overview']['map_file_url'] ?? '';
+                break;
+            case 'map_region':
+                $output = $data['map_region'] ?? '';
+                break;
+            case 'map_district':
+                $output = $data['map_district'] ?? '';
+                break;
+            default:
+                $meta_val = get_post_meta( $post_id, '_trek_' . $key, true );
+                if ( empty( $meta_val ) ) {
+                    $meta_val = get_post_meta( $post_id, $key, true );
+                }
+                $output = is_array( $meta_val ) ? implode( ', ', array_map( 'strval', $meta_val ) ) : (string) $meta_val;
+                break;
+        }
+
+        if ( '1' === $atts['raw'] ) {
+            return $output;
+        }
+        return wp_kses_post( $output );
+    }
+
+    /**
+     * Render Quick Facts Grid section via shortcode
+     * Usage: [trek_facts id="123"]
+     */
+    public static function render_trek_facts_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_facts' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) ) return '';
+
+        $facts = $data['quick_facts'] ?? array();
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-facts" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin:24px 0;">
+            <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px;">
+                <span style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Duration</span>
+                <strong style="color:#022f2e; font-size:15px;"><?php echo esc_html( $data['hero']['days'] ?? '—' ); ?></strong>
+            </div>
+            <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px;">
+                <span style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Max Elevation</span>
+                <strong style="color:#022f2e; font-size:15px;"><?php echo esc_html( $facts['high_point'] ?? '—' ); ?></strong>
+            </div>
+            <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px;">
+                <span style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Difficulty</span>
+                <strong style="color:#022f2e; font-size:15px;"><?php echo esc_html( $data['difficulty'] ?? '—' ); ?></strong>
+            </div>
+            <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px;">
+                <span style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Trip Style</span>
+                <strong style="color:#022f2e; font-size:15px;"><?php echo esc_html( $facts['style'] ?? '—' ); ?></strong>
+            </div>
+            <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px;">
+                <span style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Accommodation</span>
+                <strong style="color:#022f2e; font-size:15px;"><?php echo esc_html( $facts['accom'] ?? '—' ); ?></strong>
+            </div>
+            <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px;">
+                <span style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Best Season</span>
+                <strong style="color:#022f2e; font-size:15px;"><?php echo esc_html( $facts['season'] ?? '—' ); ?></strong>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Itinerary Accordions section via shortcode
+     * Usage: [trek_itinerary id="123"]
+     */
+    public static function render_trek_itinerary_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_itinerary' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) || empty( $data['itinerary'] ) ) return '';
+
+        $itin = $data['itinerary'];
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-itinerary" style="margin:24px 0;">
+            <?php if ( ! empty( $data['itinerary_section']['heading'] ) ) : ?>
+                <h3 style="color:#022f2e; font-size:22px; margin-bottom:16px;"><?php echo esc_html( $data['itinerary_section']['heading'] ); ?></h3>
+            <?php endif; ?>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <?php foreach ( $itin as $day ) : ?>
+                    <details style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px 18px; cursor:pointer;">
+                        <summary style="font-weight:700; color:#022f2e; display:flex; justify-content:space-between; align-items:center;">
+                            <span><span style="color:#c6a45f; margin-right:8px;">Day <?php echo esc_html( $day['day'] ?? '' ); ?>:</span> <?php echo esc_html( $day['title'] ?? '' ); ?></span>
+                            <?php if ( ! empty( $day['stage'] ) ) : ?>
+                                <span style="font-size:12px; color:#64748b; font-weight:normal;"><?php echo esc_html( $day['stage'] ); ?></span>
+                            <?php endif; ?>
+                        </summary>
+                        <div style="margin-top:10px; color:#334155; font-size:14px; line-height:1.6;">
+                            <?php if ( ! empty( $day['pills'] ) ) : ?>
+                                <p style="font-size:12px; color:#045857; margin-bottom:8px;"><strong>Tags:</strong> <?php echo esc_html( $day['pills'] ); ?></p>
+                            <?php endif; ?>
+                            <div><?php echo wp_kses_post( $day['description'] ?? '' ); ?></div>
+                        </div>
+                    </details>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Inclusions & Exclusions section via shortcode
+     * Usage: [trek_inclusions id="123"]
+     */
+    public static function render_trek_inclusions_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_inclusions' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) ) return '';
+
+        $inc = $data['inex']['inclusions'] ?? array();
+        $exc = $data['inex']['exclusions'] ?? array();
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-inex" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:24px; margin:24px 0;">
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:20px;">
+                <h4 style="color:#166534; margin-top:0; font-size:16px;">✔ <?php esc_html_e( 'Included In The Trip', 'trek-content-manager' ); ?></h4>
+                <ul style="list-style:none; padding:0; margin:12px 0 0 0;">
+                    <?php foreach ( $inc as $item ) : ?>
+                        <li style="margin-bottom:12px; font-size:13px; color:#14532d;">
+                            <strong>✔ <?php echo esc_html( $item['title'] ?? (string) $item ); ?></strong>
+                            <?php if ( ! empty( $item['description'] ) ) : ?>
+                                <p style="margin:4px 0 0 16px; font-size:12px; color:#15803d;"><?php echo esc_html( $item['description'] ); ?></p>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:20px;">
+                <h4 style="color:#991b1b; margin-top:0; font-size:16px;">✖ <?php esc_html_e( 'Not Included / Excluded', 'trek-content-manager' ); ?></h4>
+                <ul style="list-style:none; padding:0; margin:12px 0 0 0;">
+                    <?php foreach ( $exc as $item ) : ?>
+                        <li style="margin-bottom:12px; font-size:13px; color:#7f1d1d;">
+                            <strong>✖ <?php echo esc_html( $item['title'] ?? (string) $item ); ?></strong>
+                            <?php if ( ! empty( $item['description'] ) ) : ?>
+                                <p style="margin:4px 0 0 16px; font-size:12px; color:#b91c1c;"><?php echo esc_html( $item['description'] ); ?></p>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Hero Section via shortcode
+     * Usage: [trek_hero id="123"]
+     */
+    public static function render_trek_hero_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_hero' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) ) return '';
+
+        $hero = $data['hero'] ?? array();
+        $bg   = ! empty( $hero['image'] ) ? esc_url( $hero['image'] ) : '';
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-hero" style="position:relative; min-height:360px; background:#022f2e url('<?php echo $bg; ?>') center/cover no-repeat; border-radius:12px; overflow:hidden; display:flex; align-items:flex-end; padding:32px; color:#fff; margin:24px 0;">
+            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(2,47,46,0.92) 0%, rgba(2,47,46,0.3) 100%);"></div>
+            <div style="position:relative; z-index:2; max-width:800px;">
+                <?php if ( ! empty( $hero['script_title'] ) ) : ?>
+                    <span style="font-family:'Playfair Display',serif; font-style:italic; color:#c6a45f; font-size:20px;"><?php echo esc_html( $hero['script_title'] ); ?></span>
+                <?php endif; ?>
+                <h1 style="font-size:32px; margin:6px 0 12px 0; color:#fff;"><?php echo esc_html( $hero['title'] ?? $data['title'] ); ?></h1>
+                <?php if ( ! empty( $hero['subtitle'] ) ) : ?>
+                    <p style="font-size:15px; color:#e2e8f0; line-height:1.5; margin:0;"><?php echo esc_html( $hero['subtitle'] ); ?></p>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Overview & Highlights via shortcode
+     * Usage: [trek_overview id="123"]
+     */
+    public static function render_trek_overview_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_overview' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) ) return '';
+
+        $overview = $data['overview'] ?? array();
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-overview" style="margin:24px 0; font-size:15px; line-height:1.7; color:#334155;">
+            <?php if ( ! empty( $overview['heading'] ) ) : ?>
+                <h3 style="color:#022f2e; font-size:24px; margin-bottom:14px;"><?php echo esc_html( $overview['heading'] ); ?></h3>
+            <?php endif; ?>
+            <div style="margin-bottom:16px;"><?php echo wp_kses_post( $overview['content'] ?? '' ); ?></div>
+            <?php if ( ! empty( $overview['highlight'] ) ) : ?>
+                <blockquote style="background:#f8f9fa; border-left:4px solid #c6a45f; padding:14px 18px; margin:16px 0; font-style:italic; color:#022f2e;">
+                    <?php echo wp_kses_post( $overview['highlight'] ); ?>
+                </blockquote>
+            <?php endif; ?>
+            <?php if ( ! empty( $overview['highlights'] ) && is_array( $overview['highlights'] ) ) : ?>
+                <h4 style="color:#022f2e; font-size:16px; margin:16px 0 8px 0;"><?php esc_html_e( 'Key Highlights', 'trek-content-manager' ); ?></h4>
+                <ul style="padding-left:20px;">
+                    <?php foreach ( $overview['highlights'] as $hl ) : ?>
+                        <li style="margin-bottom:6px;"><?php echo esc_html( is_array( $hl ) ? ( $hl['title'] ?? '' ) : $hl ); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Gallery via shortcode
+     * Usage: [trek_gallery id="123"]
+     */
+    public static function render_trek_gallery_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_gallery' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) || empty( $data['gallery']['images'] ) ) return '';
+
+        $images = $data['gallery']['images'];
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-gallery" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin:24px 0;">
+            <?php foreach ( $images as $img_url ) : ?>
+                <a href="<?php echo esc_url( $img_url ); ?>" target="_blank" style="display:block; aspect-ratio:4/3; border-radius:8px; overflow:hidden; border:1px solid #e2e8f0;">
+                    <img src="<?php echo esc_url( $img_url ); ?>" alt="" style="width:100%; height:100%; object-fit:cover; display:block;">
+                </a>
+            <?php endforeach; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Essential Information / FAQs via shortcode
+     * Usage: [trek_essentials id="123"]
+     */
+    public static function render_trek_essentials_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_essentials' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) || empty( $data['faqs'] ) ) return '';
+
+        $faqs = $data['faqs'];
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-faqs" style="margin:24px 0; display:flex; flex-direction:column; gap:10px;">
+            <?php foreach ( $faqs as $faq ) : ?>
+                <details style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:14px 18px; cursor:pointer;">
+                    <summary style="font-weight:700; color:#022f2e;"><?php echo esc_html( $faq['question'] ?? '' ); ?></summary>
+                    <div style="margin-top:10px; color:#475569; font-size:14px; line-height:1.6;">
+                        <?php echo wp_kses_post( $faq['answer'] ?? '' ); ?>
+                    </div>
+                </details>
+            <?php endforeach; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Reviews / Testimonials via shortcode
+     * Usage: [trek_reviews id="123"]
+     */
+    public static function render_trek_reviews_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_reviews' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) || empty( $data['reviews_section']['reviews'] ) ) return '';
+
+        $revs = $data['reviews_section']['reviews'];
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-reviews" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin:24px 0;">
+            <?php foreach ( $revs as $r ) : ?>
+                <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:18px;">
+                    <div style="color:#c6a45f; margin-bottom:8px;"><?php echo str_repeat( '★', intval( $r['rating'] ?? 5 ) ); ?></div>
+                    <blockquote style="margin:0 0 12px 0; font-size:14px; color:#334155; font-style:italic;">
+                        “<?php echo esc_html( $r['quote'] ?? '' ); ?>”
+                    </blockquote>
+                    <strong style="color:#022f2e; font-size:13px; display:block;"><?php echo esc_html( $r['name'] ?? 'Traveller' ); ?></strong>
+                    <?php if ( ! empty( $r['location'] ) ) : ?>
+                        <span style="font-size:12px; color:#64748b;"><?php echo esc_html( $r['location'] ); ?></span>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Fixed Departures & Contact box via shortcode
+     * Usage: [trek_departures id="123"]
+     */
+    public static function render_trek_departures_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_departures' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) ) return '';
+
+        $contact = $data['contact'] ?? array();
+        $wa_num  = preg_replace( '/[^0-9]/', '', $contact['whatsapp'] ?? '9779803197006' );
+        $wa_link = 'https://wa.me/' . $wa_num . '?text=' . rawurlencode( 'Hello Yeti Adventure, I would like to inquire about ' . ( $data['title'] ?? 'this trek' ) );
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-departures" style="background:#022f2e; color:#fff; border-radius:12px; padding:28px; margin:24px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+            <div style="max-width:560px;">
+                <span style="color:#c6a45f; font-size:12px; text-transform:uppercase; letter-spacing:1px;"><?php echo esc_html( $contact['box_script'] ?? 'Join a Departure' ); ?></span>
+                <h3 style="color:#fff; margin:6px 0 10px 0; font-size:22px;"><?php echo esc_html( $contact['box_title'] ?? 'Inquire About Upcoming Dates' ); ?></h3>
+                <p style="color:#cbd5e1; font-size:14px; margin:0;"><?php echo esc_html( $contact['box_desc'] ?? 'Connect directly with our expedition team on WhatsApp for departures and custom routes.' ); ?></p>
+            </div>
+            <div>
+                <a href="<?php echo esc_url( $wa_link ); ?>" target="_blank" style="display:inline-block; background:#25d366; color:#fff; font-weight:700; padding:12px 24px; border-radius:8px; text-decoration:none; font-size:14px;">
+                    💬 Chat on WhatsApp
+                </a>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Map section via shortcode
+     * Usage: [trek_map id="123"]
+     */
+    public static function render_trek_map_section( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_map' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) ) return '';
+
+        $overview = $data['overview'] ?? array();
+        ob_start();
+        ?>
+        <div class="ya-trek-shortcode-map" style="margin:24px 0; border-radius:8px; overflow:hidden; border:1px solid #e2e8f0;">
+            <?php if ( ! empty( $overview['map_embed_code'] ) ) : ?>
+                <div class="ya-map-embed" style="width:100%; min-height:400px;"><?php echo $overview['map_embed_code']; ?></div>
+            <?php elseif ( ! empty( $overview['route_img'] ) ) : ?>
+                <img src="<?php echo esc_url( $overview['route_img'] ); ?>" alt="Route Map" style="width:100%; height:auto; display:block;">
+            <?php endif; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render Single Destination Card via shortcode
+     * Usage: [trek_card id="123"]
+     */
+    public static function render_trek_card_shortcode( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_card' );
+        $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
+        if ( ! $post_id ) return '';
+
+        $data = class_exists( 'Trek_CPT' ) ? Trek_CPT::get_card_data( $post_id ) : null;
+        if ( ! $data ) return '';
+
+        ob_start();
+        ?>
+        <div class="ya-trek-card" style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.06); margin:16px 0;">
+            <?php if ( ! empty( $data['image'] ) ) : ?>
+                <a href="<?php echo esc_url( $data['permalink'] ?? get_permalink( $post_id ) ); ?>" style="display:block; aspect-ratio:16/10; overflow:hidden;">
+                    <img src="<?php echo esc_url( $data['image'] ); ?>" alt="" style="width:100%; height:100%; object-fit:cover; display:block;">
+                </a>
+            <?php endif; ?>
+            <div style="padding:18px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#c6a45f; font-weight:700;"><?php echo esc_html( $data['tag'] ?? '' ); ?></span>
+                    <span style="font-size:12px; background:#e2f2e9; color:#045857; padding:2px 8px; border-radius:4px; font-weight:600;"><?php echo esc_html( $data['meta'] ?? '' ); ?></span>
+                </div>
+                <h4 style="margin:0 0 8px 0; font-size:18px;">
+                    <a href="<?php echo esc_url( $data['permalink'] ?? get_permalink( $post_id ) ); ?>" style="color:#022f2e; text-decoration:none;"><?php echo esc_html( $data['title'] ); ?></a>
+                </h4>
+                <p style="color:#64748b; font-size:13px; line-height:1.5; margin:0 0 14px 0;"><?php echo esc_html( $data['excerpt'] ?? '' ); ?></p>
+                <a href="<?php echo esc_url( $data['permalink'] ?? get_permalink( $post_id ) ); ?>" style="display:inline-block; color:#045857; font-weight:700; font-size:13px; text-decoration:underline;">View Journey →</a>
+            </div>
+        </div>
+        <?php
         return ob_get_clean();
     }
 }

@@ -110,19 +110,6 @@ $itin_script         = get_post_meta( $post_id, '_trek_itin_script', true ) ?: '
 $itin_heading        = get_post_meta( $post_id, '_trek_itin_heading', true ) ?: ( $hero_days . ' Days of Discovery' );
 $itin_subtext        = get_post_meta( $post_id, '_trek_itin_subtext', true ) ?: 'Open each day to view the walking plan, meals, accommodation and approximate duration.';
 
-$side_script         = get_post_meta( $post_id, '_trek_itin_side_script', true ) ?: ( $hero_days . ' Days' );
-$side_title          = get_post_meta( $post_id, '_trek_itin_side_title', true ) ?: ( 'Kathmandu to ' . $script_title . ' and Back' );
-$side_desc           = get_post_meta( $post_id, '_trek_itin_side_desc', true ) ?: 'The route includes acclimatisation days and a gradual ascent before reaching key high-altitude landmarks and viewpoints.';
-$side_points         = get_post_meta( $post_id, '_trek_itin_side_points', true );
-if ( empty( $side_points ) || ! is_array( $side_points ) ) {
-    $side_points = array(
-        '2 nights in Kathmandu before the trek',
-        'Acclimatisation and rest days scheduled for safety',
-        "{$title} landmark and scenic excursion",
-        'Sunrise ascent to high viewpoints'
-    );
-}
-
 $itinerary           = get_post_meta( $post_id, '_trek_itinerary_list', true ) ?: array();
 if ( empty( $itinerary ) ) {
     $itinerary = array(
@@ -155,27 +142,7 @@ if ( empty( $gallery ) ) {
     );
 }
 
-// 7. Extensions
-$ext_photo           = get_post_meta( $post_id, '_trek_ext_photo', true ) ?: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1400&q=88';
-$ext_kicker          = get_post_meta( $post_id, '_trek_ext_kicker', true ) ?: 'Make It Yours';
-$ext_script          = get_post_meta( $post_id, '_trek_ext_script', true ) ?: 'Stay a Little Longer';
-$ext_heading         = get_post_meta( $post_id, '_trek_ext_heading', true ) ?: ( 'Add another side of ' . $breadcrumb_region . ' to your trek' );
-$ext_intro           = get_post_meta( $post_id, '_trek_ext_intro', true );
-if ( empty( $ext_intro ) ) {
-    $ext_intro = "<p>The {$hero_days}-day itinerary can be adjusted around your available time, interests and preferred pace. Extension ideas below are examples only and can be customized with our travel specialists.</p>\n<p>Extra recovery time after the trek is often valuable, while cultural or wildlife extensions can add a completely different perspective to the journey.</p>";
-}
-$ext_btn_text        = get_post_meta( $post_id, '_trek_ext_btn_text', true ) ?: 'Plan a Bespoke Extension';
-$ext_btn_url         = get_post_meta( $post_id, '_trek_ext_btn_url', true ) ?: ( home_url( '/bespoke-trips/' ) );
-$extensions          = get_post_meta( $post_id, '_trek_extensions_list', true ) ?: array();
-if ( empty( $extensions ) ) {
-    $extensions = array(
-        array( 'title' => 'Kathmandu Heritage', 'desc' => 'Add guided visits to the Kathmandu Valley’s UNESCO historic squares, sacred temples, stupas and artisan neighbourhoods.', 'suggested' => 'Suggested: 1–2 extra days' ),
-        array( 'title' => 'Pokhara Lake Relaxation', 'desc' => 'Slow the pace beside serene Phewa Lake, enjoy mountain views and recover comfortably after your trek.', 'suggested' => 'Suggested: 2–3 extra days' ),
-        array( 'title' => 'Chitwan Jungle Safari', 'desc' => 'Exchange high mountains for Nepal’s subtropical lowlands, dense sal forests, rhinos, and wildlife activities.', 'suggested' => 'Suggested: 2–3 extra days' )
-    );
-}
-
-// 8. Essential Info
+// 7. Essential Info
 $ess_kicker          = get_post_meta( $post_id, '_trek_ess_kicker', true ) ?: 'Before You Go';
 $ess_script          = get_post_meta( $post_id, '_trek_ess_script', true ) ?: 'Prepare Well';
 $ess_heading         = get_post_meta( $post_id, '_trek_ess_heading', true ) ?: ( 'Essential ' . $title . ' Information' );
@@ -810,58 +777,33 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-inclusions{
       display:grid;
       grid-template-columns:repeat(2,1fr);
-      gap:15px;
+      gap:18px;
       margin-top:38px;
     }
 
     .ya-ebc-page .ya-inclusion{
       display:flex;
       align-items:flex-start;
-      gap:12px;
-      padding:17px;
+      gap:14px;
+      padding:20px 22px;
       border:1px solid var(--line);
-      border-radius:16px;
+      border-radius:18px;
       background:#fff;
+      box-shadow:0 8px 24px rgba(18,52,50,.03);
     }
 
-    .ya-ebc-page .ya-inclusion svg{width:18px;height:18px;flex:0 0 18px;margin-top:2px;color:var(--green-2)}
+    .ya-ebc-page .ya-inclusion svg{width:20px;height:20px;flex:0 0 20px;margin-top:2px;color:var(--green-2)}
+    .ya-ebc-page .ya-inclusion strong{display:block;font-size:15px;font-weight:700;color:var(--green);margin-bottom:4px}
+    .ya-ebc-page .ya-inclusion .ya-inclusion-desc{font-size:13px;line-height:1.6;color:#526462}
+    .ya-ebc-page .ya-inclusion .ya-inclusion-desc p{margin:0 0 6px}
+    .ya-ebc-page .ya-inclusion .ya-inclusion-desc p:last-child{margin-bottom:0}
     .ya-ebc-page .ya-inclusion span{font-size:13px;line-height:1.55;color:#526462}
 
     /* ITINERARY */
     .ya-ebc-page .ya-itinerary-shell{
-      display:grid;
-      grid-template-columns:310px 1fr;
-      gap:42px;
-      align-items:start;
+      display:block;
+      width:100%;
     }
-
-    .ya-ebc-page .ya-itinerary-side{
-      position:sticky;
-      top:178px;
-      padding:30px;
-      border-radius:26px;
-      background:var(--green);
-      color:#fff;
-    }
-
-    .ya-ebc-page .ya-itinerary-side .ya-script{
-      font-size:36px;
-      line-height:1;
-      color:#fff;
-    }
-
-    .ya-ebc-page .ya-itinerary-side h3{
-      margin:14px 0 16px;
-      font-family:"Cormorant Garamond",serif;
-      font-size:38px;
-      line-height:1;
-      color:#fff;
-    }
-
-    .ya-ebc-page .ya-itinerary-side p{margin:0 0 24px;color:rgba(255,255,255,.72);font-size:13.5px}
-    .ya-ebc-page .ya-itinerary-side ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
-    .ya-ebc-page .ya-itinerary-side li{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.9)}
-    .ya-ebc-page .ya-itinerary-side li svg{width:16px;height:16px;color:var(--gold);flex:0 0 16px}
 
     .ya-ebc-page .ya-days{display:grid;gap:13px}
     .ya-ebc-page .ya-day{
@@ -1005,65 +947,6 @@ $related_query = new WP_Query( array(
 
     .ya-ebc-page .ya-gallery-label strong{font-family:"Cormorant Garamond",serif;font-size:21px;font-weight:600}
     .ya-ebc-page .ya-gallery-label svg{width:18px;height:18px;flex:0 0 auto}
-
-    /* EXTENSION */
-    .ya-ebc-page .ya-extension-intro{
-      display:grid;
-      grid-template-columns:.9fr 1.1fr;
-      gap:64px;
-      align-items:center;
-      margin-bottom:54px;
-    }
-
-    .ya-ebc-page .ya-extension-photo{
-      min-height:500px;
-      border-radius:180px 180px 28px 28px;
-      background:url("<?php echo esc_url( $ext_photo ); ?>") center/cover no-repeat;
-      box-shadow:var(--shadow);
-    }
-
-    .ya-ebc-page .ya-extension-copy h3{
-      margin:14px 0 20px;
-      font-family:"Cormorant Garamond",serif;
-      font-size:clamp(43px,5vw,70px);
-      line-height:.92;
-      font-weight:600;
-      color:var(--green);
-    }
-
-    .ya-ebc-page .ya-extension-copy p{margin:0 0 18px;color:var(--muted);font-size:15.5px;line-height:1.85}
-
-    .ya-ebc-page .ya-extension-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
-    }
-
-    .ya-ebc-page .ya-extension-card{
-      min-height:300px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      padding:30px;
-      border:1px solid var(--line);
-      border-radius:24px;
-      background:#fff;
-      box-shadow:0 15px 42px rgba(16,50,48,.06);
-    }
-
-    .ya-ebc-page .ya-extension-icon{
-      width:52px;
-      height:52px;
-      display:grid;
-      place-items:center;
-      border-radius:50%;
-      background:var(--ivory);
-      color:var(--green-2);
-    }
-    .ya-ebc-page .ya-extension-icon svg{width:22px;height:22px}
-    .ya-ebc-page .ya-extension-card h4{margin:26px 0 10px;font-family:"Cormorant Garamond",serif;font-size:31px;line-height:1;color:var(--green)}
-    .ya-ebc-page .ya-extension-card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.75}
-    .ya-ebc-page .ya-extension-card small{display:block;margin-top:20px;color:var(--gold);font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
 
     /* ESSENTIAL INFO */
     .ya-ebc-page .ya-essential-layout{
@@ -1250,14 +1133,12 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-fact:nth-child(3){border-right:0}
       .ya-ebc-page .ya-fact:nth-child(n+4){border-top:1px solid var(--line)}
       .ya-ebc-page .ya-overview-grid,
-      .ya-ebc-page .ya-extension-intro,
       .ya-ebc-page .ya-review-layout{grid-template-columns:1fr}
       .ya-ebc-page .ya-map-card,
       .ya-ebc-page .ya-trip-note-card{position:relative;top:auto}
       .ya-ebc-page .ya-map-image{height:600px}
       .ya-ebc-page .ya-itinerary-shell{grid-template-columns:260px 1fr;gap:28px}
       .ya-ebc-page .ya-essential-layout{grid-template-columns:1fr 330px}
-      .ya-ebc-page .ya-extension-grid{grid-template-columns:repeat(2,1fr)}
       .ya-ebc-page .ya-related-grid{grid-template-columns:repeat(2,1fr)}
       .ya-ebc-page .ya-hero-badge{right:24px}
     }
@@ -1283,12 +1164,9 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-overview-grid,
       .ya-ebc-page .ya-itinerary-shell,
       .ya-ebc-page .ya-essential-layout{grid-template-columns:1fr}
-      .ya-ebc-page .ya-itinerary-side{position:relative;top:auto}
       .ya-ebc-page .ya-gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:360px 260px 260px}
       .ya-ebc-page .ya-gallery-item:first-child{grid-column:1/3;grid-row:auto}
       .ya-ebc-page .ya-gallery-item:nth-child(4){grid-column:auto}
-      .ya-ebc-page .ya-extension-grid{grid-template-columns:1fr}
-      .ya-ebc-page .ya-extension-photo{min-height:430px}
       .ya-ebc-page .ya-related-head{display:block}
       .ya-ebc-page .ya-related-head p{margin-top:18px}
     }
@@ -1314,7 +1192,6 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-gallery-grid{display:grid;grid-template-columns:1fr;grid-template-rows:none}
       .ya-ebc-page .ya-gallery-item,
       .ya-ebc-page .ya-gallery-item:first-child{grid-column:auto;grid-row:auto;height:300px}
-      .ya-ebc-page .ya-extension-photo{min-height:360px;border-radius:120px 120px 25px 25px}
       .ya-ebc-page .ya-info-content{padding:0 19px 22px}
       .ya-ebc-page .ya-review-form{padding:25px 18px}
       .ya-ebc-page .ya-form-grid{grid-template-columns:1fr}
@@ -1350,11 +1227,8 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-hero h1,
     .ya-ebc-page .ya-section-heading h2,
     .ya-ebc-page .ya-overview-copy h3,
-    .ya-ebc-page .ya-itinerary-side h3,
     .ya-ebc-page .ya-day-number,
     .ya-ebc-page .ya-day-title strong,
-    .ya-ebc-page .ya-extension-copy h3,
-    .ya-ebc-page .ya-extension-card h4,
     .ya-ebc-page .ya-info-head span,
     .ya-ebc-page .ya-trip-note-copy h3,
     .ya-ebc-page .ya-review-card blockquote,
@@ -1420,10 +1294,7 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-map-caption{padding:18px 0;background:transparent}
     .ya-ebc-page .ya-map-caption h3{font:600 29px/1.05 "Newsreader",Georgia,serif;color:var(--ink)}
 
-    .ya-ebc-page .ya-itinerary-shell{grid-template-columns:300px 1fr;gap:80px}
-    .ya-ebc-page .ya-itinerary-side{top:142px;padding:33px 0;border-top:1px solid var(--gold);border-radius:0;background:transparent;color:var(--ink)}
-    .ya-ebc-page .ya-itinerary-side .ya-script,.ya-ebc-page .ya-itinerary-side h3{color:var(--ink)}
-    .ya-ebc-page .ya-itinerary-side p,.ya-ebc-page .ya-itinerary-side li{color:#626a61}
+    .ya-ebc-page .ya-itinerary-shell{width:100%}
     .ya-ebc-page .ya-days{gap:0;border-top:1px solid var(--line)}
     .ya-ebc-page .ya-day{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none}
     .ya-ebc-page .ya-day-head{padding:25px 0;background:transparent}
@@ -1439,14 +1310,6 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-gallery-item{border-radius:0;background:#ddd}
     .ya-ebc-page .ya-gallery-label{right:0;bottom:0;left:0;padding:19px 20px;border-radius:0;background:linear-gradient(transparent,rgba(18,24,19,.78));align-items:flex-end}
     .ya-ebc-page .ya-gallery-label strong{font-size:24px}
-
-    .ya-ebc-page .ya-extension-intro{gap:9vw;margin-bottom:74px}
-    .ya-ebc-page .ya-extension-photo{min-height:560px;border-radius:0;box-shadow:none}
-    .ya-ebc-page .ya-extension-copy h3{font-size:clamp(48px,5vw,74px);color:var(--ink)}
-    .ya-ebc-page .ya-extension-grid{gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
-    .ya-ebc-page .ya-extension-card{min-height:270px;padding:28px;border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none}
-    .ya-ebc-page .ya-extension-icon{width:38px;height:38px;border-radius:0;background:transparent;color:var(--green-2)}
-    .ya-ebc-page .ya-extension-card h4{font-size:30px;color:var(--ink)}
 
     .ya-ebc-page .ya-essential-layout{gap:70px}
     .ya-ebc-page .ya-info-list{gap:0;border-top:1px solid var(--line)}
@@ -1474,7 +1337,6 @@ $related_query = new WP_Query( array(
     @media(max-width:1100px){
       .ya-ebc-page .ya-inner{width:min(100% - 56px,1240px)}
       .ya-ebc-page .ya-facts-grid{grid-template-columns:repeat(3,1fr)}
-      .ya-ebc-page .ya-itinerary-shell{grid-template-columns:240px 1fr;gap:42px}
       .ya-ebc-page .ya-essential-layout,.ya-ebc-page .ya-review-layout{gap:42px}
     }
     @media(max-width:820px){
@@ -1490,11 +1352,7 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-panel{padding:88px 0}
       .ya-ebc-page .ya-section-heading{margin-bottom:42px}
       .ya-ebc-page .ya-overview-grid,.ya-ebc-page .ya-itinerary-shell,.ya-ebc-page .ya-essential-layout,.ya-ebc-page .ya-review-layout{grid-template-columns:1fr;gap:42px}
-      .ya-ebc-page .ya-itinerary-side{position:static;padding-top:22px}
       .ya-ebc-page .ya-day-content{padding-left:0}
-      .ya-ebc-page .ya-extension-intro{grid-template-columns:1fr;gap:35px}
-      .ya-ebc-page .ya-extension-grid{grid-template-columns:1fr}
-      .ya-ebc-page .ya-extension-photo{min-height:420px}
       .ya-ebc-page .ya-gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:390px 260px 260px}
       .ya-ebc-page .ya-gallery-item:first-child{grid-column:1/3;grid-row:auto}
       .ya-ebc-page .ya-related-grid{grid-template-columns:repeat(2,1fr)}
@@ -1512,7 +1370,6 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-day-number{font-size:22px}
       .ya-ebc-page .ya-gallery-grid{grid-template-columns:1fr;grid-template-rows:none}
       .ya-ebc-page .ya-gallery-item,.ya-ebc-page .ya-gallery-item:first-child{grid-column:auto;height:300px}
-      .ya-ebc-page .ya-extension-photo{min-height:330px}
       .ya-ebc-page .ya-related-grid{grid-template-columns:1fr}
     }
 
@@ -1729,8 +1586,6 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-tab-stage .ya-overview-grid,
     .ya-ebc-page .ya-tab-stage .ya-itinerary-shell,
     .ya-ebc-page .ya-tab-stage .ya-gallery-grid,
-    .ya-ebc-page .ya-tab-stage .ya-extension-intro,
-    .ya-ebc-page .ya-tab-stage .ya-extension-grid,
     .ya-ebc-page .ya-tab-stage .ya-essential-layout,
     .ya-ebc-page .ya-tab-stage .ya-review-layout,
     .ya-ebc-page .ya-tab-stage .ya-form-grid{
@@ -1744,12 +1599,10 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-tab-stage .ya-section-heading h2,
     .ya-ebc-page .ya-tab-stage .ya-overview-copy h3,
     .ya-ebc-page .ya-tab-stage .ya-itinerary-side h3,
-    .ya-ebc-page .ya-tab-stage .ya-extension-copy h3,
     .ya-ebc-page .ya-tab-stage .ya-trip-note-copy h3,
     .ya-ebc-page .ya-tab-stage .ya-review-form h3{
       font-size:clamp(28px,3vw,36px);
     }
-    .ya-ebc-page .ya-tab-stage .ya-extension-card h4,
     .ya-ebc-page .ya-tab-stage .ya-map-caption h3,
     .ya-ebc-page .ya-tab-stage .ya-day-title strong,
     .ya-ebc-page .ya-tab-stage .ya-info-head span,
@@ -1869,8 +1722,6 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-tabs > .ya-panel .ya-overview-grid,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-itinerary-shell,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-gallery-grid,
-      .ya-ebc-page .ya-tabs > .ya-panel .ya-extension-intro,
-      .ya-ebc-page .ya-tabs > .ya-panel .ya-extension-grid,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-essential-layout,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-review-layout,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-form-grid{grid-template-columns:minmax(0,1fr)}
@@ -1882,7 +1733,6 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-tabs > .ya-panel .ya-section-heading h2,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-overview-copy h3,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-itinerary-side h3,
-      .ya-ebc-page .ya-tabs > .ya-panel .ya-extension-copy h3,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-trip-note-copy h3,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-review-form h3{font-size:clamp(28px,8vw,36px)}
     }
@@ -1965,9 +1815,6 @@ $related_query = new WP_Query( array(
       <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-gallery" data-tab="gallery">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 15l-5-5L5 20"/></svg>Gallery
       </button>
-      <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-extension" data-tab="extension">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/></svg>Extension
-      </button>
       <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-essential-info" data-tab="essential-info">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Essential Info
       </button>
@@ -2000,10 +1847,17 @@ $related_query = new WP_Query( array(
             </div>
 
             <div class="ya-inclusions">
-              <?php foreach ( $inclusions as $inc_point ) : ?>
+              <?php foreach ( $inclusions as $inc_point ) : 
+                $inc_title = is_array( $inc_point ) ? ( $inc_point['title'] ?? '' ) : $inc_point;
+                $inc_desc  = is_array( $inc_point ) ? ( $inc_point['desc'] ?? '' ) : '';
+                if ( empty( $inc_title ) && empty( $inc_desc ) ) continue;
+              ?>
                 <div class="ya-inclusion">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>
-                  <span><?php echo esc_html( $inc_point ); ?></span>
+                  <div>
+                    <?php if ( ! empty( $inc_title ) ) : ?><strong><?php echo esc_html( $inc_title ); ?></strong><?php endif; ?>
+                    <?php if ( ! empty( $inc_desc ) ) : ?><div class="ya-inclusion-desc"><?php echo wp_kses_post( wpautop( $inc_desc ) ); ?></div><?php endif; ?>
+                  </div>
                 </div>
               <?php endforeach; ?>
             </div>
@@ -2043,20 +1897,6 @@ $related_query = new WP_Query( array(
         </div>
 
         <div class="ya-itinerary-shell">
-          <aside class="ya-itinerary-side ya-reveal">
-            <div class="ya-script"><?php echo esc_html( $side_script ); ?></div>
-            <h3><?php echo esc_html( $side_title ); ?></h3>
-            <p><?php echo esc_html( $side_desc ); ?></p>
-            <ul>
-              <?php foreach ( $side_points as $s_pt ) : ?>
-                <li>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>
-                  <?php echo esc_html( $s_pt ); ?>
-                </li>
-              <?php endforeach; ?>
-            </ul>
-          </aside>
-
           <div class="ya-days">
             <?php foreach ( $itinerary as $i_idx => $day ) : ?>
               <article class="ya-day <?php echo 0 === $i_idx ? 'is-open' : ''; ?>">
@@ -2120,40 +1960,7 @@ $related_query = new WP_Query( array(
       </div>
     </section>
 
-    <!-- Panel 4: Extension -->
-    <section class="ya-panel" id="ya-panel-extension" role="tabpanel" data-panel="extension">
-      <div class="ya-inner">
-        <div class="ya-extension-intro">
-          <div class="ya-extension-photo ya-reveal" role="img" aria-label="<?php echo esc_attr( $title ); ?> extensions"></div>
-          <div class="ya-extension-copy ya-reveal">
-            <span class="ya-kicker"><?php echo esc_html( $ext_kicker ); ?></span>
-            <div class="ya-script"><?php echo esc_html( $ext_script ); ?></div>
-            <h3><?php echo esc_html( $ext_heading ); ?></h3>
-            <div class="ya-ext-intro-text">
-              <?php echo wp_kses_post( wpautop( $ext_intro ) ); ?>
-            </div>
-            <a class="ya-btn ya-btn-primary" href="<?php echo esc_url( $ext_btn_url ); ?>"><?php echo esc_html( $ext_btn_text ); ?></a>
-          </div>
-        </div>
-
-        <div class="ya-extension-grid ya-reveal">
-          <?php foreach ( $extensions as $e_item ) : ?>
-            <div class="ya-extension-card">
-              <div>
-                <span class="ya-extension-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h16M6 20V9l6-5 6 5v11M9 12h6M9 16h6"/></svg>
-                </span>
-                <h4><?php echo esc_html( $e_item['title'] ?? '' ); ?></h4>
-                <p><?php echo esc_html( $e_item['desc'] ?? '' ); ?></p>
-              </div>
-              <small><?php echo esc_html( $e_item['suggested'] ?? 'Suggested: 1–2 extra days' ); ?></small>
-            </div>
-          <?php endforeach; ?>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel 5: Essential Info -->
+    <!-- Panel 4: Essential Info -->
     <section class="ya-panel" id="ya-panel-essential-info" role="tabpanel" data-panel="essential-info">
       <div class="ya-inner">
         <div class="ya-section-heading ya-reveal">

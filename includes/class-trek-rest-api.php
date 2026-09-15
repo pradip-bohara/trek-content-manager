@@ -79,11 +79,10 @@ class Trek_REST_API {
             return new WP_Error( 'not_found', __( 'Trek destination not found', 'trek-content-manager' ), array( 'status' => 404 ) );
         }
 
-        $raw_json = get_post_meta( $post_id, '_trek_structured_data', true );
-        $data = json_decode( $raw_json, true );
-
-        if ( ! is_array( $data ) ) {
-            $data = Trek_Renderer::get_full_trek_data( $post );
+        $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
+        if ( empty( $data ) ) {
+            $raw_json = get_post_meta( $post_id, '_trek_structured_data', true );
+            $data     = json_decode( $raw_json, true );
         }
 
         if ( empty( $data ) ) {

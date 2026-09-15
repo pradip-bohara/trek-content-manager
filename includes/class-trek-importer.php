@@ -27,7 +27,7 @@ class Trek_Importer {
             'edit.php?post_type=trek_destination',
             __( 'JSON Importer & Schema Guide', 'trek-content-manager' ),
             __( '📥 JSON Importer', 'trek-content-manager' ),
-            'manage_trek_content',
+            'edit_posts',
             'trek-json-importer',
             array( __CLASS__, 'render_importer_page' )
         );
@@ -37,7 +37,7 @@ class Trek_Importer {
      * Main Admin Page Renderer
      */
     public static function render_importer_page() {
-        if ( ! current_user_can( 'manage_trek_content' ) ) {
+        if ( ! current_user_can( 'edit_posts' ) ) {
             wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'trek-content-manager' ) );
         }
 
@@ -669,7 +669,7 @@ class Trek_Importer {
      * Handle JSON Import (Form Submission)
      */
     public static function handle_json_import() {
-        if ( ! current_user_can( 'manage_trek_content' ) ) {
+        if ( ! current_user_can( 'edit_posts' ) ) {
             wp_die( esc_html__( 'Unauthorized user', 'trek-content-manager' ) );
         }
 
@@ -958,23 +958,175 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_itinerary_list', $clean_itin_list );
             }
 
-            // 7. Inclusions & Exclusions (Sync dual keys: _trek_inclusions & _trek_inclusions_full)
-            if ( ! empty( $item['inclusions'] ) && is_array( $item['inclusions'] ) ) {
-                $clean_inc = array_map( 'sanitize_text_field', $item['inclusions'] );
-                update_post_meta( $post_id, '_trek_inclusions', $clean_inc );
-                update_post_meta( $post_id, '_trek_inclusions_full', $clean_inc );
+            // 5b. Overview & Map Section Meta
+            $overview_sec = is_array( $item['overview'] ?? null ) ? $item['overview'] : ( $item['overview_section'] ?? array() );
+            if ( ! empty( $item['overview_kicker'] ) || ! empty( $overview_sec['kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_overview_kicker', sanitize_text_field( $item['overview_kicker'] ?? $overview_sec['kicker'] ) );
             }
-            if ( ! empty( $item['exclusions'] ) && is_array( $item['exclusions'] ) ) {
-                $clean_exc = array_map( 'sanitize_text_field', $item['exclusions'] );
-                update_post_meta( $post_id, '_trek_exclusions', $clean_exc );
-                update_post_meta( $post_id, '_trek_exclusions_full', $clean_exc );
+            if ( ! empty( $item['overview_script'] ) || ! empty( $overview_sec['script'] ) ) {
+                update_post_meta( $post_id, '_trek_overview_script', sanitize_text_field( $item['overview_script'] ?? $overview_sec['script'] ) );
+            }
+            if ( ! empty( $item['overview_heading'] ) || ! empty( $overview_sec['heading'] ) ) {
+                update_post_meta( $post_id, '_trek_overview_heading', sanitize_text_field( $item['overview_heading'] ?? $overview_sec['heading'] ) );
+            }
+            if ( ! empty( $item['overview_subheading'] ) || ! empty( $overview_sec['subheading'] ) ) {
+                update_post_meta( $post_id, '_trek_overview_subheading', sanitize_text_field( $item['overview_subheading'] ?? $overview_sec['subheading'] ) );
+            }
+            if ( ! empty( $item['overview_highlight'] ) || ! empty( $overview_sec['highlight'] ) ) {
+                update_post_meta( $post_id, '_trek_overview_highlight', wp_kses_post( $item['overview_highlight'] ?? $overview_sec['highlight'] ) );
+            }
+            if ( ! empty( $item['overview_img'] ) || ! empty( $overview_sec['image'] ) ) {
+                update_post_meta( $post_id, '_trek_overview_img', esc_url_raw( $item['overview_img'] ?? $overview_sec['image'] ) );
+            }
+            if ( ! empty( $item['route_img'] ) || ! empty( $overview_sec['route_img'] ) ) {
+                update_post_meta( $post_id, '_trek_route_img', esc_url_raw( $item['route_img'] ?? $overview_sec['route_img'] ) );
+            }
+            if ( ! empty( $item['map_file_url'] ) || ! empty( $overview_sec['map_file_url'] ) ) {
+                update_post_meta( $post_id, '_trek_map_file_url', esc_url_raw( $item['map_file_url'] ?? $overview_sec['map_file_url'] ) );
+            }
+            if ( ! empty( $item['map_embed_code'] ) || ! empty( $overview_sec['map_embed_code'] ) ) {
+                update_post_meta( $post_id, '_trek_map_embed_code', current_user_can( 'unfiltered_html' ) ? ( $item['map_embed_code'] ?? $overview_sec['map_embed_code'] ) : wp_kses_post( $item['map_embed_code'] ?? $overview_sec['map_embed_code'] ) );
+            }
+            if ( ! empty( $item['route_caption_sub'] ) || ! empty( $overview_sec['route_sub'] ) ) {
+                update_post_meta( $post_id, '_trek_route_caption_sub', sanitize_text_field( $item['route_caption_sub'] ?? $overview_sec['route_sub'] ) );
+            }
+            if ( ! empty( $item['route_caption_h3'] ) || ! empty( $overview_sec['route_heading'] ) ) {
+                update_post_meta( $post_id, '_trek_route_caption_h3', sanitize_text_field( $item['route_caption_h3'] ?? $overview_sec['route_heading'] ) );
             }
 
-            // 8. Gallery Images (Sync dual keys: _trek_gallery_images & _trek_gallery_list)
-            if ( ! empty( $item['gallery'] ) && is_array( $item['gallery'] ) ) {
+            // 6. Itinerary Section Headers & Day-by-Day Itinerary Array (Sync dual keys: _trek_itinerary & _trek_itinerary_list)
+            $itin_sec = $item['itinerary_section'] ?? array();
+            if ( ! empty( $item['itin_kicker'] ) || ! empty( $itin_sec['kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_itin_kicker', sanitize_text_field( $item['itin_kicker'] ?? $itin_sec['kicker'] ) );
+            }
+            if ( ! empty( $item['itin_script'] ) || ! empty( $itin_sec['script'] ) ) {
+                update_post_meta( $post_id, '_trek_itin_script', sanitize_text_field( $item['itin_script'] ?? $itin_sec['script'] ) );
+            }
+            if ( ! empty( $item['itin_heading'] ) || ! empty( $itin_sec['heading'] ) ) {
+                update_post_meta( $post_id, '_trek_itin_heading', sanitize_text_field( $item['itin_heading'] ?? $itin_sec['heading'] ) );
+            }
+            if ( ! empty( $item['itin_subtext'] ) || ! empty( $itin_sec['subtext'] ) ) {
+                update_post_meta( $post_id, '_trek_itin_subtext', sanitize_text_field( $item['itin_subtext'] ?? $itin_sec['subtext'] ) );
+            }
+
+            if ( ! empty( $item['itinerary'] ) && is_array( $item['itinerary'] ) ) {
+                $clean_itin = array();
+                $clean_itin_list = array();
+                $idx = 1;
+                foreach ( $item['itinerary'] as $day_data ) {
+                    if ( ! is_array( $day_data ) ) continue;
+                    $d_num   = sanitize_text_field( $day_data['day'] ?? sprintf( '%02d', $idx ) );
+                    $d_title = sanitize_text_field( $day_data['title'] ?? '' );
+                    $d_stage = sanitize_text_field( $day_data['stage'] ?? $d_title );
+                    $d_desc  = wp_kses_post( $day_data['description'] ?? $day_data['desc'] ?? '' );
+                    $d_pills = sanitize_text_field( $day_data['pills'] ?? ( ! empty( $day_data['altitude'] ) ? $day_data['altitude'] : '' ) );
+                    $d_gal   = $day_data['gallery'] ?? ( $day_data['images'] ?? array() );
+                    if ( is_string( $d_gal ) ) {
+                        $d_gal = array_values( array_filter( array_map( 'esc_url_raw', array_map( 'trim', explode( ',', $d_gal ) ) ) ) );
+                    } elseif ( ! is_array( $d_gal ) ) {
+                        $d_gal = array();
+                    }
+
+                    $clean_itin[] = array(
+                        'day'           => $d_num,
+                        'title'         => $d_title,
+                        'description'   => $d_desc,
+                        'altitude'      => sanitize_text_field( $day_data['altitude'] ?? '' ),
+                        'walking_hours' => sanitize_text_field( $day_data['walking_hours'] ?? '' ),
+                        'stay'          => sanitize_text_field( $day_data['stay'] ?? $day_data['accommodation'] ?? '' ),
+                        'meals'         => sanitize_text_field( $day_data['meals'] ?? '' ),
+                        'gallery'       => $d_gal,
+                    );
+
+                    $clean_itin_list[] = array(
+                        'day'     => $d_num,
+                        'stage'   => $d_stage,
+                        'title'   => $d_title,
+                        'pills'   => $d_pills,
+                        'desc'    => $d_desc,
+                        'gallery' => $d_gal,
+                    );
+                    $idx++;
+                }
+                update_post_meta( $post_id, '_trek_itinerary', $clean_itin );
+                update_post_meta( $post_id, '_trek_itinerary_list', $clean_itin_list );
+            }
+
+            // 7. Inclusions & Exclusions (Sync dual keys: _trek_inclusions & _trek_inclusions_full)
+            $inex_sec = $item['inex'] ?? ( $item['inclusions_section'] ?? array() );
+            if ( ! empty( $item['inex_kicker'] ) || ! empty( $inex_sec['kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_inex_kicker', sanitize_text_field( $item['inex_kicker'] ?? $inex_sec['kicker'] ) );
+            }
+            if ( ! empty( $item['inex_script'] ) || ! empty( $inex_sec['script'] ) ) {
+                update_post_meta( $post_id, '_trek_inex_script', sanitize_text_field( $item['inex_script'] ?? $inex_sec['script'] ) );
+            }
+            if ( ! empty( $item['inex_heading'] ) || ! empty( $inex_sec['heading'] ) ) {
+                update_post_meta( $post_id, '_trek_inex_heading', sanitize_text_field( $item['inex_heading'] ?? $inex_sec['heading'] ) );
+            }
+            if ( ! empty( $item['inex_subtext'] ) || ! empty( $inex_sec['subtext'] ) ) {
+                update_post_meta( $post_id, '_trek_inex_subtext', sanitize_text_field( $item['inex_subtext'] ?? $inex_sec['subtext'] ) );
+            }
+
+            $raw_inclusions = $item['inclusions'] ?? ( $inex_sec['inclusions'] ?? null );
+            if ( ! empty( $raw_inclusions ) && is_array( $raw_inclusions ) ) {
+                $clean_inc_full = array();
+                foreach ( $raw_inclusions as $inc_item ) {
+                    if ( is_array( $inc_item ) ) {
+                        $clean_inc_full[] = array(
+                            'title' => sanitize_text_field( $inc_item['title'] ?? ( $inc_item['heading'] ?? '' ) ),
+                            'desc'  => wp_kses_post( $inc_item['desc'] ?? ( $inc_item['description'] ?? ( $inc_item['content'] ?? '' ) ) ),
+                        );
+                    } else {
+                        $clean_inc_full[] = array(
+                            'title' => sanitize_text_field( (string) $inc_item ),
+                            'desc'  => '',
+                        );
+                    }
+                }
+                update_post_meta( $post_id, '_trek_inclusions_full', $clean_inc_full );
+                update_post_meta( $post_id, '_trek_inclusions', $clean_inc_full );
+            }
+
+            $raw_exclusions = $item['exclusions'] ?? ( $inex_sec['exclusions'] ?? null );
+            if ( ! empty( $raw_exclusions ) && is_array( $raw_exclusions ) ) {
+                $clean_exc_full = array();
+                foreach ( $raw_exclusions as $exc_item ) {
+                    if ( is_array( $exc_item ) ) {
+                        $clean_exc_full[] = array(
+                            'title' => sanitize_text_field( $exc_item['title'] ?? ( $exc_item['heading'] ?? '' ) ),
+                            'desc'  => wp_kses_post( $exc_item['desc'] ?? ( $exc_item['description'] ?? ( $exc_item['content'] ?? '' ) ) ),
+                        );
+                    } else {
+                        $clean_exc_full[] = array(
+                            'title' => sanitize_text_field( (string) $exc_item ),
+                            'desc'  => '',
+                        );
+                    }
+                }
+                update_post_meta( $post_id, '_trek_exclusions_full', $clean_exc_full );
+                update_post_meta( $post_id, '_trek_exclusions', $clean_exc_full );
+            }
+
+            // 8. Gallery Section & Photos (Sync dual keys: _trek_gallery_images & _trek_gallery_list)
+            $gal_sec = $item['gallery_section'] ?? ( ( isset( $item['gallery'] ) && ! empty( $item['gallery']['images'] ) ) ? $item['gallery'] : array() );
+            if ( ! empty( $item['gallery_kicker'] ) || ! empty( $gal_sec['kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_gallery_kicker', sanitize_text_field( $item['gallery_kicker'] ?? $gal_sec['kicker'] ) );
+            }
+            if ( ! empty( $item['gallery_script'] ) || ! empty( $gal_sec['script'] ) ) {
+                update_post_meta( $post_id, '_trek_gallery_script', sanitize_text_field( $item['gallery_script'] ?? $gal_sec['script'] ) );
+            }
+            if ( ! empty( $item['gallery_heading'] ) || ! empty( $gal_sec['heading'] ) ) {
+                update_post_meta( $post_id, '_trek_gallery_heading', sanitize_text_field( $item['gallery_heading'] ?? $gal_sec['heading'] ) );
+            }
+            if ( ! empty( $item['gallery_subtext'] ) || ! empty( $gal_sec['subtext'] ) ) {
+                update_post_meta( $post_id, '_trek_gallery_subtext', sanitize_text_field( $item['gallery_subtext'] ?? $gal_sec['subtext'] ) );
+            }
+
+            $raw_gallery = isset( $item['gallery'] ) && is_array( $item['gallery'] ) && ! isset( $item['gallery']['images'] ) ? $item['gallery'] : ( $gal_sec['images'] ?? ( $item['gallery_images'] ?? array() ) );
+            if ( ! empty( $raw_gallery ) && is_array( $raw_gallery ) ) {
                 $clean_gal = array();
                 $clean_gal_list = array();
-                foreach ( $item['gallery'] as $g_item ) {
+                foreach ( $raw_gallery as $g_item ) {
                     $url = is_array( $g_item ) ? ( $g_item['url'] ?? '' ) : $g_item;
                     $lbl = is_array( $g_item ) ? ( $g_item['label'] ?? $g_item['caption'] ?? '' ) : '';
                     if ( ! empty( $url ) ) {
@@ -989,32 +1141,76 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_gallery_list', $clean_gal_list );
             }
 
-            // 9. FAQs (Sync dual keys: _trek_faqs & _trek_essential_list)
-            if ( ! empty( $item['faqs'] ) && is_array( $item['faqs'] ) ) {
+            // 9. Essential Information & FAQs (Sync dual keys: _trek_faqs & _trek_essential_list)
+            $ess_sec = $item['essential'] ?? array();
+            if ( ! empty( $item['ess_kicker'] ) || ! empty( $ess_sec['kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_kicker', sanitize_text_field( $item['ess_kicker'] ?? $ess_sec['kicker'] ) );
+            }
+            if ( ! empty( $item['ess_script'] ) || ! empty( $ess_sec['script'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_script', sanitize_text_field( $item['ess_script'] ?? $ess_sec['script'] ) );
+            }
+            if ( ! empty( $item['ess_heading'] ) || ! empty( $ess_sec['heading'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_heading', sanitize_text_field( $item['ess_heading'] ?? $ess_sec['heading'] ) );
+            }
+            if ( ! empty( $item['ess_intro'] ) || ! empty( $ess_sec['intro'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_intro', wp_kses_post( $item['ess_intro'] ?? $ess_sec['intro'] ) );
+            }
+            if ( ! empty( $item['ess_card_img'] ) || ! empty( $ess_sec['card_img'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_card_img', esc_url_raw( $item['ess_card_img'] ?? $ess_sec['card_img'] ) );
+            }
+            if ( ! empty( $item['ess_card_kicker'] ) || ! empty( $ess_sec['card_kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_card_kicker', sanitize_text_field( $item['ess_card_kicker'] ?? $ess_sec['card_kicker'] ) );
+            }
+            if ( ! empty( $item['ess_card_title'] ) || ! empty( $ess_sec['card_title'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_card_title', sanitize_text_field( $item['ess_card_title'] ?? $ess_sec['card_title'] ) );
+            }
+            if ( ! empty( $item['ess_card_desc'] ) || ! empty( $ess_sec['card_desc'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_card_desc', sanitize_text_field( $item['ess_card_desc'] ?? $ess_sec['card_desc'] ) );
+            }
+            if ( ! empty( $item['ess_card_btn'] ) || ! empty( $ess_sec['card_btn'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_card_btn', sanitize_text_field( $item['ess_card_btn'] ?? $ess_sec['card_btn'] ) );
+            }
+            if ( ! empty( $item['ess_card_email'] ) || ! empty( $ess_sec['card_email'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_card_email', sanitize_email( $item['ess_card_email'] ?? $ess_sec['card_email'] ) );
+            }
+
+            $raw_faqs = $item['faqs'] ?? ( $item['essential_list'] ?? null );
+            if ( ! empty( $raw_faqs ) && is_array( $raw_faqs ) ) {
                 $clean_faqs = array();
                 $clean_ess = array();
-                foreach ( $item['faqs'] as $faq ) {
-                    if ( is_array( $faq ) && ! empty( $faq['question'] ) ) {
-                        $q = sanitize_text_field( $faq['question'] );
-                        $a = wp_kses_post( $faq['answer'] ?? '' );
-                        $clean_faqs[] = array(
-                            'question' => $q,
-                            'answer'   => $a,
-                        );
-                        $clean_ess[] = array(
-                            'title'   => $q,
-                            'content' => $a,
-                        );
+                foreach ( $raw_faqs as $faq ) {
+                    if ( is_array( $faq ) ) {
+                        $q = sanitize_text_field( $faq['question'] ?? ( $faq['title'] ?? '' ) );
+                        $a = wp_kses_post( $faq['answer'] ?? ( $faq['content'] ?? '' ) );
+                        if ( ! empty( $q ) ) {
+                            $clean_faqs[] = array( 'question' => $q, 'answer' => $a );
+                            $clean_ess[]  = array( 'title' => $q, 'content' => $a );
+                        }
                     }
                 }
                 update_post_meta( $post_id, '_trek_faqs', $clean_faqs );
                 update_post_meta( $post_id, '_trek_essential_list', $clean_ess );
             }
 
-            // 10. Curated Reviews (Sync dual keys: _trek_curated_reviews & _trek_reviews_list)
-            if ( ! empty( $item['reviews'] ) && is_array( $item['reviews'] ) ) {
+            // 10. Reviews Section & Curated Testimonials (Sync dual keys: _trek_curated_reviews & _trek_reviews_list)
+            $rev_sec = $item['reviews_section'] ?? array();
+            if ( ! empty( $item['review_kicker'] ) || ! empty( $rev_sec['kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_review_kicker', sanitize_text_field( $item['review_kicker'] ?? $rev_sec['kicker'] ) );
+            }
+            if ( ! empty( $item['review_script'] ) || ! empty( $rev_sec['script'] ) ) {
+                update_post_meta( $post_id, '_trek_review_script', sanitize_text_field( $item['review_script'] ?? $rev_sec['script'] ) );
+            }
+            if ( ! empty( $item['review_heading'] ) || ! empty( $rev_sec['heading'] ) ) {
+                update_post_meta( $post_id, '_trek_review_heading', sanitize_text_field( $item['review_heading'] ?? $rev_sec['heading'] ) );
+            }
+            if ( ! empty( $item['review_subtext'] ) || ! empty( $rev_sec['subtext'] ) ) {
+                update_post_meta( $post_id, '_trek_review_subtext', sanitize_text_field( $item['review_subtext'] ?? $rev_sec['subtext'] ) );
+            }
+
+            $raw_revs = isset( $item['reviews'] ) && is_array( $item['reviews'] ) && ! isset( $item['reviews']['reviews'] ) ? $item['reviews'] : ( $rev_sec['reviews'] ?? ( $item['curated_reviews'] ?? array() ) );
+            if ( ! empty( $raw_revs ) && is_array( $raw_revs ) ) {
                 $clean_revs = array();
-                foreach ( $item['reviews'] as $rev ) {
+                foreach ( $raw_revs as $rev ) {
                     if ( is_array( $rev ) ) {
                         $clean_revs[] = array(
                             'name'     => sanitize_text_field( $rev['name'] ?? 'Traveler' ),
@@ -1028,6 +1224,44 @@ class Trek_Importer {
                     update_post_meta( $post_id, '_trek_curated_reviews', $clean_revs );
                     update_post_meta( $post_id, '_trek_reviews_list', $clean_revs );
                 }
+            }
+
+            // 11. Fixed Departures & Contact Settings
+            $dep_sec = $item['contact'] ?? ( $item['departures'] ?? array() );
+            if ( ! empty( $item['dep_kicker'] ) || ! empty( $dep_sec['dep_kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_dep_kicker', sanitize_text_field( $item['dep_kicker'] ?? $dep_sec['dep_kicker'] ) );
+            }
+            if ( ! empty( $item['dep_script'] ) || ! empty( $dep_sec['dep_script'] ) ) {
+                update_post_meta( $post_id, '_trek_dep_script', sanitize_text_field( $item['dep_script'] ?? $dep_sec['dep_script'] ) );
+            }
+            if ( ! empty( $item['dep_heading'] ) || ! empty( $dep_sec['dep_heading'] ) ) {
+                update_post_meta( $post_id, '_trek_dep_heading', sanitize_text_field( $item['dep_heading'] ?? $dep_sec['dep_heading'] ) );
+            }
+            if ( ! empty( $item['dep_subtext'] ) || ! empty( $dep_sec['dep_subtext'] ) ) {
+                update_post_meta( $post_id, '_trek_dep_subtext', sanitize_text_field( $item['dep_subtext'] ?? $dep_sec['dep_subtext'] ) );
+            }
+
+            if ( ! empty( $item['dep_box_script'] ) || ! empty( $dep_sec['box_script'] ) ) {
+                update_post_meta( $post_id, '_trek_dep_box_script', sanitize_text_field( $item['dep_box_script'] ?? $dep_sec['box_script'] ) );
+            }
+            if ( ! empty( $item['dep_box_title'] ) || ! empty( $dep_sec['box_title'] ) ) {
+                update_post_meta( $post_id, '_trek_dep_box_title', sanitize_text_field( $item['dep_box_title'] ?? $dep_sec['box_title'] ) );
+            }
+            if ( ! empty( $item['dep_box_desc'] ) || ! empty( $dep_sec['box_desc'] ) ) {
+                update_post_meta( $post_id, '_trek_dep_box_desc', sanitize_text_field( $item['dep_box_desc'] ?? $dep_sec['box_desc'] ) );
+            }
+            if ( ! empty( $item['dep_box_photo'] ) || ! empty( $dep_sec['box_photo'] ) ) {
+                update_post_meta( $post_id, '_trek_dep_box_photo', esc_url_raw( $item['dep_box_photo'] ?? $dep_sec['box_photo'] ) );
+            }
+            if ( ! empty( $item['dep_box_note'] ) || ! empty( $dep_sec['box_note'] ) ) {
+                update_post_meta( $post_id, '_trek_dep_box_note', sanitize_text_field( $item['dep_box_note'] ?? $dep_sec['box_note'] ) );
+            }
+
+            if ( ! empty( $item['whatsapp'] ) || ! empty( $item['whatsapp_number'] ) || ! empty( $dep_sec['whatsapp'] ) ) {
+                update_post_meta( $post_id, '_trek_whatsapp_number', sanitize_text_field( $item['whatsapp'] ?? ( $item['whatsapp_number'] ?? $dep_sec['whatsapp'] ) ) );
+            }
+            if ( ! empty( $item['sales_email'] ) || ! empty( $dep_sec['email'] ) ) {
+                update_post_meta( $post_id, '_trek_sales_email', sanitize_email( $item['sales_email'] ?? $dep_sec['email'] ) );
             }
 
             // 11. Compile & Save Master JSON Payload (_trek_structured_data)
@@ -1126,18 +1360,51 @@ class Trek_Importer {
                         "meals" => "Breakfast, Lunch, Dinner"
                     )
                 ),
+                "inex" => array(
+                    "kicker"   => "What is Covered",
+                    "script"   => "Clear & Transparent",
+                    "heading"  => "Inclusions & Exclusions",
+                    "subtext"  => "Everything included in your bespoke Himalayan journey, with no hidden surprises."
+                ),
                 "inclusions" => array(
-                    "All private airport and domestic transfers",
-                    "Return scenic flights Kathmandu / Ramechhap to Lukla",
-                    "Sagarmatha National Park entry permits & TIMS card",
-                    "Experienced high-altitude English-speaking Sherpa guide & porters",
-                    "All boutique accommodation and three meals daily during trek"
+                    array(
+                        "title" => "All private airport and domestic transfers",
+                        "desc"  => "<p>Private chauffeur transfers in air-conditioned vehicles between airport, hotels and trailheads.</p>"
+                    ),
+                    array(
+                        "title" => "Return scenic mountain flights (Kathmandu–Lukla–Kathmandu)",
+                        "desc"  => "<p>Twin Otter or Dornier scenic mountain flights including full baggage allowances.</p>"
+                    ),
+                    array(
+                        "title" => "Permits, TIMS card & National Park entry fees",
+                        "desc"  => "<p>All official Sagarmatha National Park entry clearances and local Khumbu Pasang Lhamu permits.</p>"
+                    ),
+                    array(
+                        "title" => "Licensed English-speaking mountain guide & Sherpa porters",
+                        "desc"  => "<p>Government-licensed veteran high-altitude guide and 1 porter for every 2 trekkers.</p>"
+                    ),
+                    array(
+                        "title" => "Boutique hotel accommodation in Kathmandu & premier mountain lodges",
+                        "desc"  => "<p>En-suite mountain teahouses and luxury boutique hotels with three meals daily on trek.</p>"
+                    )
                 ),
                 "exclusions" => array(
-                    "International airfare to/from Kathmandu",
-                    "Nepal tourist visa",
-                    "Personal travel and emergency helicopter evacuation insurance",
-                    "Personal gear and alcoholic beverages"
+                    array(
+                        "title" => "International flights to and from Kathmandu",
+                        "desc"  => "<p>Long-haul international airfares and associated baggage overages.</p>"
+                    ),
+                    array(
+                        "title" => "Nepal tourist visa fees",
+                        "desc"  => "<p>Payable on arrival at Tribhuvan International Airport (Kathmandu).</p>"
+                    ),
+                    array(
+                        "title" => "Personal emergency evacuation insurance",
+                        "desc"  => "<p>Mandatory travel insurance covering medical emergency and high-altitude helicopter rescue.</p>"
+                    ),
+                    array(
+                        "title" => "Personal trekking gear and gratuities",
+                        "desc"  => "<p>Down jackets, sleeping bags, alcoholic drinks and tips for guiding crew.</p>"
+                    )
                 )
             ),
             array(
