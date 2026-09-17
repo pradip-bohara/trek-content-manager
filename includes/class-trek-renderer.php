@@ -24,6 +24,11 @@ class Trek_Renderer {
      * Automatically output meta tags & JSON-LD on single trek pages
      */
     public static function auto_inject_head_meta() {
+        static $rendered = false;
+        if ( $rendered || ! is_singular( 'trek_destination' ) ) {
+            return;
+        }
+        $rendered = true;
         if ( is_singular( 'trek_destination' ) ) {
             $post_id = get_the_ID();
             $trek_data = self::get_full_trek_data( $post_id );
@@ -126,8 +131,11 @@ class Trek_Renderer {
         $fact_trekking    = get_post_meta( $post_id, '_trek_fact_trekking', true ) ?: 'Usually 5–6 hours daily';
         $fact_accom       = get_post_meta( $post_id, '_trek_fact_accom', true ) ?: 'Hotel & local mountain lodges';
         $fact_style       = get_post_meta( $post_id, '_trek_fact_style', true ) ?: 'Privately Guided High-Altitude Trek';
-        $fact_season      = 'Autumn (Sep–Nov) & Spring (Mar–May)';
-        $fact_group_size  = '2–12 Travellers';
+        $fact_distance    = get_post_meta( $post_id, '_trek_fact_distance', true ) ?: '';
+        $fact_start       = get_post_meta( $post_id, '_trek_fact_start', true ) ?: '';
+        $fact_end         = get_post_meta( $post_id, '_trek_fact_end', true ) ?: '';
+        $fact_season      = get_post_meta( $post_id, '_trek_fact_season', true ) ?: 'Autumn (Sep–Nov) & Spring (Mar–May)';
+        $fact_group_size  = get_post_meta( $post_id, '_trek_fact_group_size', true ) ?: '2–12 Travellers';
 
         // Stored structured quick facts if present
         $stored_facts     = get_post_meta( $post_id, '_trek_quick_facts', true );
@@ -141,6 +149,9 @@ class Trek_Renderer {
             $fact_style      = ! empty( $stored_facts['style'] ) ? $stored_facts['style'] : $fact_style;
             $fact_season     = ! empty( $stored_facts['season'] ) ? $stored_facts['season'] : $fact_season;
             $fact_group_size = ! empty( $stored_facts['group_size'] ) ? $stored_facts['group_size'] : $fact_group_size;
+            $fact_distance   = ! empty( $stored_facts['distance'] ) ? $stored_facts['distance'] : $fact_distance;
+            $fact_start      = ! empty( $stored_facts['start'] ) ? $stored_facts['start'] : $fact_start;
+            $fact_end        = ! empty( $stored_facts['end'] ) ? $stored_facts['end'] : $fact_end;
         }
 
         // 5. Overview Narrative, Highlights & Route Map
@@ -305,8 +316,11 @@ class Trek_Renderer {
         if ( ! empty( $gallery_images ) && is_array( $gallery_images ) ) {
             foreach ( $gallery_images as $g_item ) {
                 $img_url = is_array( $g_item ) ? ( $g_item['url'] ?? '' ) : $g_item;
-                if ( ! empty( $img_url ) ) {
-                    $clean_gallery[] = esc_url_raw( $img_url );
+                if ( is_string( $img_url ) ) {
+                    $img_url = esc_url_raw( trim( $img_url ) );
+                    if ( '' !== $img_url ) {
+                        $clean_gallery[] = $img_url;
+                    }
                 }
             }
         }
@@ -458,6 +472,25 @@ class Trek_Renderer {
         $whatsapp_number     = get_post_meta( $post_id, '_trek_whatsapp_number', true ) ?: '9779803197006';
         $sales_email         = get_post_meta( $post_id, '_trek_sales_email', true ) ?: 'sales@yetiadventure.com';
 
+        // Departure dates repeater
+        $departure_dates_raw = get_post_meta( $post_id, '_trek_departure_dates', true );
+        if ( empty( $departure_dates_raw ) || ! is_array( $departure_dates_raw ) ) {
+            $departure_dates_raw = get_post_meta( $post_id, '_trek_dep_dates', true );
+        }
+        $departure_dates     = array();
+        if ( ! empty( $departure_dates_raw ) && is_array( $departure_dates_raw ) ) {
+            foreach ( $departure_dates_raw as $dd ) {
+                if ( ! is_array( $dd ) || empty( $dd['date'] ) ) continue;
+                $departure_dates[] = array(
+                    'date'   => $dd['date'],
+                    'price'  => $dd['price'] ?? '',
+                    'seats'  => $dd['seats'] ?? '',
+                    'status' => $dd['status'] ?? 'open',
+                    'note'   => $dd['note'] ?? '',
+                );
+            }
+        }
+
         // 12. Pricing / Offers
         $price               = get_post_meta( $post_id, '_trek_price', true ) ?: get_post_meta( $post_id, '_trek_cost', true );
         $currency            = get_post_meta( $post_id, '_trek_currency', true ) ?: 'USD';
@@ -519,6 +552,9 @@ class Trek_Renderer {
                 'style'        => $fact_style,
                 'season'       => $fact_season,
                 'group_size'   => $fact_group_size,
+                'distance'     => $fact_distance,
+                'start'        => $fact_start,
+                'end'          => $fact_end,
             ),
 
             // Overview & Route
@@ -594,18 +630,21 @@ class Trek_Renderer {
 
             // Fixed Departure & Contact
             'contact' => array(
-                'dep_kicker'   => $dep_kicker,
-                'dep_script'   => $dep_script,
-                'dep_heading'  => $dep_heading,
-                'dep_subtext'  => $dep_subtext,
-                'box_script'   => $dep_box_script,
-                'box_title'    => $dep_box_title,
-                'box_desc'     => $dep_box_desc,
-                'box_photo'    => $dep_box_photo,
-                'box_note'     => $dep_box_note,
-                'whatsapp'     => $whatsapp_number,
-                'email'        => $sales_email,
+                'dep_kicker'      => $dep_kicker,
+                'dep_script'      => $dep_script,
+                'dep_heading'     => $dep_heading,
+                'dep_subtext'     => $dep_subtext,
+                'box_script'      => $dep_box_script,
+                'box_title'       => $dep_box_title,
+                'box_desc'        => $dep_box_desc,
+                'box_photo'       => $dep_box_photo,
+                'box_note'        => $dep_box_note,
+                'whatsapp'        => $whatsapp_number,
+                'email'           => $sales_email,
+                'departure_dates' => $departure_dates,
             ),
+            // Departure dates top-level alias for direct access
+            'departure_dates' => $departure_dates,
 
             // Pricing
             'pricing' => array(
@@ -641,6 +680,9 @@ class Trek_Renderer {
                 'tripStyle'    => $fact_style,
                 'bestSeason'   => $fact_season,
                 'groupSize'    => $fact_group_size,
+                'distance'     => $fact_distance,
+                'start'        => $fact_start,
+                'end'          => $fact_end,
             ),
             'geography' => array(
                 'country'      => $breadcrumb_reg,
@@ -663,6 +705,17 @@ class Trek_Renderer {
      * 3. FAQPage (with Question/Answer pairs from Essential Info)
      * 4. BreadcrumbList (Home > All Trips > Region > Destination)
      */
+    private static function get_region_url( $trek_data, $region_name ) {
+        $term = get_term_by( 'name', $region_name, 'trek_region' );
+        if ( $term && ! is_wp_error( $term ) ) {
+            $link = get_term_link( $term, 'trek_region' );
+            if ( ! is_wp_error( $link ) ) {
+                return $link;
+            }
+        }
+        return home_url( '/all-trips/' );
+    }
+
     public static function render_schema_json_ld( $trek_data ) {
         if ( ! is_array( $trek_data ) || empty( $trek_data['title'] ) ) {
             $trek_data = self::get_full_trek_data( $trek_data );
@@ -830,7 +883,7 @@ class Trek_Renderer {
                     '@type'    => 'ListItem',
                     'position' => 3,
                     'name'     => esc_html( $region_name ),
-                    'item'     => home_url( '/destinations/' . sanitize_title( $region_name ) . '/' )
+                    'item'     => self::get_region_url( $trek_data, $region_name )
                 ),
                 array(
                     '@type'    => 'ListItem',
@@ -873,7 +926,7 @@ class Trek_Renderer {
 
         ?>
         <!-- Open Graph / Trek Content Manager -->
-        <meta property="og:type" content="website">
+        <meta property="og:type" content="article">
         <meta property="og:site_name" content="<?php echo esc_attr( get_bloginfo( 'name' ) ?: 'Yeti Adventure' ); ?>">
         <meta property="og:title" content="<?php echo esc_attr( $title . ' (' . $days . ' Days) | ' . $region ); ?>">
         <meta property="og:description" content="<?php echo esc_attr( $description ); ?>">

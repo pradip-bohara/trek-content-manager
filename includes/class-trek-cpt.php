@@ -607,6 +607,19 @@ class Trek_CPT {
             .ya-json-alert { padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-size: 13px; display: none; }
             .ya-json-alert--success { background: #e6f6ec; color: #0a7a3b; border: 1px solid #a3e6be; }
             .ya-json-alert--error { background: #fde8e8; color: #9b1c1c; border: 1px solid #f8b4b4; }
+            /* Modern admin editor refinement */
+            .ya-admin-box,.ya-panel-left,.ya-panel-right,.ya-rep-item,.ya-inex-card{border-color:#dfe7e3;box-shadow:0 8px 24px rgba(2,47,46,.05)}
+            .ya-admin-box{padding:20px;background:#fff}
+            .ya-admin-field input[type="text"],.ya-admin-field input[type="number"],.ya-admin-field input[type="email"],.ya-admin-field input[type="url"],.ya-admin-field select,.ya-admin-field textarea,.ya-fact-card input,.ya-fact-card select{min-height:40px;border:1px solid #cfdad5;border-radius:8px;background:#fff;transition:border-color .18s ease,box-shadow .18s ease}
+            .ya-admin-field input:focus,.ya-admin-field select:focus,.ya-admin-field textarea:focus{border-color:#0b6b62;box-shadow:0 0 0 3px rgba(11,107,98,.10);outline:0}
+            .ya-admin-field label{color:#153b36}.ya-admin-field .description{color:#71807b;line-height:1.5}
+            .ya-rep-item{background:linear-gradient(180deg,#fff 0%,#fbfdfc 100%);border-radius:12px}
+            .ya-rep-head{padding-bottom:10px;border-bottom:1px solid #e8efec}
+            .ya-tax-checklist{border-color:#cfdad5;border-radius:8px}
+            .ya-json-quick-banner{box-shadow:0 10px 28px rgba(2,47,46,.14)}
+            .ya-admin-field input[type="checkbox"],.ya-admin-field input[type="radio"]{accent-color:#0b6b62}
+            @media (max-width:782px){.ya-admin-row,.ya-admin-row--3,.ya-admin-row--4{grid-template-columns:1fr}.ya-admin-box{padding:14px}.ya-hero-2col-layout,.ya-overview-grid,.ya-itin-3col{grid-template-columns:1fr}}
+
         </style>
 
         <script>
@@ -960,6 +973,57 @@ class Trek_CPT {
                     fieldsCount++;
                 }
 
+                // Hero slider images
+                const sliderImgs = hero.slider_images || data.hero_slider_images || [];
+                if (Array.isArray(sliderImgs) && sliderImgs.length) {
+                    const sliderContainer = document.getElementById('ya-hero-slider-image-rows');
+                    if (sliderContainer) {
+                        sliderContainer.innerHTML = '';
+                        sliderImgs.forEach((url, sIdx) => {
+                            if (!url) return;
+                            const index = Date.now() + '_' + sIdx;
+                            const row = document.createElement('div');
+                            row.className = 'ya-rep-item';
+                            row.style.cssText = 'display:flex; gap:10px; align-items:center; margin:8px 0;';
+                            row.innerHTML = `
+                                <img id="ya_hero_slide_preview_${index}" class="ya-img-preview" src="${url}" style="width:100px; height:64px; margin:0; object-fit:cover;">
+                                <input type="text" name="hero_slider_image[]" id="ya_hero_slide_image_${index}" value="${url}" placeholder="Upload or enter wide hero image URL" style="flex-grow:1;">
+                                <button type="button" class="button button-secondary" onclick="yaOpenMediaUploader(this, 'ya_hero_slide_image_${index}', 'ya_hero_slide_preview_${index}')">Choose Image</button>
+                                <button type="button" class="ya-btn-delete" onclick="this.closest('.ya-rep-item').remove()" aria-label="Remove slide image">✕</button>
+                            `;
+                            sliderContainer.appendChild(row);
+                        });
+                        fieldsCount += sliderImgs.length;
+                    }
+                }
+
+                // Taxonomies Auto-Select (Categories & Regions)
+                const catArray = Array.isArray(data.category) ? data.category : (Array.isArray(data.categories) ? data.categories : (data.category ? [data.category] : []));
+                if (catArray.length) {
+                    document.querySelectorAll('input[name="trek_category_ids[]"]').forEach(cb => {
+                        const labelText = (cb.parentElement.textContent || '').trim().toLowerCase();
+                        if (catArray.some(c => String(c).toLowerCase().trim() === labelText)) {
+                            cb.checked = true;
+                            fieldsCount++;
+                        }
+                    });
+                }
+                const regArray = Array.isArray(data.region) ? data.region : (Array.isArray(data.regions) ? data.regions : (data.region ? [data.region] : (data.country ? [data.country] : [])));
+                if (regArray.length) {
+                    document.querySelectorAll('input[name="trek_region_ids[]"]').forEach(cb => {
+                        const labelText = (cb.parentElement.textContent || '').trim().toLowerCase();
+                        const slug = (cb.getAttribute('data-slug') || '').toLowerCase();
+                        if (regArray.some(r => {
+                            const rClean = String(r).toLowerCase().trim();
+                            return rClean === labelText || rClean === slug;
+                        })) {
+                            cb.checked = true;
+                            cb.dispatchEvent(new Event('change', { bubbles: true }));
+                            fieldsCount++;
+                        }
+                    });
+                }
+
                 // Card fields
                 const card = data.card || {};
                 if (card.title || data.card_title) { yaSetFieldValue('trek_card_title', card.title || data.card_title); fieldsCount++; }
@@ -975,13 +1039,17 @@ class Trek_CPT {
 
                 // 3. Quick Facts
                 const facts = data.quick_facts || data.keyFacts || data.facts || {};
-                if (facts.high_point || facts.highestPoint || data.fact_high_point) { yaSetFieldValue('trek_fact_high_point', facts.high_point || facts.highestPoint || data.fact_high_point); fieldsCount++; }
-                if (facts.region || facts.destination || data.fact_region) { yaSetFieldValue('trek_fact_region', facts.region || facts.destination || data.fact_region); fieldsCount++; }
-                if (facts.trekking || facts.dailyWalking || data.fact_trekking) { yaSetFieldValue('trek_fact_trekking', facts.trekking || facts.dailyWalking || data.fact_trekking); fieldsCount++; }
-                if (facts.accom || facts.accommodation || data.fact_accom) { yaSetFieldValue('trek_fact_accom', facts.accom || facts.accommodation || data.fact_accom); fieldsCount++; }
+                if (facts.high_point || facts.highestPoint || facts.max_altitude || data.fact_high_point) { yaSetFieldValue('trek_fact_high_point', facts.high_point || facts.highestPoint || facts.max_altitude || data.fact_high_point); fieldsCount++; }
+                if (facts.low_point || facts.lowestPoint || facts.lowest_point || data.fact_low_point) { yaSetFieldValue('trek_fact_low_point', facts.low_point || facts.lowestPoint || facts.lowest_point || data.fact_low_point); fieldsCount++; }
+                if (facts.region || facts.destination || facts.location || data.fact_region) { yaSetFieldValue('trek_fact_region', facts.region || facts.destination || facts.location || data.fact_region); fieldsCount++; }
+                if (facts.trekking || facts.dailyWalking || facts.walking_hours || data.fact_trekking) { yaSetFieldValue('trek_fact_trekking', facts.trekking || facts.dailyWalking || facts.walking_hours || data.fact_trekking); fieldsCount++; }
+                if (facts.accom || facts.accommodation || facts.stay || data.fact_accom) { yaSetFieldValue('trek_fact_accom', facts.accom || facts.accommodation || facts.stay || data.fact_accom); fieldsCount++; }
                 if (facts.style || facts.tripStyle || data.fact_style) { yaSetFieldValue('trek_fact_style', facts.style || facts.tripStyle || data.fact_style); fieldsCount++; }
                 if (facts.season || facts.bestSeason || data.fact_season) { yaSetFieldValue('trek_fact_season', facts.season || facts.bestSeason || data.fact_season); fieldsCount++; }
                 if (facts.group_size || facts.groupSize || data.fact_group_size) { yaSetFieldValue('trek_fact_group_size', facts.group_size || facts.groupSize || data.fact_group_size); fieldsCount++; }
+                if (facts.distance || data.fact_distance) { yaSetFieldValue('trek_fact_distance', facts.distance || data.fact_distance); fieldsCount++; }
+                if (facts.start || facts.starting_point || data.fact_start) { yaSetFieldValue('trek_fact_start', facts.start || facts.starting_point || data.fact_start); fieldsCount++; }
+                if (facts.end || facts.ending_point || data.fact_end) { yaSetFieldValue('trek_fact_end', facts.end || facts.ending_point || data.fact_end); fieldsCount++; }
                 
                 const statusVal = (facts.status || data.status || 'open').toLowerCase();
                 const matchedRadio = document.querySelector('input[name="trek_trip_status"][value="' + statusVal + '"]');
@@ -1342,7 +1410,49 @@ class Trek_CPT {
                 if (contact.whatsapp || data.whatsapp_number) { yaSetFieldValue('trek_whatsapp_number', contact.whatsapp || data.whatsapp_number); fieldsCount++; }
                 if (contact.email || data.sales_email) { yaSetFieldValue('trek_sales_email', contact.email || data.sales_email); fieldsCount++; }
 
-                // 11. Maps, Geometry & Difficulty
+                // 10c. Departure Dates Repeater
+                const depDatesList = contact.departure_dates || data.departure_dates || data.departures || contact.departures || (contact && contact.dates) || [];
+                if (Array.isArray(depDatesList) && depDatesList.length) {
+                    const depContainer = document.getElementById('ya-dep-dates-rows');
+                    const depEmpty = document.getElementById('ya-dep-dates-empty');
+                    if (depContainer) {
+                        depContainer.innerHTML = '';
+                        if (depEmpty) depEmpty.style.display = 'none';
+                        depDatesList.forEach((dep, i) => {
+                            const d   = dep.date   || '';
+                            const p   = dep.price  || '';
+                            const s   = dep.seats  || '';
+                            const st  = dep.status || 'open';
+                            const n   = dep.note   || '';
+                            const statusOptions = [
+                                {v:'open',      l:'✅ Open'},
+                                {v:'limited',   l:'⚠️ Limited'},
+                                {v:'soldout',   l:'❌ Sold Out'},
+                                {v:'guaranteed',l:'🌟 Guaranteed'},
+                            ].map(o => `<option value="${o.v}"${st===o.v?' selected':''}>${o.l}</option>`).join('');
+                            const div = document.createElement('div');
+                            div.className = 'ya-rep-item';
+                            div.style.cssText = 'background:#fff;border:1px solid #c9e8d5;border-radius:6px;padding:12px;margin-bottom:10px;';
+                            div.innerHTML = `
+                                <div class="ya-rep-head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                    <span style="font-weight:600;color:#022f2e;font-size:13px;">🗓️ Departure: ${d}</span>
+                                    <button type="button" class="ya-btn-delete" onclick="this.closest('.ya-rep-item').remove()">✕ Remove</button>
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 140px;gap:12px;align-items:end;">
+                                    <div class="ya-admin-field"><label>Departure Date *</label><input type="date" name="dep_date[]" value="${d}" required></div>
+                                    <div class="ya-admin-field"><label>Price</label><input type="text" name="dep_price[]" value="${p.replace(/"/g,'&quot;')}" placeholder="e.g. USD 1,290"></div>
+                                    <div class="ya-admin-field"><label>Available Seats</label><input type="text" name="dep_seats[]" value="${s.replace(/"/g,'&quot;')}" placeholder="e.g. 8 places left"></div>
+                                    <div class="ya-admin-field"><label>Status</label><select name="dep_status[]">${statusOptions}</select></div>
+                                </div>
+                                <div class="ya-admin-field" style="margin-top:8px;"><label>Note / Extra Info</label><input type="text" name="dep_note[]" value="${n.replace(/"/g,'&quot;')}" placeholder="e.g. Group discount available"></div>
+                            `;
+                            depContainer.appendChild(div);
+                        });
+                        fieldsCount += depDatesList.length;
+                    }
+                }
+
+                // 12. Pricing
                 const mapEmbed = data.map_embed_code || (overview && overview.map_embed_code) || '';
                 if (mapEmbed) { yaSetFieldValue('trek_map_embed_code', mapEmbed); fieldsCount++; }
                 const mapFile = data.map_file_url || (overview && overview.map_file_url) || '';
@@ -2732,6 +2842,112 @@ class Trek_CPT {
                 <input type="email" name="trek_sales_email" value="<?php echo esc_attr( $email ); ?>" placeholder="sales@yetiadventure.com">
             </div>
         </div>
+
+        <?php
+        // Load saved departure dates
+        $dep_dates = get_post_meta( $post->ID, '_trek_departure_dates', true );
+        if ( empty( $dep_dates ) || ! is_array( $dep_dates ) ) {
+            $dep_dates = array();
+        }
+        ?>
+        <div class="ya-admin-box" style="background:#f0faf4; border:1px solid #a7d7be; border-radius:8px; padding:18px; margin-top:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <div>
+                    <h4 style="margin:0; color:#022f2e; font-size:14px;">📅 Fixed Departure Dates</h4>
+                    <p style="margin:4px 0 0; font-size:12px; color:#4a7c59;">Add specific departure dates shown on the trip page. Each date can have a price, available seats, and status.</p>
+                </div>
+                <button type="button" class="button button-primary button-small" id="ya-add-dep-date-btn">+ Add Departure Date</button>
+            </div>
+
+            <div id="ya-dep-dates-rows">
+                <?php foreach ( $dep_dates as $idx => $dep ) : ?>
+                <div class="ya-rep-item" style="background:#fff; border:1px solid #c9e8d5; border-radius:6px; padding:12px; margin-bottom:10px;">
+                    <div class="ya-rep-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-weight:600; color:#022f2e; font-size:13px;">🗓️ Departure: <?php echo esc_html( $dep['date'] ?? '' ); ?></span>
+                        <button type="button" class="ya-btn-delete" onclick="this.closest('.ya-rep-item').remove()">✕ Remove</button>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr 140px; gap:12px; align-items:end;">
+                        <div class="ya-admin-field">
+                            <label>Departure Date *</label>
+                            <input type="date" name="dep_date[]" value="<?php echo esc_attr( $dep['date'] ?? '' ); ?>" required>
+                        </div>
+                        <div class="ya-admin-field">
+                            <label>Price (e.g. USD 1,290)</label>
+                            <input type="text" name="dep_price[]" value="<?php echo esc_attr( $dep['price'] ?? '' ); ?>" placeholder="e.g. USD 1,290">
+                        </div>
+                        <div class="ya-admin-field">
+                            <label>Available Seats</label>
+                            <input type="text" name="dep_seats[]" value="<?php echo esc_attr( $dep['seats'] ?? '' ); ?>" placeholder="e.g. 8 places left">
+                        </div>
+                        <div class="ya-admin-field">
+                            <label>Status</label>
+                            <select name="dep_status[]">
+                                <option value="open" <?php selected( $dep['status'] ?? 'open', 'open' ); ?>>✅ Open</option>
+                                <option value="limited" <?php selected( $dep['status'] ?? '', 'limited' ); ?>>⚠️ Limited</option>
+                                <option value="soldout" <?php selected( $dep['status'] ?? '', 'soldout' ); ?>>❌ Sold Out</option>
+                                <option value="guaranteed" <?php selected( $dep['status'] ?? '', 'guaranteed' ); ?>>🌟 Guaranteed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ya-admin-field" style="margin-top:8px;">
+                        <label>Note / Extra Info <span style="font-weight:400; color:#888;">(optional)</span></label>
+                        <input type="text" name="dep_note[]" value="<?php echo esc_attr( $dep['note'] ?? '' ); ?>" placeholder="e.g. Includes Annapurna permit, group discount available">
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <?php if ( empty( $dep_dates ) ) : ?>
+            <p id="ya-dep-dates-empty" style="color:#888; font-size:13px; font-style:italic; text-align:center; padding:16px 0; margin:0;">No departure dates added yet. Click "Add Departure Date" to add the first one.</p>
+            <?php else : ?>
+            <p id="ya-dep-dates-empty" style="display:none;"></p>
+            <?php endif; ?>
+        </div>
+
+        <script>
+        document.getElementById('ya-add-dep-date-btn')?.addEventListener('click', function() {
+            const container = document.getElementById('ya-dep-dates-rows');
+            const empty = document.getElementById('ya-dep-dates-empty');
+            if (empty) empty.style.display = 'none';
+            const div = document.createElement('div');
+            div.className = 'ya-rep-item';
+            div.style.cssText = 'background:#fff; border:1px solid #c9e8d5; border-radius:6px; padding:12px; margin-bottom:10px;';
+            div.innerHTML = `
+                <div class="ya-rep-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-weight:600; color:#022f2e; font-size:13px;">🗓️ New Departure Date</span>
+                    <button type="button" class="ya-btn-delete" onclick="this.closest('.ya-rep-item').remove()">✕ Remove</button>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr 140px; gap:12px; align-items:end;">
+                    <div class="ya-admin-field">
+                        <label>Departure Date *</label>
+                        <input type="date" name="dep_date[]" required>
+                    </div>
+                    <div class="ya-admin-field">
+                        <label>Price (e.g. USD 1,290)</label>
+                        <input type="text" name="dep_price[]" placeholder="e.g. USD 1,290">
+                    </div>
+                    <div class="ya-admin-field">
+                        <label>Available Seats</label>
+                        <input type="text" name="dep_seats[]" placeholder="e.g. 8 places left">
+                    </div>
+                    <div class="ya-admin-field">
+                        <label>Status</label>
+                        <select name="dep_status[]">
+                            <option value="open" selected>✅ Open</option>
+                            <option value="limited">⚠️ Limited</option>
+                            <option value="soldout">❌ Sold Out</option>
+                            <option value="guaranteed">🌟 Guaranteed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ya-admin-field" style="margin-top:8px;">
+                    <label>Note / Extra Info <span style="font-weight:400; color:#888;">(optional)</span></label>
+                    <input type="text" name="dep_note[]" placeholder="e.g. Includes Annapurna permit, group discount available">
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        </script>
         <?php
     }
 
@@ -3093,13 +3309,16 @@ class Trek_CPT {
         );
 
         foreach ( $text_fields as $f ) {
-            if ( isset( $_POST[ $f ] ) ) {
-                $value = sanitize_text_field( $_POST[ $f ] );
-                if ( '' === trim( $value ) ) {
-                    delete_post_meta( $post_id, '_' . $f );
-                } else {
-                    update_post_meta( $post_id, '_' . $f, $value );
-                }
+            if ( ! isset( $_POST[ $f ] ) || is_array( $_POST[ $f ] ) ) {
+                continue;
+            }
+
+            $value = sanitize_text_field( wp_unslash( $_POST[ $f ] ) );
+
+            if ( '' === trim( $value ) ) {
+                delete_post_meta( $post_id, '_' . $f );
+            } else {
+                update_post_meta( $post_id, '_' . $f, $value );
             }
         }
 
@@ -3143,7 +3362,7 @@ class Trek_CPT {
 
         // Textarea fields
         if ( isset( $_POST['trek_hero_subtitle'] ) ) {
-            $value = sanitize_textarea_field( $_POST['trek_hero_subtitle'] );
+            $value = sanitize_textarea_field( wp_unslash( $_POST['trek_hero_subtitle'] ) );
             if ( '' === trim( $value ) ) {
                 delete_post_meta( $post_id, '_trek_hero_subtitle' );
             } else {
@@ -3153,7 +3372,8 @@ class Trek_CPT {
 
         // Interactive Map Embed Code (HTML / iFrame / Mapbox / Leaflet)
         if ( isset( $_POST['trek_map_embed_code'] ) ) {
-            $embed_code = current_user_can( 'unfiltered_html' ) ? $_POST['trek_map_embed_code'] : wp_kses_post( $_POST['trek_map_embed_code'] );
+            $raw_embed = wp_unslash( $_POST['trek_map_embed_code'] );
+            $embed_code = current_user_can( 'unfiltered_html' ) ? $raw_embed : wp_kses_post( $raw_embed );
             if ( '' === trim( $embed_code ) ) {
                 delete_post_meta( $post_id, '_trek_map_embed_code' );
             } else {
@@ -3200,8 +3420,22 @@ class Trek_CPT {
 
             for ( $i = 0; $i < count( $titles ); $i++ ) {
                 if ( ! empty( trim( $titles[ $i ] ) ) ) {
-                    $gal_str = $galleries[ $i ] ?? '';
-                    $gal_arr = array_values( array_filter( array_map( 'esc_url_raw', array_map( 'trim', explode( ',', $gal_str ) ) ) ) );
+                    $gal_raw = $galleries[ $i ] ?? '';
+                    $gal_arr = array();
+                    $gal_values = is_array( $gal_raw )
+                        ? $gal_raw
+                        : ( is_string( $gal_raw ) ? preg_split( '/\s*,\s*/', trim( $gal_raw ), -1, PREG_SPLIT_NO_EMPTY ) : array() );
+
+                    foreach ( $gal_values as $gal_url ) {
+                        if ( ! is_string( $gal_url ) ) {
+                            continue;
+                        }
+                        $gal_url = esc_url_raw( trim( $gal_url ) );
+                        if ( '' !== $gal_url ) {
+                            $gal_arr[] = $gal_url;
+                        }
+                    }
+                    $gal_arr = array_values( array_unique( $gal_arr ) );
                     $itinerary[] = array(
                         'day'     => sanitize_text_field( $days[ $i ] ?? sprintf( '%02d', $i + 1 ) ),
                         'stage'   => sanitize_text_field( $stages[ $i ] ?? '' ),
@@ -3399,6 +3633,37 @@ class Trek_CPT {
         } else {
             delete_post_meta( $post_id, '_trek_curated_reviews' );
             delete_post_meta( $post_id, '_trek_reviews_list' );
+        }
+
+        // 10b. Fixed Departure Dates Repeater (_trek_departure_dates)
+        if ( isset( $_POST['dep_date'] ) && is_array( $_POST['dep_date'] ) ) {
+            $departure_dates = array();
+            $dep_dates_arr   = $_POST['dep_date'];
+            $dep_prices      = $_POST['dep_price'] ?? array();
+            $dep_seats       = $_POST['dep_seats'] ?? array();
+            $dep_statuses    = $_POST['dep_status'] ?? array();
+            $dep_notes       = $_POST['dep_note'] ?? array();
+
+            for ( $i = 0; $i < count( $dep_dates_arr ); $i++ ) {
+                $d = sanitize_text_field( $dep_dates_arr[ $i ] ?? '' );
+                if ( ! empty( $d ) ) {
+                    $departure_dates[] = array(
+                        'date'   => $d,
+                        'price'  => sanitize_text_field( $dep_prices[ $i ] ?? '' ),
+                        'seats'  => sanitize_text_field( $dep_seats[ $i ] ?? '' ),
+                        'status' => sanitize_text_field( $dep_statuses[ $i ] ?? 'open' ),
+                        'note'   => sanitize_text_field( $dep_notes[ $i ] ?? '' ),
+                    );
+                }
+            }
+
+            if ( empty( $departure_dates ) ) {
+                delete_post_meta( $post_id, '_trek_departure_dates' );
+            } else {
+                update_post_meta( $post_id, '_trek_departure_dates', $departure_dates );
+            }
+        } else {
+            delete_post_meta( $post_id, '_trek_departure_dates' );
         }
 
         // 11. Sync Quick Facts Array (_trek_quick_facts)

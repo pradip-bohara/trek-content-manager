@@ -22,6 +22,34 @@ class Trek_Importer {
         add_action( 'wp_ajax_trek_download_sample_json', array( __CLASS__, 'ajax_download_sample_json' ) );
     }
 
+    private static function scalar_text( $value, $default = '' ) {
+        return is_scalar( $value ) ? sanitize_text_field( (string) $value ) : $default;
+    }
+
+    private static function safe_url( $value ) {
+        return is_string( $value ) ? esc_url_raw( trim( $value ) ) : '';
+    }
+
+    private static function term_id( $term ) {
+        if ( is_array( $term ) && isset( $term['term_id'] ) ) {
+            return absint( $term['term_id'] );
+        }
+        return is_numeric( $term ) ? absint( $term ) : 0;
+    }
+
+    private static function get_or_create_term_id( $name, $taxonomy, $create = false ) {
+        $name = self::scalar_text( $name );
+        if ( '' === $name ) {
+            return 0;
+        }
+
+        $term_id = self::term_id( term_exists( $name, $taxonomy ) );
+        if ( ! $term_id && $create ) {
+            $term_id = self::term_id( wp_insert_term( $name, $taxonomy ) );
+        }
+        return $term_id;
+    }
+
     public static function add_admin_menu() {
         add_submenu_page(
             'edit.php?post_type=trek_destination',
@@ -428,126 +456,161 @@ class Trek_Importer {
                                 <td><code>string</code></td>
                                 <td><span class="ya-badge ya-badge-req">Required</span></td>
                                 <td><span class="ya-badge ya-badge-meta">post_title</span></td>
-                                <td>Main destination title. E.g. <code>"The Ultimate Everest Base Camp Experience"</code></td>
+                                <td>Main destination post title. E.g. <code>"The Ultimate Everest Base Camp Experience"</code></td>
                             </tr>
                             <tr>
                                 <td><strong>slug</strong></td>
                                 <td><code>string</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
                                 <td><span class="ya-badge ya-badge-meta">post_name</span></td>
-                                <td>URL permalink slug. E.g. <code>"everest-basecamp-trek"</code></td>
+                                <td>URL permalink slug. E.g. <code>"everest-base-camp-experience"</code></td>
                             </tr>
                             <tr>
-                                <td><strong>excerpt</strong> / card_excerpt</td>
+                                <td><strong>excerpt</strong></td>
                                 <td><code>string</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
-                                <td><span class="ya-badge ya-badge-meta">_trek_card_excerpt</span></td>
-                                <td>Card short description shown on listing grid and carousel cards.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>overview</strong> / description / content</td>
-                                <td><code>string (HTML)</code></td>
-                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
-                                <td><span class="ya-badge ya-badge-meta">post_content</span></td>
-                                <td>Full rich text narrative overview for the single trek page.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>days</strong> / duration / hero_days</td>
-                                <td><code>number | string</code></td>
-                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
-                                <td><span class="ya-badge ya-badge-meta">_trek_hero_days</span></td>
-                                <td>Number of days or string duration badge. E.g. <code>15</code> or <code>"15 Days"</code></td>
+                                <td><span class="ya-badge ya-badge-meta">post_excerpt</span></td>
+                                <td>Short post excerpt / teaser summary.</td>
                             </tr>
                             <tr>
                                 <td><strong>category</strong> / categories</td>
                                 <td><code>string | array</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
                                 <td><span class="ya-badge ya-badge-meta">trek_category</span></td>
-                                <td>Categories. E.g. <code>["Trekking", "Himalayan"]</code> or <code>"Culture"</code></td>
+                                <td>Taxonomy terms. E.g. <code>["Trekking", "Himalayan", "Signature Journey"]</code></td>
                             </tr>
                             <tr>
                                 <td><strong>region</strong> / country</td>
                                 <td><code>string | array</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
                                 <td><span class="ya-badge ya-badge-meta">trek_region</span></td>
-                                <td>Country / Region name. E.g. <code>"Nepal"</code> or <code>["Nepal", "Everest"]</code></td>
+                                <td>Taxonomy terms. E.g. <code>["Nepal"]</code></td>
                             </tr>
                             <tr>
-                                <td><strong>hero_image</strong> / bg_image</td>
-                                <td><code>string (URL)</code></td>
-                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
-                                <td><span class="ya-badge ya-badge-meta">_trek_hero_bg_img</span></td>
-                                <td>High-resolution hero header background image URL.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>card_image</strong> / image / thumbnail</td>
-                                <td><code>string (URL)</code></td>
-                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
-                                <td><span class="ya-badge ya-badge-meta">_trek_card_image_url</span></td>
-                                <td>Card thumbnail URL. Will also be set as WordPress Featured Image.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>tag</strong> / tag_label / card_tag</td>
+                                <td><strong>difficulty</strong></td>
                                 <td><code>string</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
-                                <td><span class="ya-badge ya-badge-meta">_trek_card_tag</span></td>
-                                <td>Pill tag displayed on card. E.g. <code>"Nepal · Signature Trek"</code></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_difficulty</span></td>
+                                <td>Difficulty level: <code>"Easy"</code>, <code>"Moderate"</code>, <code>"Demanding"</code>, <code>"Strenuous"</code>, <code>"Challenging"</code>, <code>"Technical"</code>.</td>
                             </tr>
                             <tr>
                                 <td><strong>featured</strong> / is_featured</td>
                                 <td><code>boolean | number</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
                                 <td><span class="ya-badge ya-badge-meta">_trek_is_featured</span></td>
-                                <td>Set <code>true</code> or <code>1</code> to highlight in featured carousel and signature journeys.</td>
+                                <td>Set <code>true</code> or <code>1</code> to highlight in featured sliders and homepage showcase.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>hero</strong></td>
+                                <td><code>object</code></td>
+                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_hero_*</span></td>
+                                <td>Hero section object: <code>script_title</code>, <code>title</code>, <code>kicker</code>, <code>subtitle</code>, <code>days</code>, <code>badge_sub</code>, <code>image</code>, <code>slider_images[]</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>card</strong></td>
+                                <td><code>object</code></td>
+                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_card_*</span></td>
+                                <td>Card display settings: <code>title</code>, <code>meta</code> (duration pill), <code>tag</code>, <code>kicker</code>, <code>excerpt</code>, <code>image</code>, <code>order</code>.</td>
                             </tr>
                             <tr>
                                 <td><strong>quick_facts</strong></td>
                                 <td><code>object</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
                                 <td><span class="ya-badge ya-badge-meta">_trek_quick_facts</span></td>
-                                <td>Object with keys: <code>max_altitude</code>, <code>destination</code>, <code>daily_walking</code>, <code>accommodation</code>, <code>style</code>, <code>season</code>, <code>group_size</code>.</td>
+                                <td>Trip specifications: <code>high_point</code>, <code>low_point</code>, <code>region</code>, <code>season</code>, <code>group_size</code>, <code>trekking</code>, <code>accom</code>, <code>style</code>, <code>distance</code>, <code>start</code>, <code>end</code>, <code>status</code>, <code>price</code>, <code>currency</code>.</td>
                             </tr>
                             <tr>
-                                <td><strong>highlights</strong></td>
-                                <td><code>array of strings</code></td>
+                                <td><strong>overview</strong></td>
+                                <td><code>object | string</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
-                                <td><span class="ya-badge ya-badge-meta">_trek_highlights</span></td>
-                                <td>List of journey bullet point highlights.</td>
+                                <td><span class="ya-badge ya-badge-meta">post_content & meta</span></td>
+                                <td>Overview section: <code>content</code> (WYSIWYG), <code>kicker</code>, <code>script</code>, <code>heading</code>, <code>subheading</code>, <code>highlight</code>, <code>highlights[]</code>, <code>route_img</code>, <code>map_file_url</code>, <code>map_embed_code</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>itinerary_section</strong></td>
+                                <td><code>object</code></td>
+                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_itin_*</span></td>
+                                <td>Itinerary section header settings: <code>kicker</code>, <code>script</code>, <code>heading</code>, <code>subtext</code>.</td>
                             </tr>
                             <tr>
                                 <td><strong>itinerary</strong></td>
                                 <td><code>array of objects</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
                                 <td><span class="ya-badge ya-badge-meta">_trek_itinerary</span></td>
-                                <td>Day-by-day itinerary. Keys per day: <code>day</code>, <code>title</code>, <code>description</code>, <code>altitude</code>, <code>walking_hours</code>, <code>stay</code>, <code>meals</code>.</td>
+                                <td>Day-by-day trail stages. Keys per day: <code>day</code>, <code>stage</code>, <code>title</code>, <code>description</code>, <code>pills</code>, <code>altitude</code>, <code>walking_hours</code>, <code>stay</code>, <code>meals</code>, <code>gallery[]</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>inex</strong> / inclusions_section</td>
+                                <td><code>object</code></td>
+                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_inex_*</span></td>
+                                <td>Inclusions & Exclusions section headers: <code>kicker</code>, <code>script</code>, <code>heading</code>, <code>subtext</code>.</td>
                             </tr>
                             <tr>
                                 <td><strong>inclusions</strong></td>
-                                <td><code>array of strings</code></td>
+                                <td><code>array of objects | strings</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
                                 <td><span class="ya-badge ya-badge-meta">_trek_inclusions</span></td>
-                                <td>What is included in this journey.</td>
+                                <td>Included items. Array of objects: <code>[{"title": "...", "desc": "..."}]</code> or array of strings.</td>
                             </tr>
                             <tr>
                                 <td><strong>exclusions</strong></td>
-                                <td><code>array of strings</code></td>
+                                <td><code>array of objects | strings</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
                                 <td><span class="ya-badge ya-badge-meta">_trek_exclusions</span></td>
-                                <td>What is not included in this journey.</td>
+                                <td>Excluded items. Array of objects: <code>[{"title": "...", "desc": "..."}]</code> or array of strings.</td>
                             </tr>
                             <tr>
                                 <td><strong>gallery</strong></td>
-                                <td><code>array of strings</code></td>
+                                <td><code>object | array</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
-                                <td><span class="ya-badge ya-badge-meta">_trek_gallery_images</span></td>
-                                <td>Array of photo URLs for the interactive journey photo gallery.</td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_gallery_*</span></td>
+                                <td>Photo gallery section with <code>kicker</code>, <code>script</code>, <code>heading</code>, <code>subtext</code>, and <code>images[]</code> (array of URLs or <code>{"url", "label"}</code>).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>essential</strong></td>
+                                <td><code>object</code></td>
+                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_ess_*</span></td>
+                                <td>Essential info section: <code>kicker</code>, <code>script</code>, <code>heading</code>, <code>intro</code>, <code>card_title</code>, <code>card_desc</code>, <code>card_btn</code>, <code>card_email</code>.</td>
                             </tr>
                             <tr>
                                 <td><strong>faqs</strong></td>
                                 <td><code>array of objects</code></td>
                                 <td><span class="ya-badge ya-badge-opt">Optional</span></td>
                                 <td><span class="ya-badge ya-badge-meta">_trek_faqs</span></td>
-                                <td>Array of FAQ items: <code>[{"question": "...", "answer": "..."}]</code></td>
+                                <td>Interactive accordion FAQs: <code>[{"question": "...", "answer": "..."}]</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>reviews_section</strong> / reviews</td>
+                                <td><code>object | array</code></td>
+                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_review_*</span></td>
+                                <td>Reviews section header & curated testimonials: <code>[{"name": "...", "location": "...", "rating": "5", "quote": "..."}]</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>contact</strong></td>
+                                <td><code>object</code></td>
+                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_dep_*</span></td>
+                                <td>Booking & WhatsApp settings: <code>dep_kicker</code>, <code>dep_script</code>, <code>dep_heading</code>, <code>dep_subtext</code>, <code>box_title</code>, <code>box_desc</code>, <code>box_photo</code>, <code>box_note</code>, <code>whatsapp</code>, <code>email</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>departures</strong></td>
+                                <td><code>array of objects</code></td>
+                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_dep_dates</span></td>
+                                <td>Fixed departure schedules: <code>[{"date": "2026-03-15", "price": "2850", "currency": "USD", "seats": 8, "status": "open", "note": "..."}]</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>pricing</strong></td>
+                                <td><code>object</code></td>
+                                <td><span class="ya-badge ya-badge-opt">Optional</span></td>
+                                <td><span class="ya-badge ya-badge-meta">_trek_price / currency</span></td>
+                                <td>Pricing details: <code>{"price": "2850", "currency": "USD"}</code></td>
                             </tr>
                         </tbody>
                     </table>
@@ -710,7 +773,8 @@ class Trek_Importer {
 
         $update_existing = ! empty( $_POST['update_existing'] );
         $create_terms    = ! empty( $_POST['create_terms'] );
-        $publish_status  = ! empty( $_POST['publish_immediately'] ) ? 'publish' : 'draft';
+        $publish_requested = ! empty( $_POST['publish_immediately'] );
+        $publish_status = ( $publish_requested && current_user_can( 'publish_posts' ) ) ? 'publish' : 'draft';
 
         $created_count = 0;
         $updated_count = 0;
@@ -748,8 +812,31 @@ class Trek_Importer {
                 }
             }
 
-            $content = ! empty( $item['overview'] ) ? wp_kses_post( $item['overview'] ) : ( ! empty( $item['description'] ) ? wp_kses_post( $item['description'] ) : ( ! empty( $item['content'] ) ? wp_kses_post( $item['content'] ) : '' ) );
-            $excerpt = ! empty( $item['excerpt'] ) ? sanitize_textarea_field( $item['excerpt'] ) : ( ! empty( $item['card_excerpt'] ) ? sanitize_textarea_field( $item['card_excerpt'] ) : '' );
+            // Extract post_content safely from overview object/string, description, or content
+            $raw_content = '';
+            if ( ! empty( $item['overview'] ) ) {
+                if ( is_array( $item['overview'] ) ) {
+                    $raw_content = $item['overview']['content'] ?? ( $item['overview']['description'] ?? ( $item['overview']['highlight'] ?? '' ) );
+                } else {
+                    $raw_content = $item['overview'];
+                }
+            } elseif ( ! empty( $item['description'] ) ) {
+                $raw_content = is_array( $item['description'] ) ? ( $item['description']['content'] ?? '' ) : $item['description'];
+            } elseif ( ! empty( $item['content'] ) ) {
+                $raw_content = is_array( $item['content'] ) ? ( $item['content']['content'] ?? '' ) : $item['content'];
+            }
+            $content = is_string( $raw_content ) ? wp_kses_post( $raw_content ) : '';
+
+            // Extract post_excerpt safely
+            $raw_excerpt = '';
+            if ( ! empty( $item['excerpt'] ) ) {
+                $raw_excerpt = is_array( $item['excerpt'] ) ? ( $item['excerpt']['text'] ?? '' ) : $item['excerpt'];
+            } elseif ( ! empty( $item['card_excerpt'] ) ) {
+                $raw_excerpt = is_array( $item['card_excerpt'] ) ? '' : $item['card_excerpt'];
+            } elseif ( ! empty( $item['card']['excerpt'] ) ) {
+                $raw_excerpt = is_array( $item['card']['excerpt'] ) ? '' : $item['card']['excerpt'];
+            }
+            $excerpt = is_string( $raw_excerpt ) ? sanitize_textarea_field( $raw_excerpt ) : '';
 
             $post_args = array(
                 'post_type'    => 'trek_destination',
@@ -781,12 +868,9 @@ class Trek_Importer {
                 foreach ( $cat_array as $cat_name ) {
                     $cat_name = sanitize_text_field( $cat_name );
                     if ( empty( $cat_name ) ) continue;
-                    $term = term_exists( $cat_name, 'trek_category' );
-                    if ( ! $term && $create_terms ) {
-                        $term = wp_insert_term( $cat_name, 'trek_category' );
-                    }
-                    if ( ! is_wp_error( $term ) && ! empty( $term['term_id'] ) ) {
-                        $cat_ids[] = (int) $term['term_id'];
+                    $term_id = self::get_or_create_term_id( $cat_name, 'trek_category', $create_terms );
+                    if ( $term_id ) {
+                        $cat_ids[] = $term_id;
                     }
                 }
                 if ( ! empty( $cat_ids ) ) {
@@ -802,12 +886,9 @@ class Trek_Importer {
                 foreach ( $reg_array as $reg_name ) {
                     $reg_name = sanitize_text_field( $reg_name );
                     if ( empty( $reg_name ) ) continue;
-                    $term = term_exists( $reg_name, 'trek_region' );
-                    if ( ! $term && $create_terms ) {
-                        $term = wp_insert_term( $reg_name, 'trek_region' );
-                    }
-                    if ( ! is_wp_error( $term ) && ! empty( $term['term_id'] ) ) {
-                        $reg_ids[] = (int) $term['term_id'];
+                    $term_id = self::get_or_create_term_id( $reg_name, 'trek_region', $create_terms );
+                    if ( $term_id ) {
+                        $reg_ids[] = $term_id;
                     }
                 }
                 if ( ! empty( $reg_ids ) ) {
@@ -816,18 +897,80 @@ class Trek_Importer {
             }
 
             // 3. Post Meta - Hero & Card
-            $days = ! empty( $item['days'] ) ? $item['days'] : ( ! empty( $item['duration'] ) ? $item['duration'] : ( ! empty( $item['hero_days'] ) ? $item['hero_days'] : '12 Days' ) );
-            $days_clean = is_numeric( $days ) ? $days . ' Days' : sanitize_text_field( $days );
-            update_post_meta( $post_id, '_trek_hero_days', $days_clean );
-            update_post_meta( $post_id, '_trek_card_meta', $days_clean );
+            // Resolve days from hero object, top-level, or fallback
+            $hero_obj = is_array( $item['hero'] ?? null ) ? $item['hero'] : array();
+            $card_obj = is_array( $item['card'] ?? null ) ? $item['card'] : array();
 
-            if ( ! empty( $item['hero_image'] ) || ! empty( $item['bg_image'] ) ) {
-                $hero_img = esc_url_raw( ! empty( $item['hero_image'] ) ? $item['hero_image'] : $item['bg_image'] );
-                update_post_meta( $post_id, '_trek_hero_bg_img', $hero_img );
+            $days = ! empty( $hero_obj['days'] ) ? $hero_obj['days'] : ( ! empty( $item['days'] ) ? $item['days'] : ( ! empty( $item['duration'] ) ? $item['duration'] : ( ! empty( $item['hero_days'] ) ? $item['hero_days'] : '' ) ) );
+            $days_clean = ! empty( $days ) ? ( is_numeric( $days ) ? $days . ' Days' : sanitize_text_field( $days ) ) : '';
+            if ( ! empty( $days_clean ) ) {
+                update_post_meta( $post_id, '_trek_hero_days', $days_clean );
             }
-            if ( ! empty( $item['card_image'] ) || ! empty( $item['image'] ) || ! empty( $item['thumbnail'] ) ) {
-                $card_img = esc_url_raw( ! empty( $item['card_image'] ) ? $item['card_image'] : ( ! empty( $item['image'] ) ? $item['image'] : $item['thumbnail'] ) );
-                update_post_meta( $post_id, '_trek_card_image_url', $card_img );
+
+            // Hero sub-fields from hero{} object
+            if ( ! empty( $hero_obj['script_title'] ) || ! empty( $item['script_title'] ) ) {
+                update_post_meta( $post_id, '_trek_script_title', sanitize_text_field( $hero_obj['script_title'] ?? $item['script_title'] ) );
+            }
+            if ( ! empty( $hero_obj['title'] ) || ! empty( $item['hero_title'] ) ) {
+                update_post_meta( $post_id, '_trek_hero_title', sanitize_text_field( $hero_obj['title'] ?? $item['hero_title'] ) );
+            }
+            if ( ! empty( $hero_obj['kicker'] ) || ! empty( $item['hero_kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_hero_kicker', sanitize_text_field( $hero_obj['kicker'] ?? $item['hero_kicker'] ) );
+            }
+            if ( ! empty( $hero_obj['subtitle'] ) || ! empty( $item['hero_subtitle'] ) || ! empty( $item['subtitle'] ) ) {
+                update_post_meta( $post_id, '_trek_hero_subtitle', sanitize_textarea_field( $hero_obj['subtitle'] ?? $item['hero_subtitle'] ?? $item['subtitle'] ) );
+            }
+            if ( ! empty( $hero_obj['badge_sub'] ) || ! empty( $item['hero_badge_sub'] ) ) {
+                update_post_meta( $post_id, '_trek_hero_badge_sub', sanitize_text_field( $hero_obj['badge_sub'] ?? $item['hero_badge_sub'] ) );
+            }
+
+            // Hero slider gallery images
+            $slider_imgs_raw = $hero_obj['slider_images'] ?? ( $item['hero_slider_images'] ?? array() );
+            if ( is_string( $slider_imgs_raw ) ) {
+                $slider_imgs_raw = preg_split( '/\s*,\s*/', trim( $slider_imgs_raw ), -1, PREG_SPLIT_NO_EMPTY );
+            }
+            if ( is_array( $slider_imgs_raw ) ) {
+                $slider_imgs_clean = array();
+                foreach ( $slider_imgs_raw as $slider_url ) {
+                    $slider_url = self::safe_url( $slider_url );
+                    if ( '' !== $slider_url ) {
+                        $slider_imgs_clean[] = $slider_url;
+                    }
+                }
+                $slider_imgs_clean = array_values( array_unique( $slider_imgs_clean ) );
+                if ( ! empty( $slider_imgs_clean ) ) {
+                    update_post_meta( $post_id, '_trek_hero_slider_images', $slider_imgs_clean );
+                } else {
+                    delete_post_meta( $post_id, '_trek_hero_slider_images' );
+                }
+            }
+
+            // Hero background image: from hero{} or top-level
+            $hero_img_url = ! empty( $hero_obj['image'] ) ? $hero_obj['image'] : ( ! empty( $item['hero_image'] ) ? $item['hero_image'] : ( ! empty( $item['bg_image'] ) ? $item['bg_image'] : '' ) );
+            if ( ! empty( $hero_img_url ) ) {
+                update_post_meta( $post_id, '_trek_hero_bg_img', self::safe_url( $hero_img_url ) );
+            }
+
+            // Card image: from card{} or top-level
+            $card_img_url = ! empty( $card_obj['image'] ) ? $card_obj['image'] : ( ! empty( $item['card_image'] ) ? $item['card_image'] : ( ! empty( $item['image'] ) ? $item['image'] : ( ! empty( $item['thumbnail'] ) ? $item['thumbnail'] : '' ) ) );
+            if ( ! empty( $card_img_url ) ) {
+                update_post_meta( $post_id, '_trek_card_image_url', self::safe_url( $card_img_url ) );
+            }
+
+            // Card sub-fields from card{} object
+            $card_title = ! empty( $card_obj['title'] ) ? $card_obj['title'] : ( ! empty( $item['card_title'] ) ? $item['card_title'] : '' );
+            if ( ! empty( $card_title ) ) {
+                update_post_meta( $post_id, '_trek_card_title', sanitize_text_field( $card_title ) );
+            }
+            $card_meta = ! empty( $card_obj['meta'] ) ? $card_obj['meta'] : $days_clean;
+            if ( ! empty( $card_meta ) ) {
+                update_post_meta( $post_id, '_trek_card_meta', sanitize_text_field( $card_meta ) );
+            }
+            if ( ! empty( $card_obj['kicker'] ) || ! empty( $item['card_kicker'] ) ) {
+                update_post_meta( $post_id, '_trek_card_kicker', sanitize_text_field( $card_obj['kicker'] ?? $item['card_kicker'] ) );
+            }
+            if ( isset( $card_obj['order'] ) || isset( $item['card_order'] ) ) {
+                update_post_meta( $post_id, '_trek_card_order', intval( $card_obj['order'] ?? $item['card_order'] ) );
             }
 
             if ( ! empty( $item['tag'] ) || ! empty( $item['tag_label'] ) || ! empty( $item['card_tag'] ) ) {
@@ -861,12 +1004,9 @@ class Trek_Importer {
             $difficulty = ! empty( $item['difficulty'] ) ? sanitize_text_field( $item['difficulty'] ) : ( ! empty( $item['quick_facts']['difficulty'] ) ? sanitize_text_field( $item['quick_facts']['difficulty'] ) : '' );
             if ( ! empty( $difficulty ) ) {
                 update_post_meta( $post_id, '_trek_difficulty', $difficulty );
-                $diff_term = term_exists( $difficulty, 'trek_difficulty' );
-                if ( ! $diff_term && $create_terms ) {
-                    $diff_term = wp_insert_term( $difficulty, 'trek_difficulty' );
-                }
-                if ( ! is_wp_error( $diff_term ) && ! empty( $diff_term['term_id'] ) ) {
-                    wp_set_object_terms( $post_id, array( (int) $diff_term['term_id'] ), 'trek_difficulty' );
+                $diff_term_id = self::get_or_create_term_id( $difficulty, 'trek_difficulty', $create_terms );
+                if ( $diff_term_id ) {
+                    wp_set_object_terms( $post_id, array( $diff_term_id ), 'trek_difficulty' );
                 } else {
                     wp_set_object_terms( $post_id, array( $difficulty ), 'trek_difficulty' );
                 }
@@ -880,28 +1020,39 @@ class Trek_Importer {
             $currency = ! empty( $item['currency'] ) ? sanitize_text_field( $item['currency'] ) : ( ! empty( $item['quick_facts']['currency'] ) ? sanitize_text_field( $item['quick_facts']['currency'] ) : 'USD' );
             update_post_meta( $post_id, '_trek_currency', $currency );
 
-            // 4. Quick Facts
-            $high_pt = sanitize_text_field( $item['quick_facts']['max_altitude'] ?? $item['quick_facts']['high_point'] ?? '' );
-            $dest    = sanitize_text_field( $item['quick_facts']['destination'] ?? $item['quick_facts']['location'] ?? '' );
-            $walk    = sanitize_text_field( $item['quick_facts']['daily_walking'] ?? $item['quick_facts']['walking_hours'] ?? '' );
-            $accom   = sanitize_text_field( $item['quick_facts']['accommodation'] ?? $item['quick_facts']['stay'] ?? '' );
-            $style   = sanitize_text_field( $item['quick_facts']['style'] ?? $item['quick_facts']['travel_style'] ?? '' );
-            $season  = sanitize_text_field( $item['quick_facts']['season'] ?? $item['quick_facts']['best_season'] ?? '' );
-            $group   = sanitize_text_field( $item['quick_facts']['group_size'] ?? '' );
+            // 4. Quick Facts — full mapping including new fields (low_point, start, end, distance, status)
+            $qf      = is_array( $item['quick_facts'] ?? null ) ? $item['quick_facts'] : array();
+            $high_pt = sanitize_text_field( $qf['high_point'] ?? $qf['max_altitude'] ?? $qf['highest_point'] ?? '' );
+            $low_pt  = sanitize_text_field( $qf['low_point']  ?? $qf['lowest_point']  ?? '' );
+            $dest    = sanitize_text_field( $qf['region']      ?? $qf['destination']   ?? $qf['location'] ?? '' );
+            $walk    = sanitize_text_field( $qf['trekking']    ?? $qf['daily_walking'] ?? $qf['walking_hours'] ?? '' );
+            $accom   = sanitize_text_field( $qf['accom']       ?? $qf['accommodation'] ?? $qf['stay'] ?? '' );
+            $style   = sanitize_text_field( $qf['style']       ?? $qf['travel_style']  ?? '' );
+            $season  = sanitize_text_field( $qf['season']      ?? $qf['best_season']   ?? '' );
+            $group   = sanitize_text_field( $qf['group_size']  ?? $qf['groupSize']     ?? '' );
+            $dist    = sanitize_text_field( $qf['distance']    ?? '' );
+            $start   = sanitize_text_field( $qf['start']       ?? $qf['starting_point'] ?? '' );
+            $end     = sanitize_text_field( $qf['end']         ?? $qf['ending_point']   ?? '' );
+            $qf_stat = sanitize_text_field( $qf['status']      ?? $item['status'] ?? 'open' );
 
             $facts = array(
-                'max_altitude'  => $high_pt,
                 'high_point'    => $high_pt,
-                'destination'   => $dest,
+                'max_altitude'  => $high_pt,
+                'low_point'     => $low_pt,
                 'region'        => $dest,
+                'destination'   => $dest,
                 'duration'      => $days_clean,
-                'daily_walking' => $walk,
                 'trekking'      => $walk,
-                'accommodation' => $accom,
+                'daily_walking' => $walk,
                 'accom'         => $accom,
+                'accommodation' => $accom,
                 'style'         => $style,
                 'season'        => $season,
                 'group_size'    => $group,
+                'distance'      => $dist,
+                'start'         => $start,
+                'end'           => $end,
+                'status'        => $qf_stat,
                 'difficulty'    => $difficulty,
                 'price'         => $price,
                 'currency'      => $currency,
@@ -909,53 +1060,22 @@ class Trek_Importer {
             update_post_meta( $post_id, '_trek_quick_facts', $facts );
 
             if ( ! empty( $high_pt ) ) update_post_meta( $post_id, '_trek_fact_high_point', $high_pt );
-            if ( ! empty( $dest ) )    update_post_meta( $post_id, '_trek_fact_region', $dest );
-            if ( ! empty( $walk ) )    update_post_meta( $post_id, '_trek_fact_trekking', $walk );
-            if ( ! empty( $accom ) )   update_post_meta( $post_id, '_trek_fact_accom', $accom );
-            if ( ! empty( $style ) )   update_post_meta( $post_id, '_trek_fact_style', $style );
-            if ( ! empty( $season ) )  update_post_meta( $post_id, '_trek_fact_season', $season );
-            if ( ! empty( $group ) )   update_post_meta( $post_id, '_trek_fact_group_size', $group );
+            if ( ! empty( $low_pt ) )  update_post_meta( $post_id, '_trek_fact_low_point',  $low_pt );
+            if ( ! empty( $dest ) )    update_post_meta( $post_id, '_trek_fact_region',      $dest );
+            if ( ! empty( $walk ) )    update_post_meta( $post_id, '_trek_fact_trekking',    $walk );
+            if ( ! empty( $accom ) )   update_post_meta( $post_id, '_trek_fact_accom',       $accom );
+            if ( ! empty( $style ) )   update_post_meta( $post_id, '_trek_fact_style',       $style );
+            if ( ! empty( $season ) )  update_post_meta( $post_id, '_trek_fact_season',      $season );
+            if ( ! empty( $group ) )   update_post_meta( $post_id, '_trek_fact_group_size',  $group );
+            if ( ! empty( $dist ) )    update_post_meta( $post_id, '_trek_fact_distance',    $dist );
+            if ( ! empty( $start ) )   update_post_meta( $post_id, '_trek_fact_start',       $start );
+            if ( ! empty( $end ) )     update_post_meta( $post_id, '_trek_fact_end',         $end );
+            if ( ! empty( $qf_stat ) ) update_post_meta( $post_id, '_trek_trip_status',      $qf_stat );
 
             // 5. Highlights Array
             if ( ! empty( $item['highlights'] ) && is_array( $item['highlights'] ) ) {
                 $clean_hl = array_map( 'sanitize_text_field', $item['highlights'] );
                 update_post_meta( $post_id, '_trek_highlights', $clean_hl );
-            }
-
-            // 6. Day-by-Day Itinerary Array (Sync dual keys: _trek_itinerary & _trek_itinerary_list)
-            if ( ! empty( $item['itinerary'] ) && is_array( $item['itinerary'] ) ) {
-                $clean_itin = array();
-                $clean_itin_list = array();
-                $idx = 1;
-                foreach ( $item['itinerary'] as $day_data ) {
-                    if ( ! is_array( $day_data ) ) continue;
-                    $d_num   = sanitize_text_field( $day_data['day'] ?? sprintf( '%02d', $idx ) );
-                    $d_title = sanitize_text_field( $day_data['title'] ?? '' );
-                    $d_stage = sanitize_text_field( $day_data['stage'] ?? $d_title );
-                    $d_desc  = wp_kses_post( $day_data['description'] ?? $day_data['desc'] ?? '' );
-                    $d_pills = sanitize_text_field( $day_data['pills'] ?? ( ! empty( $day_data['altitude'] ) ? $day_data['altitude'] : '' ) );
-
-                    $clean_itin[] = array(
-                        'day'           => $d_num,
-                        'title'         => $d_title,
-                        'description'   => $d_desc,
-                        'altitude'      => sanitize_text_field( $day_data['altitude'] ?? '' ),
-                        'walking_hours' => sanitize_text_field( $day_data['walking_hours'] ?? '' ),
-                        'stay'          => sanitize_text_field( $day_data['stay'] ?? $day_data['accommodation'] ?? '' ),
-                        'meals'         => sanitize_text_field( $day_data['meals'] ?? '' ),
-                    );
-
-                    $clean_itin_list[] = array(
-                        'day'   => $d_num,
-                        'stage' => $d_stage,
-                        'title' => $d_title,
-                        'pills' => $d_pills,
-                        'desc'  => $d_desc,
-                    );
-                    $idx++;
-                }
-                update_post_meta( $post_id, '_trek_itinerary', $clean_itin );
-                update_post_meta( $post_id, '_trek_itinerary_list', $clean_itin_list );
             }
 
             // 5b. Overview & Map Section Meta
@@ -976,13 +1096,13 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_overview_highlight', wp_kses_post( $item['overview_highlight'] ?? $overview_sec['highlight'] ) );
             }
             if ( ! empty( $item['overview_img'] ) || ! empty( $overview_sec['image'] ) ) {
-                update_post_meta( $post_id, '_trek_overview_img', esc_url_raw( $item['overview_img'] ?? $overview_sec['image'] ) );
+                update_post_meta( $post_id, '_trek_overview_img', self::safe_url( $item['overview_img'] ?? $overview_sec['image'] ) );
             }
             if ( ! empty( $item['route_img'] ) || ! empty( $overview_sec['route_img'] ) ) {
-                update_post_meta( $post_id, '_trek_route_img', esc_url_raw( $item['route_img'] ?? $overview_sec['route_img'] ) );
+                update_post_meta( $post_id, '_trek_route_img', self::safe_url( $item['route_img'] ?? $overview_sec['route_img'] ) );
             }
             if ( ! empty( $item['map_file_url'] ) || ! empty( $overview_sec['map_file_url'] ) ) {
-                update_post_meta( $post_id, '_trek_map_file_url', esc_url_raw( $item['map_file_url'] ?? $overview_sec['map_file_url'] ) );
+                update_post_meta( $post_id, '_trek_map_file_url', self::safe_url( $item['map_file_url'] ?? $overview_sec['map_file_url'] ) );
             }
             if ( ! empty( $item['map_embed_code'] ) || ! empty( $overview_sec['map_embed_code'] ) ) {
                 update_post_meta( $post_id, '_trek_map_embed_code', current_user_can( 'unfiltered_html' ) ? ( $item['map_embed_code'] ?? $overview_sec['map_embed_code'] ) : wp_kses_post( $item['map_embed_code'] ?? $overview_sec['map_embed_code'] ) );
@@ -1129,11 +1249,12 @@ class Trek_Importer {
                 foreach ( $raw_gallery as $g_item ) {
                     $url = is_array( $g_item ) ? ( $g_item['url'] ?? '' ) : $g_item;
                     $lbl = is_array( $g_item ) ? ( $g_item['label'] ?? $g_item['caption'] ?? '' ) : '';
-                    if ( ! empty( $url ) ) {
-                        $clean_gal[] = esc_url_raw( $url );
+                    $url = self::safe_url( $url );
+                    if ( '' !== $url ) {
+                        $clean_gal[] = $url;
                         $clean_gal_list[] = array(
-                            'url'   => esc_url_raw( $url ),
-                            'label' => sanitize_text_field( $lbl ),
+                            'url'   => $url,
+                            'label' => self::scalar_text( $lbl ),
                         );
                     }
                 }
@@ -1156,7 +1277,7 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_ess_intro', wp_kses_post( $item['ess_intro'] ?? $ess_sec['intro'] ) );
             }
             if ( ! empty( $item['ess_card_img'] ) || ! empty( $ess_sec['card_img'] ) ) {
-                update_post_meta( $post_id, '_trek_ess_card_img', esc_url_raw( $item['ess_card_img'] ?? $ess_sec['card_img'] ) );
+                update_post_meta( $post_id, '_trek_ess_card_img', self::safe_url( $item['ess_card_img'] ?? $ess_sec['card_img'] ) );
             }
             if ( ! empty( $item['ess_card_kicker'] ) || ! empty( $ess_sec['card_kicker'] ) ) {
                 update_post_meta( $post_id, '_trek_ess_card_kicker', sanitize_text_field( $item['ess_card_kicker'] ?? $ess_sec['card_kicker'] ) );
@@ -1251,7 +1372,7 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_dep_box_desc', sanitize_text_field( $item['dep_box_desc'] ?? $dep_sec['box_desc'] ) );
             }
             if ( ! empty( $item['dep_box_photo'] ) || ! empty( $dep_sec['box_photo'] ) ) {
-                update_post_meta( $post_id, '_trek_dep_box_photo', esc_url_raw( $item['dep_box_photo'] ?? $dep_sec['box_photo'] ) );
+                update_post_meta( $post_id, '_trek_dep_box_photo', self::safe_url( $item['dep_box_photo'] ?? $dep_sec['box_photo'] ) );
             }
             if ( ! empty( $item['dep_box_note'] ) || ! empty( $dep_sec['box_note'] ) ) {
                 update_post_meta( $post_id, '_trek_dep_box_note', sanitize_text_field( $item['dep_box_note'] ?? $dep_sec['box_note'] ) );
@@ -1264,7 +1385,37 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_sales_email', sanitize_email( $item['sales_email'] ?? $dep_sec['email'] ) );
             }
 
-            // 11. Compile & Save Master JSON Payload (_trek_structured_data)
+            // 11b. Fixed Departure Dates Array
+            $raw_deps = $item['departures'] ?? ( $dep_sec['dates'] ?? array() );
+            if ( ! empty( $raw_deps ) && is_array( $raw_deps ) ) {
+                $clean_deps = array();
+                foreach ( $raw_deps as $dep ) {
+                    if ( ! is_array( $dep ) ) continue;
+                    $clean_deps[] = array(
+                        'date'     => sanitize_text_field( $dep['date'] ?? '' ),
+                        'price'    => sanitize_text_field( $dep['price'] ?? $price ),
+                        'currency' => sanitize_text_field( $dep['currency'] ?? $currency ),
+                        'seats'    => intval( $dep['seats'] ?? 0 ),
+                        'status'   => sanitize_text_field( $dep['status'] ?? 'open' ),
+                        'note'     => sanitize_text_field( $dep['note'] ?? '' ),
+                    );
+                }
+                if ( ! empty( $clean_deps ) ) {
+                    update_post_meta( $post_id, '_trek_dep_dates', $clean_deps );
+                    update_post_meta( $post_id, '_trek_departure_dates', $clean_deps );
+                }
+            }
+
+            // 11c. Pricing block fallback (_trek_price / _trek_currency from pricing{})
+            $pricing_obj = is_array( $item['pricing'] ?? null ) ? $item['pricing'] : array();
+            if ( empty( $price ) && ! empty( $pricing_obj['price'] ) ) {
+                update_post_meta( $post_id, '_trek_price', sanitize_text_field( $pricing_obj['price'] ) );
+            }
+            if ( ! empty( $pricing_obj['currency'] ) ) {
+                update_post_meta( $post_id, '_trek_currency', sanitize_text_field( $pricing_obj['currency'] ) );
+            }
+
+            // 12. Compile & Save Master JSON Payload (_trek_structured_data)
             if ( class_exists( 'Trek_Renderer' ) ) {
                 $full_data = Trek_Renderer::get_full_trek_data( $post_id );
                 if ( ! empty( $full_data ) ) {
@@ -1283,156 +1434,197 @@ class Trek_Importer {
     }
 
     /**
-     * Get Complete Rich Sample JSON
+     * Get Complete Rich Sample JSON — loads the canonical template asset file.
+     * Falls back to a minimal inline sample if the file is not found.
      */
     public static function get_sample_json_string() {
+        $template_path = plugin_dir_path( dirname( __FILE__ ) ) . 'assets/canonical-trek-template.json';
+        if ( file_exists( $template_path ) ) {
+            $contents = file_get_contents( $template_path );
+            // Re-encode with consistent formatting (removes the _comment key for clean output)
+            $decoded = json_decode( $contents, true );
+            if ( is_array( $decoded ) ) {
+                foreach ( $decoded as &$item ) {
+                    unset( $item['_comment'] );
+                }
+                unset( $item );
+                return json_encode( $decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+            }
+            return $contents;
+        }
+        // Inline minimal fallback
         $sample = array(
             array(
-                "title" => "The Ultimate Trek: Everest Base Camp Experience",
-                "slug" => "everest-basecamp-trek",
-                "excerpt" => "Journey through Sherpa country, high mountain villages and the dramatic Khumbu landscape to the foot of Everest.",
-                "days" => 15,
+                "title"    => "The Ultimate Everest Base Camp Experience",
+                "slug"     => "everest-base-camp-experience",
+                "excerpt"  => "Journey through legendary Sherpa homelands to the foot of the world's highest mountain over 15 spectacular days.",
+                "category" => array( "Trekking", "Himalayan", "Signature Journey" ),
+                "region"   => array( "Nepal" ),
                 "difficulty" => "Strenuous",
-                "price" => "2,850",
-                "currency" => "USD",
-                "category" => array("Trekking", "Himalayan"),
-                "primary_category" => "Trekking",
-                "region" => "Nepal",
-                "map_region" => "Khumbu",
-                "map_district" => "Solukhumbu",
-                "tag" => "Trekking · Everest",
-                "featured" => true,
-                "hero_image" => "https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/AERIAL-VIEW-OF-THE-EVEREST-BASE-CAMP.jpg",
-                "card_image" => "https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/AERIAL-VIEW-OF-THE-EVEREST-BASE-CAMP.jpg",
-                "overview" => "<p>Experience the majesty of the Khumbu region on this classic Everest Base Camp trek. Stand at the base of the world's highest peak and immerse yourself in Sherpa mountain culture.</p>",
-                "quick_facts" => array(
-                    "max_altitude" => "5,364m / 17,598ft",
-                    "destination" => "Everest Region, Nepal",
-                    "daily_walking" => "5 - 7 Hours",
-                    "accommodation" => "Comfortable Mountain Lodges & Teahouses",
-                    "style" => "Privately Guided High-Altitude Trek",
-                    "season" => "March to May & September to December",
-                    "group_size" => "2 - 12 Travelers",
-                    "difficulty" => "Strenuous",
-                    "price" => "2,850",
-                    "currency" => "USD"
-                ),
-                "highlights" => array(
-                    "Stand at Everest Base Camp (5,364m) and the foot of the Khumbu Icefall",
-                    "Sunrise panoramic views from Kala Patthar (5,545m)",
-                    "Explore ancient monasteries in Tengboche and Khumjung",
-                    "Walk through legendary Sherpa capitals Namche Bazaar and Dingboche"
-                ),
-                "reviews" => array(
-                    array(
-                        "name" => "Sarah Jenkins",
-                        "location" => "United Kingdom",
-                        "rating" => "5",
-                        "quote" => "An unforgettable, life-changing trek to Everest Base Camp. The guides and Sherpa team were exceptional."
+                "featured"   => true,
+                "status"     => "open",
+                "hero" => array(
+                    "script_title" => "The Ultimate Trek",
+                    "title"        => "Everest Base Camp Experience",
+                    "kicker"       => "Khumbu · Nepal",
+                    "subtitle"     => "A majestic 15-day high-altitude journey through legendary Sherpa homelands to the foot of Mount Everest.",
+                    "days"         => 15,
+                    "badge_sub"    => "Days in Nepal",
+                    "image"        => "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
+                    "slider_images" => array(
+                        "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1600&q=85",
+                        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85"
                     )
+                ),
+                "card" => array(
+                    "title"   => "Everest Base Camp Experience",
+                    "meta"    => "15 Days",
+                    "tag"     => "Nepal · Signature Journey",
+                    "kicker"  => "Signature Journey",
+                    "excerpt" => "Ascend through legendary Sherpa homelands to the foot of Mount Everest.",
+                    "image"   => "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
+                    "order"   => 1
+                ),
+                "quick_facts" => array(
+                    "high_point"  => "5,550m / 18,209ft · Kala Patthar",
+                    "low_point"   => "1,400m / 4,593ft · Kathmandu",
+                    "region"      => "Everest Region (Khumbu), Nepal",
+                    "trekking"    => "Usually 5–7 hours daily",
+                    "accom"       => "Boutique Kathmandu Hotels & Mountain Lodges",
+                    "style"       => "Privately Guided High-Altitude Trek",
+                    "season"      => "Autumn (Sep–Nov) & Spring (Mar–May)",
+                    "group_size"  => "2–12 Travellers",
+                    "distance"    => "130 km round-trip",
+                    "start"       => "Kathmandu / Lukla (Flight)",
+                    "end"         => "Lukla / Kathmandu (Flight)",
+                    "status"      => "open",
+                    "price"       => "2850",
+                    "currency"    => "USD"
+                ),
+                "overview" => array(
+                    "kicker"      => "Nepal · 15 Days",
+                    "script"      => "The Ultimate Trek",
+                    "heading"     => "To the Foot of Mount Everest",
+                    "subheading"  => "Through the spiritual heartland of the Sherpa people",
+                    "content"     => "<p>The Everest Base Camp trek is one of the world's great mountain journeys — ascending through Sherpa homelands, glacial valleys, and high passes to stand at 5,364m before the Khumbu Icefall.</p>",
+                    "highlight"   => "<p>A demanding Himalayan journey of altitude, shifting landscapes, rich Sherpa culture, and unforgettable views of Everest, Lhotse, Ama Dablam, and Nuptse.</p>",
+                    "highlights"  => array(
+                        "Stand at Everest Base Camp (5,364m) before the Khumbu Icefall",
+                        "Dawn summit of Kala Patthar (5,550m) for panoramic Everest views",
+                        "Two acclimatisation nights in Namche Bazaar",
+                        "Visit Tengboche Monastery with Ama Dablam backdrop"
+                    ),
+                    "route_sub"     => "Route Overview",
+                    "route_heading" => "Kathmandu → Lukla → EBC → Kala Patthar → Kathmandu"
+                ),
+                "itinerary_section" => array(
+                    "kicker"  => "Day by Day",
+                    "script"  => "Your Journey",
+                    "heading" => "15 Days Through the Khumbu Valley",
+                    "subtext" => "Open each day to inspect the trail route, elevation, meals, accommodation, and walking times."
                 ),
                 "itinerary" => array(
-                    array(
-                        "day" => "01",
-                        "title" => "Arrive in Kathmandu",
-                        "description" => "Private transfer to your boutique hotel. Welcome briefing and evening heritage dinner.",
-                        "altitude" => "1,400m",
-                        "walking_hours" => "Rest day",
-                        "stay" => "Dwarika's Heritage Hotel",
-                        "meals" => "Dinner"
-                    ),
-                    array(
-                        "day" => "02",
-                        "title" => "Fly to Lukla & Trek to Phakding",
-                        "description" => "Scenic mountain flight into Lukla (2,840m) and begin hiking along the Dudh Koshi river valley.",
-                        "altitude" => "2,610m",
-                        "walking_hours" => "3 - 4 hrs",
-                        "stay" => "Yeti Mountain Home Phakding",
-                        "meals" => "Breakfast, Lunch, Dinner"
-                    ),
-                    array(
-                        "day" => "03",
-                        "title" => "Trek to Namche Bazaar",
-                        "description" => "Cross suspension bridges adorned with prayer flags and ascend through pine forests into Namche Bazaar.",
-                        "altitude" => "3,440m",
-                        "walking_hours" => "5 - 6 hrs",
-                        "stay" => "Luxury Lodge Namche",
-                        "meals" => "Breakfast, Lunch, Dinner"
-                    )
+                    array( "day" => "01", "stage" => "Kathmandu (1,400m)", "title" => "Arrive in Kathmandu & Hotel Transfer", "description" => "<p>Welcome to Nepal! Private transfer to your boutique heritage hotel. Pre-trek briefing and welcome dinner.</p>", "pills" => "Meals: Welcome Dinner · Boutique Hotel", "altitude" => "1,400m", "walking_hours" => "Transfer only", "stay" => "Dwarika's Heritage Hotel", "meals" => "Dinner", "gallery" => array() ),
+                    array( "day" => "02", "stage" => "Lukla (2,840m) → Phakding (2,610m)", "title" => "Scenic Mountain Flight to Lukla & Trek to Phakding", "description" => "<p>35-minute scenic flight to Tenzing-Hillary Airport. Meet your Sherpa crew and begin the gentle riverside trail to Phakding.</p>", "pills" => "Meals: B, L, D · Teahouse · Approx. 3–4 hrs", "altitude" => "2,610m", "walking_hours" => "3–4 hrs", "stay" => "Phakding Teahouse", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "03", "stage" => "Phakding → Namche Bazaar (3,440m)", "title" => "Ascend to the Sherpa Capital of Namche Bazaar", "description" => "<p>Cross the Hillary Suspension Bridge and enter Sagarmatha National Park. Ascend to Namche Bazaar with first glimpses of Everest.</p>", "pills" => "Meals: B, L, D · Mountain Lodge · Approx. 5–6 hrs", "altitude" => "3,440m", "walking_hours" => "5–6 hrs", "stay" => "Namche Lodge", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "04", "stage" => "Namche Bazaar — Acclimatisation", "title" => "Acclimatisation Day: Everest View Hotel Hike", "description" => "<p>Climb to the Everest View Hotel (3,880m) for panoramic views. Explore the Sherpa Culture Museum and weekend market.</p>", "pills" => "Meals: B, L, D · Mountain Lodge · 3–4 hrs hike", "altitude" => "3,880m (hike high, sleep 3,440m)", "walking_hours" => "3–4 hrs", "stay" => "Namche Lodge", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "05", "stage" => "Namche → Tengboche (3,860m)", "title" => "Trail to Tengboche Monastery with Ama Dablam Views", "description" => "<p>Contour above the Imja Khola, descend to Phunki Tenga and climb through birch forest to Tengboche Monastery with its dramatic Ama Dablam backdrop.</p>", "pills" => "Meals: B, L, D · Mountain Lodge · Approx. 5–6 hrs", "altitude" => "3,860m", "walking_hours" => "5–6 hrs", "stay" => "Tengboche Lodge", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "06", "stage" => "Tengboche → Dingboche (4,410m)", "title" => "Trek Through Pangboche to High-Altitude Dingboche", "description" => "<p>Visit the ancient Pangboche Monastery, cross the Imja Khola and ascend steeply into the broad hanging valley of Dingboche.</p>", "pills" => "Meals: B, L, D · Mountain Lodge · Approx. 5–6 hrs", "altitude" => "4,410m", "walking_hours" => "5–6 hrs", "stay" => "Dingboche Teahouse", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "07", "stage" => "Dingboche — Acclimatisation", "title" => "Acclimatisation Day: Nangkartshang Peak Hike", "description" => "<p>Hike up to Nangkartshang Peak (5,083m) for views of Island Peak, Makalu, and the Lhotse-Nuptse wall. Critical acclimatisation for Base Camp days ahead.</p>", "pills" => "Meals: B, L, D · Mountain Lodge · 4–5 hrs hike", "altitude" => "5,083m (hike high, sleep 4,410m)", "walking_hours" => "4–5 hrs", "stay" => "Dingboche Teahouse", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "08", "stage" => "Dingboche → Lobuche (4,940m)", "title" => "Trek to Lobuche Past Memorial Chortens", "description" => "<p>Cross the Khumbu moraine past the Chukpilhara climbers' memorial chortens to Lobuche. Air is noticeably thinner; stay hydrated.</p>", "pills" => "Meals: B, L, D · Teahouse · Approx. 4–5 hrs", "altitude" => "4,940m", "walking_hours" => "4–5 hrs", "stay" => "Lobuche Teahouse", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "09", "stage" => "Lobuche → Gorak Shep (5,140m) → EBC (5,364m)", "title" => "The Day You've Trained For: Everest Base Camp!", "description" => "<p>Cross the Khumbu Glacier to Gorak Shep. Continue over the glacier to Everest Base Camp (5,364m) — standing at the foot of the Khumbu Icefall and the world's highest peak.</p>", "pills" => "Meals: B, L, D · Gorak Shep Teahouse · 7–8 hrs total", "altitude" => "5,364m (EBC)", "walking_hours" => "7–8 hrs", "stay" => "Gorak Shep Teahouse", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "10", "stage" => "Gorak Shep → Kala Patthar (5,550m) → Pheriche (4,280m)", "title" => "Dawn Summit of Kala Patthar & Descent to Pheriche", "description" => "<p>Pre-dawn ascent by headtorch to Kala Patthar (5,550m) for the greatest Himalayan panorama: Everest, Lhotse, Nuptse, Pumori and Changtse at sunrise. Long descent to Pheriche.</p>", "pills" => "Meals: B, L, D · Village Teahouse · 8–9 hrs total", "altitude" => "5,550m (Kala Patthar summit)", "walking_hours" => "8–9 hrs", "stay" => "Pheriche Teahouse", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "11", "stage" => "Pheriche → Namche Bazaar (3,440m)", "title" => "Long Descent Back to Namche Bazaar", "description" => "<p>Retrace the trail through Pangboche and Tengboche, descending through birch forest back to Namche Bazaar. Celebrate with a sunset dinner at a Namche restaurant.</p>", "pills" => "Meals: B, L, D · Mountain Lodge · 7–8 hrs", "altitude" => "3,440m", "walking_hours" => "7–8 hrs", "stay" => "Namche Lodge", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "12", "stage" => "Namche → Phakding → Lukla (2,840m)", "title" => "Final Trail Day: Namche to Lukla", "description" => "<p>The final trekking day — efficient descent to Lukla for a traditional crew celebration dinner with guides, Sherpas, and porters.</p>", "pills" => "Meals: B, L, D · Lukla Lodge · 6–7 hrs", "altitude" => "2,840m", "walking_hours" => "6–7 hrs", "stay" => "Lukla Mountain Lodge", "meals" => "Breakfast, Lunch, Dinner", "gallery" => array() ),
+                    array( "day" => "13", "stage" => "Lukla → Kathmandu (1,400m)", "title" => "Scenic Mountain Flight Back to Kathmandu", "description" => "<p>Return scenic mountain flight to Kathmandu. Transfer to hotel. Afternoon free for Thamel shopping and Kathmandu exploration.</p>", "pills" => "Meals: B · Boutique Hotel · Mountain Flight", "altitude" => "1,400m", "walking_hours" => "Flight and transfers", "stay" => "Dwarika's Heritage Hotel", "meals" => "Breakfast", "gallery" => array() ),
+                    array( "day" => "14", "stage" => "Kathmandu — Free Day", "title" => "Free Day in Kathmandu: Heritage & Culture", "description" => "<p>Optional guided heritage tour to Bhaktapur Durbar Square, Boudhanath Stupa, and Swayambhunath (Monkey Temple). Complimentary post-trek health consultation available.</p>", "pills" => "Meals: B · Boutique Hotel · Free Day", "altitude" => "1,400m", "walking_hours" => "At leisure", "stay" => "Dwarika's Heritage Hotel", "meals" => "Breakfast", "gallery" => array() ),
+                    array( "day" => "15", "stage" => "Kathmandu — Departure", "title" => "Farewell & International Departure", "description" => "<p>Final breakfast in Nepal before private transfer to Tribhuvan International Airport for your onward flight. Safe travels!</p>", "pills" => "Meals: B · Airport Transfer · Departure", "altitude" => "1,400m", "walking_hours" => "Transfer only", "stay" => "Airport Departure", "meals" => "Breakfast", "gallery" => array() )
                 ),
                 "inex" => array(
-                    "kicker"   => "What is Covered",
-                    "script"   => "Clear & Transparent",
-                    "heading"  => "Inclusions & Exclusions",
-                    "subtext"  => "Everything included in your bespoke Himalayan journey, with no hidden surprises."
+                    "kicker"  => "What is Covered",
+                    "script"  => "Clear & Transparent",
+                    "heading" => "Inclusions & Exclusions",
+                    "subtext" => "Everything included in your bespoke Himalayan journey, with no hidden surprises."
                 ),
                 "inclusions" => array(
-                    array(
-                        "title" => "All private airport and domestic transfers",
-                        "desc"  => "<p>Private chauffeur transfers in air-conditioned vehicles between airport, hotels and trailheads.</p>"
-                    ),
-                    array(
-                        "title" => "Return scenic mountain flights (Kathmandu–Lukla–Kathmandu)",
-                        "desc"  => "<p>Twin Otter or Dornier scenic mountain flights including full baggage allowances.</p>"
-                    ),
-                    array(
-                        "title" => "Permits, TIMS card & National Park entry fees",
-                        "desc"  => "<p>All official Sagarmatha National Park entry clearances and local Khumbu Pasang Lhamu permits.</p>"
-                    ),
-                    array(
-                        "title" => "Licensed English-speaking mountain guide & Sherpa porters",
-                        "desc"  => "<p>Government-licensed veteran high-altitude guide and 1 porter for every 2 trekkers.</p>"
-                    ),
-                    array(
-                        "title" => "Boutique hotel accommodation in Kathmandu & premier mountain lodges",
-                        "desc"  => "<p>En-suite mountain teahouses and luxury boutique hotels with three meals daily on trek.</p>"
-                    )
+                    array( "title" => "All private airport and domestic transfers", "desc" => "<p>Private chauffeur transfers in air-conditioned vehicles between Kathmandu airport, hotels, and trailheads.</p>" ),
+                    array( "title" => "Return scenic mountain flights (Kathmandu–Lukla–Kathmandu)", "desc" => "<p>Twin Otter scenic mountain flights with 15kg baggage allowance per traveller.</p>" ),
+                    array( "title" => "All government permits, TIMS card & National Park entry fees", "desc" => "<p>Sagarmatha National Park entry, TIMS registration, and Khumbu rural municipality permits.</p>" ),
+                    array( "title" => "Licensed English-speaking senior mountain guide", "desc" => "<p>Government-licensed high-altitude guide with wilderness first aid certification and pulse oximeter monitoring.</p>" ),
+                    array( "title" => "Experienced Sherpa porters (1 per 2 trekkers, 12kg limit)", "desc" => "<p>Porter wages, insurance, and equipment fully covered per Sherpa welfare industry standards.</p>" ),
+                    array( "title" => "Boutique hotel stays in Kathmandu", "desc" => "<p>4/5-star boutique heritage hotel, twin-share, daily breakfast included.</p>" ),
+                    array( "title" => "Comfortable mountain teahouse lodges throughout the trek", "desc" => "<p>Pre-selected best-standard teahouses with three meals daily cooked fresh to order.</p>" )
                 ),
                 "exclusions" => array(
-                    array(
-                        "title" => "International flights to and from Kathmandu",
-                        "desc"  => "<p>Long-haul international airfares and associated baggage overages.</p>"
-                    ),
-                    array(
-                        "title" => "Nepal tourist visa fees",
-                        "desc"  => "<p>Payable on arrival at Tribhuvan International Airport (Kathmandu).</p>"
-                    ),
-                    array(
-                        "title" => "Personal emergency evacuation insurance",
-                        "desc"  => "<p>Mandatory travel insurance covering medical emergency and high-altitude helicopter rescue.</p>"
-                    ),
-                    array(
-                        "title" => "Personal trekking gear and gratuities",
-                        "desc"  => "<p>Down jackets, sleeping bags, alcoholic drinks and tips for guiding crew.</p>"
-                    )
-                )
-            ),
-            array(
-                "title" => "Where Culture Meets the Wild: Nepal's Treasures",
-                "slug" => "nepal-wild-trio",
-                "excerpt" => "Combine Kathmandu's living heritage, Himalayan scenery and the wildlife-rich lowlands in one varied journey.",
-                "days" => 12,
-                "category" => array("Culture", "Wildlife", "Soft Adventure"),
-                "region" => "Nepal",
-                "tag" => "Culture · Wildlife",
-                "featured" => true,
-                "hero_image" => "https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/Bhaktapur-e1656397818692.jpg",
-                "card_image" => "https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/Bhaktapur-e1656397818692.jpg",
-                "overview" => "<p>A seamless journey connecting the ancient artistic kingdoms of Kathmandu Valley, the peaceful lakeside serenity of Pokhara, and private safari wildlife drives in Chitwan National Park.</p>",
-                "quick_facts" => array(
-                    "max_altitude" => "2,175m (Nagarkot)",
-                    "destination" => "Kathmandu, Pokhara & Chitwan",
-                    "daily_walking" => "2 - 4 Hours Leisure Walking",
-                    "accommodation" => "5-Star Boutique & Luxury Safari Lodges",
-                    "style" => "Private Luxury Cultural & Wildlife Expedition",
-                    "season" => "September to May",
-                    "group_size" => "2 - 10 Travelers"
+                    array( "title" => "International flights to and from Kathmandu", "desc" => "<p>Long-haul airfares and associated international baggage overages.</p>" ),
+                    array( "title" => "Nepal tourist visa fees", "desc" => "<p>Payable on arrival at Kathmandu Airport in cash USD: USD 30 (15 days), USD 50 (30 days).</p>" ),
+                    array( "title" => "High-altitude emergency travel & evacuation insurance", "desc" => "<p>Mandatory insurance explicitly covering helicopter evacuation to 6,000m. Non-negotiable safety requirement.</p>" ),
+                    array( "title" => "Personal trekking equipment & apparel", "desc" => "<p>Four-season sleeping bag, down jacket, hiking boots, trekking poles, and headlamp.</p>" ),
+                    array( "title" => "Bottled beverages, hot showers & device charging", "desc" => "<p>Bottled water, hot showers, device charging fees, and Wi-Fi at teahouses.</p>" ),
+                    array( "title" => "Gratuities for expedition crew", "desc" => "<p>Tips for guides and porters are customary. Recommended: Guide USD 10–15/day, Porter USD 5–8/day.</p>" )
                 ),
-                "highlights" => array(
-                    "Private guided tours of Bhaktapur Durbar Square and Patan",
-                    "Sunrise mountain views over Annapurna range from Sarangkot",
-                    "Exclusive jeep safaris in Chitwan tracking one-horned rhinos & royal Bengal tigers",
-                    "Luxury boat cruise on Phewa Lake in Pokhara"
+                "gallery" => array(
+                    "kicker"  => "Visual Moments",
+                    "script"  => "In Pictures",
+                    "heading" => "Glimpses of Everest",
+                    "subtext" => "A curated collection of Khumbu landscapes, mountain trails, and authentic Sherpa encounters.",
+                    "images"  => array(
+                        array( "url" => "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85", "label" => "Everest Base Camp at dawn" ),
+                        array( "url" => "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1600&q=85", "label" => "Namche Bazaar amphitheatre" ),
+                        array( "url" => "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85", "label" => "Prayer flags over the Khumbu Valley" )
+                    )
+                ),
+                "essential" => array(
+                    "kicker"      => "Travel Advice",
+                    "script"      => "Good to Know",
+                    "heading"     => "Essential Information",
+                    "intro"       => "<p>Careful preparation ensures a safe and rewarding Himalayan journey. Review our key recommendations below.</p>",
+                    "card_kicker" => "Trip Dossier",
+                    "card_title"  => "Download Your Complete Route Notes",
+                    "card_desc"   => "Packing checklist, altitude schedule, visa guidelines, and weather data.",
+                    "card_btn"    => "Request Trip Notes",
+                    "card_email"  => "sales@yetiadventure.com"
+                ),
+                "faqs" => array(
+                    array( "question" => "What is the best season to undertake the Everest Base Camp trek?", "answer" => "<p><strong>Autumn (Sep–Nov)</strong>: Clearest skies, crisp visibility. <strong>Spring (Mar–May)</strong>: Warmer, rhododendrons in bloom, longer days. Both seasons are outstanding. Winter is possible but very cold; monsoon (Jun–Aug) is not recommended.</p>" ),
+                    array( "question" => "How fit do I need to be, and how is altitude sickness managed?", "answer" => "<p>Solid cardiovascular fitness is essential. Train with 8–12 weeks of hilly hiking with a loaded pack. Our itinerary includes two acclimatisation days (Namche & Dingboche), strict ascent rate limits, twice-daily pulse oximeter readings, and emergency evacuation protocols.</p>" ),
+                    array( "question" => "What type of accommodation and food can I expect?", "answer" => "<p>Kathmandu: 4/5-star boutique heritage hotels. Trek route: comfortable twin-share teahouse lodges with hearty fresh menus. All dietary requirements (vegetarian, vegan, gluten-free) accommodated with advance notice.</p>" )
+                ),
+                "reviews_section" => array(
+                    "kicker"  => "Guest Stories",
+                    "script"  => "Traveller Feedback",
+                    "heading" => "Words from Fellow Adventurers",
+                    "subtext" => "Genuine reflections from travellers who have walked the high trails with us.",
+                    "reviews" => array(
+                        array( "name" => "Sarah & David Jenkins", "location" => "United Kingdom", "rating" => "5", "quote" => "Standing beneath Everest was breathtaking. The warmth and professionalism of our Sherpa team made this a truly unforgettable experience." ),
+                        array( "name" => "Marcus Vance", "location" => "Melbourne, Australia", "rating" => "5", "quote" => "The two acclimatisation days made an enormous difference. I felt genuinely strong at Base Camp and Kala Patthar. Our guide Dawa was exceptional." ),
+                        array( "name" => "Priya Mehta", "location" => "Mumbai, India", "rating" => "5", "quote" => "As a solo female trekker I felt completely safe and welcomed throughout. A truly transformative Himalayan journey." )
+                    )
+                ),
+                "contact" => array(
+                    "dep_kicker"  => "Travel Together",
+                    "dep_script"  => "Choose Your Month",
+                    "dep_heading" => "Join a Fixed Departure or Customise Your Dates",
+                    "dep_subtext" => "Share your preferred travel window and group size; our expedition planners confirm availability within 24 hours.",
+                    "box_script"  => "Everest Awaits",
+                    "box_title"   => "Ask about upcoming departure dates",
+                    "box_desc"    => "Send your dates, party size, or questions directly to our trek director via WhatsApp.",
+                    "box_note"    => "Private departures confirmed prior to booking. Group discounts for 4+ travellers.",
+                    "whatsapp"    => "9779803197006",
+                    "email"       => "sales@yetiadventure.com"
+                ),
+                "departures" => array(
+                    array( "date" => "2026-03-15", "price" => "2850", "currency" => "USD", "seats" => 8,  "status" => "open",    "note" => "Spring departure — rhododendron season" ),
+                    array( "date" => "2026-04-12", "price" => "2850", "currency" => "USD", "seats" => 4,  "status" => "limited", "note" => "Peak spring season — limited seats remaining" ),
+                    array( "date" => "2026-09-27", "price" => "2850", "currency" => "USD", "seats" => 12, "status" => "open",    "note" => "Autumn departure — clearest skies of the year" ),
+                    array( "date" => "2026-10-18", "price" => "2850", "currency" => "USD", "seats" => 6,  "status" => "limited", "note" => "Peak autumn season — filling fast" ),
+                    array( "date" => "2026-11-08", "price" => "2750", "currency" => "USD", "seats" => 10, "status" => "open",    "note" => "Late autumn — colder but quieter trails" )
+                ),
+                "pricing" => array(
+                    "price"         => "2850",
+                    "numeric_price" => 2850,
+                    "currency"      => "USD",
+                    "formatted"     => "USD 2,850"
                 )
             )
         );

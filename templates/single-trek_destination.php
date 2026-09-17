@@ -52,12 +52,22 @@ if ( ! empty( $hero_slider_gallery ) && is_array( $hero_slider_gallery ) ) {
 }
 $hero_slider_images = array_values( array_unique( array_filter( $hero_slider_images ) ) );
 
-// 3. Quick Facts
-$fact_high_point     = get_post_meta( $post_id, '_trek_fact_high_point', true ) ?: '3,870m · Kyanjin Gompa';
+// 3. Quick Facts & Metrics
+$fact_high_point     = get_post_meta( $post_id, '_trek_fact_high_point', true ) ?: '5,364m / 17,598ft';
+$fact_low_point      = get_post_meta( $post_id, '_trek_fact_low_point', true ) ?: '1,400m · Kathmandu';
 $fact_region         = get_post_meta( $post_id, '_trek_fact_region', true ) ?: ( $breadcrumb_region );
 $fact_trekking       = get_post_meta( $post_id, '_trek_fact_trekking', true ) ?: 'Usually 5–6 hours';
-$fact_accom          = get_post_meta( $post_id, '_trek_fact_accom', true ) ?: 'Hotel & local lodges';
+$fact_accom          = get_post_meta( $post_id, '_trek_fact_accom', true ) ?: 'Teahouses / Lodges';
 $fact_style          = get_post_meta( $post_id, '_trek_fact_style', true ) ?: 'High-altitude trek';
+$fact_distance       = get_post_meta( $post_id, '_trek_fact_distance', true ) ?: '130 km';
+$fact_start          = get_post_meta( $post_id, '_trek_fact_start', true ) ?: 'Lukla Airport';
+$fact_end            = get_post_meta( $post_id, '_trek_fact_end', true ) ?: 'Lukla Airport';
+$fact_season         = get_post_meta( $post_id, '_trek_fact_season', true ) ?: 'Spring / Autumn';
+$fact_group_size     = get_post_meta( $post_id, '_trek_fact_group_size', true ) ?: '2–12 Travellers';
+
+$diff_terms          = get_the_terms( $post_id, 'trek_difficulty' );
+$default_diff        = ( ! empty( $diff_terms ) && ! is_wp_error( $diff_terms ) ) ? $diff_terms[0]->name : 'Challenging';
+$fact_difficulty     = get_post_meta( $post_id, '_trek_difficulty', true ) ?: $default_diff;
 
 // 4. Overview Narrative & Highlight Box
 $overview_kicker     = get_post_meta( $post_id, '_trek_overview_kicker', true ) ?: ( $breadcrumb_region . ' · ' . $hero_days . ' Days' );
@@ -251,6 +261,10 @@ $box_note            = get_post_meta( $post_id, '_trek_dep_box_note', true ) ?: 
 
 $whatsapp_number     = get_post_meta( $post_id, '_trek_whatsapp_number', true ) ?: '9779803197006';
 $sales_email         = get_post_meta( $post_id, '_trek_sales_email', true ) ?: 'sales@yetiadventure.com';
+
+// Fixed departure dates repeater
+$departure_dates_raw = get_post_meta( $post_id, '_trek_departure_dates', true );
+$departure_dates     = ( ! empty( $departure_dates_raw ) && is_array( $departure_dates_raw ) ) ? $departure_dates_raw : array();
 
 // 11. Related Treks Query
 $related_query = new WP_Query( array(
@@ -541,54 +555,80 @@ $related_query = new WP_Query( array(
       text-transform:uppercase;
     }
 
-    /* QUICK FACTS */
+    /* 2. QUICK FACTS FLOATING CARD */
     .ya-ebc-page .ya-facts{
       position:relative;
-      z-index:5;
-      margin-top:-42px;
+      z-index:10;
+      margin:-36px auto 28px;
+      width:min(100% - 40px, 1400px);
+      padding:0;
     }
-
     .ya-ebc-page .ya-facts-grid{
       display:grid;
       grid-template-columns:repeat(5,1fr);
-      background:#fff;
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      overflow:hidden;
+      background:#ffffff;
+      border:1px solid #edf0ea;
+      border-radius:18px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02);
+      padding:16px 22px;
+      gap:16px;
+      align-items:center;
+      width:100%;
+      box-sizing:border-box;
     }
-
     .ya-ebc-page .ya-fact{
-      min-height:116px;
       display:flex;
       align-items:center;
       gap:14px;
-      padding:24px;
-      border-right:1px solid var(--line);
+      min-width:0;
+      min-height:auto;
+      padding:4px 6px;
+      border:0;
     }
-
-    .ya-ebc-page .ya-fact:last-child{border-right:0}
+    .ya-ebc-page .ya-fact:last-child{border:0}
     .ya-ebc-page .ya-fact-icon{
-      width:45px;
-      height:45px;
-      display:grid;
-      place-items:center;
-      flex:0 0 45px;
-      border-radius:50%;
-      background:var(--ivory);
-      color:var(--green-2);
+      width:44px;
+      height:44px;
+      flex:0 0 44px;
+      border-radius:12px;
+      background:#fffaf0;
+      border:1px solid #fed7aa;
+      color:#c05621;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
-
-    .ya-ebc-page .ya-fact-icon svg{width:20px;height:20px}
+    .ya-ebc-page .ya-fact-icon svg{
+      width:20px;
+      height:20px;
+      stroke:#c05621;
+      stroke-width:1.8;
+      fill:none;
+    }
+    .ya-ebc-page .ya-fact-text,
+    .ya-ebc-page .ya-fact div{
+      min-width:0;
+    }
     .ya-ebc-page .ya-fact small{
       display:block;
-      margin-bottom:3px;
-      color:#879391;
-      font-size:9px;
-      font-weight:800;
-      letter-spacing:1.4px;
+      margin-bottom:2px;
+      color:#9ca3af;
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:0.08em;
       text-transform:uppercase;
+      line-height:1.2;
     }
-    .ya-ebc-page .ya-fact strong{font-size:13px;color:var(--green)}
+    .ya-ebc-page .ya-fact strong{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+      color:#111827;
+      line-height:1.35;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
     /* TABS */
 
@@ -1261,82 +1301,329 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-hero-badge{width:154px;height:154px;right:36px;background:var(--green);border-radius:0;box-shadow:none}
     .ya-ebc-page .ya-hero-badge strong{font-family:"Newsreader",Georgia,serif;color:var(--gold);font-size:48px}
 
-    .ya-ebc-page .ya-facts{margin-top:0;background:#fff;border-bottom:1px solid var(--line)}
-    .ya-ebc-page .ya-facts-grid{grid-template-columns:repeat(5,1fr);border-radius:0;box-shadow:none;background:transparent}
-    .ya-ebc-page .ya-fact{min-height:138px;padding:27px 20px;border-right:1px solid var(--line)}
-    .ya-ebc-page .ya-fact-icon{width:38px;height:38px;flex-basis:38px;border-radius:0;background:transparent;color:var(--green-2)}
-    .ya-ebc-page .ya-fact small{margin-bottom:6px;color:#7a7c75;font-size:9px;letter-spacing:1.35px}
-    .ya-ebc-page .ya-fact strong{font-size:13px;line-height:1.45;color:var(--ink)}
+    .ya-ebc-page .ya-panel{padding:90px 0;background:#fff}
+    .ya-ebc-page .ya-panel:nth-child(even){background:var(--cream)}
+    .ya-ebc-page .ya-section-heading{max-width:760px;margin:0 0 48px}
+    .ya-ebc-page .ya-section-heading .ya-script{font-size:clamp(36px,4.2vw,58px);line-height:.95;color:var(--green-2)}
+    .ya-ebc-page .ya-section-heading h2{margin-top:13px;font-size:clamp(42px,5vw,68px);line-height:.95;letter-spacing:-.03em;color:var(--ink)}
+    .ya-ebc-page .ya-section-heading p{max-width:640px;margin-top:20px;font-size:15px;line-height:1.9;color:#596359}
 
-    .ya-ebc-page .ya-tabs-wrap{top:0;margin-top:0;border-top:0;box-shadow:0 8px 22px rgba(28,34,28,.05)}
-    .ya-ebc-page .ya-tab{min-height:66px;padding:0 21px;color:#646960;font-size:9px;background:transparent}
-    .ya-ebc-page .ya-tab:hover{background:transparent;color:var(--green)}
-    .ya-ebc-page .ya-tab:after{content:"";position:absolute;right:21px;bottom:0;left:21px;height:2px;background:transparent;transition:background .25s ease}
-    .ya-ebc-page .ya-tab.is-active{background:transparent;color:var(--green)}
-    .ya-ebc-page .ya-tab.is-active:after{background:var(--gold)}
-    .ya-ebc-page .ya-tab.is-active svg{color:var(--gold)}
-    .ya-ebc-page .ya-panel{padding:128px 0;background:var(--cream)}
-    .ya-ebc-page .ya-panel:nth-child(even){background:#fff}
-    .ya-ebc-page .ya-section-heading{max-width:760px;margin:0 0 60px}
-    .ya-ebc-page .ya-section-heading .ya-script{font-size:clamp(39px,4.4vw,64px);line-height:.9}
-    .ya-ebc-page .ya-section-heading h2{margin-top:13px;font-size:clamp(46px,5.3vw,74px);line-height:.91;letter-spacing:-.035em}
-    .ya-ebc-page .ya-section-heading p{max-width:620px;margin-top:21px;font-size:15px;line-height:1.9}
+    .ya-ebc-page .ya-btn-gold{background:var(--gold);color:var(--green);font-weight:700;border:0}
+    .ya-ebc-page .ya-btn-gold:hover{background:#c49f45;color:var(--green)}
+    .ya-ebc-page .ya-btn-dark{background:var(--green);color:#fff;border:0;font-size:11px;font-weight:700;letter-spacing:1px;padding:12px 22px;border-radius:4px;display:inline-flex;align-items:center;text-decoration:none}
+    .ya-ebc-page .ya-btn-dark:hover{background:var(--green-2);color:#fff}
+    .ya-ebc-page .ya-btn-sm{padding:7px 14px;font-size:11px;font-weight:600;border:1px solid var(--line);background:#fff;border-radius:4px;cursor:pointer;color:var(--ink);transition:all .2s ease}
+    .ya-ebc-page .ya-btn-sm:hover{background:var(--cream);border-color:#b5b5aa}
 
-    .ya-ebc-page .ya-overview-grid{gap:9vw;align-items:start}
-    .ya-ebc-page .ya-overview-copy h3{font-size:clamp(29px,3vw,43px);line-height:1.06;color:var(--ink)}
-    .ya-ebc-page .ya-overview-text{font-size:16px;line-height:1.95;color:#4f564e}
-    .ya-ebc-page .ya-highlight-box{margin:35px 0;padding:24px 0 24px 28px;border-left:2px solid var(--gold);border-radius:0;background:transparent;font:500 25px/1.35 "Newsreader",Georgia,serif;color:var(--ink)}
-    .ya-ebc-page .ya-inclusions{gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-    .ya-ebc-page .ya-inclusion{padding:15px 5px;border-bottom:1px solid var(--line);font-size:12px}
-    .ya-ebc-page .ya-inclusion:last-child{border-bottom:0}
-    .ya-ebc-page .ya-map-card{border-radius:0;box-shadow:none;background:transparent}
-    .ya-ebc-page .ya-map-image{height:620px;border-radius:0}
-    .ya-ebc-page .ya-map-caption{padding:18px 0;background:transparent}
-    .ya-ebc-page .ya-map-caption h3{font:600 29px/1.05 "Newsreader",Georgia,serif;color:var(--ink)}
+    /* Overview Section: 2-Column with Checklist & Trip Facts Card */
+    .ya-ebc-page .ya-overview-grid{display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:start}
+    .ya-ebc-page .ya-overview-copy h3{font-size:clamp(26px,2.7vw,38px);line-height:1.15;color:var(--ink);margin-bottom:20px}
+    .ya-ebc-page .ya-overview-text{font-size:15px;line-height:1.88;color:#4f564e}
 
+    .ya-ebc-page .ya-inclusions-checklist{margin:32px 0 28px;display:flex;flex-direction:column;gap:14px}
+    .ya-ebc-page .ya-check-item{display:flex;align-items:flex-start;gap:14px}
+    .ya-ebc-page .ya-check-icon{
+      flex-shrink:0;
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:#e8f4ed;
+      color:#1e7e4d;
+      display:grid;
+      place-items:center;
+      margin-top:2px;
+    }
+    .ya-ebc-page .ya-check-icon svg{width:13px;height:13px}
+    .ya-ebc-page .ya-check-content strong{display:block;font-size:14px;color:var(--ink);line-height:1.4}
+    .ya-ebc-page .ya-check-desc{font-size:13px;color:#636b62;margin-top:2px}
+
+    .ya-ebc-page .ya-overview-actions{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap}
+
+    /* Right Side: Scenic Photo + Trip Facts Card */
+    .ya-ebc-page .ya-overview-side{display:flex;flex-direction:column;gap:20px}
+    .ya-ebc-page .ya-side-scenic-photo{
+      border-radius:6px;
+      overflow:hidden;
+      box-shadow:0 8px 24px rgba(0,0,0,0.06);
+      height:210px;
+    }
+    .ya-ebc-page .ya-side-scenic-photo img{width:100%;height:100%;object-fit:cover}
+
+    .ya-ebc-page .ya-trip-facts-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:6px;
+      padding:24px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.03);
+    }
+    .ya-ebc-page .ya-trip-facts-card h4{
+      margin:0 0 16px;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:1.8px;
+      color:var(--ink);
+      border-bottom:1px solid var(--line);
+      padding-bottom:10px;
+    }
+    .ya-ebc-page .ya-trip-facts-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+    .ya-ebc-page .ya-trip-facts-list li{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      font-size:13px;
+      border-bottom:1px dashed #eae7df;
+      padding-bottom:10px;
+    }
+    .ya-ebc-page .ya-trip-facts-list li:last-child{border-bottom:0;padding-bottom:0}
+    .ya-ebc-page .ya-tf-label{display:flex;align-items:center;gap:8px;color:#788077;font-size:12px}
+    .ya-ebc-page .ya-tf-label svg{width:15px;height:15px;color:var(--gold)}
+    .ya-ebc-page .ya-tf-val{font-size:13px;color:var(--ink);font-weight:600;text-align:right}
+
+    /* Highlight Quote Banner */
+    .ya-ebc-page .ya-quote-banner{
+      margin:48px 0 44px;
+      padding:28px 36px;
+      background:#fbf7ec;
+      border-left:4px solid var(--gold);
+      border-radius:4px;
+      text-align:center;
+    }
+    .ya-ebc-page .ya-quote-banner blockquote{
+      margin:0;
+      font-family:"Newsreader",Georgia,serif;
+      font-size:clamp(18px,2vw,22px);
+      line-height:1.55;
+      color:#2b332b;
+      font-style:italic;
+    }
+
+    /* Roadmap Section */
+    .ya-ebc-page .ya-roadmap-section{
+      margin-top:40px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:6px;
+      padding:26px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.03);
+    }
+    .ya-ebc-page .ya-roadmap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:14px}
+    .ya-ebc-page .ya-roadmap-header h3{margin:4px 0 0;font:600 24px/1.2 "Newsreader",Georgia,serif;color:var(--ink)}
+    .ya-ebc-page .ya-roadmap-frame{
+      position:relative;
+      border-radius:4px;
+      overflow:hidden;
+      background:#eee;
+      max-height:540px;
+    }
+    .ya-ebc-page .ya-roadmap-frame img{width:100%;height:auto;display:block;object-fit:cover}
+    .ya-ebc-page .ya-roadmap-caption{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:14px;
+      font-size:12.5px;
+      color:#666e65;
+    }
+    .ya-ebc-page .ya-roadmap-caption svg{width:16px;height:16px;color:var(--gold);flex-shrink:0}
+
+    /* Detailed Itinerary with Day Photos */
+    .ya-ebc-page .ya-itin-head-row{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
+    .ya-ebc-page .ya-itin-actions{display:flex;gap:10px}
     .ya-ebc-page .ya-itinerary-shell{width:100%}
-    .ya-ebc-page .ya-days{gap:0;border-top:1px solid var(--line)}
-    .ya-ebc-page .ya-day{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none}
-    .ya-ebc-page .ya-day-head{padding:25px 0;background:transparent}
-    .ya-ebc-page .ya-day-number{width:auto;height:auto;display:block;border-radius:0;background:transparent;color:var(--gold);font-size:26px}
-    .ya-ebc-page .ya-day-title strong{font-size:30px;color:var(--ink)}
-    .ya-ebc-page .ya-day-toggle{width:38px;height:38px;border-radius:0;background:transparent;color:var(--green);border:1px solid var(--line)}
+    .ya-ebc-page .ya-days{display:flex;flex-direction:column;gap:16px}
+    .ya-ebc-page .ya-day{
+      border:1px solid var(--line);
+      border-radius:6px;
+      background:#fff;
+      box-shadow:0 3px 14px rgba(0,0,0,0.02);
+      overflow:hidden;
+      transition:box-shadow .2s ease;
+    }
+    .ya-ebc-page .ya-day:hover{box-shadow:0 8px 24px rgba(0,0,0,0.06)}
+    .ya-ebc-page .ya-day-card-grid{display:grid;grid-template-columns:1fr 240px;gap:20px;padding:24px}
+    .ya-ebc-page .ya-day-main{display:flex;flex-direction:column}
+    .ya-ebc-page .ya-day-head{
+      padding:0;
+      background:transparent;
+      border:0;
+      width:100%;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      text-align:left;
+      cursor:pointer;
+    }
+    .ya-ebc-page .ya-day-title-block{display:flex;flex-direction:column;gap:4px}
+    .ya-ebc-page .ya-day-tag{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase}
+    .ya-ebc-page .ya-day-title-block strong{font-size:22px;color:var(--ink);line-height:1.25}
+    .ya-ebc-page .ya-day-toggle{width:32px;height:32px;border-radius:50%;background:#f4f3ec;color:var(--green);border:1px solid var(--line);display:grid;place-items:center;flex-shrink:0}
     .ya-ebc-page .ya-day.is-open .ya-day-toggle{background:var(--green-2);border-color:var(--green-2);color:#fff}
-    .ya-ebc-page .ya-day-content{padding:0 0 29px 92px}
-    .ya-ebc-page .ya-day-content p{max-width:680px;color:#5c645c}
-    .ya-ebc-page .ya-meta-pill{border-radius:0;background:#ebeae3;color:#525a51}
+    .ya-ebc-page .ya-day-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+    .ya-ebc-page .ya-day.is-open .ya-day-body{grid-template-rows:1fr}
+    .ya-ebc-page .ya-day-body-inner{overflow:hidden}
+    .ya-ebc-page .ya-day-desc{padding:14px 0 10px;color:#555d55;font-size:14.5px;line-height:1.8}
+    .ya-ebc-page .ya-day-desc p{margin:0 0 12px}
+    .ya-ebc-page .ya-day-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .ya-ebc-page .ya-meta-pill{border-radius:4px;padding:5px 11px;background:#f3f1ea;color:#454c44;font-size:11px;font-weight:600;border:1px solid #e0ddd3}
+    .ya-ebc-page .ya-day-photo{border-radius:6px;overflow:hidden;height:165px;background:#eee}
+    .ya-ebc-page .ya-day-photo img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+    .ya-ebc-page .ya-day:hover .ya-day-photo img{transform:scale(1.04)}
 
-    .ya-ebc-page .ya-gallery-grid{gap:12px;grid-template-columns:1.15fr .85fr .85fr}
-    .ya-ebc-page .ya-gallery-item{border-radius:0;background:#ddd}
-    .ya-ebc-page .ya-gallery-label{right:0;bottom:0;left:0;padding:19px 20px;border-radius:0;background:linear-gradient(transparent,rgba(18,24,19,.78));align-items:flex-end}
-    .ya-ebc-page .ya-gallery-label strong{font-size:24px}
+    /* Essential Info Accordion */
+    .ya-ebc-page .ya-essential-layout{display:grid;grid-template-columns:1fr 340px;gap:44px}
+    .ya-ebc-page .ya-info-list{display:flex;flex-direction:column;gap:12px}
+    .ya-ebc-page .ya-info-item{border:1px solid var(--line);border-radius:6px;background:#fff;overflow:hidden}
+    .ya-ebc-page .ya-info-head{padding:18px 22px;background:#fff;border:0;width:100%;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+    .ya-ebc-page .ya-info-head span{font-size:17px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:12px}
+    .ya-ebc-page .ya-info-icon{width:22px;height:22px;display:grid;place-items:center;color:var(--green-2)}
+    .ya-ebc-page .ya-info-arrow{width:18px;height:18px;color:#788077;transition:transform .3s ease}
+    .ya-ebc-page .ya-info-item.is-open .ya-info-arrow{transform:rotate(180deg)}
+    .ya-ebc-page .ya-info-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+    .ya-ebc-page .ya-info-item.is-open .ya-info-body{grid-template-rows:1fr}
+    .ya-ebc-page .ya-info-content{padding:0 22px 20px 56px;color:#555e55;font-size:14.5px;line-height:1.8}
+    .ya-ebc-page .ya-trip-note-card{border-radius:6px;background:var(--green);color:#fff;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.1)}
+    .ya-ebc-page .ya-trip-note-image{height:220px}
+    .ya-ebc-page .ya-trip-note-copy{padding:28px}
 
-    .ya-ebc-page .ya-essential-layout{gap:70px}
-    .ya-ebc-page .ya-info-list{gap:0;border-top:1px solid var(--line)}
-    .ya-ebc-page .ya-info-item{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
-    .ya-ebc-page .ya-info-head{padding:25px 0;background:transparent}
-    .ya-ebc-page .ya-info-head span{font-size:28px;color:var(--ink)}
-    .ya-ebc-page .ya-info-content{padding:0 0 26px 34px;color:#5b635b}
-    .ya-ebc-page .ya-trip-note-card{border-radius:0;box-shadow:none;background:var(--green)}
-    .ya-ebc-page .ya-trip-note-image{height:260px}
+    /* Traveler Reviews Grid */
+    .ya-ebc-page .ya-rev-head-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:28px}
+    .ya-ebc-page .ya-review-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+    .ya-ebc-page .ya-review-card{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      padding:28px 24px;
+      border:1px solid var(--line);
+      border-radius:6px;
+      background:#fff;
+      box-shadow:0 4px 18px rgba(0,0,0,.03);
+      transition:transform .25s ease,box-shadow .25s ease;
+    }
+    .ya-ebc-page .ya-review-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.06)}
+    .ya-ebc-page .ya-rev-card-top{margin-bottom:14px}
+    .ya-ebc-page .ya-review-card .ya-stars{display:flex;gap:3px;color:var(--gold)}
+    .ya-ebc-page .ya-review-card .ya-stars svg{width:16px;height:16px;fill:currentColor}
+    .ya-ebc-page .ya-review-card blockquote{
+      font-size:15.5px;
+      line-height:1.6;
+      color:var(--ink);
+      font-family:"Newsreader",Georgia,serif;
+      font-style:italic;
+      margin:0 0 22px;
+      flex-grow:1;
+    }
+    .ya-ebc-page .ya-rev-author{display:flex;align-items:center;gap:12px}
+    .ya-ebc-page .ya-rev-avatar{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      color:#fff;
+      font-size:13px;
+      font-weight:700;
+      display:grid;
+      place-items:center;
+      flex-shrink:0;
+    }
+    .ya-ebc-page .ya-rev-author strong{display:block;font-size:13.5px;color:var(--ink)}
+    .ya-ebc-page .ya-rev-author small{display:block;font-size:12px;color:#7e857c}
 
-    .ya-ebc-page .ya-review-layout{gap:90px}
-    .ya-ebc-page .ya-review-cards{gap:0;border-top:1px solid var(--line)}
-    .ya-ebc-page .ya-review-card{padding:34px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none}
-    .ya-ebc-page .ya-review-card blockquote{font-size:31px;line-height:1.3;color:var(--ink)}
-    .ya-ebc-page .ya-review-form{padding:34px;border:1px solid var(--line);border-radius:0;background:#fff;box-shadow:none}
-    .ya-ebc-page .ya-field input,.ya-ebc-page .ya-field select,.ya-ebc-page .ya-field textarea{border-radius:0;background:#fff}
+    .ya-ebc-page .ya-rev-form-wrap{margin-top:54px}
+    .ya-ebc-page .ya-review-form{
+      max-width:860px;
+      width:100%;
+      margin:0 auto;
+      padding:40px;
+      border:1px solid var(--line);
+      border-radius:6px;
+      background:#fff;
+      box-shadow:0 6px 24px rgba(0,0,0,.03);
+    }
+    .ya-ebc-page .ya-review-form h3{font-size:28px;color:var(--ink);margin:0 0 8px}
 
-    .ya-ebc-page .ya-related{padding:132px 0;background:#e9e6dd}
-    .ya-ebc-page .ya-related-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
-    .ya-ebc-page .ya-related-card{border-radius:0;background:transparent;box-shadow:none}
-    .ya-ebc-page .ya-related-image{height:290px}
-    .ya-ebc-page .ya-related-copy{padding:21px 0}
-    .ya-ebc-page .ya-related-copy h3{font-size:31px;color:var(--ink)}
+    /* Dark CTA Section ("Ready for the Himalaya?") */
+    .ya-ebc-page .ya-dark-cta-section{
+      background:linear-gradient(135deg,#131d17 0%,#0c140f 100%);
+      color:#fff;
+      padding:84px 0;
+      text-align:center;
+    }
+    .ya-ebc-page .ya-dark-cta-inner{max-width:800px;margin:0 auto}
+    .ya-ebc-page .ya-dark-cta-heading{
+      margin:0;
+      font-family:"Newsreader",Georgia,serif;
+      font-size:clamp(36px,4.5vw,56px);
+      font-style:italic;
+      color:#e8be61;
+      line-height:1.15;
+    }
+    .ya-ebc-page .ya-dark-cta-sub{
+      margin:16px auto 34px;
+      max-width:620px;
+      color:rgba(255,255,255,0.85);
+      font-size:15px;
+      line-height:1.75;
+    }
+    .ya-ebc-page .ya-dark-cta-form{
+      display:flex;
+      justify-content:center;
+      max-width:480px;
+      margin:0 auto 28px;
+      gap:8px;
+    }
+    .ya-ebc-page .ya-dark-cta-form input{
+      flex-grow:1;
+      height:48px;
+      border-radius:4px;
+      border:1px solid rgba(255,255,255,0.25);
+      background:rgba(255,255,255,0.08);
+      color:#fff;
+      padding:0 16px;
+      font-size:14px;
+    }
+    .ya-ebc-page .ya-dark-cta-form input::placeholder{color:rgba(255,255,255,0.5)}
+    .ya-ebc-page .ya-dark-cta-form .ya-btn{
+      padding:0 24px;
+      min-height:48px;
+      border-radius:4px;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .ya-ebc-page .ya-dark-cta-badges{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:28px;
+      flex-wrap:wrap;
+      font-size:13px;
+      color:rgba(255,255,255,0.72);
+    }
+    .ya-ebc-page .ya-dark-cta-badges span{display:inline-flex;align-items:center;gap:6px}
+    .ya-ebc-page .ya-dark-cta-badges svg{width:16px;height:16px;color:#e8be61}
+
+    /* Related Journeys 3-Card Grid */
+    .ya-ebc-page .ya-related{padding:100px 0;background:#f7f6f2;border-top:1px solid var(--line)}
+    .ya-ebc-page .ya-related-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+    .ya-ebc-page .ya-related-card{border-radius:4px;overflow:hidden;background:#fff;border:1px solid var(--line);box-shadow:0 4px 20px rgba(0,0,0,0.03);transition:transform .3s ease,box-shadow .3s ease}
+    .ya-ebc-page .ya-related-card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(0,0,0,0.08)}
+    .ya-ebc-page .ya-related-image{height:250px;overflow:hidden}
+    .ya-ebc-page .ya-related-image img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+    .ya-ebc-page .ya-related-card:hover .ya-related-image img{transform:scale(1.05)}
+    .ya-ebc-page .ya-related-copy{padding:22px}
+    .ya-ebc-page .ya-related-copy small{display:block;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px}
+    .ya-ebc-page .ya-related-copy h3{font-size:22px;line-height:1.22;color:var(--ink);margin:0 0 14px}
+    .ya-ebc-page .ya-related-link{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--green-2);letter-spacing:1.2px;text-transform:uppercase}
+    .ya-ebc-page .ya-related-link svg{width:14px;height:14px;transition:transform .2s ease}
+    .ya-ebc-page .ya-related-card:hover .ya-related-link svg{transform:translateX(4px)}
 
     @media(max-width:1100px){
       .ya-ebc-page .ya-inner{width:min(100% - 56px,1240px)}
       .ya-ebc-page .ya-facts-grid{grid-template-columns:repeat(3,1fr)}
+      .ya-ebc-page .ya-overview-grid{grid-template-columns:1fr}
+      .ya-ebc-page .ya-essential-layout{grid-template-columns:1fr}
+      .ya-ebc-page .ya-review-cards{grid-template-columns:repeat(2,1fr)}
+      .ya-ebc-page .ya-day-card-grid{grid-template-columns:1fr 200px}
       .ya-ebc-page .ya-essential-layout,.ya-ebc-page .ya-review-layout{gap:42px}
     }
     @media(max-width:820px){
@@ -1352,6 +1639,7 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-panel{padding:88px 0}
       .ya-ebc-page .ya-section-heading{margin-bottom:42px}
       .ya-ebc-page .ya-overview-grid,.ya-ebc-page .ya-itinerary-shell,.ya-ebc-page .ya-essential-layout,.ya-ebc-page .ya-review-layout{grid-template-columns:1fr;gap:42px}
+      .ya-ebc-page .ya-review-cards{grid-template-columns:1fr}
       .ya-ebc-page .ya-day-content{padding-left:0}
       .ya-ebc-page .ya-gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:390px 260px 260px}
       .ya-ebc-page .ya-gallery-item:first-child{grid-column:1/3;grid-row:auto}
@@ -1382,50 +1670,12 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-reading-progress{--ya-reading-progress:0%;height:3px;margin-top:18px;overflow:hidden;background:#dcdcd3}
     .ya-ebc-page .ya-reading-progress-bar{display:block;width:var(--ya-reading-progress);height:100%;background:#d1ad54;transition:width .18s linear,height .18s linear}
 
-    /* Desktop trip navigation: quiet sticky rail at left, editorial content at right. */
-    @media(min-width:1101px){
-      .ya-ebc-page .ya-tabs-wrap{
-        position:sticky;
-        top:112px;
-        z-index:70;
-        float:left;
-        width:250px;
-        margin:72px 0 0 max(40px,calc((100vw - 1240px) / 2));
-        background:transparent;
-        border:0;
-        box-shadow:none;
-      }
-      .ya-ebc-page .ya-tabs{
-        width:auto;
-        display:flex;
-        align-items:stretch;
-        overflow:visible;
-        flex-direction:column;
-        border-top:1px solid var(--line);
-      }
-      .ya-ebc-page .ya-tab{
-        width:100%;
-        min-height:0;
-        justify-content:flex-start;
-        padding:17px 10px 17px 0;
-        border-bottom:1px solid var(--line);
-        color:#73786f;
-        font-size:12px;
-        text-align:left;
-      }
-      .ya-ebc-page .ya-tab svg{width:16px;height:16px;color:#8a8c83}
-      .ya-ebc-page .ya-tab:after{right:auto;bottom:-1px;left:0;width:30px;height:1px}
-      .ya-ebc-page .ya-tab.is-active{color:var(--ink)}
-      .ya-ebc-page .ya-tab.is-active:after{height:2px}
-      .ya-ebc-page .ya-tab.is-active svg{color:var(--green-2)}
-      .ya-ebc-page .ya-tab-stage{
-        min-width:0;
-        min-height:900px;
-        margin-left:calc(250px + max(80px,calc((100vw - 1240px) / 2)));
-      }
-      .ya-ebc-page .ya-tab-stage .ya-panel{padding-right:max(40px,calc((100vw - 1240px) / 2))}
-      .ya-ebc-page .ya-related{clear:both}
+    /* Long-form editorial reading: all existing panels remain in the scrolling story. */
+    .ya-ebc-page .ya-tab-stage .ya-panel{
+      display:block;
+      scroll-margin-top:112px;
     }
+    .ya-ebc-page .ya-tab-stage .ya-panel.is-active{animation:none}
 
     /* Centred destination hero with a CPT-managed, cross-fading image slideshow. */
     .ya-ebc-page .ya-hero{
@@ -1613,35 +1863,149 @@ $related_query = new WP_Query( array(
     @media(min-width:1101px){
       .ya-ebc-page .ya-tab-mman-section{
         display:grid;
-        grid-template-columns:240px minmax(0,1400px);
-        column-gap:56px;
+        grid-template-columns:250px minmax(0,1400px);
+        column-gap:48px;
         align-items:flex-start;
-        width:min(calc(100% - 80px),1696px);
+        width:min(calc(100% - 80px),1400px);
         margin:0 auto;
       }
       .ya-ebc-page .ya-tabs-wrap{
-        --ya-sidebar-offset:20vh;
         position:sticky;
-        top:var(--ya-sidebar-offset);
+        top:96px;
         z-index:70;
         grid-column:1;
-        width:240px;
-        max-height:calc(100vh - var(--ya-sidebar-offset) - 24px);
-        max-height:calc(100svh - var(--ya-sidebar-offset) - 24px);
-        margin:72px 0 0;
+        width:250px;
+        background:#ffffff;
+        border:1px solid #edf0ea;
+        border-radius:20px;
+        box-shadow:0 4px 24px rgba(0,0,0,0.04);
+        padding:18px 14px;
+        margin:0;
         align-self:start;
         float:none;
-        overflow-x:hidden;
-        overflow-y:auto;
-        overscroll-behavior:contain;
-        scrollbar-gutter:stable;
+        overflow:visible;
+        box-sizing:border-box;
       }
+      .ya-ebc-page .ya-nav-title{
+        font-size:11px;
+        font-weight:800;
+        letter-spacing:0.1em;
+        text-transform:uppercase;
+        color:#9ca3af;
+        padding:4px 12px 14px;
+        border-bottom:1px solid #f1f3f0;
+        margin-bottom:12px;
+      }
+      .ya-ebc-page .ya-tabs{
+        width:100%;
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+        border:0;
+        overflow:visible;
+      }
+      .ya-ebc-page .ya-tab{
+        width:100%;
+        min-height:auto;
+        display:flex;
+        align-items:center;
+        justify-content:flex-start;
+        padding:11px 16px;
+        border:0;
+        border-radius:10px;
+        background:transparent;
+        color:#4b5563;
+        font-size:14.5px;
+        font-weight:600;
+        text-align:left;
+        text-transform:none;
+        letter-spacing:normal;
+        cursor:pointer;
+        transition:all .2s ease;
+        position:relative;
+        box-sizing:border-box;
+      }
+      .ya-ebc-page .ya-tab svg{display:none}
+      .ya-ebc-page .ya-tab:hover{
+        background:#f9fafb;
+        color:#111827;
+      }
+      .ya-ebc-page .ya-tab.is-active{
+        background:#fdfaf3;
+        color:#b45309;
+        font-weight:700;
+      }
+      .ya-ebc-page .ya-tab.is-active::before{
+        content:"";
+        position:absolute;
+        left:0;
+        top:6px;
+        bottom:6px;
+        width:4px;
+        background:#f59e0b;
+        border-radius:0 4px 4px 0;
+      }
+      .ya-ebc-page .ya-tab:after{display:none!important}
+
+      /* Private Heli Card in Sticky Left Sidebar */
+      .ya-ebc-page .ya-heli-card{
+        margin-top:18px;
+        padding:18px 16px;
+        background:#181715;
+        border-radius:14px;
+        color:#ffffff;
+        box-shadow:0 8px 24px rgba(0,0,0,0.12);
+      }
+      .ya-ebc-page .ya-heli-tag{
+        display:flex;
+        align-items:center;
+        gap:6px;
+        font-size:11px;
+        font-weight:800;
+        letter-spacing:0.08em;
+        color:#f59e0b;
+        margin-bottom:10px;
+        text-transform:uppercase;
+      }
+      .ya-ebc-page .ya-heli-tag svg{
+        width:15px;
+        height:15px;
+        fill:currentColor;
+        flex-shrink:0;
+      }
+      .ya-ebc-page .ya-heli-card p{
+        margin:0 0 14px;
+        font-size:12.5px;
+        line-height:1.55;
+        color:#d1d5db;
+      }
+      .ya-ebc-page .ya-heli-btn{
+        width:100%;
+        background:#f59e0b;
+        color:#111827;
+        font-size:13px;
+        font-weight:700;
+        border-radius:8px;
+        border:0;
+        padding:10px 14px;
+        text-align:center;
+        cursor:pointer;
+        transition:all .2s ease;
+        box-shadow:0 2px 8px rgba(245,158,11,0.25);
+        display:block;
+        box-sizing:border-box;
+      }
+      .ya-ebc-page .ya-heli-btn:hover{
+        background:#d97706;
+        color:#ffffff;
+      }
+
       .ya-ebc-page .ya-tab-stage{
         grid-column:2;
         min-width:0;
         margin-left:0;
       }
-      .ya-ebc-page .ya-tab-stage .ya-panel{padding-right:0}
+      .ya-ebc-page .ya-tab-stage .ya-panel{padding:0 0 60px}
       .ya-ebc-page .ya-tab-stage .ya-inner{width:100%;max-width:1400px}
       .ya-ebc-page .ya-reading-progress{
         --ya-reading-progress:0%;
@@ -1724,6 +2088,7 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-tabs > .ya-panel .ya-gallery-grid,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-essential-layout,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-review-layout,
+      .ya-ebc-page .ya-tabs > .ya-panel .ya-review-cards,
       .ya-ebc-page .ya-tabs > .ya-panel .ya-form-grid{grid-template-columns:minmax(0,1fr)}
       .ya-ebc-page .ya-tabs > .ya-panel .ya-gallery-grid{grid-template-rows:none}
       .ya-ebc-page .ya-tabs > .ya-panel .ya-gallery-item:first-child{grid-column:auto;grid-row:auto}
@@ -1780,298 +2145,570 @@ $related_query = new WP_Query( array(
   <div class="ya-facts">
     <div class="ya-inner ya-facts-grid ya-reveal">
       <div class="ya-fact">
-        <span class="ya-fact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20L10 6l4 8 2-4 4 10H4z"/></svg></span>
-        <div><small>Highest Point</small><strong><?php echo esc_html( $fact_high_point ); ?></strong></div>
+        <span class="ya-fact-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20L10 6l4 8 2-4 4 10H4z"/></svg>
+        </span>
+        <div class="ya-fact-text">
+          <small>HIGHEST POINT</small>
+          <strong><?php echo esc_html( $fact_high_point ); ?></strong>
+        </div>
       </div>
       <div class="ya-fact">
-        <span class="ya-fact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
-        <div><small>Destination</small><strong><?php echo esc_html( $fact_region ); ?></strong></div>
+        <span class="ya-fact-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </span>
+        <div class="ya-fact-text">
+          <small>DESTINATION</small>
+          <strong><?php echo esc_html( $fact_region ?: $title ); ?></strong>
+        </div>
       </div>
       <div class="ya-fact">
-        <span class="ya-fact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
-        <div><small>Daily Walking</small><strong><?php echo esc_html( $fact_trekking ); ?></strong></div>
+        <span class="ya-fact-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17.5c0-1.5 1-3.5 2.5-4.5S11 11 11 9c0-1.1-.9-2-2-2S7 7.9 7 9"/><path d="M17 17.5c0-1.5-1-3.5-2.5-4.5S13 11 13 9c0-1.1.9-2 2-2s2 .9 2 2"/><circle cx="7" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg>
+        </span>
+        <div class="ya-fact-text">
+          <small>DAILY WALKING</small>
+          <strong><?php echo esc_html( $fact_trekking ); ?></strong>
+        </div>
       </div>
       <div class="ya-fact">
-        <span class="ya-fact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 18V8l6-4 6 4v10"/><path d="M4 20h16M9 20v-6h6v6"/></svg></span>
-        <div><small>Accommodation</small><strong><?php echo esc_html( $fact_accom ); ?></strong></div>
+        <span class="ya-fact-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7v11M21 7v11M3 14h18M7 11h4a2 2 0 0 0 2-2V7H7v4z"/></svg>
+        </span>
+        <div class="ya-fact-text">
+          <small>ACCOMMODATION</small>
+          <strong><?php echo esc_html( $fact_accom ); ?></strong>
+        </div>
       </div>
       <div class="ya-fact">
-        <span class="ya-fact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13h16M7 13v7m10-7v7M6 9h12l-1-5H7L6 9z"/></svg></span>
-        <div><small>Trip Style</small><strong><?php echo esc_html( $fact_style ); ?></strong></div>
+        <span class="ya-fact-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        </span>
+        <div class="ya-fact-text">
+          <small>TRIP STYLE</small>
+          <strong><?php echo esc_html( $fact_style ); ?></strong>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- 3. Sticky Navigation Tabs -->
- <section class="ya-tab-mman-section">
+  <section class="ya-tab-mman-section">
     <nav class="ya-tabs-wrap" aria-label="Trip information tabs">
-    <div class="ya-inner ya-tabs" role="tablist">
-      <button class="ya-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="ya-panel-overview" data-tab="overview">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h8"/></svg>Overview
-      </button>
-      <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-itinerary" data-tab="itinerary">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Itinerary
-      </button>
-      <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-gallery" data-tab="gallery">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 15l-5-5L5 20"/></svg>Gallery
-      </button>
-      <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-essential-info" data-tab="essential-info">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Essential Info
-      </button>
-      <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-review" data-tab="review">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v12H8l-4 3V5z"/></svg>Review
-      </button>
-    </div>
-    <div class="ya-reading-progress" aria-hidden="true"><span class="ya-reading-progress-bar"></span></div>
-  </nav>
+      <div class="ya-nav-title">NAVIGATION</div>
+      <div class="ya-inner ya-tabs" role="tablist">
+        <button class="ya-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="ya-panel-overview" data-tab="overview">
+          Overview
+        </button>
+        <button class="ya-tab" type="button" role="tab" aria-selected="false" data-tab="overview" data-scroll-target=".ya-inclusions-checklist">
+          Highlights
+        </button>
+        <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-itinerary" data-tab="itinerary">
+          Itinerary
+        </button>
+        <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-essential-info" data-tab="essential-info">
+          Essential Info
+        </button>
+        <button class="ya-tab" type="button" role="tab" aria-selected="false" data-tab="overview" data-scroll-target=".ya-roadmap-section">
+          Extensions
+        </button>
+        <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-review" data-tab="review">
+          Reviews
+        </button>
+      </div>
 
-  <div class="ya-tab-stage">
-    <!-- Panel 1: Overview -->
-    <section class="ya-panel is-active" id="ya-panel-overview" role="tabpanel" data-panel="overview">
-      <div class="ya-inner">
-        <div class="ya-section-heading ya-reveal">
-          <span class="ya-kicker"><?php echo esc_html( $overview_kicker ); ?></span>
-          <div class="ya-script"><?php echo esc_html( $overview_script ); ?></div>
-          <h2><?php echo esc_html( $overview_heading ); ?></h2>
+      <!-- Private Heli Charters Promo Card in Left Sidebar -->
+      <div class="ya-heli-card ya-reveal">
+        <div class="ya-heli-tag">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"/></svg>
+          <span>PRIVATE HELI CHARTERS</span>
         </div>
+        <p>Customize this trek with private VIP helicopters and 5-star mountain lodges.</p>
+        <button type="button" class="ya-btn ya-heli-btn" onclick="document.querySelector('#ya-open-enquiry-modal')?.click()">Speak to a Specialist</button>
+      </div>
 
-        <div class="ya-overview-grid">
-          <div class="ya-overview-copy ya-reveal">
-            <h3><?php echo esc_html( $overview_subheading ); ?></h3>
-            <div class="ya-overview-text">
-              <?php echo wp_kses_post( wpautop( $overview_content ) ); ?>
-            </div>
+      <div class="ya-reading-progress" aria-hidden="true"><span class="ya-reading-progress-bar"></span></div>
+    </nav>
 
-            <div class="ya-highlight-box">
-              <?php echo wp_kses_post( $overview_highlight ); ?>
-            </div>
+    <div class="ya-tab-stage">
+      <!-- Panel 1: Overview -->
+      <section class="ya-panel is-active" id="ya-panel-overview" role="tabpanel" data-panel="overview">
+        <div class="ya-inner">
+          <div class="ya-section-heading ya-reveal">
+            <span class="ya-kicker"><?php echo esc_html( $overview_kicker ); ?></span>
+            <div class="ya-script"><?php echo esc_html( $overview_script ); ?></div>
+            <h2>Overview</h2>
+          </div>
 
-            <div class="ya-inclusions">
-              <?php foreach ( $inclusions as $inc_point ) : 
-                $inc_title = is_array( $inc_point ) ? ( $inc_point['title'] ?? '' ) : $inc_point;
-                $inc_desc  = is_array( $inc_point ) ? ( $inc_point['desc'] ?? '' ) : '';
-                if ( empty( $inc_title ) && empty( $inc_desc ) ) continue;
-              ?>
-                <div class="ya-inclusion">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>
-                  <div>
-                    <?php if ( ! empty( $inc_title ) ) : ?><strong><?php echo esc_html( $inc_title ); ?></strong><?php endif; ?>
-                    <?php if ( ! empty( $inc_desc ) ) : ?><div class="ya-inclusion-desc"><?php echo wp_kses_post( wpautop( $inc_desc ) ); ?></div><?php endif; ?>
+          <div class="ya-overview-grid">
+            <div class="ya-overview-copy ya-reveal">
+              <h3><?php echo esc_html( $overview_subheading ); ?></h3>
+              <div class="ya-overview-text">
+                <?php echo wp_kses_post( wpautop( $overview_content ) ); ?>
+              </div>
+
+              <!-- Checklist of Highlights & Inclusions -->
+              <div class="ya-inclusions-checklist">
+                <?php foreach ( $inclusions as $inc_point ) : 
+                  $inc_title = is_array( $inc_point ) ? ( $inc_point['title'] ?? '' ) : $inc_point;
+                  $inc_desc  = is_array( $inc_point ) ? ( $inc_point['desc'] ?? '' ) : '';
+                  if ( empty( $inc_title ) && empty( $inc_desc ) ) continue;
+                ?>
+                  <div class="ya-check-item">
+                    <span class="ya-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg></span>
+                    <div class="ya-check-content">
+                      <?php if ( ! empty( $inc_title ) ) : ?><strong><?php echo esc_html( $inc_title ); ?></strong><?php endif; ?>
+                      <?php if ( ! empty( $inc_desc ) ) : ?><div class="ya-check-desc"><?php echo wp_kses_post( wpautop( $inc_desc ) ); ?></div><?php endif; ?>
+                    </div>
                   </div>
-                </div>
+                <?php endforeach; ?>
+              </div>
+
+              <div class="ya-overview-actions">
+                <a class="ya-btn ya-btn-primary" href="mailto:<?php echo esc_attr( $sales_email ); ?>?subject=<?php echo rawurlencode( 'Request for ' . $title . ' Trip Notes' ); ?>">Request Trip Notes
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+                <a class="ya-btn ya-btn-secondary" href="<?php echo esc_url( home_url( '/bespoke-trips/' ) ); ?>">Make Itinerary Yours</a>
+              </div>
+            </div>
+
+            <!-- Right Column: Top Scenic Photo + Bottom Trip Facts Card -->
+            <div class="ya-overview-side ya-reveal">
+              <div class="ya-side-scenic-photo">
+                <img src="<?php echo esc_url( $hero_slider_images[1] ?? ( $gallery[0]['url'] ?? $hero_bg_img ) ); ?>" alt="<?php echo esc_attr( $title ); ?>" loading="lazy">
+              </div>
+
+              <div class="ya-trip-facts-card">
+                <h4>TRIP FACTS</h4>
+                <ul class="ya-trip-facts-list">
+                  <li>
+                    <span class="ya-tf-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Duration</span>
+                    <strong class="ya-tf-val"><?php echo esc_html( $hero_days ); ?> Days</strong>
+                  </li>
+                  <li>
+                    <span class="ya-tf-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20L10 6l4 8 2-4 4 10H4z"/></svg> Highest Point</span>
+                    <strong class="ya-tf-val"><?php echo esc_html( $fact_high_point ); ?></strong>
+                  </li>
+                  <li>
+                    <span class="ya-tf-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Starting Point</span>
+                    <strong class="ya-tf-val"><?php echo esc_html( $fact_start ); ?></strong>
+                  </li>
+                  <li>
+                    <span class="ya-tf-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Ending Point</span>
+                    <strong class="ya-tf-val"><?php echo esc_html( $fact_end ); ?></strong>
+                  </li>
+                  <li>
+                    <span class="ya-tf-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M16 6l6 6-6 6"/></svg> Total Distance</span>
+                    <strong class="ya-tf-val"><?php echo esc_html( $fact_distance ); ?></strong>
+                  </li>
+                  <li>
+                    <span class="ya-tf-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2"/></svg> Best Season</span>
+                    <strong class="ya-tf-val"><?php echo esc_html( $fact_season ); ?></strong>
+                  </li>
+                  <li>
+                    <span class="ya-tf-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 18V8l6-4 6 4v10"/><path d="M4 20h16"/></svg> Accommodation</span>
+                    <strong class="ya-tf-val"><?php echo esc_html( $fact_accom ); ?></strong>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Highlight Quote Banner -->
+          <div class="ya-quote-banner ya-reveal">
+            <blockquote><?php echo wp_kses_post( wp_strip_all_tags( $overview_highlight ) ); ?></blockquote>
+          </div>
+
+          <!-- Roadmap Section -->
+          <div class="ya-roadmap-section ya-reveal">
+            <div class="ya-roadmap-header">
+              <div>
+                <span class="ya-kicker">ROUTE &amp; ELEVATION</span>
+                <h3>Roadmap of the <?php echo esc_html( $title ); ?> Trek</h3>
+              </div>
+              <div class="ya-roadmap-actions">
+                <button type="button" class="ya-btn ya-btn-secondary ya-open-lightbox" data-image="<?php echo esc_url( $route_img ); ?>">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4M11 8v6M8 11h6"/></svg>
+                  VIEW FULLSCREEN MAP
+                </button>
+              </div>
+            </div>
+            <div class="ya-roadmap-frame">
+              <img src="<?php echo esc_url( $route_img ); ?>" alt="<?php echo esc_attr( $title ); ?> route map" loading="lazy">
+            </div>
+            <div class="ya-roadmap-caption">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <span>Route: <?php echo esc_html( $fact_start ); ?> → <?php echo esc_html( $fact_high_point ); ?> → <?php echo esc_html( $fact_end ); ?> · Total distance ~<?php echo esc_html( $fact_distance ); ?></span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Panel 2: Itinerary -->
+      <section class="ya-panel" id="ya-panel-itinerary" role="tabpanel" data-panel="itinerary">
+        <div class="ya-inner">
+          <div class="ya-section-heading ya-reveal">
+            <div class="ya-itin-head-row">
+              <div>
+                <span class="ya-kicker"><?php echo esc_html( $itin_kicker ); ?></span>
+                <h2>Detailed Itinerary</h2>
+                <p><?php echo esc_html( $itin_subtext ); ?></p>
+              </div>
+              <div class="ya-itin-actions">
+                <button type="button" class="ya-btn-sm" id="ya-itin-expand-all">Expand All Days</button>
+                <button type="button" class="ya-btn-sm" onclick="window.print()">Print Itinerary</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="ya-itinerary-shell">
+            <div class="ya-days">
+              <?php foreach ( $itinerary as $i_idx => $day ) : 
+                $day_num = $day['day'] ?? sprintf( '%02d', $i_idx + 1 );
+                $day_stage = ! empty( $day['stage'] ) ? $day['stage'] : 'TREK';
+                $day_photo = ! empty( $day['gallery'][0] ) 
+                  ? $day['gallery'][0] 
+                  : ( $gallery[ $i_idx % count($gallery) ]['url'] ?? $hero_bg_img );
+              ?>
+                <article class="ya-day <?php echo 0 === $i_idx ? 'is-open' : ''; ?>">
+                  <div class="ya-day-card-grid">
+                    <div class="ya-day-main">
+                      <button class="ya-day-head" type="button" aria-expanded="<?php echo 0 === $i_idx ? 'true' : 'false'; ?>">
+                        <div class="ya-day-title-block">
+                          <span class="ya-day-tag">DAY <?php echo esc_html( $day_num ); ?> | <?php echo esc_html( strtoupper( $day_stage ) ); ?></span>
+                          <strong><?php echo esc_html( $day['title'] ?? '' ); ?></strong>
+                        </div>
+                        <span class="ya-day-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>
+                      </button>
+                      <div class="ya-day-body">
+                        <div class="ya-day-body-inner">
+                          <div class="ya-day-desc">
+                            <?php echo wp_kses_post( wpautop( $day['desc'] ?? '' ) ); ?>
+                          </div>
+                          <?php 
+                          if ( ! empty( $day['pills'] ) ) : 
+                            $pills_array = array_filter( array_map( 'trim', explode( ',', $day['pills'] ) ) );
+                            if ( ! empty( $pills_array ) ) :
+                          ?>
+                            <div class="ya-day-meta">
+                              <?php foreach ( $pills_array as $pill ) : ?>
+                                <span class="ya-meta-pill"><?php echo esc_html( $pill ); ?></span>
+                              <?php endforeach; ?>
+                            </div>
+                          <?php 
+                            endif;
+                          endif; 
+                          ?>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ya-day-photo">
+                      <img src="<?php echo esc_url( $day_photo ); ?>" alt="Day <?php echo esc_attr( $day_num ); ?>: <?php echo esc_attr( $day['title'] ?? '' ); ?>" loading="lazy">
+                    </div>
+                  </div>
+                </article>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 3: Essential Info -->
+      <section class="ya-panel" id="ya-panel-essential-info" role="tabpanel" data-panel="essential-info">
+        <div class="ya-inner">
+          <div class="ya-section-heading ya-reveal">
+            <span class="ya-kicker"><?php echo esc_html( $ess_kicker ); ?></span>
+            <h2>Essential Information</h2>
+            <div class="ya-ess-intro-p">
+              <?php echo wp_kses_post( wpautop( $ess_intro ) ); ?>
+            </div>
+          </div>
+
+          <div class="ya-essential-layout">
+            <div class="ya-info-list ya-reveal">
+              <?php 
+              $ess_icons = array(
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>',
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 18v-6a9 9 0 0 1 18 0v6M3 14h18M3 18h18"/></svg>'
+              );
+              foreach ( $accordions as $a_idx => $acc ) : 
+                $icon_svg = $ess_icons[ $a_idx % count($ess_icons) ];
+              ?>
+                <article class="ya-info-item <?php echo 0 === $a_idx ? 'is-open' : ''; ?>">
+                  <button class="ya-info-head" type="button" aria-expanded="<?php echo 0 === $a_idx ? 'true' : 'false'; ?>">
+                    <span>
+                      <span class="ya-info-icon"><?php echo $icon_svg; ?></span>
+                      <?php echo esc_html( $acc['title'] ?? '' ); ?>
+                    </span>
+                    <svg class="ya-info-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                  </button>
+                  <div class="ya-info-body"><div><div class="ya-info-content">
+                    <?php echo wp_kses_post( $acc['content'] ?? '' ); ?>
+                  </div></div></div>
+                </article>
               <?php endforeach; ?>
             </div>
 
-            <div class="ya-overview-actions">
-              <a class="ya-btn ya-btn-primary" href="mailto:<?php echo esc_attr( $sales_email ); ?>?subject=<?php echo rawurlencode( 'Request for ' . $title . ' Trip Notes' ); ?>">Request Trip Notes
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-              </a>
-              <a class="ya-btn ya-btn-secondary" href="<?php echo esc_url( home_url( '/bespoke-trips/' ) ); ?>">Make Itinerary Yours</a>
+            <aside class="ya-trip-note-card ya-reveal">
+              <div class="ya-trip-note-image" role="img" aria-label="<?php echo esc_attr( $card_title ); ?>"></div>
+              <div class="ya-trip-note-copy">
+                <small><?php echo esc_html( $card_kicker ); ?></small>
+                <h3><?php echo esc_html( $card_title ); ?></h3>
+                <p><?php echo esc_html( $card_desc ); ?></p>
+                <a class="ya-btn ya-btn-light" href="mailto:<?php echo esc_attr( $card_email ); ?>?subject=<?php echo rawurlencode( 'Request for Current ' . $title . ' Trip Notes' ); ?>"><?php echo esc_html( $card_btn ); ?></a>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 4: Reviews -->
+      <section class="ya-panel" id="ya-panel-review" role="tabpanel" data-panel="review">
+        <div class="ya-inner">
+          <div class="ya-section-heading ya-reveal">
+            <div class="ya-rev-head-row">
+              <div>
+                <span class="ya-kicker"><?php echo esc_html( $rev_kicker ); ?></span>
+                <h2>Traveler Reviews</h2>
+                <p><?php echo esc_html( $rev_subtext ); ?></p>
+              </div>
+              <div>
+                <a href="#ya-review-form" class="ya-btn ya-btn-dark">WRITE A REVIEW</a>
+              </div>
             </div>
           </div>
 
-          <div class="ya-map-card ya-reveal">
-            <div class="ya-map-image">
-              <img src="<?php echo esc_url( $route_img ); ?>" alt="<?php echo esc_attr( $title ); ?> route map" loading="lazy">
-              <button type="button" class="ya-open-lightbox" data-image="<?php echo esc_url( $route_img ); ?>" aria-label="Open route map">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4M11 8v6M8 11h6"/></svg>
-              </button>
-            </div>
-            <div class="ya-map-caption">
-              <small><?php echo esc_html( $route_caption_sub ); ?></small>
-              <h3><?php echo esc_html( $route_caption_h3 ); ?></h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel 2: Itinerary -->
-    <section class="ya-panel" id="ya-panel-itinerary" role="tabpanel" data-panel="itinerary">
-      <div class="ya-inner">
-        <div class="ya-section-heading ya-reveal">
-          <span class="ya-kicker"><?php echo esc_html( $itin_kicker ); ?></span>
-          <div class="ya-script"><?php echo esc_html( $itin_script ); ?></div>
-          <h2><?php echo esc_html( $itin_heading ); ?></h2>
-          <p><?php echo esc_html( $itin_subtext ); ?></p>
-        </div>
-
-        <div class="ya-itinerary-shell">
-          <div class="ya-days">
-            <?php foreach ( $itinerary as $i_idx => $day ) : ?>
-              <article class="ya-day <?php echo 0 === $i_idx ? 'is-open' : ''; ?>">
-                <button class="ya-day-head" type="button" aria-expanded="<?php echo 0 === $i_idx ? 'true' : 'false'; ?>">
-                  <span class="ya-day-number"><?php echo esc_html( $day['day'] ?? sprintf( '%02d', $i_idx + 1 ) ); ?></span>
-                  <span class="ya-day-title">
-                    <?php if ( ! empty( $day['stage'] ) ) : ?>
-                      <small><?php echo esc_html( $day['stage'] ); ?></small>
-                    <?php endif; ?>
-                    <strong><?php echo esc_html( $day['title'] ?? '' ); ?></strong>
-                  </span>
-                  <span class="ya-day-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>
-                </button>
-                <div class="ya-day-body"><div class="ya-day-body-inner"><div class="ya-day-content">
-                  <div class="ya-day-desc">
-                    <?php echo wp_kses_post( wpautop( $day['desc'] ?? '' ) ); ?>
-                  </div>
-                  <?php 
-                  if ( ! empty( $day['pills'] ) ) : 
-                    $pills_array = array_filter( array_map( 'trim', explode( ',', $day['pills'] ) ) );
-                    if ( ! empty( $pills_array ) ) :
-                  ?>
-                    <div class="ya-day-meta">
-                      <?php foreach ( $pills_array as $pill ) : ?>
-                        <span class="ya-meta-pill"><?php echo esc_html( $pill ); ?></span>
-                      <?php endforeach; ?>
-                    </div>
-                  <?php 
-                    endif;
-                  endif; 
-                  ?>
-                </div></div></div>
-              </article>
-            <?php endforeach; ?>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel 3: Gallery -->
-    <section class="ya-panel" id="ya-panel-gallery" role="tabpanel" data-panel="gallery">
-      <div class="ya-inner">
-        <div class="ya-section-heading ya-reveal">
-          <span class="ya-kicker"><?php echo esc_html( $gal_kicker ); ?></span>
-          <div class="ya-script"><?php echo esc_html( $gal_script ); ?></div>
-          <h2><?php echo esc_html( $gal_heading ); ?></h2>
-          <p><?php echo esc_html( $gal_subtext ); ?></p>
-        </div>
-
-        <div class="ya-gallery-grid ya-reveal">
-          <?php foreach ( $gallery as $g_idx => $g_item ) : ?>
-            <button class="ya-gallery-item ya-open-lightbox" type="button" data-image="<?php echo esc_url( $g_item['url'] ); ?>">
-              <img src="<?php echo esc_url( $g_item['url'] ); ?>" alt="<?php echo esc_attr( $g_item['label'] ?? $title ); ?>" loading="lazy">
-              <span class="ya-gallery-label">
-                <strong><?php echo esc_html( $g_item['label'] ?? '' ); ?></strong>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-              </span>
-            </button>
-          <?php endforeach; ?>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel 4: Essential Info -->
-    <section class="ya-panel" id="ya-panel-essential-info" role="tabpanel" data-panel="essential-info">
-      <div class="ya-inner">
-        <div class="ya-section-heading ya-reveal">
-          <span class="ya-kicker"><?php echo esc_html( $ess_kicker ); ?></span>
-          <div class="ya-script"><?php echo esc_html( $ess_script ); ?></div>
-          <h2><?php echo esc_html( $ess_heading ); ?></h2>
-          <div class="ya-ess-intro-p">
-            <?php echo wp_kses_post( wpautop( $ess_intro ) ); ?>
-          </div>
-        </div>
-
-        <div class="ya-essential-layout">
-          <div class="ya-info-list ya-reveal">
-            <?php foreach ( $accordions as $a_idx => $acc ) : ?>
-              <article class="ya-info-item <?php echo 0 === $a_idx ? 'is-open' : ''; ?>">
-                <button class="ya-info-head" type="button" aria-expanded="<?php echo 0 === $a_idx ? 'true' : 'false'; ?>">
-                  <span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
-                    <?php echo esc_html( $acc['title'] ?? '' ); ?>
-                  </span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                </button>
-                <div class="ya-info-body"><div><div class="ya-info-content">
-                  <?php echo wp_kses_post( $acc['content'] ?? '' ); ?>
-                </div></div></div>
-              </article>
-            <?php endforeach; ?>
-          </div>
-
-          <aside class="ya-trip-note-card ya-reveal">
-            <div class="ya-trip-note-image" role="img" aria-label="<?php echo esc_attr( $card_title ); ?>"></div>
-            <div class="ya-trip-note-copy">
-              <small><?php echo esc_html( $card_kicker ); ?></small>
-              <h3><?php echo esc_html( $card_title ); ?></h3>
-              <p><?php echo esc_html( $card_desc ); ?></p>
-              <a class="ya-btn ya-btn-light" href="mailto:<?php echo esc_attr( $card_email ); ?>?subject=<?php echo rawurlencode( 'Request for Current ' . $title . ' Trip Notes' ); ?>"><?php echo esc_html( $card_btn ); ?></a>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel 6: Review -->
-    <section class="ya-panel" id="ya-panel-review" role="tabpanel" data-panel="review">
-      <div class="ya-inner">
-        <div class="ya-section-heading ya-reveal">
-          <span class="ya-kicker"><?php echo esc_html( $rev_kicker ); ?></span>
-          <div class="ya-script"><?php echo esc_html( $rev_script ); ?></div>
-          <h2><?php echo esc_html( $rev_heading ); ?></h2>
-          <p><?php echo esc_html( $rev_subtext ); ?></p>
-        </div>
-
-        <div class="ya-review-layout">
           <div class="ya-review-cards ya-reveal" id="ya-review-cards-list">
-            <?php foreach ( $display_reviews as $rev ) : 
+            <?php foreach ( $display_reviews as $rev_idx => $rev ) : 
               $star_count = intval( $rev['rating'] ?? 5 );
+              $rev_name = $rev['name'] ?? 'Traveller';
+              $name_parts = explode(' ', trim($rev_name));
+              $initials = (isset($name_parts[0][0]) ? $name_parts[0][0] : '') . (isset($name_parts[1][0]) ? $name_parts[1][0] : '');
+              $initials = strtoupper($initials) ?: 'TR';
+              $avatar_colors = array( '#1a365d', '#742a2a', '#22543d', '#744210', '#44337a', '#234e52' );
+              $bg_color = $avatar_colors[ $rev_idx % count($avatar_colors) ];
             ?>
               <article class="ya-review-card">
-                <div class="ya-stars" aria-label="<?php echo esc_attr( $star_count ); ?> out of 5 stars">
-                  <?php for ( $s = 0; $s < $star_count; $s++ ) : ?>
-                    <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
-                  <?php endfor; ?>
+                <div class="ya-rev-card-top">
+                  <div class="ya-stars" aria-label="<?php echo esc_attr( $star_count ); ?> out of 5 stars">
+                    <?php for ( $s = 0; $s < $star_count; $s++ ) : ?>
+                      <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
+                    <?php endfor; ?>
+                  </div>
                 </div>
                 <blockquote><?php echo esc_html( $rev['quote'] ?? '' ); ?></blockquote>
-                <strong><?php echo esc_html( $rev['name'] ?? 'Traveller' ); ?></strong>
-                <small><?php echo esc_html( $rev['location'] ?? '' ); ?></small>
+                <div class="ya-rev-author">
+                  <span class="ya-rev-avatar" style="background-color:<?php echo esc_attr($bg_color); ?>"><?php echo esc_html($initials); ?></span>
+                  <div>
+                    <strong><?php echo esc_html( $rev_name ); ?></strong>
+                    <small><?php echo esc_html( $rev['location'] ?? 'Verified Trekker' ); ?></small>
+                  </div>
+                </div>
               </article>
             <?php endforeach; ?>
           </div>
 
-          <form class="ya-review-form ya-reveal" id="ya-review-form">
-            <h3>Write a Review</h3>
-            <p>Your review will be saved to our database and shared with our team.</p>
-            
-            <div class="ya-review-alert ya-review-alert--success" id="ya-rev-alert-success"></div>
-            <div class="ya-review-alert ya-review-alert--error" id="ya-rev-alert-error"></div>
+          <!-- Review Form Container -->
+          <div class="ya-rev-form-wrap ya-reveal">
+            <form class="ya-review-form" id="ya-review-form">
+              <h3>Write a Review</h3>
+              <p>Your review will be saved to our database and shared with our team.</p>
+              
+              <div class="ya-review-alert ya-review-alert--success" id="ya-rev-alert-success"></div>
+              <div class="ya-review-alert ya-review-alert--error" id="ya-rev-alert-error"></div>
 
-            <input type="hidden" id="ya-review-trek-id" value="<?php echo esc_attr( $post_id ); ?>">
-            <input type="hidden" id="ya-review-trek-title" value="<?php echo esc_attr( $title ); ?>">
+              <input type="hidden" id="ya-review-trek-id" value="<?php echo esc_attr( $post_id ); ?>">
+              <input type="hidden" id="ya-review-trek-title" value="<?php echo esc_attr( $title ); ?>">
 
-            <div class="ya-form-grid">
-              <div class="ya-field"><label for="ya-review-name">Full Name *</label><input id="ya-review-name" type="text" required placeholder="e.g. John Doe"></div>
-              <div class="ya-field"><label for="ya-review-email">Email *</label><input id="ya-review-email" type="email" required placeholder="e.g. john@example.com"></div>
-              <div class="ya-field"><label for="ya-review-city">City</label><input id="ya-review-city" type="text" placeholder="e.g. London"></div>
-              <div class="ya-field"><label for="ya-review-country">Country</label><input id="ya-review-country" type="text" placeholder="e.g. United Kingdom"></div>
-              <div class="ya-field"><label for="ya-review-date">Tour Date</label><input id="ya-review-date" type="month"></div>
-              <div class="ya-field"><label>Rating *</label>
-                <div class="ya-rating-row" aria-label="Rating from 1 to 5">
-                  <input type="radio" id="ya-star5" name="ya-rating" value="5" checked required><label for="ya-star5" aria-label="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
-                  <input type="radio" id="ya-star4" name="ya-rating" value="4"><label for="ya-star4" aria-label="4 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
-                  <input type="radio" id="ya-star3" name="ya-rating" value="3"><label for="ya-star3" aria-label="3 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
-                  <input type="radio" id="ya-star2" name="ya-rating" value="2"><label for="ya-star2" aria-label="2 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
-                  <input type="radio" id="ya-star1" name="ya-rating" value="1"><label for="ya-star1" aria-label="1 star"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+              <div class="ya-form-grid">
+                <div class="ya-field"><label for="ya-review-name">Full Name *</label><input id="ya-review-name" type="text" required placeholder="e.g. John Doe"></div>
+                <div class="ya-field"><label for="ya-review-email">Email *</label><input id="ya-review-email" type="email" required placeholder="e.g. john@example.com"></div>
+                <div class="ya-field"><label for="ya-review-city">City</label><input id="ya-review-city" type="text" placeholder="e.g. London"></div>
+                <div class="ya-field"><label for="ya-review-country">Country</label><input id="ya-review-country" type="text" placeholder="e.g. United Kingdom"></div>
+                <div class="ya-field"><label for="ya-review-date">Tour Date</label><input id="ya-review-date" type="month"></div>
+                <div class="ya-field"><label>Rating *</label>
+                  <div class="ya-rating-row" aria-label="Rating from 1 to 5">
+                    <input type="radio" id="ya-star5" name="ya-rating" value="5" checked required><label for="ya-star5" aria-label="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+                    <input type="radio" id="ya-star4" name="ya-rating" value="4"><label for="ya-star4" aria-label="4 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+                    <input type="radio" id="ya-star3" name="ya-rating" value="3"><label for="ya-star3" aria-label="3 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+                    <input type="radio" id="ya-star2" name="ya-rating" value="2"><label for="ya-star2" aria-label="2 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+                    <input type="radio" id="ya-star1" name="ya-rating" value="1"><label for="ya-star1" aria-label="1 star"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+                  </div>
+                </div>
+                <div class="ya-field ya-field-full"><label for="ya-review-comment">Comment *</label><textarea id="ya-review-comment" required placeholder="Share your experience on this trek..."></textarea></div>
+                <div class="ya-field ya-field-full"><label for="ya-review-moment">Inspirational moment of your trip</label><textarea id="ya-review-moment" placeholder="What stood out most?"></textarea></div>
+                <div class="ya-field ya-field-full"><label for="ya-review-leader">What did you think of your trek leader?</label><textarea id="ya-review-leader" placeholder="Feedback on guide and porters..."></textarea></div>
+                <div class="ya-field ya-field-full"><label for="ya-review-advice">Advice for future travellers</label><textarea id="ya-review-advice" placeholder="Helpful tips for future trekkers..."></textarea></div>
+                <div class="ya-field ya-field-full" style="display:flex; gap:12px; flex-wrap:wrap;">
+                  <button class="ya-btn ya-btn-primary" type="submit" id="ya-submit-rev-btn">Submit Review to Database</button>
+                  <button class="ya-btn ya-btn-secondary" type="button" id="ya-email-rev-btn">Send via Email</button>
                 </div>
               </div>
-              <div class="ya-field ya-field-full"><label for="ya-review-comment">Comment *</label><textarea id="ya-review-comment" required placeholder="Share your experience on this trek..."></textarea></div>
-              <div class="ya-field ya-field-full"><label for="ya-review-moment">Inspirational moment of your trip</label><textarea id="ya-review-moment" placeholder="What stood out most?"></textarea></div>
-              <div class="ya-field ya-field-full"><label for="ya-review-leader">What did you think of your trek leader?</label><textarea id="ya-review-leader" placeholder="Feedback on guide and porters..."></textarea></div>
-              <div class="ya-field ya-field-full"><label for="ya-review-advice">Advice for future travellers</label><textarea id="ya-review-advice" placeholder="Helpful tips for future trekkers..."></textarea></div>
-              <div class="ya-field ya-field-full" style="display:flex; gap:12px; flex-wrap:wrap;">
-                <button class="ya-btn ya-btn-primary" type="submit" id="ya-submit-rev-btn">Submit Review to Database</button>
-                <button class="ya-btn ya-btn-secondary" type="button" id="ya-email-rev-btn">Send via Email</button>
-              </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-  </div>
- </section>
+    </div>
+  </section>
+
+  <!-- Fixed Departure Dates Section -->
+  <section class="ya-departures ya-reveal" id="ya-departures">
+    <style>
+      .ya-ebc-page .ya-departures{padding:90px 0;background:var(--cream);border-top:1px solid var(--line)}
+      .ya-ebc-page .ya-dep-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:48px}
+      .ya-ebc-page .ya-dep-head-copy{}
+      .ya-ebc-page .ya-dep-head .ya-kicker{display:block;margin-bottom:10px}
+      .ya-ebc-page .ya-dep-head h2{margin:0 0 10px;font:600 clamp(28px,3vw,40px)/1.1 "Newsreader",Georgia,serif;color:var(--green)}
+      .ya-ebc-page .ya-dep-head p{margin:0;color:var(--muted);font-size:15px;max-width:520px;line-height:1.7}
+      .ya-ebc-page .ya-dep-table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 4px 28px rgba(14,49,47,.06)}
+      .ya-ebc-page .ya-dep-table thead tr{background:var(--green);color:#fff}
+      .ya-ebc-page .ya-dep-table th{padding:14px 20px;font:600 11px/1 "Open Sans",Arial,sans-serif;text-transform:uppercase;letter-spacing:1.2px;text-align:left}
+      .ya-ebc-page .ya-dep-table tbody tr{background:#fff;border-bottom:1px solid var(--line);transition:background .18s ease}
+      .ya-ebc-page .ya-dep-table tbody tr:last-child{border-bottom:none}
+      .ya-ebc-page .ya-dep-table tbody tr:hover{background:#f5faf7}
+      .ya-ebc-page .ya-dep-table td{padding:16px 20px;font-size:14px;color:var(--ink);vertical-align:middle}
+      .ya-ebc-page .ya-dep-date-cell{font:600 15px/1.3 "Newsreader",Georgia,serif}
+      .ya-ebc-page .ya-dep-day{display:block;font-size:22px;color:var(--green)}
+      .ya-ebc-page .ya-dep-month-year{display:block;font-size:12px;color:var(--muted);font-family:Inter,Arial,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+      .ya-ebc-page .ya-dep-price{font:600 16px/1 "Newsreader",Georgia,serif;color:var(--green)}
+      .ya-ebc-page .ya-dep-price-sub{display:block;font:400 11px/1 Inter,Arial,sans-serif;color:var(--muted);margin-top:4px}
+      .ya-ebc-page .ya-dep-seats{color:var(--muted);font-size:13px}
+      .ya-ebc-page .ya-dep-note{color:var(--muted);font-size:12px;font-style:italic;margin-top:3px}
+      .ya-ebc-page .ya-dep-status{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font:600 11px/1 Inter,Arial,sans-serif;text-transform:uppercase;letter-spacing:.7px}
+      .ya-ebc-page .ya-dep-status--open{background:#edf7f0;color:#1e6b3a;border:1px solid #b7e2c7}
+      .ya-ebc-page .ya-dep-status--limited{background:#fff8e6;color:#8a5c00;border:1px solid #fcd97a}
+      .ya-ebc-page .ya-dep-status--soldout{background:#f5f5f5;color:#6b7280;border:1px solid #d1d5db}
+      .ya-ebc-page .ya-dep-status--guaranteed{background:#f0f4ff;color:#2b4aaf;border:1px solid #c7d4fa}
+      .ya-ebc-page .ya-dep-book-btn{white-space:nowrap}
+      .ya-ebc-page .ya-dep-no-dates{text-align:center;padding:56px 24px;background:#fff;border:1px solid var(--line);border-radius:12px}
+      .ya-ebc-page .ya-dep-no-dates svg{width:44px;height:44px;color:var(--gold);margin:0 auto 16px;display:block}
+      .ya-ebc-page .ya-dep-no-dates h3{margin:0 0 10px;font:600 22px/1.2 "Newsreader",Georgia,serif;color:var(--green)}
+      .ya-ebc-page .ya-dep-no-dates p{margin:0 0 22px;color:var(--muted);font-size:14px}
+      @media(max-width:820px){
+        .ya-ebc-page .ya-dep-table thead{display:none}
+        .ya-ebc-page .ya-dep-table tbody tr{display:block;padding:16px;margin-bottom:10px;border:1px solid var(--line);border-radius:8px}
+        .ya-ebc-page .ya-dep-table td{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+        .ya-ebc-page .ya-dep-table td:last-child{border-bottom:none}
+        .ya-ebc-page .ya-dep-table td::before{content:attr(data-label);font:600 11px/1 Inter,Arial,sans-serif;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);flex-shrink:0;margin-right:10px}
+      }
+    </style>
+    <div class="ya-inner">
+      <div class="ya-dep-head">
+        <div class="ya-dep-head-copy">
+          <span class="ya-kicker"><?php echo esc_html( $dep_kicker ); ?></span>
+          <h2><?php echo esc_html( $dep_heading ); ?></h2>
+          <p><?php echo esc_html( $dep_subtext ); ?></p>
+        </div>
+        <button type="button" class="ya-btn ya-btn-primary" onclick="document.querySelector('#ya-open-enquiry-modal')?.click()">
+          Enquire About Dates
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px;margin-left:6px"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+
+      <?php if ( ! empty( $departure_dates ) ) : ?>
+      <table class="ya-dep-table" aria-label="Upcoming departure dates for <?php echo esc_attr( $title ); ?>">
+        <thead>
+          <tr>
+            <th>Departure Date</th>
+            <th>Duration</th>
+            <th>Price</th>
+            <th>Availability</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ( $departure_dates as $dep ) :
+            $dep_date_str = $dep['date'] ?? '';
+            $dep_ts       = strtotime( $dep_date_str );
+            $dep_day      = $dep_ts ? date( 'd', $dep_ts ) : '';
+            $dep_mon_yr   = $dep_ts ? date( 'M Y', $dep_ts ) : $dep_date_str;
+            $dep_price    = $dep['price'] ?? '';
+            $dep_seats    = $dep['seats'] ?? '';
+            $dep_status   = $dep['status'] ?? 'open';
+            $dep_note     = $dep['note'] ?? '';
+
+            $status_label = array(
+              'open'        => 'Open',
+              'limited'     => 'Limited',
+              'soldout'     => 'Sold Out',
+              'guaranteed'  => 'Guaranteed',
+            )[ $dep_status ] ?? 'Open';
+          ?>
+          <tr>
+            <td data-label="Date" class="ya-dep-date-cell">
+              <?php if ( $dep_day ) : ?>
+                <span class="ya-dep-day"><?php echo esc_html( $dep_day ); ?></span>
+                <span class="ya-dep-month-year"><?php echo esc_html( $dep_mon_yr ); ?></span>
+              <?php else : ?>
+                <?php echo esc_html( $dep_date_str ); ?>
+              <?php endif; ?>
+            </td>
+            <td data-label="Duration"><?php echo esc_html( $hero_days ); ?> Days</td>
+            <td data-label="Price">
+              <span class="ya-dep-price"><?php echo esc_html( $dep_price ?: 'Contact us' ); ?></span>
+              <?php if ( $dep_price ) : ?><span class="ya-dep-price-sub">per person</span><?php endif; ?>
+            </td>
+            <td data-label="Availability">
+              <span class="ya-dep-seats"><?php echo esc_html( $dep_seats ?: '—' ); ?></span>
+              <?php if ( $dep_note ) : ?><div class="ya-dep-note"><?php echo esc_html( $dep_note ); ?></div><?php endif; ?>
+            </td>
+            <td data-label="Status">
+              <span class="ya-dep-status ya-dep-status--<?php echo esc_attr( $dep_status ); ?>"><?php echo esc_html( $status_label ); ?></span>
+            </td>
+            <td data-label="Book">
+              <?php if ( 'soldout' !== $dep_status ) : ?>
+              <button type="button" class="ya-btn ya-btn-primary ya-dep-book-btn" onclick="document.querySelector('#ya-open-enquiry-modal')?.click()" style="padding:9px 18px;font-size:13px;">
+                Book Now
+              </button>
+              <?php else : ?>
+              <button type="button" class="ya-btn ya-dep-book-btn" disabled style="padding:9px 18px;font-size:13px;opacity:.5;cursor:not-allowed;background:#e5e7eb;color:#9ca3af;border:1px solid #d1d5db;border-radius:8px;">
+                Sold Out
+              </button>
+              <?php endif; ?>
+            </td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+
+      <?php else : ?>
+      <div class="ya-dep-no-dates">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <h3>Departure Dates on Request</h3>
+        <p>We offer private and group departures throughout the year. Contact our team to check the current schedule and available dates that suit your plans.</p>
+        <button type="button" class="ya-btn ya-btn-primary" onclick="document.querySelector('#ya-open-enquiry-modal')?.click()">
+          Ask About Available Dates
+        </button>
+      </div>
+      <?php endif; ?>
+    </div>
+  </section>
+
+  <!-- Dark CTA Banner ("Ready for the Himalaya?") -->
+  <section class="ya-dark-cta-section ya-reveal">
+    <div class="ya-inner ya-dark-cta-inner">
+      <h2 class="ya-dark-cta-heading">Ready for the Himalaya?</h2>
+      <p class="ya-dark-cta-sub">Whether you want a customized itinerary, private departure, or have questions about acclimatization, our local expert team in Kathmandu is here to help.</p>
+      
+      <form class="ya-dark-cta-form" onsubmit="event.preventDefault(); document.querySelector('#ya-open-enquiry-modal')?.click();">
+        <input type="email" placeholder="Enter your email address" required aria-label="Email address">
+        <button type="submit" class="ya-btn ya-btn-gold">Start Planning</button>
+      </form>
+
+      <div class="ya-dark-cta-badges">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Best Price Guarantee</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Flexible Cancellation</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> 24/7 Local Support</span>
+      </div>
+    </div>
+  </section>
 
   <!-- Related Journeys -->
   <section class="ya-related">

@@ -249,6 +249,7 @@ trek-content-manager.php                  ← Main plugin entry point & asset lo
 | `trek_dep_box_note` | `_trek_dep_box_note` | `string` | Availability footnote. |
 | `trek_whatsapp_number`| `_trek_whatsapp_number` | `string` | WhatsApp contact number (digits only). |
 | `trek_sales_email` | `_trek_sales_email` | `string` | Direct booking sales email. |
+| `dep_date[]`, `dep_price[]`, `dep_seats[]`, `dep_status[]`, `dep_note[]` | `_trek_dep_dates` | `array<object>` | Array of departure dates: `[{date, price, seats, status, note}]`. |
 
 ---
 

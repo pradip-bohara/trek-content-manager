@@ -9,8 +9,8 @@
     }
 
     .ya-hero {
-        --forest: #022f2e;
-        --gold: #c7a767;
+        --forest: #617654;
+        --gold: #d1ad54;
         --gold-light: #f1dfb8;
         --white: #ffffff;
         --hero-height: 100svh;
@@ -118,6 +118,7 @@
         width: 100%;
         max-width: 1100px;
         margin: 0 auto;
+        padding-top:20vh;
     }
 
     .ya-hero h1 {
@@ -156,7 +157,7 @@
         border: 1px solid rgba(255, 255, 255, 0.28);
         border-radius: 3px;
         background: var(--gold);
-        color: var(--forest);
+        color: var(--white);
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
         font-family: "Open Sans", Arial, sans-serif;
         font-size: 11px;
@@ -184,8 +185,8 @@
     }
 
     .ya-hero-cta:hover {
-        background: #e4c98f;
-        color: #012221;
+        background: var(--forest);
+        color: var(--white);
         transform: translateY(-2px);
         box-shadow: 0 22px 48px rgba(0, 0, 0, 0.35);
     }
@@ -240,7 +241,7 @@
         width: 0%;
         height: 100%;
         border-radius: inherit;
-        background: #d1ad54;
+        background: var(--gold);
         box-shadow: 0 0 10px rgba(209, 173, 84, 0.6);
         pointer-events: none;
     }
@@ -1577,590 +1578,1032 @@
 
 <section class="destinations" id="destinations">
     <div class="destinations__inner">
-        <div class="destinations__content">
+
+        <div class="destinations__heading">
             <h2 class="destinations__title">
-                Discover the places
-                <em>that stay with you.</em>
+                Travel with
+                Yeti Adventure.
             </h2>
+
             <p class="destinations__text">
-                From the great Himalayan peaks to ancient kingdoms and
-                timeless cultures, we create journeys shaped around the
-                places that inspire you most.
+                Some journeys stay with us long after we return.
+                Discover Himalayan landscapes, ancient cultures and
+                quiet moments that become part of your story.
             </p>
         </div>
 
         <div class="destinations__area">
+        
+
             <div class="destinations__viewport" id="destinationViewport">
                 <div class="destinations__track" id="destinationTrack">
+
                     <a href="/destinations/nepal/" class="destination-card">
-                        <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=900&q=80"
-                            alt="Nepal Himalayas" loading="eager" draggable="false">
+                        <img
+                            src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1000&q=85"
+                            alt="Nepal Himalayas"
+                            loading="eager"
+                            draggable="false"
+                        >
+
                         <div class="destination-card__overlay"></div>
+
+                        <span class="destination-card__number">01</span>
+
                         <div class="destination-card__content">
-                            <span>01</span>
                             <h3>Nepal</h3>
-                            <p>Where Himalayan landscapes meet ancient trails, living culture and unforgettable mountain
-                                journeys.</p>
-                            <strong>Discover Nepal <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+
+                            <p>
+                                Himalayan trails, timeless villages and
+                                living traditions come together in journeys
+                                filled with unforgettable mountain moments.
+                            </p>
+
+                            <strong>
+                                Discover Nepal
+                                <svg width="17" height="17" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor"
+                                    stroke-width="1.8" stroke-linecap="round"
                                     stroke-linejoin="round">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                     <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg></strong>
+                                </svg>
+                            </strong>
                         </div>
                     </a>
 
                     <a href="/destinations/bhutan/" class="destination-card">
-                        <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=900&q=80"
-                            alt="Bhutan mountain landscape" loading="lazy" draggable="false">
+                        <img
+                            src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1000&q=85"
+                            alt="Bhutan mountain landscape"
+                            loading="lazy"
+                            draggable="false"
+                        >
+
                         <div class="destination-card__overlay"></div>
+
+                        <span class="destination-card__number">02</span>
+
                         <div class="destination-card__content">
-                            <span>02</span>
                             <h3>Bhutan</h3>
-                            <p>A hidden Himalayan kingdom of monasteries, forests, sacred valleys and quiet discovery.
+
+                            <p>
+                                Sacred monasteries, peaceful valleys and
+                                forested mountain paths create a slower,
+                                quieter journey unlike anywhere else.
                             </p>
-                            <strong>Discover Bhutan <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+
+                            <strong>
+                                Discover Bhutan
+                                <svg width="17" height="17" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor"
+                                    stroke-width="1.8" stroke-linecap="round"
                                     stroke-linejoin="round">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                     <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg></strong>
+                                </svg>
+                            </strong>
                         </div>
                     </a>
 
                     <a href="/destinations/india/" class="destination-card">
-                        <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=900&q=80"
-                            alt="India Taj Mahal" loading="lazy" draggable="false">
+                        <img
+                            src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1000&q=85"
+                            alt="India Taj Mahal"
+                            loading="lazy"
+                            draggable="false"
+                        >
+
                         <div class="destination-card__overlay"></div>
+
+                        <span class="destination-card__number">03</span>
+
                         <div class="destination-card__content">
-                            <span>03</span>
                             <h3>India</h3>
-                            <p>A world of extraordinary contrasts, from royal heritage and timeless cities to wild
-                                landscapes.</p>
-                            <strong>Discover India <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+
+                            <p>
+                                Ancient cities, remarkable heritage and
+                                vibrant cultures unfold across a land where
+                                every journey reveals something unexpected.
+                            </p>
+
+                            <strong>
+                                Discover India
+                                <svg width="17" height="17" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor"
+                                    stroke-width="1.8" stroke-linecap="round"
                                     stroke-linejoin="round">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                     <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg></strong>
+                                </svg>
+                            </strong>
                         </div>
                     </a>
 
                     <a href="/destinations/tibet/" class="destination-card">
-                        <img src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=900&q=80"
-                            alt="Tibet Himalayan landscape" loading="lazy" draggable="false">
+                        <img
+                            src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1000&q=85"
+                            alt="Tibet Himalayan landscape"
+                            loading="lazy"
+                            draggable="false"
+                        >
+
                         <div class="destination-card__overlay"></div>
+
+                        <span class="destination-card__number">04</span>
+
                         <div class="destination-card__content">
-                            <span>04</span>
                             <h3>Tibet</h3>
-                            <p>Journey across the roof of the world through sacred landscapes, ancient culture and vast
-                                skies.</p>
-                            <strong>Discover Tibet <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+
+                            <p>
+                                Vast skies, sacred landscapes and ancient
+                                traditions lead you across a remarkable land
+                                shaped by mountains, faith and solitude.
+                            </p>
+
+                            <strong>
+                                Discover Tibet
+                                <svg width="17" height="17" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor"
+                                    stroke-width="1.8" stroke-linecap="round"
                                     stroke-linejoin="round">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                     <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg></strong>
+                                </svg>
+                            </strong>
                         </div>
                     </a>
+
                 </div>
             </div>
+          
+            <div class="destinations__navigation">
 
-            <div class="destinations__nav" aria-label="Destination navigation">
-                <button class="destinations__dot is-active" type="button" data-slide="0" aria-label="Show Nepal"
-                    aria-current="true"></button>
-                <button class="destinations__dot" type="button" data-slide="1" aria-label="Show Bhutan"
-                    aria-current="false"></button>
-                <button class="destinations__dot" type="button" data-slide="2" aria-label="Show India"
-                    aria-current="false"></button>
-                <button class="destinations__dot" type="button" data-slide="3" aria-label="Show Tibet"
-                    aria-current="false"></button>
+                
+
+                <div class="destinations__nav">
+
+                    <button class="destinations__dot is-active"
+                        type="button"
+                        data-slide="0"
+                        aria-label="Show Nepal"
+                        aria-current="true">
+                    </button>
+
+                    <button class="destinations__dot"
+                        type="button"
+                        data-slide="1"
+                        aria-label="Show Bhutan"
+                        aria-current="false">
+                    </button>
+
+                    <button class="destinations__dot"
+                        type="button"
+                        data-slide="2"
+                        aria-label="Show India"
+                        aria-current="false">
+                    </button>
+
+                    <button class="destinations__dot"
+                        type="button"
+                        data-slide="3"
+                        aria-label="Show Tibet"
+                        aria-current="false">
+                    </button>
+
+                </div>
+
+                
+
             </div>
+
+            <div class="destinations__cta">
+                <a href="/destinations/" class="ya-hero-cta">
+                    <span>Explore All Destinations</span>
+
+                    <svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+            </div>
+
         </div>
+
     </div>
 </section>
 
 <style>
-    .destinations {
-        width: 100%;
-        background: #ffffff;
-        overflow-x: hidden;
-        overflow-y: visible;
-        padding: 80px 0;
-        box-sizing: border-box;
-    }
+.destinations {
+    width: 100%;
+    padding: 100px 0 110px;
+    background: #f8f8f3;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+}
 
-    .destinations *,
-    .destinations *::before,
-    .destinations *::after {
-        box-sizing: border-box;
-    }
+.destinations *,
+.destinations *::before,
+.destinations *::after {
+    box-sizing: border-box;
+}
 
-    .destinations__inner {
-        width: min(1400px);
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: minmax(300px, 0.42fr) minmax(0, 1fr);
-        gap: 60px;
-        align-items: center;
-    }
+.destinations__inner {
+    width: min(1400px, calc(100% - 64px));
+    margin: 0 auto;
+}
 
-    /* ── Left panel ── */
-    .destinations__content {
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background: transparent;
-    }
+.destinations__heading {
+    max-width: 760px;
+    margin-bottom: 55px;
+}
 
-    .destinations__title {
-        margin: 0;
-        font-family: "Newsreader", Georgia, serif;
-        font-size: clamp(36px, 4.2vw, 58px);
-        font-weight: 400;
-        line-height: 1.05;
-        letter-spacing: -1.5px;
-        color: #111111;
-    }
+.destinations__title {
+    margin: 0;
+    font-family: "Newsreader", Georgia, serif;
+    font-size: 48px;
+    line-height: 1;
+    font-weight: 400;
+    letter-spacing: -2px;
+    color: #15251d;
+}
 
-    .destinations__title em {
-        display: block;
-        margin-top: 4px;
-        font-family: "Newsreader", Georgia, serif;
-        font-style: italic;
-        font-weight: 400;
-        color: #617654;
-        opacity: 1;
+
+
+.destinations__text {
+    max-width: 570px;
+    margin: 24px 0 0;
+    font-family: "DM Sans", "Inter", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #5c655e;
+}
+
+.destinations__area {
+    width: 100%;
+    position: relative;
+}
+
+.destinations__viewport {
+    width: 100%;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: pan-y;
+    position: relative;
+}
+
+.destinations__viewport.is-dragging {
+    cursor: grabbing;
+}
+
+.destinations__track {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    width: 100%;
+    transform: none;
+    will-change: transform;
+    user-select: none;
+}
+
+.destination-card {
+    position: relative;
+    width: 100%;
+    max-width: none;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #26352d;
+    color: #fff;
+    text-decoration: none;
+    isolation: isolate;
+    box-shadow: 0 9px 30px rgba(28, 47, 35, .09);
+    transition:
+        transform .45s cubic-bezier(.2, .7, .2, 1),
+        box-shadow .45s ease;
+}
+
+.destination-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 22px 50px rgba(28, 47, 35, .16);
+}
+
+.destination-card > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    user-select: none;
+    pointer-events: none;
+    transform: scale(1.01);
+    transition: transform 1s cubic-bezier(.2, .7, .2, 1);
+}
+
+.destination-card:hover > img {
+    transform: scale(1.075);
+}
+
+.destination-card__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,.04) 0%,
+            rgba(0,0,0,.02) 32%,
+            rgba(0,0,0,.18) 53%,
+            rgba(0,0,0,.68) 76%,
+            rgba(0,0,0,.91) 100%
+        );
+}
+
+.destination-card__number {
+    position: absolute;
+    top: 19px;
+    left: 19px;
+    z-index: 3;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.42);
+    border-radius: 50%;
+    background: rgba(255,255,255,.13);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-family: "DM Sans", "Inter", Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.destination-card__content {
+    position: absolute;
+    left: 25px;
+    right: 25px;
+    bottom: 25px;
+    z-index: 3;
+}
+
+.destination-card__content h3 {
+    margin: 0 0 10px;
+    font-family: "Newsreader", Georgia, serif;
+    font-size: 38px;
+    line-height: 1;
+    font-weight: 400;
+    letter-spacing: -.8px;
+    color: #fff;
+}
+
+.destination-card__content p {
+    max-width: 270px;
+    margin: 0;
+    font-family: "DM Sans", "Inter", Arial, sans-serif;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: rgba(255,255,255,.84);
+}
+
+.destination-card__content strong {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,.25);
+    font-family: "DM Sans", "Inter", Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    transition: gap .35s ease, color .3s ease;
+}
+
+.destination-card:hover .destination-card__content strong {
+    gap: 15px;
+    color: #d7ead9;
+}
+
+.destinations__navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 30px;
+}
+
+.destinations__nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.destinations__dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #ccd4cc;
+    cursor: pointer;
+    transition:
+        width .35s ease,
+        background .35s ease;
+}
+
+.destinations__dot.is-active {
+    width: 28px;
+    border-radius: 20px;
+    background: #617654;
+}
+
+.destinations__dot:hover {
+    background: #617654;
+}
+
+
+
+.destinations__cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 42px;
+}
+
+.destinations__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 50px;
+    padding: 0 25px;
+    border: 1px solid #617654;
+    border-radius: 50px;
+    background: #617654;
+    color: #fff;
+    text-decoration: none;
+    font-family: "DM Sans", "Inter", Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    transition:
+        background .3s ease,
+        transform .3s ease,
+        box-shadow .3s ease,
+        gap .3s ease;
+}
+
+.destinations__button:hover {
+    background: #4e654d;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(97,118,84,.2);
+    gap: 16px;
+}
+
+/* Desktop 1400px+: static four-card layout */
+@media (min-width: 1401px) {
+    .destinations__heading {
+        max-width: 760px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
     }
 
     .destinations__text {
-        max-width: 380px;
-        margin: 28px 0 0;
-        font-family: "Open Sans", Arial, sans-serif;
-        font-size: 14px;
-        line-height: 1.8;
-        color: #555e52;
+        margin-left: auto;
+        margin-right: auto;
     }
 
-    /* ── Right cards area ── */
-    .destinations__area {
-        min-width: 0;
-        overflow: hidden;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        background: transparent;
-        padding: 0;
+    .destinations__arrow,
+    .destinations__navigation {
+        display: none !important;
     }
 
     .destinations__viewport {
-        position: relative;
+        overflow: visible;
+        cursor: default;
+        touch-action: auto;
+    }
+
+    .destinations__track {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         width: 100%;
+        transform: none !important;
+    }
+
+    .destination-card {
         min-width: 0;
+    }
+}
+
+/* Carousel controls: always sit at the left/right sides of the cards */
+@media (max-width: 1400px) {
+    .destinations__area {
+        position: relative;
+    }
+
+    .destinations__arrow {
+        position: absolute;
+        top: 50%;
+        z-index: 20;
+        transform: translateY(-50%);
+        margin: 0;
+        flex: 0 0 auto;
+    }
+
+    .destinations__arrow:first-child {
+        left: 8px;
+    }
+
+    .destinations__arrow:last-child {
+        right: 8px;
+    }
+
+    .destinations__arrow:first-child:hover,
+    .destinations__arrow:last-child:hover {
+        transform: translateY(-50%);
+    }
+
+
+    .destinations__track {
+        display: flex;
+        gap: 20px;
+        width: max-content;
+        transform: translate3d(0, 0, 0);
+    }
+
+    .destination-card {
+        flex: 0 0 285px;
+        width: 250px;
+        max-width: none;
+    }
+
+    .destinations__arrow,
+    .destinations__navigation {
+        display: flex;
+        width: 100%;
+    }
+
+    .destinations__viewport {
         overflow: hidden;
         cursor: grab;
         touch-action: pan-y;
     }
+}
 
-    .destinations__viewport::-webkit-scrollbar {
-        display: none;
+@media (max-width: 1200px) {
+
+    .destinations__inner {
+        width: calc(100% - 48px);
     }
 
-    .destinations__viewport.is-dragging {
-        cursor: grabbing;
-    }
-
-    .destinations__track {
-        display: flex;
-        gap: 16px;
-        width: max-content;
-        transform: translate3d(0, 0, 0);
-        will-change: transform;
-        user-select: none;
-    }
-
-    /* ── Destination cards ── */
     .destination-card {
-        position: relative;
-        flex: 0 0 320px;
-        height: 500px;
-        overflow: hidden;
-        border-radius: 12px;
-        background: #1a1a1a;
-        color: #ffffff;
-        text-decoration: none;
-        isolation: isolate;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.13);
-        transition: box-shadow 0.35s ease, transform 0.35s ease;
+        flex: 0 0 285px;
+        width: 285px;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .destinations {
+        padding: 75px 0 85px;
     }
 
-    .destination-card:hover {
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
-        transform: translateY(-3px);
+    .destinations__inner {
+        width: calc(100% - 40px);
     }
 
-    .destination-card img {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        user-select: none;
-        pointer-events: none;
-        transform: scale(1.01);
-        transition: transform 0.9s cubic-bezier(.2, .7, .2, 1);
+    .destinations__heading {
+        margin-bottom: 40px;
     }
 
-    .destination-card:hover img {
-        transform: scale(1.07);
+    .destinations__title {
+        text-align: center;
+        font-size: 48px;
     }
 
-    .destination-card__overlay {
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        background: linear-gradient(to bottom,
-                rgba(0, 0, 0, 0) 30%,
-                rgba(0, 0, 0, 0.15) 52%,
-                rgba(0, 0, 0, 0.72) 80%,
-                rgba(0, 0, 0, 0.88) 100%);
-        transition: background 0.45s ease;
+    .destination-card {
+        flex-basis: 300px;
+        height: 450px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .destinations__arrow:first-child {
+        left: 6px;
     }
 
-    .destination-card:hover .destination-card__overlay {
-        background: linear-gradient(to bottom,
-                rgba(0, 0, 0, 0.1) 20%,
-                rgba(0, 0, 0, 0.35) 50%,
-                rgba(0, 0, 0, 0.82) 80%,
-                rgba(0, 0, 0, 0.94) 100%);
+    .destinations__arrow:last-child {
+        right: 6px;
+    }
+
+    .destinations {
+        padding: 60px 0 70px;
+    }
+
+    .destinations__inner {
+        width: calc(100% - 28px);
+    }
+
+    .destinations__heading {
+        margin-bottom: 32px;
+    }
+
+    .destinations__title {
+        text-align: center;
+        font-size: 42px;
+        letter-spacing: -1.5px;
+    }
+
+    .destinations__text {
+        margin-top: 20px;
+        font-size: 13px;
+        line-height: 1.75;
+    }
+
+    .destination-card {
+        flex-basis: calc(100vw - 56px);
+        height: 475px;
+        border-radius: 14px;
     }
 
     .destination-card__content {
-        position: absolute;
-        left: 26px;
-        right: 26px;
-        bottom: 28px;
-        z-index: 2;
-    }
-
-    /* Hide the numbered span to match reference */
-    .destination-card__content>span {
-        display: none;
+        left: 22px;
+        right: 22px;
+        bottom: 22px;
     }
 
     .destination-card__content h3 {
-        margin: 0 0 10px;
-        font-family: "Newsreader", Georgia, serif;
-        font-size: 32px;
-        font-weight: 400;
-        line-height: 1.05;
-        letter-spacing: -0.8px;
-        color: #ffffff;
+        font-size: 35px;
     }
 
     .destination-card__content p {
-        max-width: 260px;
-        margin: 0;
-        font-family: "Open Sans", Arial, sans-serif;
-        font-size: 13px;
-        line-height: 1.65;
-        color: rgba(255, 255, 255, 0.80);
+        max-width: 100%;
+        text-align: justify;
+        text-justify:center;
     }
 
-    .destination-card__content strong {
-        display: none;
-    }
-
-    /* ── Dot navigation ── */
-    .destinations__nav {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 8px;
+    .destinations__navigation {
         margin-top: 22px;
-        padding: 0;
-        background: transparent;
+        gap: 13px;
     }
 
-    .destinations__dot {
-        width: 10px;
-        height: 10px;
-        padding: 0;
-        border: none;
-        border-radius: 999px;
-        background: #cfd8cb;
-        cursor: pointer;
-        transition: width 0.35s ease, background 0.35s ease;
+    .destinations__arrow {
+        width: 37px;
+        height: 37px;
     }
 
-    .destinations__dot.is-active {
-        width: 32px;
-        height: 10px;
-        background: #617654;
-        border-radius: 999px;
+    .destinations__cta {
+        margin-top: 32px;
     }
 
-    .destinations__dot:hover {
-        background: #617654;
+    .destinations__button {
+        width: 100%;
+        max-width: 290px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .destinations__title {
+        font-size: 38px;
+        text-align: center;
     }
 
-    /* ── Responsive ── */
-    @media (max-width: 1100px) {
-        .destinations__inner {
-            width: calc(100% - 48px);
-            grid-template-columns: minmax(240px, 0.5fr) minmax(0, 1fr);
-            gap: 40px;
-        }
-
-        .destination-card {
-            flex: 0 0 290px;
-            height: 500px;
-        }
+    .destination-card {
+        flex-basis: calc(100vw - 44px);
+        height: 450px;
     }
+}
 
-    @media (max-width: 800px) {
-        .destinations {
-            padding: 60px 0;
-        }
+@media (prefers-reduced-motion: reduce) {
 
-        .destinations__inner {
-            width: calc(100% - 40px);
-            grid-template-columns: 1fr;
-            gap: 32px;
-        }
-
-        .destinations__title {
-            font-size: clamp(32px, 7vw, 48px);
-        }
-
-        .destinations__nav {
-            justify-content: center;
-        }
-
-        .destination-card {
-            flex: 0 0 260px;
-            height: 460px;
-        }
+    .destinations *,
+    .destinations *::before,
+    .destinations *::after {
+        transition: none !important;
+        animation: none !important;
     }
-
-    @media (max-width: 500px) {
-        .destinations {
-            padding: 44px 0;
-        }
-
-        .destinations__inner {
-            width: calc(100% - 28px);
-        }
-
-        .destinations__title {
-            font-size: clamp(28px, 8vw, 38px);
-        }
-
-        .destinations__text {
-            font-size: 13px;
-        }
-
-        .destination-card {
-            flex: 0 0 220px;
-            height: 400px;
-        }
-
-        .destination-card__content h3 {
-            font-size: 20px;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-
-        .destinations__track,
-        .destination-card img,
-        .destination-card__content p,
-        .destinations__dot {
-            transition: none;
-        }
-    }
+}
 </style>
 
 <script>
-    (function () {
-        const viewport = document.getElementById('destinationViewport');
-        const track = document.getElementById('destinationTrack');
-        const buttons = [...document.querySelectorAll('.destinations__dot')];
+(function () {
+    const viewport = document.getElementById("destinationViewport");
+    const track = document.getElementById("destinationTrack");
+    const dots = [...document.querySelectorAll(".destinations__dot")];
+    const next = document.getElementById("destinationNext");
+    const prev = document.getElementById("destinationPrev");
 
-        if (!viewport || !track) return;
+    if (!viewport || !track) return;
 
-        const originalCards = [...track.querySelectorAll('.destination-card')];
-        if (!originalCards.length) return;
+    const originalCards = [...track.querySelectorAll(".destination-card")];
+    if (!originalCards.length) return;
 
-        const copyCardsForLoop = (copies = 2) => {
-            for (let copy = 0; copy < copies; copy += 1) {
-                originalCards.forEach((card) => {
-                    const clone = card.cloneNode(true);
-                    clone.setAttribute('aria-hidden', 'true');
-                    clone.tabIndex = -1;
-                    track.appendChild(clone);
-                });
-            }
-        };
-        copyCardsForLoop();
+    const desktopQuery = window.matchMedia("(min-width: 1401px)");
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-        let position = 0;
-        let isPlaying = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        let isDragging = false;
-        let dragged = false;
-        let startX = 0;
-        let dragStartPosition = 0;
-        let lastTime = performance.now();
-        let frameId = 0;
-        const speed = 0.045;
-        const dragThreshold = 6;
+    let clonesAdded = false;
+    let position = 0;
+    let isDragging = false;
+    let dragged = false;
+    let startX = 0;
+    let dragStart = 0;
+    let lastTime = performance.now();
+    let playing = false;
+    let wasPlaying = false;
+    const speed = 0.035;
 
-        function getCardStep() {
-            const card = track.querySelector('.destination-card');
-            if (!card) return 348;
-            const styles = window.getComputedStyle(track);
-            const gap = parseFloat(styles.gap) || parseFloat(styles.columnGap) || 18;
-            return card.offsetWidth + gap;
+    function isDesktop() {
+        return desktopQuery.matches;
+    }
+
+    function addClones() {
+        if (clonesAdded) return;
+
+        originalCards.forEach(card => {
+            const clone = card.cloneNode(true);
+            clone.setAttribute("aria-hidden", "true");
+            clone.tabIndex = -1;
+            track.appendChild(clone);
+        });
+
+        originalCards.forEach(card => {
+            const clone = card.cloneNode(true);
+            clone.setAttribute("aria-hidden", "true");
+            clone.tabIndex = -1;
+            track.appendChild(clone);
+        });
+
+        clonesAdded = true;
+    }
+
+    function getStep() {
+        const card = track.querySelector(".destination-card");
+        if (!card) return 325;
+
+        const styles = window.getComputedStyle(track);
+        const gap = parseFloat(styles.gap) || 20;
+
+        return card.offsetWidth + gap;
+    }
+
+    function getLoopWidth() {
+        return getStep() * originalCards.length;
+    }
+
+    function normalize() {
+        const width = getLoopWidth();
+        if (!width) return;
+
+        position = ((position % width) + width) % width;
+    }
+
+    function render() {
+        if (isDesktop()) {
+            track.style.transform = "none";
+            return;
         }
 
-        function getLoopWidth() {
-            return getCardStep() * originalCards.length;
-        }
+        track.style.transform = `translate3d(${-position}px,0,0)`;
+    }
 
-        function render() {
-            track.style.transform = `translate3d(${-position}px, 0, 0)`;
-        }
+    function updateDots() {
+        if (isDesktop()) return;
 
-        function updateActiveDot() {
-            const loopWidth = getLoopWidth();
-            if (loopWidth <= 0) return;
-            const step = getCardStep();
-            const normalized = ((position % loopWidth) + loopWidth) % loopWidth;
-            const activeIndex = Math.floor((normalized + step * 0.3) / step) % originalCards.length;
-            buttons.forEach((btn, i) => {
-                const active = i === activeIndex;
-                btn.classList.toggle('is-active', active);
-                btn.setAttribute('aria-current', active ? 'true' : 'false');
-            });
-        }
+        const step = getStep();
+        const width = getLoopWidth();
 
-        function normalizePosition() {
-            const loopWidth = getLoopWidth();
-            if (loopWidth <= 0) return;
-            position = ((position % loopWidth) + loopWidth) % loopWidth;
-        }
+        if (!width) return;
 
-        function update(nextPosition = position) {
-            position = nextPosition;
-            normalizePosition();
+        const normalized = ((position % width) + width) % width;
+        const active =
+            Math.floor((normalized + step * 0.3) / step) %
+            originalCards.length;
+
+        dots.forEach((dot, index) => {
+            const activeState = index === active;
+
+            dot.classList.toggle("is-active", activeState);
+            dot.setAttribute("aria-current", activeState ? "true" : "false");
+        });
+    }
+
+    function update(value) {
+        if (isDesktop()) {
+            position = 0;
             render();
-            updateActiveDot();
+            return;
         }
 
-        function animate(time) {
-            const delta = time - lastTime;
-            lastTime = time;
-            if (isPlaying && !isDragging && !document.hidden) {
-                update(position + speed * delta);
-            }
-            frameId = window.requestAnimationFrame(animate);
-        }
+        position = value;
+        normalize();
+        render();
+        updateDots();
+    }
 
-        frameId = window.requestAnimationFrame(animate);
+    function setMode() {
+        const desktop = isDesktop();
 
-        buttons.forEach((button) => {
-            button.addEventListener('click', () => {
-                const index = Number(button.dataset.slide);
-                update(index * getCardStep());
-            });
-        });
-
-        viewport.addEventListener('pointerdown', (event) => {
-            if (event.button !== 0) return;
-            isDragging = true;
-            dragged = false;
-            startX = event.clientX;
-            dragStartPosition = position;
-            viewport.classList.add('is-dragging');
-            viewport.setPointerCapture(event.pointerId);
-        });
-
-        viewport.addEventListener('pointermove', (event) => {
-            if (!isDragging) return;
-            const distance = event.clientX - startX;
-            dragged ||= Math.abs(distance) > dragThreshold;
-            update(dragStartPosition - distance);
-        });
-
-        function stopDragging(event) {
-            if (!isDragging) return;
+        if (desktop) {
+            playing = false;
             isDragging = false;
-            viewport.classList.remove('is-dragging');
-            if (event && viewport.hasPointerCapture(event.pointerId)) {
-                viewport.releasePointerCapture(event.pointerId);
-            }
+            position = 0;
+            track.style.transform = "none";
+            viewport.classList.remove("is-dragging");
+        } else {
+            addClones();
+
+            playing = !reducedMotionQuery.matches;
+            position = 0;
+            lastTime = performance.now();
+
+            render();
+            updateDots();
+        }
+    }
+
+    function animate(time) {
+        const delta = time - lastTime;
+        lastTime = time;
+
+        if (
+            !isDesktop() &&
+            playing &&
+            !isDragging &&
+            !document.hidden &&
+            !reducedMotionQuery.matches
+        ) {
+            update(position + speed * delta);
         }
 
-        viewport.addEventListener('pointerup', stopDragging);
-        viewport.addEventListener('pointercancel', stopDragging);
-        viewport.addEventListener('click', (event) => {
+        requestAnimationFrame(animate);
+    }
+
+    dots.forEach(dot => {
+        dot.addEventListener("click", function () {
+            if (isDesktop()) return;
+
+            const index = Number(this.dataset.slide);
+            update(index * getStep());
+        });
+    });
+
+    if (next) {
+        next.addEventListener("click", function () {
+            if (isDesktop()) return;
+            update(position + getStep());
+        });
+    }
+
+    if (prev) {
+        prev.addEventListener("click", function () {
+            if (isDesktop()) return;
+            update(position - getStep());
+        });
+    }
+
+    viewport.addEventListener("pointerdown", function (event) {
+        if (isDesktop() || event.button !== 0) return;
+
+        isDragging = true;
+        dragged = false;
+        startX = event.clientX;
+        dragStart = position;
+
+        viewport.classList.add("is-dragging");
+
+        viewport.setPointerCapture(event.pointerId);
+    });
+
+    viewport.addEventListener("pointermove", function (event) {
+        if (!isDragging || isDesktop()) return;
+
+        const distance = event.clientX - startX;
+
+        if (Math.abs(distance) > 6) {
+            dragged = true;
+        }
+
+        update(dragStart - distance);
+    });
+
+    function stopDragging(event) {
+        if (!isDragging) return;
+
+        isDragging = false;
+        viewport.classList.remove("is-dragging");
+
+        if (
+            event &&
+            viewport.hasPointerCapture(event.pointerId)
+        ) {
+            viewport.releasePointerCapture(event.pointerId);
+        }
+    }
+
+    viewport.addEventListener("pointerup", stopDragging);
+    viewport.addEventListener("pointercancel", stopDragging);
+
+    viewport.addEventListener(
+        "click",
+        function (event) {
             if (!dragged) return;
+
             event.preventDefault();
             event.stopPropagation();
+
             dragged = false;
-        }, true);
+        },
+        true
+    );
 
-        let wasPlayingBeforeHover = false;
-        viewport.addEventListener('mouseenter', () => {
-            wasPlayingBeforeHover = isPlaying;
-            isPlaying = false;
-        });
+    viewport.addEventListener("mouseenter", function () {
+        if (isDesktop()) return;
 
-        viewport.addEventListener('mouseleave', () => {
-            if (wasPlayingBeforeHover) {
-                isPlaying = true;
+        wasPlaying = playing;
+        playing = false;
+    });
+
+    viewport.addEventListener("mouseleave", function () {
+        if (isDesktop()) return;
+
+        if (wasPlaying) {
+            playing = true;
+        }
+    });
+
+    viewport.addEventListener(
+        "wheel",
+        function (event) {
+            if (isDesktop()) return;
+
+            if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+                event.preventDefault();
+
+                update(position + event.deltaX * 0.8);
             }
-        });
+        },
+        { passive: false }
+    );
 
-        viewport.addEventListener('wheel', (event) => {
-            if (Math.abs(event.deltaX) > Math.abs(event.deltaY) || event.shiftKey) {
-                event.preventDefault();
-                update(position + (event.deltaX || event.deltaY) * 0.8);
-            }
-        }, { passive: false });
+    viewport.tabIndex = 0;
 
-        viewport.tabIndex = 0;
-        viewport.setAttribute('aria-label', 'Destination carousel');
-        viewport.addEventListener('keydown', (event) => {
-            const step = getCardStep();
-            if (event.key === "ArrowRight") {
-                event.preventDefault();
-                update(position + step);
-            } else if (event.key === "ArrowLeft") {
-                event.preventDefault();
-                update(position - step);
-            } else if (event.key === " ") {
-                event.preventDefault();
-                isPlaying = !isPlaying;
-            }
-        });
+    viewport.addEventListener("keydown", function (event) {
+        if (isDesktop()) return;
 
-        window.addEventListener('resize', () => {
-            update();
-        });
+        if (event.key === "ArrowRight") {
+            event.preventDefault();
+            update(position + getStep());
+        }
 
-        document.addEventListener('visibilitychange', () => {
-            lastTime = performance.now();
-        });
+        if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            update(position - getStep());
+        }
 
-        updateActiveDot();
-        window.addEventListener('pagehide', () => window.cancelAnimationFrame(frameId));
-    })();
+        if (event.key === " ") {
+            event.preventDefault();
+            playing = !playing;
+        }
+    });
+
+    function handleModeChange() {
+        setMode();
+    }
+
+    if (desktopQuery.addEventListener) {
+        desktopQuery.addEventListener("change", handleModeChange);
+    } else {
+        desktopQuery.addListener(handleModeChange);
+    }
+
+    window.addEventListener("resize", function () {
+        if (isDesktop()) {
+            position = 0;
+            render();
+        } else {
+            update(position);
+        }
+    });
+
+    document.addEventListener("visibilitychange", function () {
+        lastTime = performance.now();
+    });
+
+    setMode();
+    requestAnimationFrame(animate);
+})();
 </script>
-
-
 <!-- YETI ADVENTURE / ABOUT SECTION -->
 <section class="ya-about" id="about">
     <!-- LEFT SIDE: MEDIA / IMAGE (OUTSIDE EDGE, HEIGHT CAPPED) -->

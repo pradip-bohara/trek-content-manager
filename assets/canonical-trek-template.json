@@ -1,271 +1,495 @@
 [
   {
+    "_comment": "Trek Content Manager — Canonical Destination Template v2.0 | All fields, all sections, ready to import via JSON Importer or Quick JSON Auto-Fill metabox.",
+
     "title": "The Ultimate Everest Base Camp Experience",
     "slug": "everest-base-camp-experience",
-    "categories": [
-      "Trekking",
-      "High Altitude Expedition",
-      "Signature Journey"
-    ],
+    "excerpt": "Journey through legendary Sherpa homelands, ancient pine forests, and glacial moraines across 15 spectacular days to stand at the foot of the world's highest mountain.",
+
+    "category": ["Trekking", "Himalayan", "Signature Journey"],
     "primary_category": "Signature Journey",
-    "regions": [
-      "Nepal",
-      "Khumbu"
-    ],
-    "breadcrumb_region": "Nepal",
+    "region": ["Nepal"],
     "difficulty": "Strenuous",
-    "map_region": "Khumbu",
+    "map_region": "Everest Region (Khumbu / EBC)",
     "map_district": "Solukhumbu",
-    "featured": "1",
+    "featured": true,
     "status": "open",
+
     "hero": {
       "script_title": "The Ultimate Trek",
       "title": "Everest Base Camp Experience",
       "kicker": "Khumbu · Nepal",
-      "subtitle": "A majestic 15-day high-altitude journey ascending through legendary Sherpa homelands, ancient pine forests, and alpine glacial valleys to the foot of Mount Everest.",
-      "days": "15 Days",
+      "subtitle": "A majestic 15-day high-altitude journey ascending through legendary Sherpa homelands, ancient pine forests, and alpine glacial valleys to the foot of Mount Everest — the world's highest peak.",
+      "days": 15,
       "badge_sub": "Days in Nepal",
-      "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85"
+      "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
+      "slider_images": [
+        "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1600&q=85",
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
+        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=85",
+        "https://images.unsplash.com/photo-1571922021609-f38c01ad6b20?auto=format&fit=crop&w=1600&q=85"
+      ]
     },
+
     "card": {
       "title": "Everest Base Camp Experience",
       "meta": "15 Days",
       "tag": "Nepal · Signature Journey",
       "kicker": "Signature Journey",
-      "excerpt": "Ascend through legendary Sherpa homelands, alpine valleys, and glacial moraines to the foot of Mount Everest.",
+      "excerpt": "Ascend through legendary Sherpa homelands, alpine valleys and glacial moraines to the foot of Mount Everest.",
       "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
       "order": 1
     },
+
     "quick_facts": {
-      "high_point": "5,550m · Kala Patthar",
-      "low_point": "1,400m · Kathmandu",
-      "status": "open",
-      "region": "Everest Region, Nepal",
+      "high_point": "5,550m / 18,209ft · Kala Patthar",
+      "low_point": "1,400m / 4,593ft · Kathmandu",
+      "region": "Everest Region (Khumbu), Nepal",
       "season": "Autumn (Sep–Nov) & Spring (Mar–May)",
       "group_size": "2–12 Travellers",
-      "trekking": "Usually 5–6 hours daily",
-      "accom": "Boutique Kathmandu hotels & comfortable mountain lodges",
+      "trekking": "Usually 5–7 hours daily",
+      "accom": "Boutique Kathmandu Hotels & Comfortable Mountain Lodges",
       "style": "Privately Guided High-Altitude Trek",
       "distance": "130 km round-trip",
-      "start": "Kathmandu / Lukla",
-      "end": "Lukla / Kathmandu"
+      "start": "Kathmandu / Lukla (Flight)",
+      "end": "Lukla / Kathmandu (Flight)",
+      "status": "open",
+      "price": "2850",
+      "currency": "USD"
     },
+
     "overview": {
       "kicker": "Nepal · 15 Days",
       "script": "The Ultimate Trek",
       "heading": "To the Foot of Mount Everest",
       "subheading": "Through the spiritual heartland of the Sherpa people",
-      "content": "<p>The Everest Base Camp trek stands as one of the world's quintessential mountain journeys. Beginning with an exhilarating scenic flight into Lukla, you step directly into high Himalayan terrain where suspension bridges draped with prayer flags span turquoise glacial rivers.</p><p>Over two carefully paced weeks, you will acclimatise in the bustling mountain trading capital of Namche Bazaar, visit the revered Tengboche Monastery with panoramic vistas of Ama Dablam, and traverse lunar moraine landscapes into Gorak Shep.</p><p>Standing at Everest Base Camp (5,364m) before the formidable Khumbu Icefall, followed by a dawn summit of Kala Patthar (5,550m), delivers an unmatched view of Mount Everest, Lhotse, Nuptse, and Pumori.</p>",
-      "highlight": "<p>A demanding Himalayan journey defined by altitude, changing landscapes, rich Sherpa heritage, and unforgettable encounters beneath the world's highest summits.</p>",
+      "content": "<p>The Everest Base Camp trek stands as one of the world's quintessential mountain journeys — a pilgrimage through landscapes so dramatic and a culture so deeply rooted in mountain tradition that each step carries the weight of adventure history. Beginning with an exhilarating scenic mountain flight into Lukla's legendary Tenzing-Hillary Airport, you step directly into high Himalayan terrain where suspension bridges draped with prayer flags span turquoise glacial rivers tumbling from peaks above 8,000 metres.</p><p>Over two carefully paced weeks, you will acclimatise in the bustling Sherpa trading capital of Namche Bazaar, perched amphitheatre-like above the confluence of the Bhote Kosi and Dudh Koshi rivers. From here, the trail ascends through silver birch forests to the spiritual sanctuary of Tengboche Monastery — backdropped by the soaring spike of Ama Dablam — before continuing through the high-altitude villages of Dingboche and Lobuche toward the lunar moraine landscape of Gorak Shep.</p><p>Standing at Everest Base Camp (5,364m) before the formidable churning walls of the Khumbu Icefall, then watching the Himalayan dawn ignite the summit pyramid of Everest from the rocky crest of Kala Patthar (5,550m) are defining moments that transform every trekker who completes them. Throughout the journey, a dedicated team of government-licensed guides and experienced Sherpa porters ensure your safety, comfort, and access to authentic mountain culture at every stage.</p>",
+      "highlight": "<p>A demanding yet deeply rewarding Himalayan journey defined by altitude, shifting mountain landscapes, rich Sherpa cultural heritage, and unforgettable views beneath the world's highest summits — including Everest, Lhotse, Nuptse, Ama Dablam, and Cho Oyu.</p>",
       "highlights": [
-        "Stand at Everest Base Camp (5,364m) directly beside the Khumbu Icefall",
-        "Dawn climb of Kala Patthar (5,550m) for panoramic sunrise vistas of Mount Everest",
-        "Two nights in vibrant Namche Bazaar with guided acclimatisation hikes",
-        "Visit the spiritual heart of the Khumbu at Tengboche Buddhist Monastery",
-        "Full private logistics support from seasoned Sherpa guides and dedicated porter crew"
+        "Stand at Everest Base Camp (5,364m) directly before the iconic Khumbu Icefall",
+        "Dawn climb of Kala Patthar (5,550m) for panoramic sunrise views of Mount Everest",
+        "Two acclimatisation nights in Namche Bazaar with guided cultural hikes",
+        "Visit the revered Tengboche Monastery with direct views of Ama Dablam",
+        "Cross legendary Hillary and Tenzing suspension bridges adorned with prayer flags",
+        "Hike above the clouds through Sagarmatha National Park's pristine alpine forests",
+        "Full private guide, Sherpa porter, and medical safety kit support throughout"
       ],
-      "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
-      "route_img": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
+      "image": "https://images.unsplash.com/photo-1571922021609-f38c01ad6b20?auto=format&fit=crop&w=1600&q=85",
+      "route_img": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=85",
       "map_file_url": "",
       "map_embed_code": "",
       "route_sub": "Route Overview",
-      "route_heading": "Kathmandu to Everest Base Camp & Back"
+      "route_heading": "Kathmandu → Lukla → EBC → Kala Patthar → Kathmandu"
     },
+
     "itinerary_section": {
       "kicker": "Day by Day",
       "script": "Your Journey",
       "heading": "15 Days Through the Khumbu Valley",
-      "subtext": "Open each day to inspect the planned trail route, elevation profile, meals, accommodation, and walking times."
+      "subtext": "Open each day to inspect the planned trail route, elevation profile, meals, accommodation, and estimated walking times. All days include dedicated guide and porter support."
     },
+
     "itinerary": [
       {
         "day": "01",
         "stage": "Kathmandu (1,400m)",
-        "title": "Arrive in Kathmandu & Hotel Transfer",
-        "description": "<p>Welcome to Nepal! Upon clearing customs at Tribhuvan International Airport, an expedition representative will greet you and escort you by private vehicle to your boutique heritage hotel. Enjoy a leisurely afternoon followed by a comprehensive pre-trek briefing and welcome dinner.</p>",
-        "pills": "Meals: Welcome Dinner · Boutique Heritage Hotel",
-        "altitude": "1,400m",
+        "title": "Arrive in Kathmandu & Boutique Hotel Transfer",
+        "description": "<p>Welcome to Nepal! Upon clearing customs at Tribhuvan International Airport, an expedition representative will greet you and escort you by private vehicle to your boutique heritage hotel in central Kathmandu. Enjoy a leisurely afternoon to recover from your journey before a comprehensive pre-trek briefing covering equipment checks, permit documentation, and daily logistics. The evening concludes with a traditional Nepali welcome dinner.</p>",
+        "pills": "Meals: Welcome Dinner · Boutique Heritage Hotel · Kathmandu",
+        "altitude": "1,400m / 4,593ft",
         "walking_hours": "Airport transfer only",
-        "stay": "Kathmandu Boutique Hotel",
+        "stay": "Dwarika's Heritage Hotel, Kathmandu",
+        "meals": "Dinner",
         "gallery": []
       },
       {
         "day": "02",
-        "stage": "Lukla (2,840m) to Phakding (2,610m)",
-        "title": "Scenic Mountain Flight to Lukla & Hike to Phakding",
-        "description": "<p>Early morning scenic flight to Tenzing-Hillary Airport in Lukla. Meet your Sherpa trekking crew, adjust daypacks, and begin the gentle downward hike along the Dudh Koshi riverbank through pine and rhododendron woods to the village of Phakding.</p>",
+        "stage": "Kathmandu → Lukla (2,840m) → Phakding (2,610m)",
+        "title": "Scenic Mountain Flight to Lukla & Trek to Phakding",
+        "description": "<p>An early morning departure for the iconic 35-minute scenic mountain flight to Tenzing-Hillary Airport in Lukla — one of the world's most dramatically situated runways, perched on a cliff edge at 2,840m. Meet your Sherpa trekking crew, distribute loads to porters, and begin the gentle downward trail along the Dudh Koshi riverbank through fragrant pine and rhododendron woodland to the river village of Phakding. Cross two suspension bridges adorned with colourful prayer flags as yak caravans pass by.</p>",
         "pills": "Meals: B, L, D · Teahouse Lodge · Approx. 3–4 hrs",
-        "altitude": "2,610m",
+        "altitude": "2,610m / 8,563ft",
         "walking_hours": "3–4 hrs",
-        "stay": "Phakding Mountain Lodge",
+        "stay": "Phakding Mountain Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
         "gallery": []
       },
       {
         "day": "03",
-        "stage": "Phakding (2,610m) to Namche Bazaar (3,440m)",
+        "stage": "Phakding (2,610m) → Namche Bazaar (3,440m)",
         "title": "Ascend to the Sherpa Capital of Namche Bazaar",
-        "description": "<p>Cross the high Hillary Suspension Bridge adorned with wind-whipped prayer flags and begin the sustained zig-zag ascent through Sagarmatha National Park into Namche Bazaar, where your first glimpse of Mount Everest appears through the trees.</p>",
+        "description": "<p>Today's trail crosses the spectacular Hillary Suspension Bridge — one of the highest suspension bridges in Nepal — before entering Sagarmatha National Park at Jorsale checkpoint. A sustained two-hour zig-zag ascent through mixed forest brings you to the amphitheatre of Namche Bazaar, the vibrant Sherpa capital and commercial hub of the Khumbu region. On a clear day, your first thrilling glimpse of Mount Everest appears framed through the trees just before you crest the ridge into town.</p>",
         "pills": "Meals: B, L, D · Mountain Lodge · Approx. 5–6 hrs",
-        "altitude": "3,440m",
+        "altitude": "3,440m / 11,286ft",
         "walking_hours": "5–6 hrs",
         "stay": "Namche Bazaar Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
         "gallery": []
       },
       {
         "day": "04",
-        "stage": "Namche Bazaar (3,440m)",
-        "title": "Acclimatisation Day & Viewpoint Hike",
-        "description": "<p>Rest and acclimatise. Undertake a panoramic morning hike up to the Everest View Hotel (3,880m) for sweeping vistas of Ama Dablam, Thamserku, and Everest. Explore the local Sherpa culture museum and vibrant weekend market.</p>",
-        "pills": "Meals: B, L, D · Mountain Lodge · Approx. 3–4 hrs",
-        "altitude": "3,880m (Hike high, sleep low)",
-        "walking_hours": "3–4 hrs",
+        "stage": "Namche Bazaar (3,440m) — Acclimatisation",
+        "title": "Acclimatisation Day: Everest View Hotel Hike & Sherpa Museum",
+        "description": "<p>A critical and rewarding acclimatisation rest day. Following the 'climb high, sleep low' principle, you will hike up to the famous Everest View Hotel (3,880m) for sweeping 180-degree panoramas of Ama Dablam, Thamserku, Kantega, and — on a clear morning — the distinctive summit pyramid of Mount Everest rising above the Lhotse–Nuptse ridge. In the afternoon, explore the informative Sherpa Culture Museum in Namche and browse the weekend market.</p>",
+        "pills": "Meals: B, L, D · Mountain Lodge · Acclimatisation Hike 3–4 hrs",
+        "altitude": "3,880m / 12,729ft (hike high, sleep at 3,440m)",
+        "walking_hours": "3–4 hrs acclimatisation hike",
         "stay": "Namche Bazaar Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
         "gallery": []
       },
       {
         "day": "05",
-        "stage": "Namche Bazaar to Tengboche (3,860m)",
+        "stage": "Namche Bazaar (3,440m) → Tengboche (3,860m)",
         "title": "Trail to Tengboche Monastery with Ama Dablam Views",
-        "description": "<p>Follow a contouring path above the Imja Khola river before descending to Phunki Tenga for lunch. Climb steadily through birch and fir forests to reach the ridge-top spiritual sanctuary of Tengboche Monastery, set against an awe-inspiring backdrop of Ama Dablam.</p>",
-        "pills": "Meals: B, L, D · Mountain Lodge · Approx. 5 hrs",
-        "altitude": "3,860m",
-        "walking_hours": "5 hrs",
+        "description": "<p>Leaving Namche, a contour path weaves above the Imja Khola before descending steeply to the river crossing at Phunki Tenga (3,250m) — a welcome lunch stop beneath towering fir trees. A sustained two-hour climb through silver birch and conifer forest leads to the dramatic ridge-top sanctuary of Tengboche Monastery, the largest and most sacred monastery in the Khumbu. The setting is extraordinary: the monastery stands directly before the soaring triangular peak of Ama Dablam (6,812m), with Everest, Lhotse, and Nuptse visible behind.</p>",
+        "pills": "Meals: B, L, D · Mountain Lodge · Approx. 5–6 hrs",
+        "altitude": "3,860m / 12,664ft",
+        "walking_hours": "5–6 hrs",
         "stay": "Tengboche Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "06",
+        "stage": "Tengboche (3,860m) → Dingboche (4,410m)",
+        "title": "Trek Through Pangboche to High-Altitude Dingboche",
+        "description": "<p>Descend from Tengboche through open meadows and juniper scrub into the lower Khumbu, visiting the ancient Pangboche Monastery — the oldest in the region — before crossing the Imja Khola and ascending sharply into the broad hanging valley of Dingboche. This elevated settlement (4,410m) marks your transition into the true high Himalayan zone: the vegetation is sparse, yak herding dominates, and the peaks crowd the horizon in every direction. Evenings at this altitude are cold; retire early and drink plenty of fluids.</p>",
+        "pills": "Meals: B, L, D · Mountain Lodge · Approx. 5–6 hrs",
+        "altitude": "4,410m / 14,468ft",
+        "walking_hours": "5–6 hrs",
+        "stay": "Dingboche Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "07",
+        "stage": "Dingboche (4,410m) — Acclimatisation",
+        "title": "Acclimatisation Day: Nangkartshang Peak Hike",
+        "description": "<p>A second essential acclimatisation day. An early morning hike up the flank of Nangkartshang Peak (5,083m) rewards with exceptional views of Island Peak (Imja Tse), Makalu, Baruntse, and the full Lhotse–Nuptse wall. This altitude gain significantly prepares your body for the high camps ahead. Return to Dingboche for a hearty lunch, afternoon rest, and pre-dinner briefing on Lobuche and the approach to Base Camp.</p>",
+        "pills": "Meals: B, L, D · Mountain Lodge · Hike 4–5 hrs",
+        "altitude": "5,083m (hike high, sleep at 4,410m)",
+        "walking_hours": "4–5 hrs acclimatisation hike",
+        "stay": "Dingboche Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "08",
+        "stage": "Dingboche (4,410m) → Lobuche (4,940m)",
+        "title": "Trek to Lobuche Past Memorial Chortens",
+        "description": "<p>The trail climbs steeply out of Dingboche, crossing the lateral moraine of the Khumbu Glacier and emerging onto the bleak but starkly beautiful Khumbu plateau. Before reaching Lobuche, you pass the sobering Chukpilhara Memorial — rows of white chortens commemorating climbers and Sherpas lost on Everest. At 4,940m, the air is noticeably thinner; headaches are common and appetite often reduces. Stay well-hydrated, maintain a slow pace, and inform your guide of any altitude symptoms.</p>",
+        "pills": "Meals: B, L, D · Mountain Teahouse · Approx. 4–5 hrs",
+        "altitude": "4,940m / 16,207ft",
+        "walking_hours": "4–5 hrs",
+        "stay": "Lobuche Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "09",
+        "stage": "Lobuche (4,940m) → Gorak Shep (5,140m) → Everest Base Camp (5,364m)",
+        "title": "The Day You've Trained For: Everest Base Camp!",
+        "description": "<p>The culmination of your Himalayan journey. The trail from Lobuche follows the eastern flank of the Khumbu Glacier across rocky lateral moraine terrain to the seasonal outpost of Gorak Shep (5,140m) — the last teahouse before Base Camp — where packs are deposited and a light lunch is taken. The final two-hour route to Base Camp (5,364m) traverses the undulating surface of the glacier itself, a surreal landscape of blue ice towers, meltwater streams, and coloured expedition tents. Standing beneath the thundering seracs of the Khumbu Icefall, with the West Shoulder of Everest directly above, is an experience of pure, unequalled Himalayan majesty.</p>",
+        "pills": "Meals: B, L, D · Gorak Shep Teahouse · Approx. 7–8 hrs total",
+        "altitude": "5,364m / 17,598ft (Everest Base Camp)",
+        "walking_hours": "7–8 hrs (including EBC visit)",
+        "stay": "Gorak Shep Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "10",
+        "stage": "Gorak Shep (5,140m) → Kala Patthar (5,550m) → Pheriche (4,280m)",
+        "title": "Dawn Summit of Kala Patthar & Descent to Pheriche",
+        "description": "<p>A pre-dawn alarm at 04:30. By headtorch, ascend the steep scree and rocky ridge of Kala Patthar (5,550m) as the Himalayan sky transforms from deep purple to blazing amber gold. The summit vantage point delivers one of the greatest panoramas on Earth: the triangular summit of Mount Everest rising impossibly above the South Col, flanked by Lhotse, Nuptse, Changtse, Pumori, and the Rongbuk Glacier valley stretching north toward Tibet. After photographs, descend to Gorak Shep for a late breakfast before a long, descending trail to the lower village of Pheriche.</p>",
+        "pills": "Meals: B, L, D · Village Teahouse · Approx. 8–9 hrs total",
+        "altitude": "5,550m / 18,209ft (Kala Patthar summit)",
+        "walking_hours": "8–9 hrs (including descent to Pheriche)",
+        "stay": "Pheriche Village Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "11",
+        "stage": "Pheriche (4,280m) → Namche Bazaar (3,440m)",
+        "title": "Long Descent Back to Namche Bazaar",
+        "description": "<p>The descent from Pheriche to Namche is a long but joyful day as the air thickens and vegetation returns. Retrace familiar trails through Pangboche and Tengboche — now seen from a fresh perspective with Base Camp already behind you. A sustained descent through birch forest and across the Phunki Tenga river bridges leads back into the welcoming warmth of Namche Bazaar. Celebrate with a sunset beer and dinner at a favourite Namche restaurant, reflecting on the remarkable week just completed.</p>",
+        "pills": "Meals: B, L, D · Mountain Lodge · Approx. 7–8 hrs",
+        "altitude": "3,440m / 11,286ft",
+        "walking_hours": "7–8 hrs",
+        "stay": "Namche Bazaar Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "12",
+        "stage": "Namche Bazaar (3,440m) → Phakding (2,610m) → Lukla (2,840m)",
+        "title": "Final Trail Day: Namche to Lukla",
+        "description": "<p>A bittersweet final trekking day retracing the now-familiar trail from Namche through Monjo, past the park checkpoint, and back along the Dudh Koshi riverbank to Phakding — this time moving efficiently with the trail already etched in memory. A sustained ascent from Phakding through the forest canopy returns you to Lukla's main street, where the trekking crew rests and groups gather for farewell moments. A traditional crew-celebration dinner with your guide, Sherpas, and porters rounds out an extraordinary journey.</p>",
+        "pills": "Meals: B, L, D · Lukla Lodge · Approx. 6–7 hrs",
+        "altitude": "2,840m / 9,318ft",
+        "walking_hours": "6–7 hrs",
+        "stay": "Lukla Mountain Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "13",
+        "stage": "Lukla (2,840m) → Kathmandu (1,400m)",
+        "title": "Scenic Mountain Flight Back to Kathmandu",
+        "description": "<p>After an early breakfast, transfer to Lukla Airport for the return scenic mountain flight to Kathmandu — a final aerial salute to the peaks that hosted your extraordinary journey. Transfer to your hotel for hot showers, fresh city food, and a well-earned afternoon of leisure. The evening is free for souvenir shopping in Thamel's vibrant bazaars or a quiet dinner in Kathmandu's increasingly sophisticated restaurant scene.</p>",
+        "pills": "Meals: B · Boutique City Hotel · Mountain Flight",
+        "altitude": "1,400m / 4,593ft",
+        "walking_hours": "Airport flight and transfers",
+        "stay": "Dwarika's Heritage Hotel, Kathmandu",
+        "meals": "Breakfast",
+        "gallery": []
+      },
+      {
+        "day": "14",
+        "stage": "Kathmandu — Free Day",
+        "title": "Free Day in Kathmandu: Heritage & Culture",
+        "description": "<p>A full free day in Kathmandu to explore at leisure or join an optional guided heritage tour. Recommended highlights include a rickshaw tour through the medieval lanes of Bhaktapur Durbar Square (UNESCO), meditation at the Buddhist stupa of Boudhanath, sunset views from the hilltop temple of Swayambhunath (Monkey Temple), and lunch at the garden terrace of the Hyatt Regency overlooking the Bagmati valley. A complimentary post-trek health consultation is also available through our expedition medical partner.</p>",
+        "pills": "Meals: B · Boutique City Hotel · Free Day / Optional Tours",
+        "altitude": "1,400m / 4,593ft",
+        "walking_hours": "At leisure",
+        "stay": "Dwarika's Heritage Hotel, Kathmandu",
+        "meals": "Breakfast",
+        "gallery": []
+      },
+      {
+        "day": "15",
+        "stage": "Kathmandu — Departure",
+        "title": "Farewell & International Departure",
+        "description": "<p>Your final morning in Nepal. Enjoy a last Himalayan breakfast before a private vehicle transfers you to Tribhuvan International Airport in ample time for your onward international flight. Our expedition team will coordinate baggage, documentation, and any last-minute logistics to ensure a smooth and memorable departure. Safe travels — and we hope to see you again soon on the trails.</p>",
+        "pills": "Meals: B · Airport Transfer · Departure Day",
+        "altitude": "1,400m / 4,593ft",
+        "walking_hours": "Airport transfer only",
+        "stay": "Airport Transfer — Departure",
+        "meals": "Breakfast",
         "gallery": []
       }
     ],
+
     "inex": {
       "kicker": "What is Covered",
       "script": "Clear & Transparent",
       "heading": "Inclusions & Exclusions",
-      "subtext": "Everything included in your bespoke Himalayan journey, with no hidden surprises."
+      "subtext": "Everything included in your bespoke Himalayan journey, with no hidden surprises. Our all-inclusive pricing is designed so you can focus entirely on the trail."
     },
+
     "inclusions": [
       {
         "title": "All private airport and domestic transfers",
-        "desc": "<p>Private chauffeur transfers in air-conditioned vehicles between Kathmandu airport, hotel, and trailheads.</p>"
+        "desc": "<p>Private chauffeur-driven transfers in air-conditioned vehicles between Kathmandu Tribhuvan International Airport, hotels, and all domestic transfer points throughout the journey.</p>"
       },
       {
         "title": "Return scenic mountain flights (Kathmandu–Lukla–Kathmandu)",
-        "desc": "<p>Twin Otter or Dornier scenic mountain flights including 15kg total baggage allowance per traveller.</p>"
+        "desc": "<p>Return Twin Otter or Dornier scenic mountain flights on the world-famous Kathmandu–Lukla route, including all airport departure taxes and 15kg total baggage allowance per traveller.</p>"
       },
       {
-        "title": "Sagarmatha National Park entry permits & Khumbu local tax",
-        "desc": "<p>All official national park clearances, TIMS registrations, and rural municipality permits handled in advance.</p>"
+        "title": "All government permits, TIMS card & National Park entry fees",
+        "desc": "<p>Sagarmatha National Park entry clearances, TIMS (Trekkers' Information Management System) card, and Khumbu Pasang Lhamu rural municipality permits — all arranged and paid in advance by our team.</p>"
       },
       {
-        "title": "Licensed English-speaking mountain guide & Sherpa porters",
-        "desc": "<p>Government-licensed senior high-altitude guide certified in wilderness first aid, plus 1 porter for every 2 trekkers (12kg luggage allowance per client).</p>"
+        "title": "Licensed English-speaking senior mountain guide",
+        "desc": "<p>Government-licensed senior high-altitude trekking guide certified in wilderness first aid and altitude management, with pulse oximeter for twice-daily blood oxygen monitoring of all trekkers.</p>"
       },
       {
-        "title": "Boutique hotel stays in Kathmandu & premier mountain lodges",
-        "desc": "<p>Twin-share accommodation in boutique Kathmandu hotels and comfortable mountain lodges throughout the trekking route.</p>"
+        "title": "Experienced Sherpa porters (1 porter per 2 trekkers, 12kg limit)",
+        "desc": "<p>Dedicated Sherpa porters assigned on a 1:2 ratio with a strict maximum of 12kg of client luggage per porter, per Sherpa welfare industry standards. Porter wages, insurance, and equipment are fully covered.</p>"
       },
       {
-        "title": "Three meals daily during the trek",
-        "desc": "<p>Full breakfast, hot lunch, and hearty dinners ordered fresh from lodge menus along the high trail.</p>"
+        "title": "Boutique hotel stays in Kathmandu (2 nights each way)",
+        "desc": "<p>4/5-star boutique heritage hotel accommodation in central Kathmandu on a twin-share basis with daily breakfast included. Upgrades to private suites available on request.</p>"
       },
       {
-        "title": "Comprehensive medical safety gear",
-        "desc": "<p>Group medical kit, pulse oximeter for twice-daily oxygen saturation monitoring, and satellite communication protocol.</p>"
+        "title": "Comfortable mountain teahouse lodges throughout the trek",
+        "desc": "<p>Pre-selected, highest-standard teahouse accommodation with private or twin rooms along the Everest trail, with three meals daily cooked fresh to order from lodge menus.</p>"
       }
     ],
+
     "exclusions": [
       {
         "title": "International flights to and from Kathmandu",
-        "desc": "<p>Long-haul international airfares and associated baggage overages.</p>"
+        "desc": "<p>Long-haul international airfares to and from Tribhuvan International Airport (Kathmandu), and any associated international baggage overages, are not included in the land price.</p>"
       },
       {
         "title": "Nepal tourist visa fees",
-        "desc": "<p>Payable upon arrival at Tribhuvan International Airport (Kathmandu) in cash USD.</p>"
+        "desc": "<p>Nepal tourist visas are payable on arrival at Kathmandu International Airport in cash USD. Fees: USD 30 (15 days), USD 50 (30 days), USD 125 (90 days). Bring passport-size photos and exact USD cash.</p>"
       },
       {
-        "title": "Mandatory high-altitude emergency travel insurance",
-        "desc": "<p>Must explicitly include medical emergency, emergency helicopter search, and evacuation up to 6,000m altitude.</p>"
+        "title": "High-altitude emergency travel & medical evacuation insurance",
+        "desc": "<p>Mandatory comprehensive travel insurance explicitly covering helicopter emergency evacuation to 6,000m, medical emergencies, trip cancellation, and personal liability. This is a non-negotiable safety requirement.</p>"
       },
       {
-        "title": "Personal trekking equipment and apparel",
-        "desc": "<p>Personal down jackets, four-season sleeping bags, hiking boots, and trekking poles.</p>"
+        "title": "Personal trekking equipment & technical apparel",
+        "desc": "<p>Personal four-season sleeping bag (−10°C comfort rating), down jacket, technical hiking boots, trekking poles, headlamp, and all personal clothing. Equipment hire available in Kathmandu and Namche Bazaar.</p>"
       },
       {
-        "title": "Beverages, hot showers, and electronic device charging",
-        "desc": "<p>Bottled drinks, alcoholic beverages, battery charging fees, and hot showers at high-altitude mountain lodges.</p>"
+        "title": "Bottled beverages, hot showers, device charging & Wi-Fi",
+        "desc": "<p>Bottled mineral water, hot beverages beyond included meals, alcoholic beverages, hot showers, solar device charging fees, and Wi-Fi access at teahouses (typically NPR 200–500 per device per day).</p>"
       },
       {
         "title": "Gratuities for expedition crew",
-        "desc": "<p>Tips for your lead guide, assistant guides, and porters at the conclusion of the trek.</p>"
+        "desc": "<p>Tipping of guiding and porter crew at the conclusion of the trek is customary and deeply appreciated. Recommended guidelines: Lead guide USD 10–15/day, Porters USD 5–8/day per trekker.</p>"
       }
     ],
+
     "gallery": {
       "kicker": "Visual Moments",
       "script": "In Pictures",
       "heading": "Glimpses of Everest",
-      "subtext": "A curated collection of landscapes, trails, and authentic mountain encounters.",
+      "subtext": "A curated collection of landscapes, mountain trails, and authentic Sherpa encounters captured on the journey to the world's highest base camp.",
       "images": [
-        "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
-        "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1600&q=85",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85"
+        {
+          "url": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
+          "label": "Everest Base Camp at dawn"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1600&q=85",
+          "label": "Namche Bazaar amphitheatre"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
+          "label": "Prayer flags over the Khumbu Valley"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=85",
+          "label": "Trail through rhododendron forests below Tengboche"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1571922021609-f38c01ad6b20?auto=format&fit=crop&w=1600&q=85",
+          "label": "Ama Dablam peak at sunrise"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1529688499228-2c9e1b89f6c3?auto=format&fit=crop&w=1600&q=85",
+          "label": "Khumbu Icefall from Base Camp"
+        }
       ]
     },
+
     "essential": {
       "kicker": "Travel Advice",
       "script": "Good to Know",
-      "heading": "Essential Information",
-      "intro": "<p>Careful preparation and sound health awareness ensure a safe and triumphant Himalayan journey. Review our key recommendations below.</p>",
+      "heading": "Essential Information for Your Everest Journey",
+      "intro": "<p>Careful preparation and sound health awareness ensure a safe, successful, and deeply rewarding Himalayan journey. Our expedition team has compiled these evidence-based recommendations for every Everest Base Camp trekker.</p>",
       "card_img": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
       "card_kicker": "Trip Dossier",
-      "card_title": "Download Comprehensive Route Notes",
-      "card_desc": "Packing checklist, altitude acclimatisation schedule, visa guidelines, and weather data.",
+      "card_title": "Download Your Complete Route Notes",
+      "card_desc": "Includes detailed packing checklist, altitude acclimatisation schedule, Nepal visa guidelines, medical preparation advice, and seasonal weather data.",
       "card_btn": "Request Trip Notes",
       "card_email": "sales@yetiadventure.com"
     },
+
     "faqs": [
       {
         "question": "What is the best season to undertake the Everest Base Camp trek?",
-        "answer": "<p>The premier seasons are spring (March through May) for stable skies, longer days, and blooming rhododendron valleys, and autumn (late September through November) for crisp visibility and pristine mountain views.</p>"
+        "answer": "<p>The two premier trekking seasons are <strong>Autumn (mid-September to late November)</strong> and <strong>Spring (early March to late May)</strong>. Autumn offers crisp, clear skies after the monsoon, vivid mountain visibility, and moderate temperatures. Spring brings longer days, blooming rhododendron valleys, and the visual drama of expedition teams on the mountain. Both seasons offer outstanding conditions; spring is slightly warmer at lower elevations.</p><ul><li><strong>Autumn:</strong> September–November — Best overall visibility</li><li><strong>Spring:</strong> March–May — Warmer, flowers in bloom</li><li><strong>Winter:</strong> December–February — Possible but very cold; fewer trekkers</li><li><strong>Monsoon:</strong> June–August — Not recommended; heavy rain and leeches</li></ul>"
       },
       {
-        "question": "How fit do I need to be, and how is altitude managed?",
-        "answer": "<p>A solid foundation of cardiovascular endurance is essential. Our itineraries include built-in acclimatisation rest days in Namche Bazaar, gradual altitude gain, and twice-daily pulse oximeter monitoring by your lead Sherpa guide.</p>"
+        "question": "How fit do I need to be, and how is altitude sickness managed?",
+        "answer": "<p>You do not need to be an extreme athlete, but a solid foundation of <strong>cardiovascular aerobic fitness</strong> is essential. Our recommended pre-trek training includes 8–12 weeks of regular hiking on hilly terrain with a loaded pack, plus swimming or cycling for cardio base. Our itineraries incorporate two built-in acclimatisation rest days at Namche Bazaar (3,440m) and Dingboche (4,410m), following the internationally recognised 'climb high, sleep low' principle.</p><p>Altitude sickness (Acute Mountain Sickness / AMS) is managed through: strict ascent rate limits (no more than 300–500m net gain per day above 3,000m), twice-daily pulse oximeter blood oxygen readings by your lead Sherpa guide, immediate descent protocols if symptoms worsen, and ready access to supplemental oxygen and emergency evacuation services.</p>"
       },
       {
-        "question": "What standard of accommodation and meals can I expect?",
-        "answer": "<p>In Kathmandu, you will stay in 4/5-star boutique heritage hotels. On the trail, you will stay in comfortable teahouses with private twin rooms and hearty multi-course meals prepared fresh daily.</p>"
+        "question": "What type of accommodation and food can I expect on the trail?",
+        "answer": "<p>In <strong>Kathmandu</strong>, you stay at 4/5-star boutique heritage hotels with en-suite bathrooms, international breakfast buffets, and city-centre locations. On the <strong>trekking route</strong>, accommodation is in the best available mountain teahouse lodges — typically twin-share rooms with comfortable beds, blankets, and attached bathroom facilities at lower elevations, with basic shared bathrooms at higher altitudes (Lobuche, Gorak Shep).</p><p>Trail food is hearty and surprisingly varied: dal bhat (rice and lentil), pasta, pizza, soups, porridge, pancakes, fried rice, noodles, and fresh baked goods are all available from teahouse menus. All dietary requirements — vegetarian, vegan, gluten-free — are easily accommodated with advance notice.</p>"
       }
     ],
+
     "reviews_section": {
       "kicker": "Guest Stories",
       "script": "Traveller Feedback",
       "heading": "Words from Fellow Adventurers",
-      "subtext": "Genuine reflections from travellers who have walked the high trails with us.",
+      "subtext": "Genuine reflections from travellers who have walked the high Himalayan trails with us.",
       "reviews": [
         {
           "name": "Sarah & David Jenkins",
           "location": "United Kingdom",
           "rating": "5",
-          "quote": "Standing beneath Everest was breathtaking, but what truly elevated our expedition was the unmatched warmth, care, and professionalism of our Sherpa team."
+          "quote": "Standing beneath Everest was breathtaking, but what truly elevated our entire expedition was the unmatched warmth, expertise, and professionalism of our Sherpa team. Every detail was perfectly planned. We are already dreaming of the Annapurna Circuit next year."
         },
         {
           "name": "Marcus Vance",
-          "location": "Australia",
+          "location": "Melbourne, Australia",
           "rating": "5",
-          "quote": "The pacing was immaculate. Having two acclimatisation days made a massive difference to my stamina at Base Camp and Kala Patthar."
+          "quote": "The two built-in acclimatisation days made an enormous difference — I felt genuinely strong at Base Camp and Kala Patthar. The sunrise from Kala Patthar was the most stunning thing I have ever witnessed. Our guide Dawa was exceptional in every way."
+        },
+        {
+          "name": "Priya Mehta",
+          "location": "Mumbai, India",
+          "rating": "5",
+          "quote": "As a solo female trekker, I felt completely safe, welcomed, and supported throughout. The guide's knowledge of the mountains, Sherpa history, and Tibetan Buddhism added a fascinating cultural dimension I hadn't expected. An absolutely transformative journey."
         }
       ]
     },
+
     "contact": {
       "dep_kicker": "Travel Together",
       "dep_script": "Choose Your Month",
-      "dep_heading": "Join a Fixed Departure or Customise Dates",
-      "dep_subtext": "Share your preferred travel window and group size; our expedition planners will confirm upcoming departure dates and availability within 24 hours.",
+      "dep_heading": "Join a Fixed Departure or Customise Your Dates",
+      "dep_subtext": "Share your preferred travel window and group size; our expedition planners will confirm upcoming departure slots and availability within 24 hours.",
       "box_script": "Everest Awaits",
       "box_title": "Ask about upcoming departure dates",
-      "box_desc": "Send your dates, party size, or custom questions directly to our trip director via WhatsApp.",
-      "box_photo": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
-      "box_note": "Dates and private departures confirmed directly prior to booking.",
+      "box_desc": "Send your preferred dates, party size, or specific questions directly to our trek director via WhatsApp — we typically respond within 2 hours.",
+      "box_photo": "https://images.unsplash.com/photo-1571922021609-f38c01ad6b20?auto=format&fit=crop&w=1600&q=85",
+      "box_note": "Private and custom departures confirmed prior to booking. Group discounts available for 4+ travellers.",
       "whatsapp": "9779803197006",
       "email": "sales@yetiadventure.com"
     },
+
+    "departures": [
+      {
+        "date": "2026-03-15",
+        "price": "2850",
+        "currency": "USD",
+        "seats": 8,
+        "status": "open",
+        "note": "Spring departure — rhododendron season"
+      },
+      {
+        "date": "2026-04-12",
+        "price": "2850",
+        "currency": "USD",
+        "seats": 4,
+        "status": "limited",
+        "note": "Peak spring season — limited seats remaining"
+      },
+      {
+        "date": "2026-05-03",
+        "price": "2850",
+        "currency": "USD",
+        "seats": 10,
+        "status": "open",
+        "note": "Late spring — Everest expedition season"
+      },
+      {
+        "date": "2026-09-27",
+        "price": "2850",
+        "currency": "USD",
+        "seats": 12,
+        "status": "open",
+        "note": "Autumn departure — clearest skies of the year"
+      },
+      {
+        "date": "2026-10-18",
+        "price": "2850",
+        "currency": "USD",
+        "seats": 6,
+        "status": "limited",
+        "note": "Peak autumn season — filling fast"
+      },
+      {
+        "date": "2026-11-08",
+        "price": "2750",
+        "currency": "USD",
+        "seats": 10,
+        "status": "open",
+        "note": "Late autumn — colder but quieter trails"
+      }
+    ],
+
     "pricing": {
       "price": "2850",
       "numeric_price": 2850,
