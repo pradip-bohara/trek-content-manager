@@ -760,14 +760,11 @@ $related_query = new WP_Query( array(
       }
       .ya-ebc-page .ya-tabs-wrap{
         position:sticky;
-        top:180px;
+        top:140px;
         z-index:70;
         grid-column:1;
         width:250px;
         background:#ffffff;
-        border:1px solid var(--line);
-        border-radius:12px;
-        box-shadow:0 4px 20px rgba(27,35,27,.04);
         padding:18px 14px;
         margin:12px 0 ;
         box-sizing:border-box;
@@ -1597,6 +1594,9 @@ $related_query = new WP_Query( array(
         <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-review" data-tab="review">
           Reviews
         </button>
+        <button class="ya-tab" type="button" role="tab" aria-selected="false" data-tab="departures" data-scroll-to="ya-departures">
+          Fixed Departures
+        </button>
       </div>
 
       <!-- Private Heli Charters Promo Card in Left Sidebar -->
@@ -1942,10 +1942,8 @@ $related_query = new WP_Query( array(
           <?php endif; ?>
         </div>
       </section>
-    </div>
-  </section>
 
-  <!-- Fixed Departure Dates Section -->
+       <!-- Fixed Departure Dates Section -->
   <section class="ya-departures ya-reveal" id="ya-departures">
     <style>
       /* ── Departure Dates ──────────────────────────────── */
@@ -1953,6 +1951,7 @@ $related_query = new WP_Query( array(
         padding: 90px 0;
         background: var(--cream);
         border-top: 1px solid var(--line);
+        scroll-margin-top: 112px;
       }
       .ya-ebc-page .ya-dep-head {
         display: flex;
@@ -2199,6 +2198,10 @@ $related_query = new WP_Query( array(
       <?php endif; ?>
     </div>
   </section>
+    </div>
+  </section>
+
+ 
 
   <!-- Dark CTA Banner ("Ready for the Himalaya?") -->
   <style>
@@ -3136,33 +3139,58 @@ $related_query = new WP_Query( array(
       const setActiveTab = name => {
         const targetTab = tabs.find(tab => tab.dataset.tab === name);
         const targetPanel = panels.find(panel => panel.dataset.panel === name);
-        if (!targetTab || !targetPanel) return;
+        if (!targetTab) return;
 
         tabs.forEach(tab => {
           const active = tab === targetTab;
           tab.classList.toggle('is-active', active);
           tab.setAttribute('aria-selected', String(active));
         });
-        panels.forEach(panel => panel.classList.toggle('is-active', panel === targetPanel));
+        if (targetPanel) {
+          panels.forEach(panel => panel.classList.toggle('is-active', panel === targetPanel));
+        }
         return { targetTab, targetPanel };
       };
 
-      const activateTab = (name, scroll = true) => {
+      const activateTab = (name, scroll = true, clickedTab = null) => {
+        const targetTab = clickedTab || tabs.find(tab => tab.dataset.tab === name || tab.dataset.scrollTo === name);
+        if (!targetTab) return;
+
+        const scrollToId = targetTab.dataset.scrollTo;
+        if (scrollToId) {
+          const targetEl = document.getElementById(scrollToId);
+          if (targetEl) {
+            tabs.forEach(tab => {
+              const active = tab === targetTab;
+              tab.classList.toggle('is-active', active);
+              tab.setAttribute('aria-selected', String(active));
+            });
+            if (!mobileTabs.matches) {
+              targetTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+          }
+        }
+
         const active = setActiveTab(name);
         if (!active) return;
-        const { targetTab, targetPanel } = active;
+        const { targetPanel } = active;
         if (!mobileTabs.matches) {
           targetTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
         if (scroll && !mobileTabs.matches) {
-          targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const scrollTarget = targetTab.dataset.scrollTarget ? document.querySelector(targetTab.dataset.scrollTarget) : null;
+          if (scrollTarget) {
+            scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else if (targetPanel) {
+            targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         }
       };
 
-      tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab.dataset.tab, true)));
+      tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab.dataset.tab, true, tab)));
       root.querySelectorAll('.ya-jump-tab').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.target, true)));
-
-
 
       // Keep the visual navigation state aligned with the visible long-form section.
       if ('IntersectionObserver' in window) {
@@ -3170,11 +3198,23 @@ $related_query = new WP_Query( array(
           const visible = entries
             .filter(entry => entry.isIntersecting)
             .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-          if (visible?.target?.dataset?.panel) {
+          if (!visible?.target) return;
+          if (visible.target.id === 'ya-departures') {
+            const depTab = tabs.find(t => t.dataset.scrollTo === 'ya-departures' || t.dataset.tab === 'departures');
+            if (depTab) {
+              tabs.forEach(t => {
+                const active = t === depTab;
+                t.classList.toggle('is-active', active);
+                t.setAttribute('aria-selected', String(active));
+              });
+            }
+          } else if (visible.target.dataset?.panel) {
             setActiveTab(visible.target.dataset.panel);
           }
         }, { rootMargin: '-18% 0px -65% 0px', threshold: 0.01 });
         panels.forEach(panel => sectionObserver.observe(panel));
+        const depEl = document.getElementById('ya-departures');
+        if (depEl) sectionObserver.observe(depEl);
       }
 
       // Reading progress for the long-form content, shown directly below the fixed left navigation.
