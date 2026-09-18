@@ -111,17 +111,22 @@ if ( empty( $inclusions ) || ! is_array( $inclusions ) ) {
 }
 
 $route_img           = get_post_meta( $post_id, '_trek_route_img', true ) ?: ( $featured_img ?: 'https://yetiadventure.com/wp-content/uploads/2022/02/15-Days_Everest-Base-Camp-trek-map-722x1024.jpg' );
-$route_caption_sub   = get_post_meta( $post_id, '_trek_route_caption_sub', true ) ?: 'Route Map';
-$route_caption_h3    = get_post_meta( $post_id, '_trek_route_caption_h3', true ) ?: ( 'Kathmandu to ' . $title );
+$map_embed_code      = get_post_meta( $post_id, '_trek_map_embed_code', true ) ?: '';
+$map_file_url        = get_post_meta( $post_id, '_trek_map_file_url', true ) ?: '';
+$route_caption_sub   = get_post_meta( $post_id, '_trek_route_caption_sub', true ) ?: 'ROUTE & ELEVATION';
+$route_caption_h3    = get_post_meta( $post_id, '_trek_route_caption_h3', true ) ?: ( 'Roadmap of the ' . $title . ' Trek' );
 
 // 5. Itinerary
 $itin_kicker         = get_post_meta( $post_id, '_trek_itin_kicker', true ) ?: 'Day by Day';
-$itin_script         = get_post_meta( $post_id, '_trek_itin_script', true ) ?: 'Your Journey';
-$itin_heading        = get_post_meta( $post_id, '_trek_itin_heading', true ) ?: ( $hero_days . ' Days of Discovery' );
-$itin_subtext        = get_post_meta( $post_id, '_trek_itin_subtext', true ) ?: 'Open each day to view the walking plan, meals, accommodation and approximate duration.';
+$itin_script         = get_post_meta( $post_id, '_trek_itin_script', true ) ?: 'YOUR JOURNEY';
+$itin_heading        = get_post_meta( $post_id, '_trek_itin_heading', true ) ?: 'Day by Day Itinerary';
+$itin_subtext        = get_post_meta( $post_id, '_trek_itin_subtext', true ) ?: 'A flexible private itinerary blending heritage, nature, mountain views and local encounters.';
 
-$itinerary           = get_post_meta( $post_id, '_trek_itinerary_list', true ) ?: array();
-if ( empty( $itinerary ) ) {
+$itinerary           = get_post_meta( $post_id, '_trek_itinerary_list', true );
+if ( empty( $itinerary ) || ! is_array( $itinerary ) ) {
+    $itinerary = get_post_meta( $post_id, '_trek_itinerary', true );
+}
+if ( empty( $itinerary ) || ! is_array( $itinerary ) ) {
     $itinerary = array(
         array( 'day' => '01', 'stage' => 'Kathmandu', 'title' => 'Arrival in Kathmandu', 'desc' => 'Welcome to Nepal. On arrival, a representative and driver will meet you at the airport, escort you to your hotel and brief you on the days ahead.', 'pills' => 'Meals: None, Hotel Accommodation' ),
         array( 'day' => '02', 'stage' => 'Trek Departure', 'title' => 'Journey from Kathmandu to Trailhead', 'desc' => "Meet your guide and team for the journey to the trek starting point. Begin the first walking stage through mountain villages and lush foothills.", 'pills' => 'Breakfast & Dinner, Mountain Lodge, Approx. 4 hrs' ),
@@ -134,6 +139,59 @@ if ( empty( $itinerary ) ) {
         array( 'day' => '09', 'stage' => 'Kathmandu', 'title' => 'Return to Kathmandu', 'desc' => 'Transfer back to Kathmandu. Check into your hotel with the afternoon free for relaxation or shopping in Thamel.', 'pills' => 'Breakfast, Hotel Accommodation' ),
         array( 'day' => '10', 'stage' => 'Departure', 'title' => 'Airport Transfer & Departure', 'desc' => 'Transfer to the international airport for your onward flight home with lifelong Himalayan memories.', 'pills' => 'Breakfast, Airport Transfer' )
     );
+}
+
+if ( ! function_exists( 'ya_get_itin_pill_icon' ) ) {
+    function ya_get_itin_pill_icon( $text ) {
+        $t = strtolower( $text );
+        if ( preg_match( '/meal|breakfast|lunch|dinner|food|cuisine|bbq|tea|coffee/', $t ) ) {
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2v20M18 2a3 3 0 0 0-3 3v5a3 3 0 0 0 3 3M6 2v6a3 3 0 0 0 3 3v11M3 2v6a3 3 0 0 0 3 3M9 2v6a3 3 0 0 1-3 3"/></svg>';
+        }
+        if ( preg_match( '/hotel|lodge|stay|resort|boutique|accommodation|camp|teahouse|room/', $t ) ) {
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/><circle cx="9" cy="9" r="1"/><circle cx="9" cy="13" r="1"/><circle cx="9" cy="17" r="1"/></svg>';
+        }
+        if ( preg_match( '/walk|trek|hike|trail|climb|hour|hr|approx|km|distance/', $t ) ) {
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="4" r="2"/><path d="m15 22-3-7-3 3v6M9 13l3-3 3 1 3 4M6 17l3-4"/></svg>';
+        }
+        if ( preg_match( '/guide|sherpa|leader|escort|briefing|team|porter/', $t ) ) {
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>';
+        }
+        if ( preg_match( '/heritage|durbar|temple|culture|city|monastery|stupa|craft|art/', $t ) ) {
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M4 18h16M6 18V9M10 18V9M14 18V9M18 18V9M2 9l10-6 10 6"/></svg>';
+        }
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>';
+    }
+}
+
+if ( ! function_exists( 'ya_parse_day_stage_meta' ) ) {
+    function ya_parse_day_stage_meta( $day, $fallback_region ) {
+        $stage    = $day['stage'] ?? '';
+        $altitude = $day['altitude'] ?? '';
+        $loc      = '';
+        $alt      = '';
+
+        if ( preg_match( '/^(.*?)\s*\((.*?)\)$/', trim( $stage ), $matches ) ) {
+            $loc = trim( $matches[1] );
+            $alt = trim( $matches[2] );
+        } elseif ( preg_match( '/(\d+[\d,]*\s*m)/i', $stage, $alt_match ) ) {
+            $alt = trim( $alt_match[1] );
+            $loc = trim( str_replace( $alt_match[0], '', $stage ) );
+            $loc = trim( trim( $loc, ', -·' ) );
+        } else {
+            $loc = trim( $stage );
+        }
+
+        if ( ! empty( $altitude ) && empty( $alt ) ) {
+            $alt = trim( $altitude );
+        }
+        if ( empty( $loc ) ) {
+            $loc = $fallback_region ?: 'Trailhead';
+        }
+        if ( empty( $alt ) ) {
+            $alt = '1,350m';
+        }
+        return array( 'location' => $loc, 'altitude' => $alt );
+    }
 }
 
 // 6. Gallery
@@ -1025,159 +1083,312 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-roadmap-caption{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12.5px;color:var(--muted)}
     .ya-ebc-page .ya-roadmap-caption svg{width:16px;height:16px;color:var(--gold);flex-shrink:0}
 
-    /* 5. ITINERARY SECTION: Permanently Open, No Dividing Lines, Interactive Carousel */
-    .ya-ebc-page .ya-itin-head-row{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:16px;
-      margin-bottom:24px;
+    /* 5. ITINERARY SECTION: Luxury Editorial 3-Column Cards */
+    .ya-ebc-page .yt-itin-header {
+      margin-bottom: 44px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--line);
     }
-    .ya-ebc-page .ya-days{
-      display:flex;
-      flex-direction:column;
-      gap:24px;
+    .ya-ebc-page .yt-itin-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-family: Inter, Arial, sans-serif;
     }
-    /* All day panels permanently open and dividing lines removed */
-    .ya-ebc-page .ya-day{
-      border:none!important;
-      border-radius:12px;
-      background:#ffffff;
-      box-shadow:0 4px 18px rgba(27,35,27,.04);
-      padding:24px;
-      overflow:hidden;
-      transition:box-shadow .2s ease;
+    .ya-ebc-page .yt-itin-dash {
+      width: 24px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 1px;
     }
-    .ya-ebc-page .ya-day:hover{box-shadow:0 8px 26px rgba(27,35,27,.07)}
-    .ya-ebc-page .ya-day-card-grid{
-      display:grid;
-      grid-template-columns:1fr 280px;
-      gap:24px;
-      align-items:start;
+    .ya-ebc-page .yt-itin-h2 {
+      margin: 0 0 10px;
+      font: 600 clamp(28px, 3.4vw, 40px) / 1.15 "Newsreader", Georgia, serif;
+      color: var(--green);
     }
-    .ya-ebc-page .ya-day-main{display:flex;flex-direction:column}
-    .ya-ebc-page .ya-day-title-block{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
-    .ya-ebc-page .ya-day-tag{
-      font-size:11px;
-      font-weight:800;
-      letter-spacing:1.5px;
-      color:var(--gold);
-      text-transform:uppercase;
-      font-family:"Inter","Open Sans",sans-serif;
+    .ya-ebc-page .yt-itin-desc {
+      margin: 0;
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 700px;
     }
-    .ya-ebc-page .ya-day-title-block strong{
-      font-size:21px;
-      color:var(--ink);
-      line-height:1.25;
-      font-family:"Newsreader",Georgia,serif;
-      font-weight:600;
-    }
-    .ya-ebc-page .ya-day-body{
-      display:block!important;
-    }
-    .ya-ebc-page .ya-day-desc{
-      padding:4px 0 10px;
-      color:#4f5a4e;
-      font-size:14.5px;
-      line-height:1.8;
-    }
-    .ya-ebc-page .ya-day-desc p{margin:0 0 10px}
-    .ya-ebc-page .ya-day-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-    .ya-ebc-page .ya-meta-pill{
-      border-radius:4px;
-      padding:4px 10px;
-      background:#f4f7f2;
-      color:#455244;
-      font-size:11px;
-      font-weight:600;
-      border:1px solid #e1e7de;
+    .ya-ebc-page .yt-days-list {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
     }
 
-    /* Itinerary Interactive Carousel */
-    .ya-ebc-page .ya-day-carousel{
-      position:relative;
-      width:100%;
-      height:185px;
-      border-radius:8px;
-      overflow:hidden;
-      background:#eee;
-      box-shadow:0 4px 14px rgba(0,0,0,.06);
+    /* Itinerary Day Editorial Card */
+    .ya-ebc-page .yt-day-card {
+     
+      padding: 28px 28px 28px 24px;
+      display: grid;
+      grid-template-columns: 140px minmax(0, 1fr) 340px;
+      gap: 0;
+      align-items: stretch;
+      overflow: hidden;
+      transition: box-shadow .3s ease, border-color .3s ease;
+      position: relative;
     }
-    .ya-ebc-page .ya-day-carousel-viewport{
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      position:relative;
+    .yt-day-card{
+      padding-top:20px;
+      padding-bottom:20px;
     }
-    .ya-ebc-page .ya-day-carousel-track{
-      display:flex;
-      width:100%;
-      height:100%;
-      position:relative;
+    .ya-ebc-page .yt-day-card:hover {
+      box-shadow: 0 10px 40px rgba(23, 63, 56, 0.10);
+      border-color: #d4cbbc;
     }
-    .ya-ebc-page .ya-day-carousel-slide{
-      position:absolute;
-      inset:0;
-      opacity:0;
-      transition:opacity .4s ease,transform .4s ease;
-      transform:scale(1.02);
-      pointer-events:none;
+    /* Subtle left accent line per card */
+    .ya-ebc-page .yt-day-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 20px;
+      bottom: 20px;
+      width: 3px;
+      border-radius: 0 2px 2px 0;
+      opacity: 0.6;
     }
-    .ya-ebc-page .ya-day-carousel-slide.is-active{
-      opacity:1;
-      transform:scale(1);
-      pointer-events:auto;
+
+    /* Left Column: Day Index & Location/Altitude */
+    .ya-ebc-page .yt-day-left {
+      border-right: 1px solid #ece8df;
+      padding: 4px 24px 4px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
     }
-    .ya-ebc-page .ya-day-carousel-slide img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
+    .ya-ebc-page .yt-day-num-tag {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-family: Inter, Arial, sans-serif;
+      margin-bottom: 8px;
     }
-    .ya-ebc-page .ya-day-carousel-btn{
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
-      width:30px;
-      height:30px;
-      border-radius:50%;
-      background:rgba(26,35,27,.6);
-      border:0;
-      color:#fff;
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-      z-index:4;
-      transition:background .2s ease;
+    .ya-ebc-page .yt-day-gold-dash {
+      width: 22px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 1px;
+      margin-bottom: 18px;
     }
-    .ya-ebc-page .ya-day-carousel-btn:hover{background:var(--green-2)}
-    .ya-ebc-page .ya-day-carousel-btn svg{width:14px;height:14px}
-    .ya-ebc-page .ya-day-carousel-prev{left:8px}
-    .ya-ebc-page .ya-day-carousel-next{right:8px}
-    .ya-ebc-page .ya-day-carousel-dots{
-      position:absolute;
-      bottom:8px;
-      left:50%;
-      transform:translateX(-50%);
-      display:flex;
-      align-items:center;
-      gap:5px;
-      z-index:4;
+    .ya-ebc-page .yt-day-stat {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      margin-bottom: 10px;
     }
-    .ya-ebc-page .ya-day-carousel-dot{
-      width:6px;
-      height:6px;
-      padding:0;
-      border:0;
-      border-radius:50%;
-      background:rgba(255,255,255,.5);
-      cursor:pointer;
-      transition:all .2s ease;
+    .ya-ebc-page .yt-day-stat-icon {
+      width: 15px;
+      height: 15px;
+      color: var(--green);
+      flex-shrink: 0;
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .ya-ebc-page .ya-day-carousel-dot.is-active{
-      width:16px;
-      border-radius:999px;
-      background:var(--gold);
+    .ya-ebc-page .yt-day-stat-icon svg {
+      width: 14px;
+      height: 14px;
+    }
+    .ya-ebc-page .yt-day-stat-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: #24352e;
+      line-height: 1.35;
+    }
+
+    /* Center Column: Title, Narrative, Pills */
+    .ya-ebc-page .yt-day-center {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      padding: 4px 28px 4px 28px;
+    }
+    .ya-ebc-page .yt-day-title {
+      margin: 0 0 11px;
+      font: 600 21px / 1.28 "Newsreader", Georgia, serif;
+      color: var(--green);
+    }
+    .ya-ebc-page .yt-day-body-text {
+      font-size: 14px;
+      line-height: 1.78;
+      color: #505c52;
+      flex: 1;
+      margin-bottom: 16px;
+    }
+    .ya-ebc-page .yt-day-body-text p {
+      margin: 0 0 9px;
+    }
+    .ya-ebc-page .yt-day-body-text p:last-child {
+      margin-bottom: 0;
+    }
+    .ya-ebc-page .yt-day-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid #f0ece3;
+    }
+    .ya-ebc-page .yt-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #f2f6ef;
+      border-radius: 999px;
+      padding: 5px 12px 5px 9px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--green);
+      border: 1px solid #dde8de;
+      letter-spacing: 0.01em;
+    }
+    .ya-ebc-page .yt-pill:hover {
+      background: #e8f0e8;
+    }
+    .ya-ebc-page .yt-pill-icon {
+      width: 13px;
+      height: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      opacity: 0.8;
+    }
+    .ya-ebc-page .yt-pill-icon svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* Right Column: Image Gallery Carousel — fixed 16:10 aspect */
+    .ya-ebc-page .yt-day-gallery {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      background: #eceae3;
+      align-self: center;
+      flex-shrink: 0;
+    }
+    /* No-image placeholder */
+    .ya-ebc-page .yt-day-no-image {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #f5f2ea;
+      color: #a0a898;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-align: center;
+      padding: 20px;
+      min-height: 190px;
+    }
+    .ya-ebc-page .yt-day-no-image svg {
+      width: 36px;
+      height: 36px;
+      opacity: 0.35;
+    }
+    /* Carousel internals */
+    .ya-ebc-page .yt-day-carousel-viewport {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .ya-ebc-page .yt-day-carousel-track {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .ya-ebc-page .yt-day-carousel-slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity .4s ease;
+      pointer-events: none;
+    }
+    .ya-ebc-page .yt-day-carousel-slide.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .ya-ebc-page .yt-day-carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* Counter + nav badge */
+    .ya-ebc-page .yt-gallery-overlay-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 5;
+      background: rgba(15, 38, 33, 0.80);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-radius: 999px;
+      padding: 5px 6px 5px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ya-ebc-page .yt-gallery-counter {
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: Inter, Arial, sans-serif;
+      letter-spacing: 0.5px;
+      min-width: 28px;
+    }
+    .ya-ebc-page .yt-gallery-btns {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .ya-ebc-page .yt-gallery-nav-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(255,255,255,0.12);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      transition: background .2s, border-color .2s;
+    }
+    .ya-ebc-page .yt-gallery-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.30);
+      border-color: rgba(255,255,255,0.8);
+    }
+
+    /* Roadmap embed styling */
+    .ya-ebc-page .ya-map-embed-wrapper iframe {
+      width: 100%!important;
+      min-height: 420px;
+      border: 0;
+      display: block;
     }
 
     /* 6. ESSENTIAL INFORMATION: Clean Collapsible Panels with Icons */
@@ -1454,21 +1665,109 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-reading-progress-bar{position:absolute;top:0;right:0;width:100%;height:var(--ya-reading-progress);background:var(--gold);transition:height .18s linear;border-radius:2px}
 
     /* Responsive */
+    @media(max-width:1300px){
+      /* Slightly tighten gallery column at large tablet */
+      .ya-ebc-page .yt-day-card{grid-template-columns:130px minmax(0,1fr) 300px}
+      .ya-ebc-page .yt-day-center{padding:4px 20px}
+    }
     @media(max-width:1100px){
       .ya-ebc-page .ya-tab-mman-section{display:block;width:100%}
-      .ya-ebc-page .ya-tabs-wrap{position:static;width:100%;margin:0 0 24px;box-shadow:none;border-radius:0}
-      .ya-ebc-page .ya-tabs{flex-direction:row;overflow-x:auto;padding-bottom:6px}
-      .ya-ebc-page .ya-tab{white-space:nowrap}
+      .ya-ebc-page .ya-tabs-wrap{position:static;width:100%;margin:0 0 24px;box-shadow:none;border-radius:0;border:none;padding:0;background:transparent}
+      .ya-ebc-page .ya-nav-title{display:none;}
+      .ya-ebc-page .ya-tabs{display:flex;flex-direction:column;gap:10px}
+      .ya-ebc-page .ya-tab{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        width:100%;
+        padding:15px 20px;
+        background:#ffffff;
+        border:1px solid var(--line);
+        border-radius:12px;
+        font-size:15.5px;
+        font-weight:700;
+        color:var(--green);
+        text-align:left;
+        box-shadow:0 2px 10px rgba(0,0,0,.03);
+      }
+      .ya-ebc-page .ya-tab::after{
+        content:"";
+        width:8px;
+        height:8px;
+        border-right:2px solid var(--gold);
+        border-bottom:2px solid var(--gold);
+        transform:rotate(45deg);
+        transition:transform .25s ease;
+        margin-left:auto;
+      }
+      .ya-ebc-page .ya-tab.is-active{
+        background:#f5f8f3;
+        border-color:var(--gold);
+        border-left:4px solid var(--gold);
+      }
+      .ya-ebc-page .ya-tab.is-active::after{
+        transform:rotate(-135deg);
+      }
+      /* Panels moved inside .ya-tabs (mobile accordion) */
+      .ya-ebc-page .ya-tabs > .ya-panel{
+        display:none;
+        padding:20px 16px 32px;
+        background:var(--cream);
+        border:1px solid var(--line);
+        border-top:0;
+        border-radius:0 0 12px 12px;
+        margin-top:-10px;
+        margin-bottom:10px;
+      }
+      .ya-ebc-page .ya-tabs > .ya-panel.is-active{display:block}
+      /* Fallback panels in ya-tab-stage */
+      .ya-ebc-page .ya-tab-stage .ya-panel{display:none;padding:18px 0 28px}
+      .ya-ebc-page .ya-tab-stage .ya-panel.is-active{display:block}
       .ya-ebc-page .ya-overview-grid{grid-template-columns:1fr}
       .ya-ebc-page .ya-review-cards{grid-template-columns:repeat(2,1fr)}
       .ya-ebc-page .ya-essential-layout{grid-template-columns:1fr}
-      .ya-ebc-page .ya-day-card-grid{grid-template-columns:1fr 240px}
+      .ya-ebc-page .ya-heli-card{margin:24px 0}
+      /* Itinerary card: 2-col (left + center stacked, gallery right) on tablet */
+      .ya-ebc-page .yt-day-card{
+        grid-template-columns:110px minmax(0,1fr) 240px;
+        padding:20px 20px 20px 18px;
+      }
+      .ya-ebc-page .yt-day-center{padding:4px 16px}
     }
 
-    @media(max-width:820px){
+    @media(max-width:860px){
+      /* Full single-column stack on mobile */
+      .ya-ebc-page .yt-day-card{
+        grid-template-columns:1fr;
+        padding:22px 18px;
+        border-radius:16px;
+        gap:0;
+      }
+      .ya-ebc-page .yt-day-card::before{display:none}
+      /* Gallery moves to top */
+      .ya-ebc-page .yt-day-gallery{
+        order:-1;
+        border-radius:10px;
+        aspect-ratio:16/9;
+        margin-bottom:16px;
+      }
+      .ya-ebc-page .yt-day-no-image{min-height:160px}
+      /* Left strip becomes horizontal row */
+      .ya-ebc-page .yt-day-left{
+        border-right:0;
+        border-bottom:1px solid #ece8df;
+        padding:0 0 14px;
+        flex-direction:row;
+        flex-wrap:wrap;
+        align-items:center;
+        gap:14px;
+        margin-bottom:14px;
+      }
+      .ya-ebc-page .yt-day-gold-dash{display:none}
+      .ya-ebc-page .yt-day-num-tag{font-size:10px}
+      /* Center gets no side padding */
+      .ya-ebc-page .yt-day-center{padding:0}
       .ya-ebc-page .ya-review-cards{grid-template-columns:1fr}
-      .ya-ebc-page .ya-day-card-grid{grid-template-columns:1fr}
-      .ya-ebc-page .ya-day-carousel{height:220px}
       .ya-ebc-page .ya-modal-dialog{padding:26px 20px}
     }
 
@@ -1476,6 +1775,7 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-hero-actions{width:100%}
       .ya-ebc-page .ya-btn{width:100%}
       .ya-ebc-page .ya-form-grid{grid-template-columns:1fr}
+      .ya-ebc-page .yt-day-gallery{aspect-ratio:16/10}
     }
   </style>
 
@@ -1689,140 +1989,189 @@ $related_query = new WP_Query( array(
           </div>
 
           <!-- Roadmap Section -->
+          <?php if ( ! empty( $map_embed_code ) || ! empty( $map_file_url ) || ! empty( $route_img ) ) : ?>
           <div class="ya-roadmap-section ya-reveal">
             <div class="ya-roadmap-header">
               <div>
-                <span class="ya-kicker">ROUTE &amp; ELEVATION</span>
-                <h3>Roadmap of the <?php echo esc_html( $title ); ?> Trek</h3>
+                <span class="ya-kicker"><?php echo esc_html( $route_caption_sub ); ?></span>
+                <h3><?php echo esc_html( $route_caption_h3 ); ?></h3>
               </div>
             </div>
             <div class="ya-roadmap-frame">
-              <img src="<?php echo esc_url( $route_img ); ?>" alt="<?php echo esc_attr( $title ); ?> route map" loading="lazy">
+              <?php if ( ! empty( $map_embed_code ) ) : ?>
+                <div class="ya-map-embed-wrapper">
+                  <?php echo wp_kses( $map_embed_code, array(
+                    'iframe' => array(
+                      'src'             => true,
+                      'width'           => true,
+                      'height'          => true,
+                      'frameborder'     => true,
+                      'allowfullscreen' => true,
+                      'style'           => true,
+                      'loading'         => true,
+                    ),
+                    'div' => array( 'id' => true, 'class' => true, 'style' => true ),
+                    'script' => array( 'src' => true, 'type' => true ),
+                  ) ); ?>
+                </div>
+              <?php elseif ( ! empty( $map_file_url ) ) : ?>
+                <div class="ya-map-file-wrapper" style="position:relative;">
+                  <?php if ( ! empty( $route_img ) ) : ?>
+                    <img src="<?php echo esc_url( $route_img ); ?>" alt="<?php echo esc_attr( $title ); ?> route map" loading="lazy">
+                  <?php endif; ?>
+                  <div class="ya-map-file-cta" style="margin-top:14px; text-align:center;">
+                    <a href="<?php echo esc_url( $map_file_url ); ?>" target="_blank" rel="noopener noreferrer" class="ya-btn ya-btn-sm ya-btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+                      View / Download Interactive Route File (<?php echo esc_html( strtoupper( pathinfo( parse_url( $map_file_url, PHP_URL_PATH ), PATHINFO_EXTENSION ) ?: 'MAP' ) ); ?>)
+                    </a>
+                  </div>
+                </div>
+              <?php elseif ( ! empty( $route_img ) ) : ?>
+                <img src="<?php echo esc_url( $route_img ); ?>" alt="<?php echo esc_attr( $title ); ?> route map" loading="lazy">
+              <?php endif; ?>
             </div>
             <div class="ya-roadmap-caption">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
               <span>Route: <?php echo esc_html( $fact_start ); ?> → <?php echo esc_html( $fact_high_point ); ?> → <?php echo esc_html( $fact_end ); ?> · Total distance ~<?php echo esc_html( $fact_distance ); ?></span>
             </div>
           </div>
+          <?php endif; ?>
         </div>
       </section>
 
-      <!-- Panel 2: Itinerary (All day-by-day panels permanently open, no dividing lines, interactive carousel with arrows and dots) -->
-      <?php 
-      // Collect image pool for interactive day carousels
-      $itin_gallery_pool = array();
-      if ( ! empty( $hero_slider_images ) && is_array( $hero_slider_images ) ) {
-        $itin_gallery_pool = array_merge( $itin_gallery_pool, $hero_slider_images );
-      }
-      if ( ! empty( $gallery ) && is_array( $gallery ) ) {
-        foreach ( $gallery as $g ) {
-          $g_url = is_array( $g ) ? ( $g['url'] ?? '' ) : $g;
-          if ( ! empty( $g_url ) ) $itin_gallery_pool[] = $g_url;
-        }
-      }
-      $itin_gallery_pool = array_values( array_unique( array_filter( $itin_gallery_pool ) ) );
-      if ( count( $itin_gallery_pool ) < 3) {
-        $itin_gallery_pool = array_merge( $itin_gallery_pool, array(
-          'https://yetiadventure.com/wp-content/uploads/2022/02/NAMCHE-BAZAAR-1024x576.jpg',
-          'https://yetiadventure.com/wp-content/uploads/2022/02/AERIAL-VIEW-OF-THE-EVEREST-BASE-CAMP.jpg',
-          'https://yetiadventure.com/wp-content/uploads/2022/02/CHORTEIN-ON-THE-WAY-TO-TENGBOCHE-1024x476.jpg',
-          'https://yetiadventure.com/wp-content/uploads/2022/02/KHUMBU-GLACIER-1024x683.jpg'
-        ) );
-      }
+      <!-- Panel 2: Itinerary — day-specific images only; no external fallbacks -->
+      <?php
+      // NOTE: No gallery pool / external fallback images.
+      // Each day shows ONLY its own uploaded photos.
+      // If a day has no image, a styled placeholder is shown instead.
       ?>
       <section class="ya-panel" id="ya-panel-itinerary" role="tabpanel" data-panel="itinerary">
         <div class="ya-inner">
-          <div class="ya-section-heading ya-reveal">
-            <div class="ya-itin-head-row">
-              <div>
-                <span class="ya-kicker"><?php echo esc_html( $itin_kicker ); ?></span>
-                <h2>Day by Day Itinerary</h2>
-                <p><?php echo esc_html( $itin_subtext ); ?></p>
-              </div>
-              <div class="ya-itin-actions">
-                <button type="button" class="ya-btn-sm" onclick="window.print()">Print Itinerary</button>
-              </div>
+          <div class="yt-itin-header ya-reveal">
+            <div class="yt-itin-eyebrow">
+              <span class="yt-itin-dash"></span>
+              <span><?php echo esc_html( $itin_script ?: 'YOUR JOURNEY' ); ?></span>
             </div>
+            <h2 class="yt-itin-h2"><?php echo esc_html( $itin_heading ?: 'Day by Day Itinerary' ); ?></h2>
+            <p class="yt-itin-desc"><?php echo esc_html( $itin_subtext ?: 'A flexible private itinerary blending heritage, nature, mountain views and local encounters.' ); ?></p>
           </div>
 
-          <div class="ya-itinerary-shell">
-            <div class="ya-days">
-              <?php foreach ( $itinerary as $i_idx => $day ) : 
-                $day_num   = $day['day'] ?? sprintf( '%02d', $i_idx + 1 );
-                $day_stage = ! empty( $day['stage'] ) ? $day['stage'] : 'TREK';
+          <div class="yt-days-list">
+            <?php foreach ( $itinerary as $i_idx => $day ) :
+              $day_num  = $day['day'] ?? sprintf( '%02d', $i_idx + 1 );
+              $meta_info = ya_parse_day_stage_meta( $day, $breadcrumb_region );
+              $loc_name  = $meta_info['location'];
+              $alt_val   = $meta_info['altitude'];
 
-                // Assemble multi-image array for interactive day carousel
-                $day_images = array();
-                if ( ! empty( $day['gallery'] ) && is_array( $day['gallery'] ) ) {
-                  $day_images = $day['gallery'];
-                } elseif ( ! empty( $day['photo'] ) ) {
-                  $day_images = array( $day['photo'] );
+              // Collect ONLY this day's own uploaded images — no external fallbacks.
+              $day_images = array();
+              if ( ! empty( $day['gallery'] ) && is_array( $day['gallery'] ) ) {
+                foreach ( $day['gallery'] as $gi ) {
+                  $gi_url = is_array( $gi ) ? ( $gi['url'] ?? '' ) : $gi;
+                  if ( ! empty( $gi_url ) ) $day_images[] = $gi_url;
                 }
-                if ( count( $day_images ) < 3 ) {
-                  $p_len = count( $itin_gallery_pool );
-                  $img_a = ! empty( $day_images[0] ) ? $day_images[0] : $itin_gallery_pool[ $i_idx % $p_len ];
-                  $img_b = $itin_gallery_pool[ ( $i_idx + 1 ) % $p_len ];
-                  $img_c = $itin_gallery_pool[ ( $i_idx + 2 ) % $p_len ];
-                  $day_images = array_values( array_unique( array( $img_a, $img_b, $img_c ) ) );
+              }
+              if ( empty( $day_images ) && ! empty( $day['images'] ) && is_array( $day['images'] ) ) {
+                foreach ( $day['images'] as $gi ) {
+                  $gi_url = is_array( $gi ) ? ( $gi['url'] ?? '' ) : $gi;
+                  if ( ! empty( $gi_url ) ) $day_images[] = $gi_url;
                 }
-              ?>
-                <article class="ya-day ya-reveal" id="day-<?php echo esc_attr( $day_num ); ?>">
-                  <div class="ya-day-card-grid">
-                    <div class="ya-day-main">
-                      <div class="ya-day-title-block">
-                        <span class="ya-day-tag">DAY <?php echo esc_html( $day_num ); ?> · <?php echo esc_html( strtoupper( $day_stage ) ); ?></span>
-                        <strong><?php echo esc_html( $day['title'] ?? '' ); ?></strong>
-                      </div>
-                      <div class="ya-day-body">
-                        <div class="ya-day-desc">
-                          <?php echo wp_kses_post( wpautop( $day['desc'] ?? '' ) ); ?>
-                        </div>
-                        <?php 
-                        if ( ! empty( $day['pills'] ) ) : 
-                          $pills_array = array_filter( array_map( 'trim', explode( ',', $day['pills'] ) ) );
-                          if ( ! empty( $pills_array ) ) :
-                        ?>
-                          <div class="ya-day-meta">
-                            <?php foreach ( $pills_array as $pill ) : ?>
-                              <span class="ya-meta-pill"><?php echo esc_html( $pill ); ?></span>
-                            <?php endforeach; ?>
-                          </div>
-                        <?php 
-                          endif;
-                        endif; 
-                        ?>
-                      </div>
-                    </div>
+              }
+              if ( empty( $day_images ) && ! empty( $day['photo'] ) ) {
+                $day_images[] = $day['photo'];
+              }
+              // Deduplicate & keep only real URLs
+              $day_images = array_values( array_unique( array_filter( $day_images ) ) );
+              $has_images = ! empty( $day_images );
 
-                    <!-- Interactive Photo Carousel -->
-                    <div class="ya-day-carousel" data-carousel-index="<?php echo esc_attr( $i_idx ); ?>">
-                      <div class="ya-day-carousel-viewport">
-                        <div class="ya-day-carousel-track">
-                          <?php foreach ( $day_images as $d_img_idx => $d_img_url ) : ?>
-                            <div class="ya-day-carousel-slide<?php echo 0 === $d_img_idx ? ' is-active' : ''; ?>">
-                              <img src="<?php echo esc_url( $d_img_url ); ?>" alt="Day <?php echo esc_attr( $day_num ); ?> photo <?php echo $d_img_idx + 1; ?>" loading="lazy">
-                            </div>
-                          <?php endforeach; ?>
+              // Pills
+              $pills_raw   = $day['pills'] ?? ( $day['meals'] ?? '' );
+              $pills_items = array();
+              if ( ! empty( $pills_raw ) ) {
+                $pills_items = array_values( array_filter( array_map( 'trim', preg_split( '/[,;]+/', $pills_raw ) ) ) );
+              }
+            ?>
+              <article class="yt-day-card ya-reveal" id="day-<?php echo esc_attr( $day_num ); ?>">
+
+                <!-- Left: Day number, location, altitude -->
+                <div class="yt-day-left">
+                  <div class="yt-day-num-tag">DAY <?php echo esc_html( $day_num ); ?></div>
+                  <div class="yt-day-gold-dash"></div>
+                  <div class="yt-day-stat">
+                    <span class="yt-day-stat-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                    </span>
+                    <span class="yt-day-stat-val"><?php echo esc_html( $loc_name ); ?></span>
+                  </div>
+                  <?php if ( ! empty( $alt_val ) ) : ?>
+                  <div class="yt-day-stat">
+                    <span class="yt-day-stat-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+                    </span>
+                    <span class="yt-day-stat-val"><?php echo esc_html( $alt_val ); ?></span>
+                  </div>
+                  <?php endif; ?>
+                </div>
+
+                <!-- Center: Title, description, pills -->
+                <div class="yt-day-center">
+                  <h3 class="yt-day-title"><?php echo esc_html( $day['title'] ?? ( 'Day ' . $day_num ) ); ?></h3>
+                  <div class="yt-day-body-text">
+                    <?php echo wp_kses_post( wpautop( $day['desc'] ?? ( $day['description'] ?? '' ) ) ); ?>
+                  </div>
+                  <?php if ( ! empty( $pills_items ) ) : ?>
+                  <div class="yt-day-pills">
+                    <?php foreach ( $pills_items as $pill ) :
+                      $pill_icon = ya_get_itin_pill_icon( $pill );
+                    ?>
+                      <span class="yt-pill">
+                        <span class="yt-pill-icon" aria-hidden="true"><?php echo $pill_icon; ?></span>
+                        <span class="yt-pill-text"><?php echo esc_html( $pill ); ?></span>
+                      </span>
+                    <?php endforeach; ?>
+                  </div>
+                  <?php endif; ?>
+                </div>
+
+                <!-- Right: Images or no-image placeholder -->
+                <?php if ( $has_images ) : ?>
+                <div class="yt-day-gallery" data-day-gallery>
+                  <div class="yt-day-carousel-viewport">
+                    <div class="yt-day-carousel-track">
+                      <?php foreach ( $day_images as $d_idx => $d_img ) : ?>
+                        <div class="yt-day-carousel-slide<?php echo 0 === $d_idx ? ' is-active' : ''; ?>">
+                          <img src="<?php echo esc_url( $d_img ); ?>"
+                               alt="<?php echo esc_attr( ( $day['title'] ?? ( 'Day ' . $day_num ) ) . ' — photo ' . ( $d_idx + 1 ) ); ?>"
+                               loading="lazy">
                         </div>
-                      </div>
-                      <?php if ( count( $day_images ) > 1 ) : ?>
-                        <button type="button" class="ya-day-carousel-btn ya-day-carousel-prev" aria-label="Previous image">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-                        </button>
-                        <button type="button" class="ya-day-carousel-btn ya-day-carousel-next" aria-label="Next image">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                        </button>
-                        <div class="ya-day-carousel-dots">
-                          <?php foreach ( $day_images as $d_img_idx => $d_img_url ) : ?>
-                            <button type="button" class="ya-day-carousel-dot<?php echo 0 === $d_img_idx ? ' is-active' : ''; ?>" aria-label="Slide <?php echo $d_img_idx + 1; ?>" data-slide-index="<?php echo esc_attr( $d_img_idx ); ?>"></button>
-                          <?php endforeach; ?>
-                        </div>
-                      <?php endif; ?>
+                      <?php endforeach; ?>
                     </div>
                   </div>
-                </article>
-              <?php endforeach; ?>
-            </div>
+                  <?php if ( count( $day_images ) > 1 ) : ?>
+                  <div class="yt-gallery-overlay-badge">
+                    <span class="yt-gallery-counter">1 / <?php echo count( $day_images ); ?></span>
+                    <div class="yt-gallery-btns">
+                      <button type="button" class="yt-gallery-nav-btn yt-gallery-prev" aria-label="Previous image">&#8249;</button>
+                      <button type="button" class="yt-gallery-nav-btn yt-gallery-next" aria-label="Next image">&#8250;</button>
+                    </div>
+                  </div>
+                  <?php endif; ?>
+                </div>
+                <?php else : ?>
+                <div class="yt-day-gallery">
+                  <div class="yt-day-no-image" role="img" aria-label="No image uploaded for this day">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+                      <rect x="3" y="3" width="18" height="18" rx="3"/>
+                      <path d="M3 16l5-5 4 4 3-3 6 5"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                    </svg>
+                    <span>No image uploaded<br>for this day</span>
+                  </div>
+                </div>
+                <?php endif; ?>
+
+              </article>
+            <?php endforeach; ?>
           </div>
         </div>
       </section>
@@ -3120,6 +3469,16 @@ $related_query = new WP_Query( array(
             const tab = tabs.find(item => item.dataset.tab === panel.dataset.panel);
             if (tab && panel.previousElementSibling !== tab) tab.insertAdjacentElement('afterend', panel);
           });
+          // On mobile: Overview open by default, all others closed
+          panels.forEach(panel => {
+            const isOverview = panel.dataset.panel === 'overview';
+            panel.classList.toggle('is-active', isOverview);
+          });
+          tabs.forEach(tab => {
+            const isOverview = tab.dataset.tab === 'overview' && !tab.dataset.scrollTarget;
+            tab.classList.toggle('is-active', isOverview);
+            tab.setAttribute('aria-selected', String(isOverview));
+          });
         } else {
           tabsList.setAttribute('role', 'tablist');
           panels.forEach(panel => tabStage.appendChild(panel));
@@ -3169,7 +3528,23 @@ $related_query = new WP_Query( array(
         }
       };
 
-      tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab.dataset.tab, true, tab)));
+      tabs.forEach(tab => tab.addEventListener('click', () => {
+        if (mobileTabs.matches) {
+          // Accordion behaviour on mobile: toggle the panel, don't close others
+          const targetPanel = panels.find(p => p.dataset.panel === tab.dataset.tab);
+          if (!targetPanel) return;
+          const isNowOpen = !targetPanel.classList.contains('is-active');
+          targetPanel.classList.toggle('is-active', isNowOpen);
+          tab.classList.toggle('is-active', isNowOpen);
+          tab.setAttribute('aria-selected', String(isNowOpen));
+          if (isNowOpen) {
+            // Smooth scroll to the tab header
+            setTimeout(() => tab.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+          }
+        } else {
+          activateTab(tab.dataset.tab, true, tab);
+        }
+      }));
       root.querySelectorAll('.ya-jump-tab').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.target, true)));
 
       // Keep the visual navigation state aligned with the visible long-form section.
@@ -3206,44 +3581,41 @@ $related_query = new WP_Query( array(
         requestProgressUpdate();
       }
 
-      // 3. Day-by-Day Interactive Image Carousels
-      root.querySelectorAll('.ya-day-carousel').forEach(carousel => {
-        const slides = [...carousel.querySelectorAll('.ya-day-carousel-slide')];
-        const dots = [...carousel.querySelectorAll('.ya-day-carousel-dot')];
-        const prevBtn = carousel.querySelector('.ya-day-carousel-prev');
-        const nextBtn = carousel.querySelector('.ya-day-carousel-next');
-        if (slides.length <= 1) return;
+      // 3. Day-by-Day Interactive Image Carousels (.yt-day-gallery)
+      root.querySelectorAll('[data-day-gallery]').forEach(gallery => {
+        const slides    = [...gallery.querySelectorAll('.yt-day-carousel-slide')];
+        const counter   = gallery.querySelector('.yt-gallery-counter');
+        const prevBtn   = gallery.querySelector('.yt-gallery-prev');
+        const nextBtn   = gallery.querySelector('.yt-gallery-next');
+        const total     = slides.length;
+        if (total <= 1) return;
 
-        let currentIndex = 0;
-        const setSlide = index => {
-          currentIndex = (index + slides.length) % slides.length;
-          slides.forEach((slide, i) => {
-            slide.classList.toggle('is-active', i === currentIndex);
-          });
-          dots.forEach((dot, i) => {
-            dot.classList.toggle('is-active', i === currentIndex);
-          });
+        let cur = 0;
+
+        const goTo = idx => {
+          slides[cur].classList.remove('is-active');
+          cur = (idx + total) % total;
+          slides[cur].classList.add('is-active');
+          if (counter) counter.textContent = `${cur + 1} / ${total}`;
         };
 
-        prevBtn?.addEventListener('click', e => {
-          e.preventDefault();
-          e.stopPropagation();
-          setSlide(currentIndex - 1);
+        prevBtn?.addEventListener('click', e => { e.stopPropagation(); goTo(cur - 1); });
+        nextBtn?.addEventListener('click', e => { e.stopPropagation(); goTo(cur + 1); });
+
+        // Keyboard navigation when gallery is focused
+        gallery.setAttribute('tabindex', '0');
+        gallery.addEventListener('keydown', e => {
+          if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(cur - 1); }
+          if (e.key === 'ArrowRight') { e.preventDefault(); goTo(cur + 1); }
         });
 
-        nextBtn?.addEventListener('click', e => {
-          e.preventDefault();
-          e.stopPropagation();
-          setSlide(currentIndex + 1);
-        });
-
-        dots.forEach((dot, i) => {
-          dot.addEventListener('click', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            setSlide(i);
-          });
-        });
+        // Touch / swipe support
+        let touchStartX = 0;
+        gallery.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+        gallery.addEventListener('touchend', e => {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          if (Math.abs(dx) > 40) goTo(dx < 0 ? cur + 1 : cur - 1);
+        }, { passive: true });
       });
 
       // 4. Essential Info Collapsible Accordion
