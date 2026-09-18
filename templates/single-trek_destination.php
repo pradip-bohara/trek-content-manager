@@ -1594,7 +1594,7 @@ $related_query = new WP_Query( array(
         <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-review" data-tab="review">
           Reviews
         </button>
-        <button class="ya-tab" type="button" role="tab" aria-selected="false" data-tab="departures" data-scroll-to="ya-departures">
+        <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-departures" data-tab="departures">
           Fixed Departures
         </button>
       </div>
@@ -1602,7 +1602,6 @@ $related_query = new WP_Query( array(
       <!-- Private Heli Charters Promo Card in Left Sidebar -->
       <div class="ya-heli-card ya-reveal">
         <div class="ya-heli-tag">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"/></svg>
           <span>THE SELECTION OF TREKS</span>
         </div>
         <p>Explore our curated selection of treks, tailored to offer unforgettable experiences in the mountains.</p>
@@ -1943,16 +1942,14 @@ $related_query = new WP_Query( array(
         </div>
       </section>
 
-       <!-- Fixed Departure Dates Section -->
-  <section class="ya-departures ya-reveal" id="ya-departures">
-    <style>
-      /* ── Departure Dates ──────────────────────────────── */
-      .ya-ebc-page .ya-departures {
-        padding: 90px 0;
-        background: var(--cream);
-        border-top: 1px solid var(--line);
-        scroll-margin-top: 112px;
-      }
+      <!-- Panel 5: Fixed Departure Dates -->
+      <section class="ya-panel ya-departures ya-reveal" id="ya-departures" role="tabpanel" data-panel="departures">
+        <style>
+          /* ── Departure Dates ──────────────────────────────── */
+          .ya-ebc-page .ya-departures {
+            padding: 44px 0 60px;
+            border-top: 1px solid var(--line);
+          }
       .ya-ebc-page .ya-dep-head {
         display: flex;
         flex-wrap: wrap;
@@ -2378,7 +2375,7 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-related-card {
       display: flex;
       flex-direction: column;
-      border-radius: 20px;
+      border-radius: 2px;
       overflow: hidden;
       background: #fff;
       border: 1px solid #dce8e3;
@@ -3153,25 +3150,8 @@ $related_query = new WP_Query( array(
       };
 
       const activateTab = (name, scroll = true, clickedTab = null) => {
-        const targetTab = clickedTab || tabs.find(tab => tab.dataset.tab === name || tab.dataset.scrollTo === name);
+        const targetTab = clickedTab || tabs.find(tab => tab.dataset.tab === name);
         if (!targetTab) return;
-
-        const scrollToId = targetTab.dataset.scrollTo;
-        if (scrollToId) {
-          const targetEl = document.getElementById(scrollToId);
-          if (targetEl) {
-            tabs.forEach(tab => {
-              const active = tab === targetTab;
-              tab.classList.toggle('is-active', active);
-              tab.setAttribute('aria-selected', String(active));
-            });
-            if (!mobileTabs.matches) {
-              targetTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
-            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            return;
-          }
-        }
 
         const active = setActiveTab(name);
         if (!active) return;
@@ -3179,11 +3159,11 @@ $related_query = new WP_Query( array(
         if (!mobileTabs.matches) {
           targetTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
-        if (scroll && !mobileTabs.matches) {
+        if (scroll && !mobileTabs.matches && targetPanel) {
           const scrollTarget = targetTab.dataset.scrollTarget ? document.querySelector(targetTab.dataset.scrollTarget) : null;
           if (scrollTarget) {
             scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          } else if (targetPanel) {
+          } else {
             targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }
@@ -3198,23 +3178,11 @@ $related_query = new WP_Query( array(
           const visible = entries
             .filter(entry => entry.isIntersecting)
             .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-          if (!visible?.target) return;
-          if (visible.target.id === 'ya-departures') {
-            const depTab = tabs.find(t => t.dataset.scrollTo === 'ya-departures' || t.dataset.tab === 'departures');
-            if (depTab) {
-              tabs.forEach(t => {
-                const active = t === depTab;
-                t.classList.toggle('is-active', active);
-                t.setAttribute('aria-selected', String(active));
-              });
-            }
-          } else if (visible.target.dataset?.panel) {
+          if (visible?.target?.dataset?.panel) {
             setActiveTab(visible.target.dataset.panel);
           }
         }, { rootMargin: '-18% 0px -65% 0px', threshold: 0.01 });
         panels.forEach(panel => sectionObserver.observe(panel));
-        const depEl = document.getElementById('ya-departures');
-        if (depEl) sectionObserver.observe(depEl);
       }
 
       // Reading progress for the long-form content, shown directly below the fixed left navigation.
