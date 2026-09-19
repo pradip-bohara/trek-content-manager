@@ -421,7 +421,7 @@ $related_query = new WP_Query( array(
 
 <section class="ya-ebc-page" id="ya-ebc-page">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
     html:has(.ya-ebc-page),
     body:has(.ya-ebc-page){
@@ -514,7 +514,7 @@ $related_query = new WP_Query( array(
       overflow:visible;
       background:var(--cream);
       color:var(--ink);
-      font-family:"Open Sans","Inter",Arial,sans-serif;
+      font-family:"Open Sans",Arial,sans-serif;
       line-height:1.65;
       position:relative;
       z-index:1;
@@ -568,7 +568,7 @@ $related_query = new WP_Query( array(
       font-weight:800;
       letter-spacing:2px;
       text-transform:uppercase;
-      font-family:"Inter","Open Sans",sans-serif;
+      font-family:"Open Sans",sans-serif;
     }
 
     .ya-ebc-page .ya-kicker:before{
@@ -594,7 +594,7 @@ $related_query = new WP_Query( array(
       letter-spacing:1px;
       text-transform:uppercase;
       cursor:pointer;
-      font-family:"Inter","Open Sans",sans-serif;
+      font-family:"Open Sans",sans-serif;
       transition:all .22s ease;
     }
 
@@ -783,7 +783,7 @@ $related_query = new WP_Query( array(
     }
     .yt-qf__label{
       display:block;
-      font-family:Inter,'DM Sans',Arial,sans-serif;
+      font-family:"Open Sans",Arial,sans-serif;
       font-size:9.5px;
       font-weight:600;
       letter-spacing:.12em;
@@ -795,7 +795,7 @@ $related_query = new WP_Query( array(
     }
     .yt-qf__value{
       display:block;
-      font-family:'Cormorant Garamond','Libre Baskerville','Newsreader',Georgia,serif;
+      font-family:"Newsreader",Georgia,serif;
       font-size:clamp(16px,1.45vw,20px);
       font-weight:600;
       color:#173F38;
@@ -804,7 +804,7 @@ $related_query = new WP_Query( array(
     }
     .yt-qf__sub{
       display:block;
-      font-family:Inter,'DM Sans',Arial,sans-serif;
+      font-family:"Open Sans",Arial,sans-serif;
       font-size:11px;
       color:#8a9487;
       margin-top:3px;
@@ -915,46 +915,268 @@ $related_query = new WP_Query( array(
         font-weight:700;
         border-left:3px solid var(--green-2);
       }
-      .ya-ebc-page .ya-heli-card{
+      /* Share Journey Button in Left Sidebar - Sleek standalone button */
+      .ya-ebc-page .ya-share-sidebar-wrap{
         margin-top:16px;
-        padding:16px 14px;
-        background:#1a231b;
-        border-radius:10px;
-        color:#ffffff;
-        box-shadow:0 6px 20px rgba(0,0,0,.1);
       }
-      .ya-ebc-page .ya-heli-tag{
+      .ya-ebc-page .ya-share-card-btn{
+        width:100%;
+        min-height:42px;
+        padding:10px 16px;
+        background:#617555;
+        color:#ffffff;
+        font-size:13px;
+        font-weight:700;
+        border-radius:8px;
+        border:1px solid #617555;
+        cursor:pointer;
         display:flex;
         align-items:center;
-        gap:6px;
-        font-size:10px;
-        font-weight:800;
-        letter-spacing:0.08em;
-        color:var(--gold);
-        margin-bottom:8px;
-        text-transform:uppercase;
-      }
-      .ya-ebc-page .ya-heli-tag svg{width:14px;height:14px;fill:currentColor}
-      .ya-ebc-page .ya-heli-card p{
-        margin:0 0 12px;
-        font-size:12px;
-        line-height:1.55;
-        color:#d1ded0;
-      }
-      .ya-ebc-page .ya-heli-btn{
-        width:100%;
-        background:var(--gold);
-        color:var(--green);
-        font-size:12px;
-        font-weight:700;
-        border-radius:6px;
-        border:0;
-        padding:9px 12px;
-        text-align:center;
-        cursor:pointer;
+        justify-content:center;
+        gap:8px;
+        font-family:"Open Sans",Arial,sans-serif;
         transition:all .2s ease;
+        box-shadow:0 2px 8px rgba(97,117,85,0.2);
+        letter-spacing:0.01em;
       }
-      .ya-ebc-page .ya-heli-btn:hover{background:var(--gold-hover)}
+      .ya-ebc-page .ya-share-card-btn:hover{
+        background:#cfab55;
+        border-color:#cfab55;
+        color:#ffffff;
+        transform:translateY(-1px);
+        box-shadow:0 4px 14px rgba(207,171,85,0.35);
+      }
+      .ya-ebc-page .ya-share-card-btn svg{width:16px;height:16px}
+
+    /* Share Modal - Premium Editorial UI with Real Destination Data */
+    .ya-share-modal{
+      position:fixed;
+      inset:0;
+      z-index:999999;
+      background:rgba(15,23,18,0.68);
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .ya-share-modal.is-open{
+      display:flex;
+    }
+    .ya-share-dialog{
+      position:relative;
+      width:100%;
+      max-width:480px;
+      background:#ffffff;
+      border-radius:8px;
+      border:1px solid #e2e8e0;
+      overflow:hidden;
+      box-shadow:0 24px 60px rgba(0,0,0,0.28);
+      animation:yaShareZoom .25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes yaShareZoom{
+      from{opacity:0;transform:scale(0.95) translateY(12px)}
+      to{opacity:1;transform:scale(1) translateY(0)}
+    }
+    .ya-share-close{
+      position:absolute;
+      top:12px;
+      right:12px;
+      z-index:10;
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.92);
+      border:none;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#173f38;
+      transition:all .2s ease;
+      box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    }
+    .ya-share-close:hover{
+      background:#ffffff;
+      color:#cfab55;
+      transform:scale(1.08);
+    }
+    .ya-share-close svg{width:16px;height:16px}
+    
+    .ya-share-modal-hero{
+      position:relative;
+      height:150px;
+      background:center/cover no-repeat;
+    }
+    .ya-share-modal-hero-overlay{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(15,23,18,0.2) 0%, rgba(15,23,18,0.85) 100%);
+    }
+    .ya-share-modal-hero-text{
+      position:absolute;
+      bottom:14px;
+      left:20px;
+      right:20px;
+      color:#ffffff;
+    }
+    .ya-share-modal-tag{
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:1.2px;
+      text-transform:uppercase;
+      color:#cfab55;
+      display:block;
+      font-family:"Open Sans",Arial,sans-serif;
+      margin-bottom:3px;
+    }
+    .ya-share-modal-hero-text h3{
+      margin:0;
+      font-size:20px;
+      color:#ffffff;
+      font-family:"Newsreader",Georgia,serif;
+      font-weight:600;
+      line-height:1.25;
+      letter-spacing:-0.01em;
+    }
+
+    /* Real Destination Data Strip in Modal */
+    .ya-share-data-strip{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(80px, 1fr));
+      gap:8px;
+      padding:12px 20px;
+      background:#f8faf7;
+      border-bottom:1px solid #eef2ec;
+    }
+    .ya-share-data-item{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .ya-share-data-label{
+      font-size:9.5px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.8px;
+      color:#778575;
+      font-family:"Open Sans",Arial,sans-serif;
+    }
+    .ya-share-data-value{
+      font-size:13px;
+      font-weight:600;
+      color:#173f38;
+      font-family:"Newsreader",Georgia,serif;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .ya-share-modal-content{
+      padding:18px 20px 22px;
+    }
+    .ya-share-modal-desc{
+      margin:0 0 14px;
+      font-size:13px;
+      color:#556353;
+      line-height:1.5;
+      font-family:"Open Sans",Arial,sans-serif;
+    }
+    .ya-social-grid{
+      display:grid;
+      grid-template-columns:repeat(5, 1fr);
+      gap:8px;
+      margin-bottom:18px;
+    }
+    .ya-social-btn{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      padding:10px 4px;
+      border-radius:8px;
+      border:1px solid #edf0ea;
+      text-decoration:none;
+      color:#3d4a3b;
+      font-size:11px;
+      font-weight:600;
+      font-family:"Open Sans",Arial,sans-serif;
+      transition:all .2s ease;
+      background:#fbfbfb;
+      cursor:pointer;
+    }
+    .ya-social-btn:hover{
+      transform:translateY(-2px);
+      border-color:#cfab55;
+      box-shadow:0 4px 12px rgba(0,0,0,0.06);
+      color:#173f38;
+    }
+    .ya-social-icon{
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:transform .2s ease;
+    }
+    .ya-social-btn:hover .ya-social-icon{transform:scale(1.08)}
+    .ya-social-btn--whatsapp .ya-social-icon{background:#25D366;color:#ffffff}
+    .ya-social-btn--facebook .ya-social-icon{background:#1877F2;color:#ffffff}
+    .ya-social-btn--x .ya-social-icon{background:#000000;color:#ffffff}
+    .ya-social-btn--linkedin .ya-social-icon{background:#0A66C2;color:#ffffff}
+    .ya-social-btn--email .ya-social-icon{background:#617555;color:#ffffff}
+    .ya-social-icon svg{width:18px;height:18px}
+    
+    .ya-share-copy-box label{
+      display:block;
+      font-size:11px;
+      font-weight:700;
+      color:#667265;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      margin-bottom:6px;
+      font-family:"Open Sans",Arial,sans-serif;
+    }
+    .ya-share-copy-row{
+      display:flex;
+      gap:8px;
+    }
+    .ya-share-copy-row input{
+      flex:1;
+      padding:10px 12px;
+      border:1px solid #d8dfd6;
+      border-radius:8px;
+      font-size:12.5px;
+      color:#445242;
+      background:#f8faf7;
+      outline:none;
+      font-family:"Open Sans",Arial,sans-serif;
+    }
+    .ya-copy-link-btn{
+      padding:10px 18px;
+      border-radius:8px;
+      background:#617555;
+      color:#ffffff;
+      border:none;
+      font-size:12.5px;
+      font-weight:700;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-family:"Open Sans",Arial,sans-serif;
+      transition:all .2s ease;
+      white-space:nowrap;
+    }
+    .ya-copy-link-btn:hover{
+      background:#cfab55;
+    }
+    .ya-copy-link-btn.is-copied{
+      background:#2e7d32;
+    }
+    .ya-copy-link-btn svg{width:14px;height:14px}
 
       /* Right Side Stage: Proper padding, spacing and max font size 42px */
       .ya-ebc-page .ya-tab-stage{
@@ -1019,7 +1241,7 @@ $related_query = new WP_Query( array(
       text-transform: uppercase;
       color: #cfab55;
       margin-bottom: 8px;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-highlights-header h3 {
       margin: 0 0 8px;
@@ -1033,7 +1255,7 @@ $related_query = new WP_Query( array(
       font-size: 14.5px;
       line-height: 1.6;
       max-width: 640px;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-highlights-grid {
       display: grid;
@@ -1087,14 +1309,14 @@ $related_query = new WP_Query( array(
       font-weight: 700;
       color: #1a2e26;
       line-height: 1.4;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-check-desc {
       font-size: 13px;
       color: #637069;
       line-height: 1.6;
       margin-top: 4px;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-check-desc p {
       margin: 0;
@@ -1134,7 +1356,7 @@ $related_query = new WP_Query( array(
       color:var(--ink);
       border-bottom:1px solid var(--line);
       padding-bottom:8px;
-      font-family:"Inter","Open Sans",sans-serif;
+      font-family:"Open Sans",sans-serif;
     }
     .ya-ebc-page .ya-trip-facts-list{
       list-style:none;
@@ -1199,7 +1421,7 @@ $related_query = new WP_Query( array(
       text-transform:uppercase;
       color:#cfab55;
       margin-bottom:8px;
-      font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;
+      font-family:"Open Sans",Arial,sans-serif;
     }
     .ya-ebc-page .ya-roadmap-header h3{
       margin:0;
@@ -1228,7 +1450,7 @@ $related_query = new WP_Query( array(
       margin-top:18px;
       padding:16px 22px;
       border-radius:8px;
-      font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;
+      font-family:"Open Sans",Arial,sans-serif;
     }
     .ya-ebc-page .ya-trail-point{
       display:flex;
@@ -1306,7 +1528,7 @@ $related_query = new WP_Query( array(
       letter-spacing: 0.16em;
       text-transform: uppercase;
       color: #cfab55;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .yt-itin-h2 {
       margin: 0 0 10px;
@@ -1320,7 +1542,7 @@ $related_query = new WP_Query( array(
       line-height: 1.7;
       color: #637069;
       max-width: 680px;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .yt-days-list {
       display: flex;
@@ -1371,7 +1593,7 @@ $related_query = new WP_Query( array(
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--gold);
-      font-family: Inter, Arial, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
       margin-bottom: 8px;
     }
     .ya-ebc-page .yt-day-gold-dash {
@@ -1568,7 +1790,7 @@ $related_query = new WP_Query( array(
       color: #ffffff;
       font-size: 11px;
       font-weight: 700;
-      font-family: Inter, Arial, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
       letter-spacing: 0.5px;
       line-height: 1;
     }
@@ -1634,7 +1856,7 @@ $related_query = new WP_Query( array(
       color: #ffffff;
       font-size: 11.5px;
       font-weight: 600;
-      font-family: Inter, Arial, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
       text-shadow: 0 1px 4px rgba(0,0,0,0.85);
       pointer-events: none;
     }
@@ -2061,7 +2283,7 @@ $related_query = new WP_Query( array(
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: #cfab55;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-kicker-sep {
       display: inline-block;
@@ -2074,7 +2296,7 @@ $related_query = new WP_Query( array(
       font-size: 13px;
       font-weight: 700;
       color: #cfab55;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -2107,7 +2329,7 @@ $related_query = new WP_Query( array(
       transition: all 0.2s ease;
       white-space: nowrap;
       text-decoration: none;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-write-btn:hover {
       background: #cfab55;
@@ -2160,7 +2382,7 @@ $related_query = new WP_Query( array(
       font-weight: 700;
       line-height: 1.35;
       color: #18181b;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
       flex-grow: 1;
     }
     .ya-ebc-page .ya-rev-card-score {
@@ -2171,7 +2393,7 @@ $related_query = new WP_Query( array(
       align-items: center;
       gap: 4px;
       flex-shrink: 0;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-card-text {
       flex-grow: 1;
@@ -2182,7 +2404,7 @@ $related_query = new WP_Query( array(
       font-size: 13.5px;
       line-height: 1.62;
       color: #4b5563;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-card-bottom {
       padding-top: 14px;
@@ -2207,7 +2429,7 @@ $related_query = new WP_Query( array(
       font-weight: 700;
       letter-spacing: 0.5px;
       flex-shrink: 0;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-author-meta {
       min-width: 0;
@@ -2222,7 +2444,7 @@ $related_query = new WP_Query( array(
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-author-sub {
       display: block;
@@ -2232,7 +2454,7 @@ $related_query = new WP_Query( array(
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
 
     /* Empty State */
@@ -2270,7 +2492,7 @@ $related_query = new WP_Query( array(
       color: #637069;
       font-size: 14px;
       line-height: 1.6;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
 
     /* Load More Button */
@@ -2291,7 +2513,7 @@ $related_query = new WP_Query( array(
       border: 1px solid #617555;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-load-more-btn:hover {
       background: #cfab55;
@@ -2461,7 +2683,7 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-overview-grid{grid-template-columns:1fr}
       .ya-ebc-page .ya-review-cards{grid-template-columns:repeat(2,1fr)}
       .ya-ebc-page .ya-essential-layout{grid-template-columns:1fr}
-      .ya-ebc-page .ya-heli-card{margin:24px 0}
+      .ya-ebc-page .ya-share-card{margin:20px 0}
       /* Itinerary card: 2-col (left + center stacked, gallery right) on tablet */
       .ya-ebc-page .yt-day-card{
         grid-template-columns:110px minmax(0,1fr) 240px;
@@ -2667,13 +2889,12 @@ $related_query = new WP_Query( array(
         </button>
       </div>
 
-      <!-- Private Heli Charters Promo Card in Left Sidebar -->
-      <div class="ya-heli-card ya-reveal">
-        <div class="ya-heli-tag">
-          <span>THE SELECTION OF TREKS</span>
-        </div>
-        <p>Explore our curated selection of treks, tailored to offer unforgettable experiences in the mountains.</p>
-        <button type="button" class="ya-btn ya-heli-btn" onclick="document.querySelector('#ya-open-enquiry-modal')?.click()">Explore Treks</button>
+      <!-- Share This Journey Button in Left Sidebar -->
+      <div class="ya-share-sidebar-wrap ya-reveal">
+        <button type="button" class="ya-btn ya-share-card-btn" id="ya-open-share-btn" aria-label="<?php esc_attr_e( 'Share This Journey', 'trek-content-manager' ); ?>">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Share This Journey</span>
+        </button>
       </div>
 
       <div class="ya-reading-progress" aria-hidden="true"><span class="ya-reading-progress-bar"></span></div>
@@ -3311,14 +3532,14 @@ $related_query = new WP_Query( array(
       .ya-ebc-page .ya-dep-day        { display: block; font-size: 22px; color: var(--green); }
       .ya-ebc-page .ya-dep-month-year {
         display: block;
-        font: 500 12px / 1 Inter, Arial, sans-serif;
+        font: 500 12px / 1 "Open Sans", Arial, sans-serif;
         color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-top: 2px;
       }
       .ya-ebc-page .ya-dep-price     { font: 600 16px / 1 "Newsreader", Georgia, serif; color: var(--green); }
-      .ya-ebc-page .ya-dep-price-sub { display: block; font: 400 11px / 1 Inter, Arial, sans-serif; color: var(--muted); margin-top: 4px; }
+      .ya-ebc-page .ya-dep-price-sub { display: block; font: 400 11px / 1 "Open Sans", Arial, sans-serif; color: var(--muted); margin-top: 4px; }
       .ya-ebc-page .ya-dep-seats     { color: var(--muted); font-size: 13px; }
       .ya-ebc-page .ya-dep-note      { color: var(--muted); font-size: 12px; font-style: italic; margin-top: 3px; }
       .ya-ebc-page .ya-dep-book-btn  { white-space: nowrap; }
@@ -3329,7 +3550,7 @@ $related_query = new WP_Query( array(
         gap: 5px;
         padding: 4px 11px;
         border-radius: 20px;
-        font: 600 11px / 1 Inter, Arial, sans-serif;
+        font: 600 11px / 1 "Open Sans", Arial, sans-serif;
         text-transform: uppercase;
         letter-spacing: .7px;
       }
@@ -3388,7 +3609,7 @@ $related_query = new WP_Query( array(
         .ya-ebc-page .ya-dep-table tbody tr { display: block; padding: 16px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 10px; }
         .ya-ebc-page .ya-dep-table td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
         .ya-ebc-page .ya-dep-table td:last-child { border-bottom: none; margin-top: 6px; }
-        .ya-ebc-page .ya-dep-table td::before { content: attr(data-label); font: 600 11px/1 Inter, Arial, sans-serif; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); flex-shrink: 0; margin-right: 12px; }
+        .ya-ebc-page .ya-dep-table td::before { content: attr(data-label); font: 600 11px/1 "Open Sans", Arial, sans-serif; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); flex-shrink: 0; margin-right: 12px; }
       }
     </style>
     <div class="ya-inner">
@@ -3531,7 +3752,7 @@ $related_query = new WP_Query( array(
       align-items: center;
       gap: 8px;
       margin-bottom: 18px;
-      font: 600 11px / 1 Inter, Arial, sans-serif;
+      font: 600 11px / 1 "Open Sans", Arial, sans-serif;
       letter-spacing: 2.5px;
       text-transform: uppercase;
       color: #e8be61;
@@ -3710,7 +3931,7 @@ $related_query = new WP_Query( array(
       padding: 5px 12px;
       background: rgba(7,94,84,.88);
       border-radius: 50px;
-      font: 600 11px / 1 Inter, Arial, sans-serif;
+      font: 600 11px / 1 "Open Sans", Arial, sans-serif;
       letter-spacing: .8px;
       text-transform: uppercase;
       color: #fff;
@@ -3728,7 +3949,7 @@ $related_query = new WP_Query( array(
       padding: 4px 10px;
       background: rgba(10,30,20,.75);
       border-radius: 50px;
-      font: 600 10px / 1 Inter, Arial, sans-serif;
+      font: 600 10px / 1 "Open Sans", Arial, sans-serif;
       letter-spacing: 1.2px;
       text-transform: uppercase;
       color: #fff;
@@ -3744,7 +3965,7 @@ $related_query = new WP_Query( array(
       position: relative;
     }
     .ya-ebc-page .ya-related-eyebrow {
-      font: 700 10px / 1 Inter, Arial, sans-serif;
+      font: 700 10px / 1 "Open Sans", Arial, sans-serif;
       letter-spacing: 1.8px;
       text-transform: uppercase;
       color: var(--gold);
@@ -3774,13 +3995,13 @@ $related_query = new WP_Query( array(
       margin-right: 14px;
     }
     .ya-ebc-page .ya-related-info-label {
-      font: 500 10px / 1 Inter, Arial, sans-serif;
+      font: 500 10px / 1 "Open Sans", Arial, sans-serif;
       letter-spacing: .8px;
       text-transform: uppercase;
       color: #617579;
     }
     .ya-ebc-page .ya-related-info-value {
-      font: 600 13px / 1.2 Inter, Arial, sans-serif;
+      font: 600 13px / 1.2 "Open Sans", Arial, sans-serif;
       color: #102f35;
     }
     /* CTA row */
@@ -3796,7 +4017,7 @@ $related_query = new WP_Query( array(
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      font: 700 11px / 1 Inter, Arial, sans-serif;
+      font: 700 11px / 1 "Open Sans", Arial, sans-serif;
       letter-spacing: 1.2px;
       text-transform: uppercase;
       color: #075e54;
@@ -3812,7 +4033,7 @@ $related_query = new WP_Query( array(
       padding: 5px 12px;
       background: #eaf5f0;
       border-radius: 50px;
-      font: 600 11px / 1 Inter, Arial, sans-serif;
+      font: 600 11px / 1 "Open Sans", Arial, sans-serif;
       color: #075e54;
     }
     .ya-ebc-page .ya-related-duration-pill svg { width: 12px; height: 12px; }
@@ -4128,7 +4349,7 @@ $related_query = new WP_Query( array(
       font-size: 13px;
       line-height: 1.6;
       color: #5c6863;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
 
     /* Modal Right: Review Form */
@@ -4149,7 +4370,7 @@ $related_query = new WP_Query( array(
       margin: 0;
       color: #637069;
       font-size: 14px;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
 
     /* Rating Selector */
@@ -4168,7 +4389,7 @@ $related_query = new WP_Query( array(
       font-size: 13px;
       font-weight: 700;
       color: #1a2e26;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-star-select {
       display: inline-flex;
@@ -4215,7 +4436,7 @@ $related_query = new WP_Query( array(
       color: #1a2e26;
       font-size: 13px;
       font-weight: 600;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-review-modal input,
     .ya-ebc-page .ya-review-modal select,
@@ -4229,7 +4450,7 @@ $related_query = new WP_Query( array(
       padding: 11px 13px;
       box-sizing: border-box;
       transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-review-modal input:focus,
     .ya-ebc-page .ya-review-modal select:focus,
@@ -4260,7 +4481,7 @@ $related_query = new WP_Query( array(
       align-items: center;
       gap: 8px;
       transition: all 0.2s ease;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-submit-btn:hover {
       background: #cfab55;
@@ -4279,7 +4500,7 @@ $related_query = new WP_Query( array(
       font-size: 13.5px;
       line-height: 1.5;
       margin-bottom: 16px;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-modal-alert.is-error {
       display: block;
@@ -4322,7 +4543,7 @@ $related_query = new WP_Query( array(
       color: #55625c;
       font-size: 14.5px;
       line-height: 1.6;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-rev-success-note {
       font-size: 13.5px;
@@ -4506,6 +4727,127 @@ $related_query = new WP_Query( array(
             <strong>Pending Moderation:</strong> To ensure honest and verified traveler experiences, your review will be published once reviewed by our expedition team.
           </div>
           <button type="button" class="ya-rev-success-close-btn" id="ya-rev-success-close">Close Window</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Journey Modal -->
+  <div class="ya-share-modal" id="ya-share-modal" role="dialog" aria-modal="true" aria-labelledby="ya-share-modal-title" aria-hidden="true">
+    <div class="ya-share-dialog" role="document">
+      <button class="ya-share-close" type="button" aria-label="Close share popup" id="ya-share-modal-close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      
+      <?php 
+        $share_thumb = ! empty( $hero_bg_img ) ? $hero_bg_img : ( ! empty( $card_image_url ) ? $card_image_url : ( $hero_slider_images[0] ?? '' ) );
+        $share_url   = get_permalink( $post_id );
+        $share_region = ! empty( $fact_region ) ? $fact_region : ( ! empty( $breadcrumb_region ) ? $breadcrumb_region : 'Nepal' );
+
+        // Rich pre-filled email content with real trek data
+        $email_subject = 'Check out this Himalayan trek: ' . $title;
+        $email_body    = "Hi,\n\nI thought you would love to see this trek with Yeti Adventure:\n\n"
+                       . "• Trip: " . $title . "\n"
+                       . ( ! empty( $hero_days ) ? "• Duration: " . $hero_days . " Days\n" : "" )
+                       . "• Region: " . $share_region . "\n"
+                       . ( ! empty( $fact_high_point ) ? "• Highest Point: " . $fact_high_point . "\n" : "" )
+                       . ( ! empty( $difficulty ) ? "• Difficulty: " . $difficulty . "\n" : "" )
+                       . ( ! empty( $fact_season ) ? "• Best Season: " . $fact_season . "\n" : "" )
+                       . "\nView the complete itinerary, maps and details here:\n" . $share_url . "\n\nWarm regards!";
+        $mailto_link   = 'mailto:?subject=' . rawurlencode( $email_subject ) . '&body=' . rawurlencode( $email_body );
+      ?>
+      <div class="ya-share-modal-hero" style="background-image:url('<?php echo esc_url( $share_thumb ); ?>');">
+        <div class="ya-share-modal-hero-overlay"></div>
+        <div class="ya-share-modal-hero-text">
+          <span class="ya-share-modal-tag"><?php echo esc_html( $share_region ); ?></span>
+          <h3 id="ya-share-modal-title"><?php echo esc_html( $title ); ?></h3>
+        </div>
+      </div>
+
+      <!-- Real Destination Data Strip -->
+      <div class="ya-share-data-strip">
+        <?php if ( ! empty( $hero_days ) ) : ?>
+          <div class="ya-share-data-item">
+            <span class="ya-share-data-label">Duration</span>
+            <span class="ya-share-data-value"><?php echo esc_html( $hero_days ); ?> Days</span>
+          </div>
+        <?php endif; ?>
+        <?php if ( ! empty( $fact_high_point ) ) : ?>
+          <div class="ya-share-data-item">
+            <span class="ya-share-data-label">Highest Point</span>
+            <span class="ya-share-data-value"><?php echo esc_html( $fact_high_point ); ?></span>
+          </div>
+        <?php endif; ?>
+        <?php if ( ! empty( $difficulty ) ) : ?>
+          <div class="ya-share-data-item">
+            <span class="ya-share-data-label">Difficulty</span>
+            <span class="ya-share-data-value"><?php echo esc_html( $difficulty ); ?></span>
+          </div>
+        <?php endif; ?>
+        <?php if ( ! empty( $fact_season ) ) : ?>
+          <div class="ya-share-data-item">
+            <span class="ya-share-data-label">Best Season</span>
+            <span class="ya-share-data-value"><?php echo esc_html( $fact_season ); ?></span>
+          </div>
+        <?php endif; ?>
+      </div>
+
+      <div class="ya-share-modal-content">
+        <p class="ya-share-modal-desc">Share this journey with friends, family, or travel companions:</p>
+
+        <!-- Social Share Buttons Grid -->
+        <div class="ya-social-grid">
+          <!-- WhatsApp -->
+          <a class="ya-social-btn ya-social-btn--whatsapp" href="https://api.whatsapp.com/send?text=<?php echo rawurlencode( 'Check out this incredible trek: ' . $title . ' (' . ( $hero_days ? $hero_days . ' Days, ' : '' ) . $share_region . ') - ' . $share_url ); ?>" target="_blank" rel="noopener noreferrer" title="Share via WhatsApp">
+            <span class="ya-social-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+            </span>
+            <span>WhatsApp</span>
+          </a>
+
+          <!-- Facebook -->
+          <a class="ya-social-btn ya-social-btn--facebook" href="https://www.facebook.com/sharer/sharer.php?u=<?php echo rawurlencode( $share_url ); ?>" target="_blank" rel="noopener noreferrer" title="Share on Facebook">
+            <span class="ya-social-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </span>
+            <span>Facebook</span>
+          </a>
+
+          <!-- X / Twitter -->
+          <a class="ya-social-btn ya-social-btn--x" href="https://twitter.com/intent/tweet?text=<?php echo rawurlencode( 'Discover ' . $title . ' with Yeti Adventure: ' ); ?>&url=<?php echo rawurlencode( $share_url ); ?>" target="_blank" rel="noopener noreferrer" title="Share on X">
+            <span class="ya-social-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </span>
+            <span>X</span>
+          </a>
+
+          <!-- LinkedIn -->
+          <a class="ya-social-btn ya-social-btn--linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo rawurlencode( $share_url ); ?>" target="_blank" rel="noopener noreferrer" title="Share on LinkedIn">
+            <span class="ya-social-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.74c-.95 0-1.72.77-1.72 1.72s.77 1.72 1.72 1.72 1.72-.77 1.72-1.72-.77-1.72-1.72-1.72z"/></svg>
+            </span>
+            <span>LinkedIn</span>
+          </a>
+
+          <!-- Email -->
+          <a class="ya-social-btn ya-social-btn--email" id="ya-share-email-btn" href="<?php echo esc_url( $mailto_link ); ?>" title="Share via Email">
+            <span class="ya-social-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <span>Email</span>
+          </a>
+        </div>
+
+        <!-- Direct Link Copy Box -->
+        <div class="ya-share-copy-box">
+          <label for="ya-share-url-input">Trip Link</label>
+          <div class="ya-share-copy-row">
+            <input type="text" id="ya-share-url-input" value="<?php echo esc_url( $share_url ); ?>" readonly>
+            <button type="button" id="ya-copy-trip-link-btn" class="ya-copy-link-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -5123,6 +5465,79 @@ $related_query = new WP_Query( array(
         });
         const parentWrap = this.closest('.ya-rev-load-more-wrap');
         if (parentWrap) parentWrap.style.display = 'none';
+      });
+
+      // 8. Share Journey Modal & Native Share
+      const shareBtn = root.querySelector('#ya-open-share-btn');
+      const shareModal = document.querySelector('#ya-share-modal');
+      const shareClose = document.querySelector('#ya-share-modal-close');
+      const copyBtn = document.querySelector('#ya-copy-trip-link-btn');
+      const urlInput = document.querySelector('#ya-share-url-input');
+
+      const openShareModal = () => {
+        if (!shareModal) return;
+        shareModal.classList.add('is-open');
+        shareModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+
+      const closeShareModal = () => {
+        if (!shareModal) return;
+        shareModal.classList.remove('is-open');
+        shareModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      if (shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+          const shareData = {
+            title: document.title,
+            text: <?php echo wp_json_encode( 'Explore ' . $title . ' with Yeti Adventure' ); ?>,
+            url: window.location.href
+          };
+          if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
+            try {
+              await navigator.share(shareData);
+              return;
+            } catch (err) {
+              if (err.name !== 'AbortError') {
+                openShareModal();
+              }
+            }
+          } else {
+            openShareModal();
+          }
+        });
+      }
+
+      shareClose?.addEventListener('click', closeShareModal);
+      shareModal?.addEventListener('click', (e) => {
+        if (e.target === shareModal) closeShareModal();
+      });
+
+      copyBtn?.addEventListener('click', () => {
+        if (!urlInput) return;
+        urlInput.select();
+        navigator.clipboard.writeText(urlInput.value).then(() => {
+          const labelSpan = copyBtn.querySelector('span');
+          if (labelSpan) {
+            const originalText = labelSpan.textContent;
+            labelSpan.textContent = 'Copied! ✓';
+            copyBtn.classList.add('is-copied');
+            setTimeout(() => {
+              labelSpan.textContent = originalText;
+              copyBtn.classList.remove('is-copied');
+            }, 2000);
+          }
+        });
+      });
+
+      const emailBtn = document.getElementById('ya-share-email-btn');
+      emailBtn?.addEventListener('click', () => {
+        const mailto = emailBtn.getAttribute('href');
+        if (mailto && mailto.startsWith('mailto:')) {
+          window.location.href = mailto;
+        }
       });
     })();
   </script>
