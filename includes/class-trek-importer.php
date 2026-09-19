@@ -1294,6 +1294,9 @@ class Trek_Importer {
             if ( ! empty( $item['ess_card_email'] ) || ! empty( $ess_sec['card_email'] ) ) {
                 update_post_meta( $post_id, '_trek_ess_card_email', sanitize_email( $item['ess_card_email'] ?? $ess_sec['card_email'] ) );
             }
+            if ( ! empty( $item['ess_card_file'] ) || ! empty( $ess_sec['card_file'] ) ) {
+                update_post_meta( $post_id, '_trek_ess_card_file', self::safe_url( $item['ess_card_file'] ?? $ess_sec['card_file'] ) );
+            }
 
             $raw_faqs = $item['faqs'] ?? ( $item['essential_list'] ?? null );
             if ( ! empty( $raw_faqs ) && is_array( $raw_faqs ) ) {
@@ -1303,9 +1306,10 @@ class Trek_Importer {
                     if ( is_array( $faq ) ) {
                         $q = sanitize_text_field( $faq['question'] ?? ( $faq['title'] ?? '' ) );
                         $a = wp_kses_post( $faq['answer'] ?? ( $faq['content'] ?? '' ) );
+                        $tag = sanitize_text_field( $faq['tag'] ?? '' );
                         if ( ! empty( $q ) ) {
-                            $clean_faqs[] = array( 'question' => $q, 'answer' => $a );
-                            $clean_ess[]  = array( 'title' => $q, 'content' => $a );
+                            $clean_faqs[] = array( 'question' => $q, 'answer' => $a, 'tag' => $tag );
+                            $clean_ess[]  = array( 'title' => $q, 'content' => $a, 'tag' => $tag );
                         }
                     }
                 }
@@ -1669,5 +1673,19 @@ class Trek_Importer {
         );
 
         return json_encode( $sample, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+    }
+
+    /**
+     * AJAX handler for downloading the sample JSON file directly.
+     */
+    public static function ajax_download_sample_json() {
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_die( esc_html__( 'Unauthorized user', 'trek-content-manager' ), '', array( 'response' => 403 ) );
+        }
+        $json = self::get_sample_json_string();
+        header( 'Content-Type: application/json; charset=utf-8' );
+        header( 'Content-Disposition: attachment; filename="yeti-adventures-destinations-sample.json"' );
+        echo $json;
+        exit;
     }
 }

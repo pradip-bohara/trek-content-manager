@@ -1,6 +1,6 @@
 [
   {
-    "_comment": "Trek Content Manager — Canonical Destination Template v2.0 | All fields, all sections, ready to import via JSON Importer or Quick JSON Auto-Fill metabox.",
+    "_comment": "Trek Content Manager — Canonical Destination Template v2.5 | 100% field parity with Trek_CPT, Trek_Importer, Trek_Renderer, and Trek_REST_API.",
 
     "title": "The Ultimate Everest Base Camp Experience",
     "slug": "everest-base-camp-experience",
@@ -9,11 +9,14 @@
     "category": ["Trekking", "Himalayan", "Signature Journey"],
     "primary_category": "Signature Journey",
     "region": ["Nepal"],
+    "country": "Nepal",
     "difficulty": "Strenuous",
     "map_region": "Everest Region (Khumbu / EBC)",
     "map_district": "Solukhumbu",
     "featured": true,
     "status": "open",
+    "price": "2850",
+    "currency": "USD",
 
     "hero": {
       "script_title": "The Ultimate Trek",
@@ -24,6 +27,7 @@
       "badge_sub": "Days in Nepal",
       "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
       "slider_images": [
+        "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
         "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1600&q=85",
         "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
         "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=85",
@@ -76,8 +80,8 @@
       ],
       "image": "https://images.unsplash.com/photo-1571922021609-f38c01ad6b20?auto=format&fit=crop&w=1600&q=85",
       "route_img": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=85",
-      "map_file_url": "",
-      "map_embed_code": "",
+      "map_file_url": "https://yetiadventure.com/wp-content/uploads/maps/everest-base-camp-route-map.pdf",
+      "map_embed_code": "<iframe src=\"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d113032.64560124898!2d86.82823616644485!3d27.98812061298492!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39e854a215bd9ebd%3A0x576dcf806abbfa2!2sMount%20Everest!5e0!3m2!1sen!2snp!4v1680000000000!5m2!1sen!2snp\" width=\"100%\" height=\"450\" style=\"border:0; border-radius:12px;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>",
       "route_sub": "Route Overview",
       "route_heading": "Kathmandu → Lukla → EBC → Kala Patthar → Kathmandu"
     },
@@ -100,7 +104,9 @@
         "walking_hours": "Airport transfer only",
         "stay": "Dwarika's Heritage Hotel, Kathmandu",
         "meals": "Dinner",
-        "gallery": []
+        "gallery": [
+          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80"
+        ]
       },
       {
         "day": "02",
@@ -124,7 +130,9 @@
         "walking_hours": "5–6 hrs",
         "stay": "Namche Bazaar Lodge",
         "meals": "Breakfast, Lunch, Dinner",
-        "gallery": []
+        "gallery": [
+          "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80"
+        ]
       },
       {
         "day": "04",
@@ -148,7 +156,9 @@
         "walking_hours": "5–6 hrs",
         "stay": "Tengboche Lodge",
         "meals": "Breakfast, Lunch, Dinner",
-        "gallery": []
+        "gallery": [
+          "https://images.unsplash.com/photo-1571922021609-f38c01ad6b20?auto=format&fit=crop&w=1200&q=80"
+        ]
       },
       {
         "day": "06",
@@ -196,7 +206,9 @@
         "walking_hours": "7–8 hrs (including EBC visit)",
         "stay": "Gorak Shep Teahouse",
         "meals": "Breakfast, Lunch, Dinner",
-        "gallery": []
+        "gallery": [
+          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80"
+        ]
       },
       {
         "day": "10",
@@ -208,7 +220,9 @@
         "walking_hours": "8–9 hrs (including descent to Pheriche)",
         "stay": "Pheriche Village Teahouse",
         "meals": "Breakfast, Lunch, Dinner",
-        "gallery": []
+        "gallery": [
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80"
+        ]
       },
       {
         "day": "11",
@@ -380,21 +394,25 @@
       "card_title": "Download Your Complete Route Notes",
       "card_desc": "Includes detailed packing checklist, altitude acclimatisation schedule, Nepal visa guidelines, medical preparation advice, and seasonal weather data.",
       "card_btn": "Request Trip Notes",
-      "card_email": "sales@yetiadventure.com"
+      "card_email": "sales@yetiadventure.com",
+      "card_file": "https://yetiadventure.com/wp-content/uploads/dossiers/ebc-route-dossier-2026.pdf"
     },
 
     "faqs": [
       {
         "question": "What is the best season to undertake the Everest Base Camp trek?",
-        "answer": "<p>The two premier trekking seasons are <strong>Autumn (mid-September to late November)</strong> and <strong>Spring (early March to late May)</strong>. Autumn offers crisp, clear skies after the monsoon, vivid mountain visibility, and moderate temperatures. Spring brings longer days, blooming rhododendron valleys, and the visual drama of expedition teams on the mountain. Both seasons offer outstanding conditions; spring is slightly warmer at lower elevations.</p><ul><li><strong>Autumn:</strong> September–November — Best overall visibility</li><li><strong>Spring:</strong> March–May — Warmer, flowers in bloom</li><li><strong>Winter:</strong> December–February — Possible but very cold; fewer trekkers</li><li><strong>Monsoon:</strong> June–August — Not recommended; heavy rain and leeches</li></ul>"
+        "answer": "<p>The two premier trekking seasons are <strong>Autumn (mid-September to late November)</strong> and <strong>Spring (early March to late May)</strong>. Autumn offers crisp, clear skies after the monsoon, vivid mountain visibility, and moderate temperatures. Spring brings longer days, blooming rhododendron valleys, and the visual drama of expedition teams on the mountain. Both seasons offer outstanding conditions; spring is slightly warmer at lower elevations.</p><ul><li><strong>Autumn:</strong> September–November — Best overall visibility</li><li><strong>Spring:</strong> March–May — Warmer, flowers in bloom</li><li><strong>Winter:</strong> December–February — Possible but very cold; fewer trekkers</li><li><strong>Monsoon:</strong> June–August — Not recommended; heavy rain and leeches</li></ul>",
+        "tag": "Seasons & Weather"
       },
       {
         "question": "How fit do I need to be, and how is altitude sickness managed?",
-        "answer": "<p>You do not need to be an extreme athlete, but a solid foundation of <strong>cardiovascular aerobic fitness</strong> is essential. Our recommended pre-trek training includes 8–12 weeks of regular hiking on hilly terrain with a loaded pack, plus swimming or cycling for cardio base. Our itineraries incorporate two built-in acclimatisation rest days at Namche Bazaar (3,440m) and Dingboche (4,410m), following the internationally recognised 'climb high, sleep low' principle.</p><p>Altitude sickness (Acute Mountain Sickness / AMS) is managed through: strict ascent rate limits (no more than 300–500m net gain per day above 3,000m), twice-daily pulse oximeter blood oxygen readings by your lead Sherpa guide, immediate descent protocols if symptoms worsen, and ready access to supplemental oxygen and emergency evacuation services.</p>"
+        "answer": "<p>You do not need to be an extreme athlete, but a solid foundation of <strong>cardiovascular aerobic fitness</strong> is essential. Our recommended pre-trek training includes 8–12 weeks of regular hiking on hilly terrain with a loaded pack, plus swimming or cycling for cardio base. Our itineraries incorporate two built-in acclimatisation rest days at Namche Bazaar (3,440m) and Dingboche (4,410m), following the internationally recognised 'climb high, sleep low' principle.</p><p>Altitude sickness (Acute Mountain Sickness / AMS) is managed through: strict ascent rate limits (no more than 300–500m net gain per day above 3,000m), twice-daily pulse oximeter blood oxygen readings by your lead Sherpa guide, immediate descent protocols if symptoms worsen, and ready access to supplemental oxygen and emergency evacuation services.</p>",
+        "tag": "Fitness & Safety"
       },
       {
         "question": "What type of accommodation and food can I expect on the trail?",
-        "answer": "<p>In <strong>Kathmandu</strong>, you stay at 4/5-star boutique heritage hotels with en-suite bathrooms, international breakfast buffets, and city-centre locations. On the <strong>trekking route</strong>, accommodation is in the best available mountain teahouse lodges — typically twin-share rooms with comfortable beds, blankets, and attached bathroom facilities at lower elevations, with basic shared bathrooms at higher altitudes (Lobuche, Gorak Shep).</p><p>Trail food is hearty and surprisingly varied: dal bhat (rice and lentil), pasta, pizza, soups, porridge, pancakes, fried rice, noodles, and fresh baked goods are all available from teahouse menus. All dietary requirements — vegetarian, vegan, gluten-free — are easily accommodated with advance notice.</p>"
+        "answer": "<p>In <strong>Kathmandu</strong>, you stay at 4/5-star boutique heritage hotels with en-suite bathrooms, international breakfast buffets, and city-centre locations. On the <strong>trekking route</strong>, accommodation is in the best available mountain teahouse lodges — typically twin-share rooms with comfortable beds, blankets, and attached bathroom facilities at lower elevations, with basic shared bathrooms at higher altitudes (Lobuche, Gorak Shep).</p><p>Trail food is hearty and surprisingly varied: dal bhat (rice and lentil), pasta, pizza, soups, porridge, pancakes, fried rice, noodles, and fresh baked goods are all available from teahouse menus. All dietary requirements — vegetarian, vegan, gluten-free — are easily accommodated with advance notice.</p>",
+        "tag": "Logistics & Food"
       }
     ],
 
@@ -495,6 +513,484 @@
       "numeric_price": 2850,
       "currency": "USD",
       "formatted": "USD 2,850"
+    }
+  },
+  {
+    "_comment": "Destination 2: Annapurna Circuit & Thorong La Pass — Demonstrating multi-destination bulk import with distinct geography, pricing, and itinerary structure.",
+
+    "title": "Annapurna Circuit & Thorong La Pass",
+    "slug": "annapurna-circuit-thorong-la-pass",
+    "excerpt": "Traverse dramatic climate zones from subtropical river valleys to the windswept Tibetan plateau and across the formidable 5,416m Thorong La Pass.",
+
+    "category": ["Trekking", "Himalayan", "High Altitude"],
+    "primary_category": "High Altitude",
+    "region": ["Nepal"],
+    "country": "Nepal",
+    "difficulty": "Strenuous",
+    "map_region": "Annapurna Region (Annapurna / Mustang)",
+    "map_district": "Manang & Mustang",
+    "featured": true,
+    "status": "open",
+    "price": "2450",
+    "currency": "USD",
+
+    "hero": {
+      "script_title": "The Grand Circuit",
+      "title": "Annapurna Circuit & Thorong La",
+      "kicker": "Annapurna · Nepal",
+      "subtitle": "A world-renowned 16-day expedition encircling the Annapurna Massif, crossing from lush rhododendron forests into arid Tibetan landscapes and conquering the 5,416m Thorong La Pass.",
+      "days": 16,
+      "badge_sub": "Days in Nepal",
+      "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
+      "slider_images": [
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
+        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=85",
+        "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85"
+      ]
+    },
+
+    "card": {
+      "title": "Annapurna Circuit & Thorong La Pass",
+      "meta": "16 Days",
+      "tag": "Nepal · High Altitude",
+      "kicker": "High Altitude",
+      "excerpt": "Circle the Annapurna Massif and cross the formidable 5,416m Thorong La Pass into sacred Mustang.",
+      "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
+      "order": 2
+    },
+
+    "quick_facts": {
+      "high_point": "5,416m / 17,769ft · Thorong La Pass",
+      "low_point": "820m / 2,690ft · Besisahar",
+      "region": "Annapurna Region (Manang & Mustang), Nepal",
+      "season": "Autumn (Sep–Nov) & Spring (Mar–May)",
+      "group_size": "2–12 Travellers",
+      "trekking": "Usually 5–7 hours daily",
+      "accom": "Boutique Heritage Hotels & Traditional Mountain Lodges",
+      "style": "Privately Guided High-Altitude Trek",
+      "distance": "160 km circuit route",
+      "start": "Kathmandu / Besisahar (Drive)",
+      "end": "Jomsom / Pokhara (Flight/Drive)",
+      "status": "open",
+      "price": "2450",
+      "currency": "USD"
+    },
+
+    "overview": {
+      "kicker": "Nepal · 16 Days",
+      "script": "The Grand Circuit",
+      "heading": "Across the Great Himalayan Divide",
+      "subheading": "From lush subtropical valleys to the rain shadow of Mustang",
+      "content": "<p>The Annapurna Circuit is widely celebrated as one of the world's most diverse long-distance treks. Over 16 unforgettable days, you journey from terraced subtropical rice paddies and tumbling waterfalls through dense rhododendron and oak forests, rising steadily into the arid, windswept high-altitude plateau of Manang reminiscent of the Tibetan highlands.</p><p>Acclimatising in the medieval village of Manang beneath the imposing north face of Annapurna II, III, and Gangapurna prepares you for the trek's ultimate challenge: the pre-dawn crossing of Thorong La Pass at 5,416 metres. Descending into the sacred pilgrimage valley of Muktinath and onward through the dramatic Kali Gandaki gorge — the deepest gorge on Earth — completes an epic journey spanning cultures, religions, and ecosystems.</p>",
+      "highlight": "<p>An extraordinary journey crossing from lush green valleys into the arid Tibetan-influenced realm of Mustang, crowned by the high-altitude achievement of the 5,416m Thorong La Pass.</p>",
+      "highlights": [
+        "Cross the legendary 5,416m Thorong La Pass under Himalayan sunrise",
+        "Explore the ancient Buddhist enclave and monasteries of Manang Valley",
+        "Visit the sacred pilgrimage shrine of Muktinath revered by Hindus and Buddhists",
+        "Trek through the deepest gorge on Earth along the Kali Gandaki River",
+        "Relax in the tranquil lakeside paradise of Pokhara with views of Machapuchare",
+        "Full private guide and Sherpa porter support throughout the expedition"
+      ],
+      "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
+      "route_img": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=85",
+      "map_file_url": "https://yetiadventure.com/wp-content/uploads/maps/annapurna-circuit-route-map.pdf",
+      "map_embed_code": "<iframe src=\"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112773.12345678901!2d83.9500!3d28.6000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3995e8a71c3b1234%3A0x1234567890abcdef!2sAnnapurna%20Massif!5e0!3m2!1sen!2snp!4v1680000000001!5m2!1sen!2snp\" width=\"100%\" height=\"450\" style=\"border:0; border-radius:12px;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>",
+      "route_sub": "Route Overview",
+      "route_heading": "Kathmandu → Besisahar → Manang → Thorong La → Pokhara"
+    },
+
+    "itinerary_section": {
+      "kicker": "Day by Day",
+      "script": "Your Journey",
+      "heading": "16 Days Encircling the Annapurna Massif",
+      "subtext": "Explore each day's trail details, elevation profiles, overnight stops, and walking times. Fully supported with private guides and porters."
+    },
+
+    "itinerary": [
+      {
+        "day": "01",
+        "stage": "Kathmandu (1,400m)",
+        "title": "Arrive in Kathmandu & Expedition Briefing",
+        "description": "<p>Arrival at Tribhuvan International Airport and private transfer to your boutique heritage hotel. Welcome drink, comprehensive pre-trek briefing, gear inspection, and traditional Nepali welcome dinner.</p>",
+        "pills": "Meals: Welcome Dinner · Boutique Hotel",
+        "altitude": "1,400m",
+        "walking_hours": "Transfer only",
+        "stay": "Kathmandu Boutique Heritage Hotel",
+        "meals": "Dinner",
+        "gallery": []
+      },
+      {
+        "day": "02",
+        "stage": "Kathmandu → Besisahar → Dharapani (1,960m)",
+        "title": "Scenic Overland Drive into the Marshyangdi Valley",
+        "description": "<p>Scenic morning drive from Kathmandu along the Prithvi Highway, following the Trishuli and Marshyangdi rivers past Besisahar to Dharapani. Transition from lush foothills to alpine landscapes.</p>",
+        "pills": "Meals: B, L, D · Teahouse · Approx. 7–8 hrs drive",
+        "altitude": "1,960m",
+        "walking_hours": "Drive 7–8 hrs",
+        "stay": "Dharapani Mountain Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "03",
+        "stage": "Dharapani (1,960m) → Chame (2,710m)",
+        "title": "Trek Through Pine Forests to District Capital Chame",
+        "description": "<p>The trail weaves through dense pine and oak forests, crossing suspension bridges over the thundering Marshyangdi River with dramatic views of Lamjung Himal and Annapurna II ahead.</p>",
+        "pills": "Meals: B, L, D · Mountain Lodge · Approx. 5–6 hrs",
+        "altitude": "2,710m",
+        "walking_hours": "5–6 hrs",
+        "stay": "Chame Mountain Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "04",
+        "stage": "Chame (2,710m) → Pisang (3,300m)",
+        "title": "Walk Beneath the Dramatic Paungda Danda Rock Face",
+        "description": "<p>Enter the upper valley where the landscape becomes markedly drier. Gaze upon the smooth curved granite wall of Paungda Danda (Swargadwari) rising 1,500m above the river before reaching Pisang.</p>",
+        "pills": "Meals: B, L, D · Teahouse · Approx. 5 hrs",
+        "altitude": "3,300m",
+        "walking_hours": "5 hrs",
+        "stay": "Pisang Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "05",
+        "stage": "Pisang (3,300m) → Manang (3,540m)",
+        "title": "High Route via Ghyaru & Ngawal with Panoramic Views",
+        "description": "<p>Follow the breathtaking upper route via Ghyaru and Ngawal, offering commanding vistas of Annapurna II, III, IV, Gangapurna, and Tilicho Peak before descending to the ancient trading village of Manang.</p>",
+        "pills": "Meals: B, L, D · Mountain Lodge · Approx. 6–7 hrs",
+        "altitude": "3,540m",
+        "walking_hours": "6–7 hrs",
+        "stay": "Manang Mountain Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "06",
+        "stage": "Manang (3,540m) — Acclimatisation",
+        "title": "Acclimatisation Day: Gangapurna Lake & Chongkor Viewpoint",
+        "description": "<p>Rest and acclimatise in Manang. Take an excursion to turquoise Gangapurna Lake and the Chongkor viewpoint for panoramic mountain photography. Visit the Himalayan Rescue Association clinic for an altitude lecture.</p>",
+        "pills": "Meals: B, L, D · Mountain Lodge · 3–4 hrs hike",
+        "altitude": "3,800m (acclimatisation hike)",
+        "walking_hours": "3–4 hrs",
+        "stay": "Manang Mountain Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "07",
+        "stage": "Manang (3,540m) → Yak Kharka (4,050m)",
+        "title": "Ascend Above the Treeline into Alpine Scrub",
+        "description": "<p>Leave the valley floor and climb steadily out of the Marshyangdi Valley, passing juniper shrubs and grazing blue sheep to reach the high alpine pasture settlement of Yak Kharka.</p>",
+        "pills": "Meals: B, L, D · Alpine Teahouse · Approx. 4 hrs",
+        "altitude": "4,050m",
+        "walking_hours": "4 hrs",
+        "stay": "Yak Kharka Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "08",
+        "stage": "Yak Kharka (4,050m) → Thorong Phedi (4,540m)",
+        "title": "Trek to High Camp / Thorong Phedi",
+        "description": "<p>A short but demanding climb across a dramatic scree slope to the base of the pass at Thorong Phedi. Rest early in preparation for the pre-dawn summit departure tomorrow morning.</p>",
+        "pills": "Meals: B, L, D · High Teahouse · Approx. 3–4 hrs",
+        "altitude": "4,540m",
+        "walking_hours": "3–4 hrs",
+        "stay": "Thorong Phedi Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "09",
+        "stage": "Thorong Phedi (4,540m) → Thorong La Pass (5,416m) → Muktinath (3,800m)",
+        "title": "Conquer Thorong La Pass & Descend to Sacred Muktinath",
+        "description": "<p>A pre-dawn 04:00 start by headlamp. Ascend the steep switchbacks to the prayer-flag strewn crest of Thorong La Pass (5,416m) under sunrise. Celebrate this pinnacle achievement before a long 1,600m descent into sacred Muktinath.</p>",
+        "pills": "Meals: B, L, D · Village Lodge · 8–9 hrs total",
+        "altitude": "5,416m (Pass summit)",
+        "walking_hours": "8–9 hrs",
+        "stay": "Muktinath Village Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": [
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80"
+        ]
+      },
+      {
+        "day": "10",
+        "stage": "Muktinath (3,800m) → Marpha (2,670m)",
+        "title": "Trek Through the Kali Gandaki Valley to Apple Capital Marpha",
+        "description": "<p>Visit Muktinath's sacred 108 water spouts and perpetual flame before trekking down through the dramatic, wind-sculpted Kali Gandaki valley past Jomsom to the charming whitewashed village of Marpha, famed for its apple orchards and cider.</p>",
+        "pills": "Meals: B, L, D · Heritage Teahouse · Approx. 5–6 hrs",
+        "altitude": "2,670m",
+        "walking_hours": "5–6 hrs",
+        "stay": "Marpha Heritage Teahouse",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "11",
+        "stage": "Marpha (2,670m) → Tatopani (1,190m)",
+        "title": "Overland Drive to Natural Hot Springs at Tatopani",
+        "description": "<p>Scenic transfer through the deepest section of the Kali Gandaki Gorge between Dhaulagiri and Annapurna to the riverside oasis of Tatopani. Relax your muscles in the therapeutic natural hot spring pools.</p>",
+        "pills": "Meals: B, L, D · Garden Lodge · Approx. 4 hrs drive",
+        "altitude": "1,190m",
+        "walking_hours": "Drive 4 hrs",
+        "stay": "Tatopani Hot Spring Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "12",
+        "stage": "Tatopani (1,190m) → Ghorepani (2,860m)",
+        "title": "Climb Through Rhododendron Forests to Ghorepani",
+        "description": "<p>A sustained climb ascending from subtropical orchards through lush rhododendron and magnolia forests to the picturesque ridge settlement of Ghorepani beneath the gaze of Dhaulagiri.</p>",
+        "pills": "Meals: B, L, D · Mountain Lodge · Approx. 6–7 hrs",
+        "altitude": "2,860m",
+        "walking_hours": "6–7 hrs",
+        "stay": "Ghorepani Mountain Lodge",
+        "meals": "Breakfast, Lunch, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "13",
+        "stage": "Ghorepani → Poon Hill (3,210m) → Pokhara (820m)",
+        "title": "Dawn Sunrise at Poon Hill & Transfer to Lakeside Pokhara",
+        "description": "<p>Pre-dawn hike to Poon Hill (3,210m) for an iconic sunrise panorama spanning Dhaulagiri, Annapurna I, Machapuchare, and Manaslu. Descend to Nayapul and drive to your luxury lakeside hotel in Pokhara.</p>",
+        "pills": "Meals: B, L · Lakeside Resort · Pokhara",
+        "altitude": "820m (Pokhara)",
+        "walking_hours": "4 hrs hike + 2 hrs drive",
+        "stay": "Temple Tree Resort & Spa, Pokhara",
+        "meals": "Breakfast, Lunch",
+        "gallery": []
+      },
+      {
+        "day": "14",
+        "stage": "Pokhara (820m) — Relaxation Day",
+        "title": "Leisure Day in Lakeside Pokhara",
+        "description": "<p>A relaxing day in Nepal's adventure capital. Enjoy boat rides on Phewa Lake, visit the World Peace Pagoda, indulge in spa treatments, and dine at waterfront restaurants.</p>",
+        "pills": "Meals: B · Lakeside Resort · Free Day",
+        "altitude": "820m",
+        "walking_hours": "At leisure",
+        "stay": "Temple Tree Resort & Spa, Pokhara",
+        "meals": "Breakfast",
+        "gallery": []
+      },
+      {
+        "day": "15",
+        "stage": "Pokhara → Kathmandu (1,400m)",
+        "title": "Scenic Mountain Flight to Kathmandu",
+        "description": "<p>Morning scenic flight back to Kathmandu with views of the Annapurna and Manaslu ranges. Afternoon free for souvenir shopping in Thamel. Farewell celebratory dinner with your guide team.</p>",
+        "pills": "Meals: B, Farewell Dinner · Boutique Hotel",
+        "altitude": "1,400m",
+        "walking_hours": "Flight and transfer",
+        "stay": "Kathmandu Boutique Heritage Hotel",
+        "meals": "Breakfast, Dinner",
+        "gallery": []
+      },
+      {
+        "day": "16",
+        "stage": "Kathmandu — Departure",
+        "title": "International Airport Transfer & Departure",
+        "description": "<p>Final breakfast at your hotel followed by a private transfer to Tribhuvan International Airport for your flight home, carrying memories of an extraordinary circuit around Annapurna.</p>",
+        "pills": "Meals: B · Airport Transfer · Departure Day",
+        "altitude": "1,400m",
+        "walking_hours": "Transfer only",
+        "stay": "Airport Departure",
+        "meals": "Breakfast",
+        "gallery": []
+      }
+    ],
+
+    "inex": {
+      "kicker": "What is Covered",
+      "script": "Clear & Transparent",
+      "heading": "Inclusions & Exclusions",
+      "subtext": "Complete clarity on all services and inclusions provided on your Annapurna Circuit expedition."
+    },
+
+    "inclusions": [
+      {
+        "title": "All private overland and domestic airport transfers",
+        "desc": "<p>Private vehicles for Kathmandu, Besisahar, Pokhara, and airport transfers as specified in the itinerary.</p>"
+      },
+      {
+        "title": "Domestic scenic flight (Pokhara to Kathmandu)",
+        "desc": "<p>Scheduled flight with mountain views, including 15kg luggage allowance and airport taxes.</p>"
+      },
+      {
+        "title": "All ACAP permits and TIMS registration cards",
+        "desc": "<p>Annapurna Conservation Area Project (ACAP) entry permit and TIMS cards arranged in advance.</p>"
+      },
+      {
+        "title": "Licensed English-speaking senior trekking guide",
+        "desc": "<p>Wilderness first-aid certified mountain guide with daily pulse oximeter monitoring.</p>"
+      },
+      {
+        "title": "Experienced Sherpa porters (1:2 ratio, 12kg limit)",
+        "desc": "<p>Porter wages, insurance, food, and equipment fully provided per welfare standards.</p>"
+      },
+      {
+        "title": "Heritage hotel stays in Kathmandu and Pokhara resort",
+        "desc": "<p>Boutique 4-star hotels with daily breakfast on a twin-share basis.</p>"
+      },
+      {
+        "title": "Best available mountain lodge teahouse accommodation",
+        "desc": "<p>Pre-selected teahouse accommodation along the circuit with three hearty meals daily.</p>"
+      }
+    ],
+
+    "exclusions": [
+      {
+        "title": "International flights to and from Nepal",
+        "desc": "<p>Airfares to/from Kathmandu and personal excess baggage fees.</p>"
+      },
+      {
+        "title": "Nepal tourist visa fee",
+        "desc": "<p>Payable in cash USD at Kathmandu airport on arrival.</p>"
+      },
+      {
+        "title": "Emergency helicopter evacuation and travel insurance",
+        "desc": "<p>Mandatory insurance covering medical evacuation up to 6,000m altitude.</p>"
+      },
+      {
+        "title": "Personal trekking equipment and gear",
+        "desc": "<p>Sleeping bag, down jacket, boots, trekking poles, and personal clothing.</p>"
+      },
+      {
+        "title": "Teahouse extras (hot showers, charging, Wi-Fi)",
+        "desc": "<p>Personal snacks, hot showers, device battery charging, and Wi-Fi access fees.</p>"
+      },
+      {
+        "title": "Expedition crew gratuities",
+        "desc": "<p>Tips for guides and porters at the conclusion of the trek.</p>"
+      }
+    ],
+
+    "gallery": {
+      "kicker": "Visual Moments",
+      "script": "In Pictures",
+      "heading": "Glimpses of Annapurna",
+      "subtext": "A visual showcase of dramatic landscapes, mountain passes, and cultural encounters along the circuit.",
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
+          "label": "Thorong La Pass summit ridge"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=85",
+          "label": "Manang Valley and Gangapurna"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=85",
+          "label": "Sunrise on Machapuchare from Pokhara"
+        }
+      ]
+    },
+
+    "essential": {
+      "kicker": "Travel Advice",
+      "script": "Good to Know",
+      "heading": "Essential Information for Annapurna Circuit",
+      "intro": "<p>Detailed preparation advice for crossing Thorong La Pass, managing altitude, and packing for varied climate zones.</p>",
+      "card_img": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
+      "card_kicker": "Trip Dossier",
+      "card_title": "Download Annapurna Circuit Route Dossier",
+      "card_desc": "Comprehensive packing list, Thorong La elevation guide, weather data, and permit details.",
+      "card_btn": "Request Route Dossier",
+      "card_email": "sales@yetiadventure.com",
+      "card_file": "https://yetiadventure.com/wp-content/uploads/dossiers/annapurna-circuit-dossier-2026.pdf"
+    },
+
+    "faqs": [
+      {
+        "question": "How challenging is the Thorong La Pass crossing?",
+        "answer": "<p>Thorong La (5,416m) is a strenuous high-altitude pass. The ascent from Thorong Phedi takes 4–5 hours on steep terrain in sub-zero pre-dawn temperatures, followed by a 1,600m descent to Muktinath. Proper acclimatisation at Manang is essential for a safe, successful crossing.</p>",
+        "tag": "Pass Crossing"
+      },
+      {
+        "question": "What kind of clothing is required for the temperature variation?",
+        "answer": "<p>Temperatures vary widely: from +25°C in the subtropical valleys to −15°C at Thorong La. A four-season layering system is essential, including thermal base layers, fleece mid-layers, windproof/waterproof outer shells, and a heavy down jacket.</p>",
+        "tag": "Gear & Clothing"
+      }
+    ],
+
+    "reviews_section": {
+      "kicker": "Guest Stories",
+      "script": "Traveller Feedback",
+      "heading": "Words from Fellow Adventurers",
+      "subtext": "Real experiences shared by adventurers who have crossed Thorong La with Yeti Adventure.",
+      "reviews": [
+        {
+          "name": "Elena Rostova",
+          "location": "Switzerland",
+          "rating": "5",
+          "quote": "Crossing Thorong La at sunrise was the most profound mountain experience of my life. The team paced us perfectly and made sure everyone arrived safely."
+        },
+        {
+          "name": "Thomas Lindqvist",
+          "location": "Sweden",
+          "rating": "5",
+          "quote": "From lush rice terraces to the snows of the pass and the hot springs of Tatopani, this trek has everything. Outstanding logistics and fantastic guides."
+        }
+      ]
+    },
+
+    "contact": {
+      "dep_kicker": "Travel Together",
+      "dep_script": "Choose Your Month",
+      "dep_heading": "Join a Fixed Departure or Customise Your Dates",
+      "dep_subtext": "Contact our Himalayan specialists to join an upcoming small-group departure or design a private expedition.",
+      "box_script": "Annapurna Awaits",
+      "box_title": "Enquire about Annapurna departures",
+      "box_desc": "Reach out directly on WhatsApp for instant date checks and group rates.",
+      "box_photo": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85",
+      "box_note": "Group departures guaranteed with minimum 2 travellers. Early bird rates available.",
+      "whatsapp": "9779803197006",
+      "email": "sales@yetiadventure.com"
+    },
+
+    "departures": [
+      {
+        "date": "2026-03-22",
+        "price": "2450",
+        "currency": "USD",
+        "seats": 8,
+        "status": "open",
+        "note": "Spring rhododendron departure"
+      },
+      {
+        "date": "2026-04-19",
+        "price": "2450",
+        "currency": "USD",
+        "seats": 6,
+        "status": "open",
+        "note": "Peak spring season"
+      },
+      {
+        "date": "2026-10-04",
+        "price": "2450",
+        "currency": "USD",
+        "seats": 10,
+        "status": "open",
+        "note": "Autumn premier departure — clearest skies"
+      },
+      {
+        "date": "2026-10-25",
+        "price": "2450",
+        "currency": "USD",
+        "seats": 4,
+        "status": "limited",
+        "note": "Late autumn — limited seats remaining"
+      }
+    ],
+
+    "pricing": {
+      "price": "2450",
+      "numeric_price": 2450,
+      "currency": "USD",
+      "formatted": "USD 2,450"
     }
   }
 ]
