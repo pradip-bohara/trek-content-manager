@@ -410,18 +410,39 @@ $sales_email         = get_post_meta( $post_id, '_trek_sales_email', true ) ?: '
 $departure_dates_raw = get_post_meta( $post_id, '_trek_departure_dates', true );
 $departure_dates     = ( ! empty( $departure_dates_raw ) && is_array( $departure_dates_raw ) ) ? $departure_dates_raw : array();
 
-// 11. Related Treks Query
-$related_query = new WP_Query( array(
+// 11. Related Treks Query (Prioritizes same region if available)
+$current_regions = wp_get_post_terms( $post_id, 'trek_region', array( 'fields' => 'ids' ) );
+$related_args = array(
     'post_type'      => 'trek_destination',
     'posts_per_page' => 4,
     'post__not_in'   => array( $post_id ),
-    'post_status'    => 'publish'
-) );
+    'post_status'    => 'publish',
+);
+if ( ! empty( $current_regions ) && ! is_wp_error( $current_regions ) ) {
+    $related_args['tax_query'] = array(
+        array(
+            'taxonomy' => 'trek_region',
+            'field'    => 'term_id',
+            'terms'    => $current_regions,
+        ),
+    );
+}
+$related_query = new WP_Query( $related_args );
+
+// Fallback if fewer than 2 treks in the same region
+if ( ! $related_query->have_posts() || $related_query->post_count < 2 ) {
+    $related_query = new WP_Query( array(
+        'post_type'      => 'trek_destination',
+        'posts_per_page' => 4,
+        'post__not_in'   => array( $post_id ),
+        'post_status'    => 'publish',
+    ) );
+}
 ?>
 
 <section class="ya-ebc-page" id="ya-ebc-page">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Water+Brush&display=swap');
 
     html:has(.ya-ebc-page),
     body:has(.ya-ebc-page){
@@ -622,8 +643,11 @@ $related_query = new WP_Query( array(
 
     /* 1. HERO SECTION */
     .ya-ebc-page .ya-hero{
-      min-height:92vh;
-      min-height:92svh;
+      height:100vh;
+      height:100svh;
+      min-height:100vh;
+      min-height:100svh;
+      box-sizing:border-box;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -659,24 +683,35 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-hero-slider-dots{
       position:absolute;
       z-index:3;
-      bottom:24px;
+      bottom:28px;
       left:50%;
       display:flex;
       align-items:center;
-      gap:8px;
+      gap:10px;
       transform:translateX(-50%);
+     
+    
     }
     .ya-ebc-page .ya-hero-slider-dot{
       width:8px;
       height:8px;
       padding:0;
-      border:1px solid rgba(255,255,255,.8);
+      border:1.5px solid rgba(255,255,255,0.85);
       border-radius:999px;
-      background:rgba(255,255,255,.25);
+      background:rgba(255,255,255,0.4);
       cursor:pointer;
-      transition:all .3s ease;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline:none;
     }
-    .ya-ebc-page .ya-hero-slider-dot.is-active{width:26px;background:var(--gold);border-color:var(--gold)}
+    .ya-ebc-page .ya-hero-slider-dot:hover{
+      background:rgba(255,255,255,0.85);
+      transform:scale(1.2);
+    }
+    .ya-ebc-page .ya-hero-slider-dot.is-active{
+      width:40px;
+      background:#cfab55;
+      border-color:#cfab55;
+    }
 
     .ya-ebc-page .ya-hero-content{
       width:min(880px,100%);
@@ -699,13 +734,13 @@ $related_query = new WP_Query( array(
     }
 
     .ya-ebc-page .ya-hero h1{
-      font-size:clamp(30px,4.2vw,42px)!important;
-      line-height:1.1;
+      font-size:clamp(32px,4.6vw,52px)!important;
+      line-height:1.12;
       font-weight:600;
       color:#fff;
       margin:0 0 8px;
       text-shadow:0 3px 14px rgba(0,0,0,.45);
-      max-width:920px;
+      max-width:960px;
     }
 
     .ya-ebc-page .ya-hero-subtitle{
@@ -3728,7 +3763,7 @@ $related_query = new WP_Query( array(
       padding: 100px 0;
       text-align: center;
       background: #0c1610 center / cover no-repeat;
-      background-image: url('<?php echo esc_url( plugins_url( "assets/images/dark-cta-bg.jpg", dirname(__FILE__) . "/../trek-content-manager.php" ) ); ?>');
+      background-image: url('<?php echo esc_url( $hero_slider_images[0] ?? ( $hero_bg_img ?: $featured_img ) ); ?>');
     }
     .ya-ebc-page .ya-dark-cta-section::before {
       content: "";
@@ -3736,9 +3771,9 @@ $related_query = new WP_Query( array(
       inset: 0;
       background: linear-gradient(
         to bottom,
-        rgba(5, 14, 9, 0.62) 0%,
-        rgba(5, 14, 9, 0.72) 50%,
-        rgba(5, 14, 9, 0.80) 100%
+        rgba(5, 14, 9, 0.68) 0%,
+        rgba(5, 14, 9, 0.78) 50%,
+        rgba(5, 14, 9, 0.88) 100%
       );
     }
     .ya-ebc-page .ya-dark-cta-inner {
@@ -3747,71 +3782,74 @@ $related_query = new WP_Query( array(
       max-width: 780px;
       margin: 0 auto;
     }
+    .ya-ebc-page .ya-dark-cta-script {
+      font-family: 'Water Brush', cursive;
+      font-size: clamp(34px, 4.5vw, 48px);
+      color: #cfab55;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
     .ya-ebc-page .ya-dark-cta-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       font: 600 11px / 1 "Open Sans", Arial, sans-serif;
       letter-spacing: 2.5px;
       text-transform: uppercase;
-      color: #e8be61;
-      opacity: .9;
+      color: #cfab55;
+      opacity: .95;
     }
-    .ya-ebc-page .ya-dark-cta-eyebrow::before,
-    .ya-ebc-page .ya-dark-cta-eyebrow::after {
-      content: "";
-      display: block;
-      width: 28px;
-      height: 1px;
-      background: #e8be61;
-      opacity: .5;
-    }
+ 
     .ya-ebc-page .ya-dark-cta-heading {
       margin: 0;
-      font: italic 600 clamp(38px, 5vw, 62px) / 1.1 "Newsreader", Georgia, serif;
+      font: italic 600 clamp(36px, 4.8vw, 56px) / 1.15 "Newsreader", Georgia, serif;
       color: #fff;
       letter-spacing: -.5px;
     }
-    .ya-ebc-page .ya-dark-cta-heading em { color: #e8be61; font-style: inherit; }
+    .ya-ebc-page .ya-dark-cta-heading em { color: #cfab55; font-style: inherit; }
     .ya-ebc-page .ya-dark-cta-sub {
-      margin: 18px auto 36px;
+      margin: 18px auto 32px;
       max-width: 580px;
-      color: rgba(255,255,255,.8);
+      color: rgba(255,255,255,.85);
       font-size: 15px;
       line-height: 1.75;
+      font-family: "Open Sans", Arial, sans-serif;
     }
-    .ya-ebc-page .ya-dark-cta-form {
-      display: flex;
+    .ya-ebc-page .ya-dark-cta-action {
+      margin-bottom: 32px;
+    }
+    .ya-ebc-page .ya-dark-cta-btn {
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-      max-width: 500px;
-      margin: 0 auto 32px;
-      gap: 0;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.2);
-      border-radius: 50px;
-      padding: 5px 5px 5px 22px;
-      backdrop-filter: blur(6px);
-    }
-    .ya-ebc-page .ya-dark-cta-form input {
-      flex-grow: 1;
-      height: 44px;
-      border: none;
-      background: transparent;
-      color: #fff;
+      gap: 10px;
+      height: 50px;
+      padding: 0 36px;
+      border-radius: 4px;
+      background: #cfab55;
+      color: #173331;
+      border: 1px solid #cfab55;
+      font-family: "Open Sans", Arial, sans-serif;
       font-size: 14px;
-      min-width: 0;
-    }
-    .ya-ebc-page .ya-dark-cta-form input:focus { outline: none; }
-    .ya-ebc-page .ya-dark-cta-form input::placeholder { color: rgba(255,255,255,.45); }
-    .ya-ebc-page .ya-dark-cta-form .ya-btn-gold {
-      height: 44px;
-      padding: 0 26px;
-      border-radius: 50px;
-      font-size: 13px;
       font-weight: 700;
-      white-space: nowrap;
-      flex-shrink: 0;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .25s ease;
+      box-shadow: 0 4px 18px rgba(207, 171, 85, 0.35);
+    }
+    .ya-ebc-page .ya-dark-cta-btn:hover {
+      background: #617555;
+      border-color: #617555;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(97, 117, 85, 0.4);
+    }
+    .ya-ebc-page .ya-dark-cta-btn svg {
+      width: 16px;
+      height: 16px;
     }
     .ya-ebc-page .ya-dark-cta-divider {
       width: 40px;
@@ -3826,14 +3864,15 @@ $related_query = new WP_Query( array(
       gap: 6px 28px;
       flex-wrap: wrap;
       font-size: 13px;
-      color: rgba(255,255,255,.65);
+      color: rgba(255,255,255,.75);
+      font-family: "Open Sans", Arial, sans-serif;
     }
     .ya-ebc-page .ya-dark-cta-badges span {
       display: inline-flex;
       align-items: center;
       gap: 7px;
     }
-    .ya-ebc-page .ya-dark-cta-badges svg { width: 15px; height: 15px; color: #e8be61; }
+    .ya-ebc-page .ya-dark-cta-badges svg { width: 15px; height: 15px; color: #cfab55; }
     .ya-ebc-page .ya-dark-cta-badges span + span::before {
       content: "";
       display: inline-block;
@@ -3844,15 +3883,7 @@ $related_query = new WP_Query( array(
     }
     @media(max-width:560px){
       .ya-ebc-page .ya-dark-cta-section { padding: 72px 0; }
-      .ya-ebc-page .ya-dark-cta-form {
-        flex-direction: column;
-        align-items: stretch;
-        border-radius: 14px;
-        padding: 14px;
-        gap: 10px;
-      }
-      .ya-ebc-page .ya-dark-cta-form input { height: 48px; text-align: center; }
-      .ya-ebc-page .ya-dark-cta-form .ya-btn-gold { height: 48px; border-radius: 10px; }
+      .ya-ebc-page .ya-dark-cta-btn { width: 100%; max-width: 320px; }
       .ya-ebc-page .ya-dark-cta-badges span + span::before { display: none; }
     }
 
@@ -4053,20 +4084,23 @@ $related_query = new WP_Query( array(
 
   <section class="ya-dark-cta-section ya-reveal">
     <div class="ya-inner ya-dark-cta-inner">
+      <div class="ya-dark-cta-script">Travelling with Yeti Adventure</div>
       <div class="ya-dark-cta-eyebrow">Plan Your Journey</div>
-      <h2 class="ya-dark-cta-heading">Ready for the <em>Himalaya?</em></h2>
+      <h2 class="ya-dark-cta-heading">Ready for Travelling with <em>Yeti Adventure?</em></h2>
       <p class="ya-dark-cta-sub">Whether you want a customized itinerary, private departure, or have questions about acclimatization, our local expert team in Kathmandu is here to help.</p>
 
-      <form class="ya-dark-cta-form" id="ya-dark-cta-form" onsubmit="event.preventDefault(); const email = this.querySelector('input[type=email]')?.value || ''; window.yaOpenEnquiry ? window.yaOpenEnquiry({email: email}) : document.querySelector('#ya-open-enquiry-modal')?.click();">
-        <input type="email" id="ya-dark-cta-email" placeholder="Enter your email address" required aria-label="Email address">
-        <button type="submit" class="ya-btn ya-btn-gold">Start Planning</button>
-      </form>
+      <div class="ya-dark-cta-action">
+        <button type="button" class="ya-dark-cta-btn" onclick="document.querySelector('#ya-open-enquiry-modal')?.click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Plan Your Trip
+        </button>
+      </div>
 
       <div class="ya-dark-cta-divider"></div>
       <div class="ya-dark-cta-badges">
         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Best Price Guarantee</span>
         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Flexible Cancellation</span>
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> 24/7 Local Support</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Local Support</span>
       </div>
     </div>
   </section>
@@ -4214,42 +4248,57 @@ $related_query = new WP_Query( array(
   </section>
 
   <style>
-    .ya-ebc-page .ya-enquiry-modal{position:fixed;inset:0;z-index:1000001;display:none;align-items:center;justify-content:center;padding:28px;background:rgba(15,25,18,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow-y:auto}
+    .ya-ebc-page .ya-enquiry-modal{position:fixed;inset:0;z-index:1000001;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(15,25,18,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow-y:auto}
     .ya-ebc-page .ya-enquiry-modal.is-open{display:flex}
-    .ya-ebc-page .ya-enquiry-dialog{position:relative;display:grid;grid-template-columns:minmax(330px,.9fr) minmax(460px,1.1fr);width:min(1040px,100%);max-height:calc(100svh - 56px);overflow:auto;background:#fff;border-radius:20px;box-shadow:0 32px 90px rgba(0,0,0,.35)}
-    .ya-ebc-page .ya-enquiry-image{position:relative;min-height:620px;background:center / cover no-repeat;color:#fff}
-    .ya-ebc-page .ya-enquiry-image:after{position:absolute;inset:0;content:"";background:linear-gradient(180deg,rgba(12,22,16,.05) 25%,rgba(12,22,16,.8) 100%)}
-    .ya-ebc-page .ya-enquiry-image-copy{position:absolute;z-index:1;right:32px;bottom:30px;left:32px}
-    .ya-ebc-page .ya-enquiry-image-copy small{display:block;margin-bottom:8px;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;color:#f5dd9c}
-    .ya-ebc-page .ya-enquiry-image-copy strong{font:600 16px/1.35 "Newsreader",Georgia,serif}
-    .ya-ebc-page .ya-enquiry-content{padding:44px 46px 40px;color:#202821}
-    .ya-ebc-page .ya-enquiry-close{position:absolute;z-index:2;top:16px;right:16px;width:38px;height:38px;display:grid;place-items:center;border:1px solid #d7dfd4;border-radius:50%;background:#fff;color:#617654;cursor:pointer;transition:background .2s ease,color .2s ease,transform .2s ease}
-    .ya-ebc-page .ya-enquiry-close:hover{background:#d1ad54;color:#202821;transform:rotate(90deg)}
-    .ya-ebc-page .ya-enquiry-close:active{background:#617654;color:#fff;transform:rotate(90deg) scale(.92)}
-    .ya-ebc-page .ya-enquiry-close svg{width:19px;height:19px}
-    .ya-ebc-page .ya-enquiry-meta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;color:#617654;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none}
-    .ya-ebc-page .ya-enquiry-meta span{display:inline-flex;align-items:center;gap:6px}
-    .ya-ebc-page .ya-enquiry-meta svg{width:16px;height:16px;color:#d1ad54}
-    .ya-ebc-page .ya-enquiry-content h2{margin:0;font:600 16px/1.4 "Newsreader",Georgia,serif;color:#202821;text-transform:none}
-    .ya-ebc-page .ya-enquiry-intro{margin:10px 0 25px;color:#667068;font-size:14px;line-height:1.65}
-    .ya-ebc-page .ya-enquiry-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+    .ya-ebc-page .ya-enquiry-dialog{position:relative;display:grid;grid-template-columns:minmax(320px,.9fr) minmax(460px,1.1fr);width:min(1000px,100%);max-height:calc(100svh - 48px);overflow:auto;background:#fff;border-radius:4px;border:1px solid #e2e8e0;box-shadow:0 28px 80px rgba(0,0,0,.32)}
+    .ya-ebc-page .ya-enquiry-image{position:relative;min-height:580px;background:center / cover no-repeat;color:#fff;border-radius:4px 0 0 4px}
+    .ya-ebc-page .ya-enquiry-image:after{position:absolute;inset:0;content:"";background:linear-gradient(180deg,rgba(12,22,16,.08) 35%,rgba(12,22,16,.88) 100%)}
+    .ya-ebc-page .ya-enquiry-image-copy{position:absolute;z-index:2;right:28px;bottom:28px;left:28px}
+    .ya-ebc-page .ya-enquiry-dest-kicker-wrap{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .ya-ebc-page .ya-enquiry-dest-kicker{font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#cfab55;font-family:"Open Sans",Arial,sans-serif}
+    .ya-ebc-page .ya-enquiry-dest-kicker-line{width:34px;height:2px;background:#cfab55;border-radius:1px}
+    .ya-ebc-page .ya-enquiry-image-copy h3{margin:0 0 12px;font:700 clamp(20px,2.2vw,26px)/1.25 "Newsreader",Georgia,serif;color:#fff}
+    .ya-ebc-page .ya-enquiry-dest-meta{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:rgba(255,255,255,.92);font-family:"Open Sans",Arial,sans-serif}
+    .ya-ebc-page .ya-enquiry-dest-meta svg{width:16px;height:16px;color:#cfab55}
+    .ya-ebc-page .ya-enquiry-dest-meta .ya-dot{color:rgba(255,255,255,.45)}
+    .ya-ebc-page .ya-enquiry-content{position:relative;padding:36px 40px;background:#fff;color:#173f38}
+    .ya-ebc-page .ya-enquiry-close{position:absolute;z-index:2;top:16px;right:16px;width:34px;height:34px;display:grid;place-items:center;border:1px solid #d7dfd4;border-radius:50%;background:#fff;color:#617555;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+    .ya-ebc-page .ya-enquiry-close:hover{background:#cfab55;border-color:#cfab55;color:#fff;transform:scale(1.08)}
+    .ya-ebc-page .ya-enquiry-top-kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:8px}
+    .ya-ebc-page .ya-enquiry-top-kicker svg{width:20px;height:20px;color:#617555}
+    .ya-ebc-page .ya-enquiry-top-kicker span{font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#617555;font-family:"Open Sans",Arial,sans-serif}
+    .ya-ebc-page .ya-enquiry-content h2{margin:0 0 8px;font:700 clamp(24px,2.4vw,30px)/1.2 "Newsreader",Georgia,serif;color:#173331;text-transform:none}
+    .ya-ebc-page .ya-enquiry-intro{margin:0 0 20px;color:#64748b;font-size:13.5px;line-height:1.6;font-family:"Open Sans",Arial,sans-serif}
+    .ya-ebc-page .ya-enquiry-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
     .ya-ebc-page .ya-enquiry-form .ya-field{margin:0}
     .ya-ebc-page .ya-enquiry-form .ya-field-full{grid-column:1/-1}
-    .ya-ebc-page .ya-enquiry-form label{display:block;margin:0 0 7px;color:#435045;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none}
-    .ya-ebc-page .ya-enquiry-form label em{font-weight:400}
-    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select,.ya-ebc-page .ya-enquiry-form textarea{width:100%;border:1px solid #d7dfd4;border-radius:10px;background:#fbfcfa;color:#202821;font-size:14px;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
-    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select{height:48px;padding:0 14px}
-    .ya-ebc-page .ya-enquiry-form textarea{min-height:108px;padding:13px 14px;resize:vertical}
-    .ya-ebc-page .ya-enquiry-form input:focus,.ya-ebc-page .ya-enquiry-form select:focus,.ya-ebc-page .ya-enquiry-form textarea:focus{border-color:#617654;outline:0;background:#fff;box-shadow:0 0 0 3px rgba(97,118,84,.14)}
-    .ya-ebc-page .ya-enquiry-form [aria-invalid="true"]{border-color:#a34231;background:#fff7f5}
-    .ya-ebc-page .ya-enquiry-actions{display:block;margin-top:2px}
-    .ya-ebc-page .ya-enquiry-actions .ya-btn{width:100%;min-height:50px;justify-content:center;border-radius:10px;text-transform:none}
-    .ya-ebc-page .ya-enquiry-note{margin:10px 0 0;color:#667068;font-size:12px;line-height:1.5;text-align:center}
-    .ya-ebc-page .ya-enquiry-alert{display:none;grid-column:1/-1;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.45}
-    .ya-ebc-page .ya-enquiry-alert.is-success{display:block;background:#edf4ea;color:#315336}
-    .ya-ebc-page .ya-enquiry-alert.is-error{display:block;background:#fff1ee;color:#a34231}
+    .ya-ebc-page .ya-enquiry-form label{display:flex;align-items:center;gap:6px;margin:0 0 6px;color:#2c3e35;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;font-family:"Open Sans",Arial,sans-serif}
+    .ya-ebc-page .ya-enquiry-form label svg{width:15px;height:15px;color:#617555;flex-shrink:0}
+    .ya-ebc-page .ya-enquiry-form label em{font-weight:400;color:#8a9988}
+    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select,.ya-ebc-page .ya-enquiry-form textarea{width:100%;border:1px solid #dcdfe4;border-radius:4px;background:#fff;color:#173f38;font-size:13.5px;font-family:"Open Sans",Arial,sans-serif;box-sizing:border-box;transition:border-color .2s ease,box-shadow .2s ease}
+    .ya-ebc-page .ya-enquiry-form input,.ya-ebc-page .ya-enquiry-form select{height:44px;padding:0 14px}
+    .ya-ebc-page .ya-enquiry-form textarea{min-height:85px;padding:10px 14px;resize:vertical}
+    .ya-ebc-page .ya-enquiry-form input:focus,.ya-ebc-page .ya-enquiry-form select:focus,.ya-ebc-page .ya-enquiry-form textarea:focus{border-color:#617555;outline:0;box-shadow:0 0 0 3px rgba(97,117,85,.16)}
+    .ya-ebc-page .ya-enquiry-form [aria-invalid="true"]{border-color:#a34231;background:#fff8f6}
+    .ya-ebc-page .ya-enquiry-actions{display:block;margin-top:4px}
+    .ya-ebc-page .ya-enquiry-submit-btn{width:100%;height:48px;justify-content:center;border-radius:4px;background:#617555;color:#fff;border:1px solid #617555;font-size:13.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:"Open Sans",Arial,sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .2s ease;box-shadow:0 2px 8px rgba(97,117,85,0.25)}
+    .ya-ebc-page .ya-enquiry-submit-btn:hover{background:#cfab55;border-color:#cfab55;color:#fff;transform:translateY(-1px);box-shadow:0 4px 14px rgba(207,171,85,0.35)}
+    .ya-ebc-page .ya-enquiry-submit-btn svg{width:16px;height:16px}
+    .ya-ebc-page .ya-enquiry-note{display:flex;align-items:center;justify-content:center;gap:6px;margin:12px 0 0;color:#64748b;font-size:11.5px;line-height:1.5;text-align:center;font-family:"Open Sans",Arial,sans-serif}
+    .ya-ebc-page .ya-enquiry-note svg{width:13px;height:13px;color:#64748b;flex-shrink:0}
+    .ya-ebc-page .ya-enquiry-alert{display:none;grid-column:1/-1;padding:12px 16px;border-radius:4px;font-size:13.5px;line-height:1.5;font-family:"Open Sans",Arial,sans-serif}
+    .ya-ebc-page .ya-enquiry-alert.is-success{display:block;background:#edf7ed;color:#1e4620;border:1px solid #c8e6c9}
+    .ya-ebc-page .ya-enquiry-alert.is-error{display:block;background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
     .ya-ebc-page .ya-enquiry-honeypot{position:absolute!important;left:-9999px!important}
-    @media(max-width:760px){.ya-ebc-page .ya-enquiry-modal{padding:14px}.ya-ebc-page .ya-enquiry-dialog{grid-template-columns:1fr;max-height:calc(100svh - 28px)}.ya-ebc-page .ya-enquiry-image{min-height:210px}.ya-ebc-page .ya-enquiry-image-copy{right:24px;bottom:22px;left:24px}.ya-ebc-page .ya-enquiry-content{padding:30px 24px}.ya-ebc-page .ya-enquiry-form{grid-template-columns:1fr}.ya-ebc-page .ya-enquiry-form .ya-field-full{grid-column:auto}}
+    @media(max-width:760px){
+      .ya-ebc-page .ya-enquiry-modal{padding:12px}
+      .ya-ebc-page .ya-enquiry-dialog{grid-template-columns:1fr;max-height:calc(100svh - 24px)}
+      .ya-ebc-page .ya-enquiry-image{min-height:220px;border-radius:4px 4px 0 0}
+      .ya-ebc-page .ya-enquiry-image-copy{right:20px;bottom:18px;left:20px}
+      .ya-ebc-page .ya-enquiry-content{padding:26px 20px}
+      .ya-ebc-page .ya-enquiry-form{grid-template-columns:1fr}
+      .ya-ebc-page .ya-enquiry-form .ya-field-full{grid-column:auto}
+    }
 
     /* ── Write Your Review Modal (z-index: 1000000) ─────────────────── */
     .ya-ebc-page .ya-review-modal {
@@ -4598,25 +4647,85 @@ $related_query = new WP_Query( array(
   <div class="ya-enquiry-modal" id="ya-enquiry-modal" role="dialog" aria-modal="true" aria-labelledby="ya-enquiry-heading" aria-hidden="true">
     <div class="ya-enquiry-dialog" role="document">
       <button class="ya-enquiry-close" type="button" aria-label="Close enquiry form"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      <div class="ya-enquiry-image" style="background-image:url('<?php echo esc_url( $hero_slider_images[0] ?? $hero_bg_img ); ?>');">
-        <div class="ya-enquiry-image-copy"><small><?php echo esc_html( $breadcrumb_region ); ?></small><strong><?php echo esc_html( $title ); ?></strong></div>
+      <div class="ya-enquiry-image" style="background-image:url('<?php echo esc_url( $hero_slider_images[0] ?? ( $hero_bg_img ?: $featured_img ) ); ?>');">
+        <div class="ya-enquiry-image-copy">
+          <div class="ya-enquiry-dest-kicker-wrap">
+            <span class="ya-enquiry-dest-kicker"><?php echo esc_html( $breadcrumb_region ?: 'NEPAL' ); ?></span>
+            <span class="ya-enquiry-dest-kicker-line"></span>
+          </div>
+          <h3><?php echo esc_html( $title ); ?></h3>
+          <div class="ya-enquiry-dest-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17l4-8 4 5 3-3 4 6"/><path d="M14 13l2-4 5 9H3"/></svg>
+            <span><?php echo esc_html( ! empty( $hero_days ) ? $hero_days . ' Days' : '15 Days' ); ?></span>
+            <span class="ya-dot">•</span>
+            <span><?php echo esc_html( $fact_difficulty ?: 'Moderate' ); ?></span>
+            <span class="ya-dot">•</span>
+            <span><?php echo esc_html( $fact_high_point ?: '5,364 m' ); ?></span>
+          </div>
+        </div>
       </div>
       <div class="ya-enquiry-content">
-        <div class="ya-enquiry-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg><?php echo esc_html( $breadcrumb_region ); ?></span><span><?php echo esc_html( $hero_days ); ?> Days</span></div>
-        <h2 id="ya-enquiry-heading">Plan your <?php echo esc_html( $title ); ?> trip</h2>
-        <p class="ya-enquiry-intro">Tell us a little about your travel plans and our local team will tailor this journey for you.</p>
+        <div class="ya-enquiry-top-kicker">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17l4-8 4 5 3-3 4 6"/><path d="M14 13l2-4 5 9H3"/></svg>
+          <span>PLAN YOUR JOURNEY</span>
+        </div>
+        <h2 id="ya-enquiry-heading">Request Your Trip Information</h2>
+        <p class="ya-enquiry-intro">Tell us about your travel plans and our local team will tailor this journey for you.</p>
         <form class="ya-enquiry-form" id="ya-enquiry-form" novalidate>
           <input type="hidden" id="ya-enquiry-trek-id" value="<?php echo esc_attr( $post_id ); ?>">
           <div class="ya-enquiry-honeypot" aria-hidden="true"><label>Website<input id="ya-enquiry-website" type="text" tabindex="-1" autocomplete="off"></label></div>
-          <div class="ya-field"><label for="ya-enquiry-name">Full name *</label><input id="ya-enquiry-name" type="text" required minlength="2" autocomplete="name" placeholder="Your full name"></div>
-          <div class="ya-field"><label for="ya-enquiry-people">Number of travellers *</label><select id="ya-enquiry-people" required><option value="" selected disabled>Select travellers</option><option>1 traveller</option><option>2 travellers</option><option>3–5 travellers</option><option>6–10 travellers</option><option>10+ travellers</option></select></div>
-          <div class="ya-field"><label for="ya-enquiry-email">Email *</label><input id="ya-enquiry-email" type="email" required autocomplete="email" placeholder="you@email.com"></div>
-          <div class="ya-field"><label for="ya-enquiry-phone">Phone / WhatsApp <em>(optional)</em></label><input id="ya-enquiry-phone" type="tel" autocomplete="tel" placeholder="Your phone number"></div>
-          <div class="ya-field ya-field-full"><label for="ya-enquiry-message">Message</label><textarea id="ya-enquiry-message" placeholder="Tell us about your travel plans, fitness, dates or any special requests."></textarea></div>
+          <div class="ya-field">
+            <label for="ya-enquiry-name">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Full name *
+            </label>
+            <input id="ya-enquiry-name" type="text" required minlength="2" autocomplete="name" placeholder="Your full name">
+          </div>
+          <div class="ya-field">
+            <label for="ya-enquiry-people">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Number of travellers *
+            </label>
+            <select id="ya-enquiry-people" required>
+              <option value="" selected disabled>Select travellers</option>
+              <option>1 traveller</option>
+              <option>2 travellers</option>
+              <option>3–5 travellers</option>
+              <option>6–10 travellers</option>
+              <option>10+ travellers</option>
+            </select>
+          </div>
+          <div class="ya-field">
+            <label for="ya-enquiry-email">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Email *
+            </label>
+            <input id="ya-enquiry-email" type="email" required autocomplete="email" placeholder="you@email.com">
+          </div>
+          <div class="ya-field">
+            <label for="ya-enquiry-phone">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Phone / WhatsApp <em>(optional)</em>
+            </label>
+            <input id="ya-enquiry-phone" type="tel" autocomplete="tel" placeholder="Your phone number">
+          </div>
+          <div class="ya-field ya-field-full">
+            <label for="ya-enquiry-message">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Message
+            </label>
+            <textarea id="ya-enquiry-message" placeholder="Tell us about your travel plans, fitness, dates or any special requests."></textarea>
+          </div>
           <div class="ya-enquiry-alert" id="ya-enquiry-alert" role="status" aria-live="polite"></div>
           <div class="ya-field ya-field-full ya-enquiry-actions">
-            <button class="ya-btn ya-btn-primary" type="submit" data-enquiry-action="whatsapp">Send enquiry and continue to WhatsApp</button>
-            <p class="ya-enquiry-note">Your enquiry is saved before WhatsApp opens.</p>
+            <button class="ya-btn ya-enquiry-submit-btn" type="submit" data-enquiry-action="save">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              SEND ENQUIRY
+            </button>
+            <p class="ya-enquiry-note">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Your enquiry is securely saved and our Himalayan specialists will respond promptly.
+            </p>
           </div>
         </form>
       </div>
@@ -4948,9 +5057,9 @@ $related_query = new WP_Query( array(
       enquiryForm?.addEventListener('submit', async event => {
         event.preventDefault();
         if (!validateEnquiryForm()) return;
-        const submitter = event.submitter;
-        const action = submitter?.dataset.enquiryAction || 'save';
         const submitButtons = [...enquiryForm.querySelectorAll('button[type="submit"]')];
+        const submitter = event.submitter || submitButtons[0];
+        const action = submitter?.dataset.enquiryAction || 'save';
         const payload = {
           trek_id: root.querySelector('#ya-enquiry-trek-id')?.value || '',
           name: getValue('#ya-enquiry-name'),
@@ -4963,8 +5072,8 @@ $related_query = new WP_Query( array(
         };
         if (enquiryAlert) enquiryAlert.className = 'ya-enquiry-alert';
         submitButtons.forEach(button => button.disabled = true);
-        const originalText = submitter?.textContent;
-        if (submitter) submitter.textContent = 'Saving your enquiry…';
+        const originalHtml = submitter?.innerHTML;
+        if (submitter) submitter.innerHTML = '<span>Saving enquiry…</span>';
         try {
           const response = await fetch(`${restUrl}enquiries`, {
             method: 'POST',
@@ -4996,7 +5105,7 @@ $related_query = new WP_Query( array(
           }
         } finally {
           submitButtons.forEach(button => button.disabled = false);
-          if (submitter && originalText) submitter.textContent = originalText;
+          if (submitter && originalHtml) submitter.innerHTML = originalHtml;
         }
       });
 

@@ -324,7 +324,16 @@ class Trek_CPT {
                 echo $email ? '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>' : '—';
                 break;
             case 'enquiry_phone':
-                echo esc_html( get_post_meta( $post_id, '_trek_enquiry_phone', true ) ?: '—' );
+                $phone = get_post_meta( $post_id, '_trek_enquiry_phone', true );
+                if ( $phone ) {
+                    $clean_phone = preg_replace( '/[^0-9]/', '', $phone );
+                    echo esc_html( $phone );
+                    if ( ! empty( $clean_phone ) ) {
+                        echo ' <a href="https://wa.me/' . esc_attr( $clean_phone ) . '" target="_blank" title="Chat on WhatsApp" style="color:#25D366; text-decoration:none; font-weight:bold;">💬</a>';
+                    }
+                } else {
+                    echo '—';
+                }
                 break;
             case 'enquiry_people':
                 echo esc_html( get_post_meta( $post_id, '_trek_enquiry_travellers', true ) ?: '—' );
@@ -3189,75 +3198,152 @@ class Trek_CPT {
 
     /** Read-only details for enquiries saved from the trip planning popup or journey finder. */
     public static function render_enquiry_detail_metabox( $post ) {
-        $trek_id    = absint( get_post_meta( $post->ID, '_trek_enquiry_trek_id', true ) );
-        $trek_title = get_post_meta( $post->ID, '_trek_enquiry_trek_title', true );
-        $email      = get_post_meta( $post->ID, '_trek_enquiry_email', true );
-        $phone      = get_post_meta( $post->ID, '_trek_enquiry_phone', true );
-        $travellers = get_post_meta( $post->ID, '_trek_enquiry_travellers', true );
-        $source     = get_post_meta( $post->ID, '_trek_enquiry_source', true );
-        $region     = get_post_meta( $post->ID, '_trek_enquiry_region', true );
-        $feeling    = get_post_meta( $post->ID, '_trek_enquiry_feeling', true );
-        $pace       = get_post_meta( $post->ID, '_trek_enquiry_pace', true );
+        $trek_id     = absint( get_post_meta( $post->ID, '_trek_enquiry_trek_id', true ) );
+        $trek_title  = get_post_meta( $post->ID, '_trek_enquiry_trek_title', true );
+        $name        = get_post_meta( $post->ID, '_trek_enquiry_name', true ) ?: $post->post_title;
+        $email       = get_post_meta( $post->ID, '_trek_enquiry_email', true );
+        $phone       = get_post_meta( $post->ID, '_trek_enquiry_phone', true );
+        $travellers  = get_post_meta( $post->ID, '_trek_enquiry_travellers', true );
+        $source      = get_post_meta( $post->ID, '_trek_enquiry_source', true );
+        $date        = get_post_meta( $post->ID, '_trek_enquiry_date', true ) ?: $post->post_date;
+        $ip          = get_post_meta( $post->ID, '_trek_enquiry_ip', true );
+        $status      = get_post_meta( $post->ID, '_trek_enquiry_status', true ) ?: 'New';
+        $region      = get_post_meta( $post->ID, '_trek_enquiry_region', true );
+        $feeling     = get_post_meta( $post->ID, '_trek_enquiry_feeling', true );
+        $pace        = get_post_meta( $post->ID, '_trek_enquiry_pace', true );
+        $clean_phone = preg_replace( '/[^0-9]/', '', $phone );
         ?>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;background:#fcfcfc;padding:16px;border-radius:8px;border:1px solid #e2e4e7;">
-            <div>
-                <strong style="color:#2c3338;"><?php esc_html_e( 'Matched Journey / Trip', 'trek-content-manager' ); ?></strong><br>
-                <?php
-                if ( $trek_id && get_post( $trek_id ) ) {
-                    echo '<a href="' . esc_url( get_edit_post_link( $trek_id ) ) . '"><strong>' . esc_html( get_the_title( $trek_id ) ) . '</strong></a>';
-                } elseif ( ! empty( $trek_title ) ) {
-                    echo '<strong style="color:#022f2e;">' . esc_html( $trek_title ) . '</strong>';
-                } else {
-                    echo '—';
-                }
-                ?>
-            </div>
-            <div>
-                <strong style="color:#2c3338;"><?php esc_html_e( 'Email', 'trek-content-manager' ); ?></strong><br>
-                <?php echo $email ? '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>' : '—'; ?>
-            </div>
-            <div>
-                <strong style="color:#2c3338;"><?php esc_html_e( 'Source', 'trek-content-manager' ); ?></strong><br>
-                <?php
-                if ( 'journey_finder' === $source || 'Journey Selector' === $source ) {
-                    echo '<span style="display:inline-block;color:#022f2e;background:#e2f2e9;padding:3px 9px;border-radius:6px;font-weight:600;font-size:11px;border:1px solid #b7dfc8;">🗺️ ' . esc_html__( 'Journey Selector', 'trek-content-manager' ) . '</span>';
-                } else {
-                    echo esc_html( $source ?: 'frontend' );
-                }
-                ?>
-            </div>
-            <?php if ( ! empty( $phone ) ) : ?>
+        <div style="background:#fff; border:1px solid #ccd0d4; border-radius:8px; padding:20px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;">
+            <!-- Top Header Status Strip -->
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:14px; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
                 <div>
-                    <strong style="color:#2c3338;"><?php esc_html_e( 'Phone / WhatsApp', 'trek-content-manager' ); ?></strong><br>
-                    <?php echo esc_html( $phone ); ?>
+                    <span style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#617555;"><?php esc_html_e( 'Enquiry Status', 'trek-content-manager' ); ?></span>
+                    <h3 style="margin:2px 0 0; font-size:18px; color:#173331; font-weight:700;"><?php echo esc_html( $name ); ?></h3>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span style="display:inline-block; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600; background:#f0faf4; color:#166534; border:1px solid #bbf7d0;">
+                        <?php echo esc_html( $status ); ?>
+                    </span>
+                    <span style="font-size:12px; color:#64748b;">
+                        📅 <?php echo esc_html( date_i18n( 'M j, Y - g:i a', strtotime( $date ) ) ); ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Main Info Grid -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:20px;">
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+                    <span style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;"><?php esc_html_e( 'Destination / Journey', 'trek-content-manager' ); ?></span>
+                    <?php
+                    if ( $trek_id && get_post( $trek_id ) ) {
+                        echo '<a href="' . esc_url( get_edit_post_link( $trek_id ) ) . '" style="font-weight:700; color:#045857; text-decoration:none; font-size:14px;">🏔️ ' . esc_html( get_the_title( $trek_id ) ) . '</a>';
+                        echo ' <a href="' . esc_url( get_permalink( $trek_id ) ) . '" target="_blank" style="font-size:11px; color:#64748b; text-decoration:underline; margin-left:4px;">(view page ↗)</a>';
+                    } elseif ( ! empty( $trek_title ) ) {
+                        echo '<strong style="color:#173331; font-size:14px;">🏔️ ' . esc_html( $trek_title ) . '</strong>';
+                    } else {
+                        echo '<span style="color:#94a3b8;">' . esc_html__( 'General Destination Enquiry', 'trek-content-manager' ) . '</span>';
+                    }
+                    ?>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+                    <span style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;"><?php esc_html_e( 'Email Address', 'trek-content-manager' ); ?></span>
+                    <?php if ( $email ) : ?>
+                        <a href="mailto:<?php echo esc_attr( $email ); ?>" style="color:#0284c7; font-weight:600; font-size:14px; text-decoration:none;">
+                            ✉️ <?php echo esc_html( $email ); ?>
+                        </a>
+                    <?php else : ?>
+                        <span style="color:#94a3b8;">—</span>
+                    <?php endif; ?>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+                    <span style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;"><?php esc_html_e( 'Phone / WhatsApp', 'trek-content-manager' ); ?></span>
+                    <?php if ( $phone ) : ?>
+                        <strong style="color:#173331; font-size:14px;"><?php echo esc_html( $phone ); ?></strong>
+                        <?php if ( ! empty( $clean_phone ) ) : ?>
+                            <a href="https://wa.me/<?php echo esc_attr( $clean_phone ); ?>" target="_blank" style="display:inline-block; margin-left:6px; background:#25D366; color:#fff; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; text-decoration:none;">
+                                WhatsApp ↗
+                            </a>
+                        <?php endif; ?>
+                    <?php else : ?>
+                        <span style="color:#94a3b8;">Not provided</span>
+                    <?php endif; ?>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+                    <span style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;"><?php esc_html_e( 'Number of Travellers', 'trek-content-manager' ); ?></span>
+                    <strong style="color:#173331; font-size:14px;">👥 <?php echo esc_html( $travellers ?: 'Not specified' ); ?></strong>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+                    <span style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;"><?php esc_html_e( 'Lead Source', 'trek-content-manager' ); ?></span>
+                    <?php
+                    if ( 'journey_finder' === $source || 'Journey Selector' === $source ) {
+                        echo '<span style="display:inline-block; color:#022f2e; background:#e2f2e9; padding:2px 8px; border-radius:4px; font-weight:600; font-size:12px;">🗺️ Journey Selector</span>';
+                    } elseif ( 'single-destination-planning-popup' === $source ) {
+                        echo '<span style="display:inline-block; color:#92400e; background:#fef3c7; padding:2px 8px; border-radius:4px; font-weight:600; font-size:12px;">🏔️ Trip Planning Popup</span>';
+                    } else {
+                        echo '<strong style="color:#173331; font-size:13px;">' . esc_html( $source ?: 'Frontend' ) . '</strong>';
+                    }
+                    ?>
+                </div>
+
+                <?php if ( ! empty( $ip ) ) : ?>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+                    <span style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;"><?php esc_html_e( 'Client IP', 'trek-content-manager' ); ?></span>
+                    <code style="background:#edf2f7; padding:2px 6px; border-radius:4px; font-size:12px;"><?php echo esc_html( $ip ); ?></code>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Selected Preferences (if available) -->
+            <?php if ( ! empty( $region ) || ! empty( $feeling ) || ! empty( $pace ) ) : ?>
+                <div style="margin-bottom:20px; padding:14px; background:#f0f7f6; border-radius:8px; border:1px solid #cce5e3;">
+                    <strong style="color:#022f2e; display:block; margin-bottom:8px; font-size:13px;">🧭 <?php esc_html_e( 'Selected Travel Preferences', 'trek-content-manager' ); ?>:</strong>
+                    <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                        <?php if ( ! empty( $region ) ) : ?>
+                            <div><span style="color:#646970; font-size:11px; text-transform:uppercase; font-weight:700;"><?php esc_html_e( 'Region', 'trek-content-manager' ); ?>:</span> <strong><?php echo esc_html( ucwords( str_replace( array( '-', '_' ), ' ', $region ) ) ); ?></strong></div>
+                        <?php endif; ?>
+                        <?php if ( ! empty( $feeling ) ) : ?>
+                            <div><span style="color:#646970; font-size:11px; text-transform:uppercase; font-weight:700;"><?php esc_html_e( 'Feeling', 'trek-content-manager' ); ?>:</span> <strong><?php echo esc_html( ucwords( $feeling ) ); ?></strong></div>
+                        <?php endif; ?>
+                        <?php if ( ! empty( $pace ) ) : ?>
+                            <div><span style="color:#646970; font-size:11px; text-transform:uppercase; font-weight:700;"><?php esc_html_e( 'Pace', 'trek-content-manager' ); ?>:</span> <strong><?php echo esc_html( ucwords( $pace ) ); ?></strong></div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endif; ?>
-            <?php if ( ! empty( $travellers ) ) : ?>
-                <div>
-                    <strong style="color:#2c3338;"><?php esc_html_e( 'Travellers', 'trek-content-manager' ); ?></strong><br>
-                    <?php echo esc_html( $travellers ); ?>
+
+            <!-- Message Box -->
+            <div style="background:#fbfaf7; border:1px solid #e0dad0; border-radius:8px; padding:16px; margin-bottom:18px;">
+                <span style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#854d0e; margin-bottom:8px; letter-spacing:0.05em;">
+                    💬 <?php esc_html_e( 'Traveler’s Message & Notes', 'trek-content-manager' ); ?>
+                </span>
+                <div style="font-size:14px; line-height:1.7; color:#173331; white-space:pre-wrap;">
+                    <?php echo esc_html( $post->post_content ?: 'No additional message provided.' ); ?>
                 </div>
-            <?php endif; ?>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <?php if ( $email ) : ?>
+                    <a href="mailto:<?php echo esc_attr( $email ); ?>?subject=<?php echo esc_attr( rawurlencode( 'Your enquiry for ' . ( $trek_title ?: 'Yeti Adventure' ) ) ); ?>" class="button button-primary" style="background:#045857; border-color:#023837; border-radius:6px;">
+                        ✉️ <?php esc_html_e( 'Reply by Email', 'trek-content-manager' ); ?>
+                    </a>
+                <?php endif; ?>
+                <?php if ( ! empty( $clean_phone ) ) : ?>
+                    <a href="https://wa.me/<?php echo esc_attr( $clean_phone ); ?>" target="_blank" class="button" style="background:#25D366; color:#fff; border-color:#1ebc59; border-radius:6px;">
+                        💬 <?php esc_html_e( 'Chat on WhatsApp', 'trek-content-manager' ); ?>
+                    </a>
+                <?php endif; ?>
+                <?php if ( $trek_id && get_post( $trek_id ) ) : ?>
+                    <a href="<?php echo esc_url( get_permalink( $trek_id ) ); ?>" target="_blank" class="button button-secondary" style="border-radius:6px;">
+                        🏔️ <?php esc_html_e( 'View Trek Page', 'trek-content-manager' ); ?>
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
-
-        <?php if ( ! empty( $region ) || ! empty( $feeling ) || ! empty( $pace ) ) : ?>
-            <div style="margin-top:16px;padding:14px;background:#f0f7f6;border-radius:8px;border:1px solid #cce5e3;">
-                <strong style="color:#022f2e;display:block;margin-bottom:8px;">🧭 <?php esc_html_e( 'Selected Travel Preferences', 'trek-content-manager' ); ?>:</strong>
-                <div style="display:flex;gap:15px;flex-wrap:wrap;">
-                    <?php if ( ! empty( $region ) ) : ?>
-                        <div><span style="color:#646970;font-size:11px;text-transform:uppercase;font-weight:700;"><?php esc_html_e( 'Region', 'trek-content-manager' ); ?>:</span> <strong><?php echo esc_html( ucwords( str_replace( array( '-', '_' ), ' ', $region ) ) ); ?></strong></div>
-                    <?php endif; ?>
-                    <?php if ( ! empty( $feeling ) ) : ?>
-                        <div><span style="color:#646970;font-size:11px;text-transform:uppercase;font-weight:700;"><?php esc_html_e( 'Feeling', 'trek-content-manager' ); ?>:</span> <strong><?php echo esc_html( ucwords( $feeling ) ); ?></strong></div>
-                    <?php endif; ?>
-                    <?php if ( ! empty( $pace ) ) : ?>
-                        <div><span style="color:#646970;font-size:11px;text-transform:uppercase;font-weight:700;"><?php esc_html_e( 'Pace', 'trek-content-manager' ); ?>:</span> <strong><?php echo esc_html( ucwords( $pace ) ); ?></strong></div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <p style="margin:18px 0 0;color:#646970;"><?php esc_html_e( 'The traveller’s itinerary request details are stored in the main WordPress editor above.', 'trek-content-manager' ); ?></p>
         <?php
     }
 

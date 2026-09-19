@@ -176,22 +176,62 @@ class Trek_REST_API {
             return new WP_Error( 'missing_fields', __( 'Please provide your name and message.', 'trek-content-manager' ), array( 'status' => 400 ) );
         }
 
+        $trek_title = $trek_id ? get_the_title( $trek_id ) : sanitize_text_field( $params['trek_title'] ?? '' );
+
         $post_id = wp_insert_post( array(
             'post_type'    => 'trek_enquiry',
             'post_title'   => $name,
             'post_content' => $message,
-            'post_status'  => 'private',
+            'post_status'  => 'publish',
         ), true );
 
         if ( is_wp_error( $post_id ) ) {
             return new WP_Error( 'db_error', __( 'Failed to store the enquiry.', 'trek-content-manager' ), array( 'status' => 500 ) );
         }
 
+        update_post_meta( $post_id, '_trek_enquiry_name', $name );
         update_post_meta( $post_id, '_trek_enquiry_email', $email );
         update_post_meta( $post_id, '_trek_enquiry_trek_id', $trek_id );
+        update_post_meta( $post_id, '_trek_enquiry_trek_title', $trek_title );
         update_post_meta( $post_id, '_trek_enquiry_phone', $phone );
         update_post_meta( $post_id, '_trek_enquiry_travellers', $travellers );
-        update_post_meta( $post_id, '_trek_enquiry_source', sanitize_text_field( $params['source'] ?? 'frontend' ) );
+        update_post_meta( $post_id, '_trek_enquiry_source', sanitize_text_field( $params['source'] ?? 'single-destination-planning-popup' ) );
+        update_post_meta( $post_id, '_trek_enquiry_date', current_time( 'mysql' ) );
+        update_post_meta( $post_id, '_trek_enquiry_ip', sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ) );
+        update_post_meta( $post_id, '_trek_enquiry_status', 'New' );
+
+        // Send email notification to site admin
+        $admin_email = get_option( 'admin_email' );
+        if ( $admin_email ) {
+            $dest_label = ! empty( $trek_title ) ? $trek_title : 'General Enquiry';
+            $subject    = sprintf( '[New Enquiry] %s - %s', $name, $dest_label );
+            $body       = sprintf(
+                "New enquiry received from website:\n\n" .
+                "Traveler Name: %s\n" .
+                "Destination: %s\n" .
+                "Email: %s\n" .
+                "Phone / WhatsApp: %s\n" .
+                "Travellers: %s\n" .
+                "Date: %s\n" .
+                "Source: %s\n\n" .
+                "Message:\n%s\n\n" .
+                "View and manage in WordPress Admin:\n%s",
+                $name,
+                $dest_label,
+                $email,
+                $phone ?: 'Not provided',
+                $travellers ?: 'Not specified',
+                current_time( 'Y-m-d H:i:s' ),
+                sanitize_text_field( $params['source'] ?? 'single-destination-planning-popup' ),
+                $message,
+                admin_url( 'post.php?post=' . $post_id . '&action=edit' )
+            );
+            $headers = array(
+                'Content-Type: text/plain; charset=UTF-8',
+                'Reply-To: ' . $name . ' <' . $email . '>',
+            );
+            wp_mail( $admin_email, $subject, $body, $headers );
+        }
 
         return rest_ensure_response( array(
             'success' => true,

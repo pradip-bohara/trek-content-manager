@@ -1687,324 +1687,621 @@ class Trek_Shortcodes {
      * =========================================================================
      * SHORTCODE 4: [ya_signature_journeys]
      * =========================================================================
-     * Generates dynamic home signature journeys slider shell with all region cards
-     * sequentially numbered 01, 02, 03... matching the home.html layout.
+     * Generates the 2027 Trip Collection card grid matching the premium editorial
+     * related-card design with 10px border radius, brand colors #cfab55 and #617555,
+     * Open Sans and Newsreader typography, full CPT dynamic data, and a smooth
+     * Load More Journeys button.
      */
     public static function render_signature_journeys( $atts ) {
+        self::$instance_counter++;
+        $uid = 'ya_sig_' . self::$instance_counter;
 
-    self::$instance_counter++;
-    $uid = 'ya_sig_' . self::$instance_counter;
-
-    $atts = shortcode_atts(
-        array(
-            'category'       => '',
-            'region'         => 'nepal',   // Default region: Nepal
-            'default_region' => 'nepal',   // Fallback default region
-            'featured'       => '1',
-            'count'          => 12,        // Default to 12 posts
-            'orderby'        => 'menu_order title',
-            'order'          => 'ASC',
-        ),
-        $atts,
-        'ya_signature_journeys'
-    );
-
-    // Resolve effective region: prefer explicit att, else fall back to default_region
-    $effective_region = ! empty( $atts['region'] )
-        ? sanitize_title( $atts['region'] )
-        : sanitize_title( $atts['default_region'] );
-
-    $posts_count = intval( $atts['count'] );
-
-    if ( $posts_count === 0 ) {
-        $posts_count = -1;
-    }
-
-    /*
-     * ---------------------------------------------------------
-     * BASE QUERY
-     * ---------------------------------------------------------
-     */
-    $query_args = array(
-        'post_type'      => 'trek_destination',
-        'post_status'    => 'publish',
-        'posts_per_page' => $posts_count,
-        'orderby'        => sanitize_sql_orderby( $atts['orderby'] ) ?: 'menu_order title',
-        'order'          => strtoupper( $atts['order'] ) === 'DESC' ? 'DESC' : 'ASC',
-        'no_found_rows'  => true,
-    );
-
-    /*
-     * ---------------------------------------------------------
-     * FEATURED FILTER
-     * ---------------------------------------------------------
-     */
-    $featured_enabled =
-        '1' === $atts['featured'] ||
-        'yes' === strtolower( $atts['featured'] ) ||
-        'true' === strtolower( $atts['featured'] );
-
-    if ( $featured_enabled ) {
-        $query_args['meta_query'] = array(
-            'relation' => 'OR',
+        $atts = shortcode_atts(
             array(
-                'key'     => '_trek_featured_home',
-                'value'   => '1',
-                'compare' => '=',
+                'category'       => '',
+                'region'         => 'nepal',   // Default region: Nepal
+                'default_region' => 'nepal',   // Fallback default region
+                'featured'       => '',        // Empty by default to display all Nepal journeys
+                'count'          => -1,        // Fetch all matching posts
+                'per_page'       => 6,         // Visible per page before load more
+                'orderby'        => 'menu_order title',
+                'order'          => 'ASC',
             ),
-            array(
-                'key'     => '_trek_is_featured',
-                'value'   => '1',
-                'compare' => '=',
-            ),
-        );
-    }
-
-    /*
-     * ---------------------------------------------------------
-     * TAXONOMY FILTERS
-     * ---------------------------------------------------------
-     */
-    $tax_query = array();
-
-    /*
-     * CATEGORY
-     */
-    if ( ! empty( $atts['category'] ) && 'all' !== strtolower( $atts['category'] ) ) {
-
-        $cat_terms = array_filter(
-            array_map(
-                'sanitize_title',
-                explode( ',', $atts['category'] )
-            )
+            $atts,
+            'ya_signature_journeys'
         );
 
-        if ( ! empty( $cat_terms ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'trek_category',
-                'field'    => 'slug',
-                'terms'    => $cat_terms,
-                'operator' => 'IN',
+        $posts_count = intval( $atts['count'] );
+        if ( $posts_count === 0 ) {
+            $posts_count = -1;
+        }
+
+        /*
+         * ---------------------------------------------------------
+         * BASE QUERY
+         * ---------------------------------------------------------
+         */
+        $query_args = array(
+            'post_type'      => 'trek_destination',
+            'post_status'    => 'publish',
+            'posts_per_page' => $posts_count,
+            'orderby'        => sanitize_sql_orderby( $atts['orderby'] ) ?: 'menu_order title',
+            'order'          => strtoupper( $atts['order'] ) === 'DESC' ? 'DESC' : 'ASC',
+            'no_found_rows'  => true,
+        );
+
+        /*
+         * FEATURED FILTER (Optional)
+         */
+        if ( '1' === $atts['featured'] || 'yes' === strtolower( $atts['featured'] ) || 'true' === strtolower( $atts['featured'] ) ) {
+            $query_args['meta_query'] = array(
+                'relation' => 'OR',
+                array(
+                    'key'     => '_trek_featured_home',
+                    'value'   => '1',
+                    'compare' => '=',
+                ),
+                array(
+                    'key'     => '_trek_is_featured',
+                    'value'   => '1',
+                    'compare' => '=',
+                ),
             );
         }
-    }
 
-    /*
-     * REGION – always applied (defaults to 'nepal')
-     */
-    if ( 'all' !== $effective_region ) {
+        /*
+         * TAXONOMY FILTERS
+         */
+        $tax_query = array();
 
-        // Support comma-separated multi-region: region="nepal,bhutan"
-        $reg_terms = array_filter(
-            array_map(
-                'sanitize_title',
-                explode( ',', $effective_region )
-            )
-        );
-
-        if ( ! empty( $reg_terms ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'trek_region',
-                'field'    => 'slug',
-                'terms'    => $reg_terms,
-                'operator' => 'IN',
-            );
-        }
-    }
-
-    /*
-     * Only add relation when both category and region
-     * filters exist.
-     */
-    if ( ! empty( $tax_query ) ) {
-
-        if ( count( $tax_query ) > 1 ) {
-            $tax_query['relation'] = 'AND';
+        // Category filter
+        if ( ! empty( $atts['category'] ) && 'all' !== strtolower( $atts['category'] ) ) {
+            $cat_terms = array_filter( array_map( 'sanitize_title', explode( ',', $atts['category'] ) ) );
+            if ( ! empty( $cat_terms ) ) {
+                $tax_query[] = array(
+                    'taxonomy' => 'trek_category',
+                    'field'    => 'slug',
+                    'terms'    => $cat_terms,
+                    'operator' => 'IN',
+                );
+            }
         }
 
-        $query_args['tax_query'] = $tax_query;
-    }
+        // Region filter (defaults to 'nepal' unless 'all' is passed)
+        $effective_region = ! empty( $atts['region'] ) ? sanitize_title( $atts['region'] ) : sanitize_title( $atts['default_region'] );
+        if ( 'all' !== $effective_region && ! empty( $effective_region ) ) {
+            $reg_terms = array_filter( array_map( 'sanitize_title', explode( ',', $effective_region ) ) );
+            if ( ! empty( $reg_terms ) ) {
+                $tax_query[] = array(
+                    'taxonomy' => 'trek_region',
+                    'field'    => 'slug',
+                    'terms'    => $reg_terms,
+                    'operator' => 'IN',
+                );
+            }
+        }
 
-    /*
-     * ---------------------------------------------------------
-     * DATABASE QUERY
-     * ---------------------------------------------------------
-     */
-    $query = new WP_Query( $query_args );
-
-    $cards = array();
-    $idx   = 1;
-
-    /*
-     * ---------------------------------------------------------
-     * FEATURED FALLBACK
-     *
-     * If no featured posts exist, remove ONLY the featured
-     * filter and keep category/region filters.
-     * ---------------------------------------------------------
-     */
-    if ( ! $query->have_posts() && isset( $query_args['meta_query'] ) ) {
-
-        unset( $query_args['meta_query'] );
+        if ( ! empty( $tax_query ) ) {
+            if ( count( $tax_query ) > 1 ) {
+                $tax_query['relation'] = 'AND';
+            }
+            $query_args['tax_query'] = $tax_query;
+        }
 
         $query = new WP_Query( $query_args );
-    }
 
-    /*
-     * ---------------------------------------------------------
-     * BUILD CARDS FROM DATABASE
-     * ---------------------------------------------------------
-     */
-    if ( $query->have_posts() ) {
-
-        while ( $query->have_posts() ) {
-
-            $query->the_post();
-
-            $trip = self::get_formatted_trip_data(
-                get_the_ID(),
-                $idx
-            );
-
-            if ( ! empty( $trip ) ) {
-
-                $cards[] = $trip;
-                $idx++;
-            }
+        // Fallback: If region taxonomy returned 0 posts (e.g. taxonomy terms not yet assigned to posts), query all published trek destinations
+        if ( ! $query->have_posts() && ! empty( $query_args['tax_query'] ) ) {
+            unset( $query_args['tax_query'] );
+            $query = new WP_Query( $query_args );
         }
 
-        wp_reset_postdata();
-    }
+        // Second fallback: If featured was active and yielded no posts, remove featured
+        if ( ! $query->have_posts() && isset( $query_args['meta_query'] ) ) {
+            unset( $query_args['meta_query'] );
+            $query = new WP_Query( $query_args );
+        }
 
-    /*
-     * ---------------------------------------------------------
-     * OUTPUT
-     * ---------------------------------------------------------
-     */
-    ob_start();
-    ?>
+        /*
+         * ---------------------------------------------------------
+         * BUILD CARDS WITH FULL CPT METADATA
+         * ---------------------------------------------------------
+         */
+        $cards = array();
+        if ( $query->have_posts() ) {
+            while ( $query->have_posts() ) {
+                $query->the_post();
+                $p_id = get_the_ID();
 
-    <div class="ya-journey-shell ya-reveal" id="<?php echo esc_attr( $uid ); ?>">
+                // Title & URL
+                $c_title = get_the_title( $p_id );
+                $c_url   = get_permalink( $p_id );
 
-        <button
-            class="ya-slider-btn ya-slider-prev"
-            type="button"
-            aria-label="<?php esc_attr_e( 'Previous journey', 'trek-content-manager' ); ?>"
-        >
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-            >
-                <path d="M15 18l-6-6 6-6"/>
-            </svg>
-        </button>
+                // Image
+                $c_img = get_the_post_thumbnail_url( $p_id, 'large' );
+                if ( empty( $c_img ) ) {
+                    $c_img = get_post_meta( $p_id, '_trek_card_image_url', true );
+                }
+                if ( empty( $c_img ) ) {
+                    $c_img = get_post_meta( $p_id, '_trek_hero_bg_img', true );
+                }
+                if ( empty( $c_img ) ) {
+                    $c_img = 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80';
+                }
 
-        <div
-            class="ya-journey-track"
-            id="<?php echo esc_attr( $uid ); ?>_track"
-        >
+                // Category badge
+                $cat_terms = get_the_terms( $p_id, 'trek_category' );
+                $badge     = ( ! empty( $cat_terms ) && ! is_wp_error( $cat_terms ) ) ? $cat_terms[0]->name : 'Trekking';
 
-            <?php foreach ( $cards as $c ) : ?>
+                // Region / Country
+                $c_region = get_post_meta( $p_id, '_trek_fact_region', true );
+                if ( empty( $c_region ) ) {
+                    $c_region = get_post_meta( $p_id, '_trek_breadcrumb_region', true );
+                }
+                if ( empty( $c_region ) ) {
+                    $reg_terms = get_the_terms( $p_id, 'trek_region' );
+                    if ( ! empty( $reg_terms ) && ! is_wp_error( $reg_terms ) ) {
+                        $c_region = $reg_terms[0]->name;
+                    }
+                }
+                if ( empty( $c_region ) ) {
+                    $c_region = 'Nepal';
+                }
 
-                <a
-                    class="ya-journey-card"
-                    href="<?php echo esc_url( $c['permalink'] ); ?>"
-                    style="--img:url('<?php echo esc_url( $c['image'] ); ?>')"
-                >
+                // Difficulty
+                $diff_terms = get_the_terms( $p_id, 'trek_difficulty' );
+                $c_diff     = ( ! empty( $diff_terms ) && ! is_wp_error( $diff_terms ) ) ? $diff_terms[0]->name : get_post_meta( $p_id, '_trek_difficulty', true );
+                if ( empty( $c_diff ) ) {
+                    $c_diff = 'Moderate';
+                }
+                // Strip redundant " Trek" suffix if present
+                $c_diff = preg_replace( '/\s*trek$/i', '', trim( $c_diff ) );
 
-                    <span class="ya-card-meta">
-                        <?php echo esc_html( $c['duration_meta'] ); ?>
-                    </span>
+                // Duration / Days
+                $days_raw = get_post_meta( $p_id, '_trek_hero_days', true );
+                if ( empty( $days_raw ) ) {
+                    $days_raw = get_post_meta( $p_id, '_trek_fact_duration', true );
+                }
+                $c_days = preg_replace( '/[^0-9]/', '', (string) $days_raw );
+                if ( empty( $c_days ) ) {
+                    $c_days = '12';
+                }
 
-                    <span class="ya-card-number">
-                        <?php echo esc_html( $c['number'] ); ?>
-                    </span>
+                // Best Season
+                $c_season = get_post_meta( $p_id, '_trek_fact_season', true );
+                if ( empty( $c_season ) ) {
+                    $c_season = get_post_meta( $p_id, '_trek_fact_best_season', true );
+                }
+                if ( empty( $c_season ) ) {
+                    $c_season = 'Mar – Nov';
+                }
 
-                    <div class="ya-card-body">
+                $cards[] = array(
+                    'id'     => $p_id,
+                    'url'    => $c_url,
+                    'img'    => $c_img,
+                    'alt'    => $c_title,
+                    'badge'  => $badge,
+                    'region' => $c_region,
+                    'diff'   => $c_diff,
+                    'title'  => $c_title,
+                    'days'   => $c_days,
+                    'season' => $c_season,
+                );
+            }
+            wp_reset_postdata();
+        }
 
-                        <small>
-                            <?php echo esc_html( $c['tag'] ); ?>
-                        </small>
+        // Fallback sample cards if database has 0 published treks
+        if ( empty( $cards ) ) {
+            $cards = array(
+                array(
+                    'id'     => 1,
+                    'url'    => '#',
+                    'img'    => 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80',
+                    'alt'    => 'Kathmandu Valley & Himalayan Foothills',
+                    'badge'  => 'Trekking',
+                    'region' => 'Nepal',
+                    'diff'   => 'Moderate',
+                    'title'  => 'Kathmandu Valley & Himalayan Foothills',
+                    'days'   => '5',
+                    'season' => 'Mar – Nov',
+                ),
+                array(
+                    'id'     => 2,
+                    'url'    => '#',
+                    'img'    => 'https://yetiadventure.com/wp-content/uploads/2022/02/15-Days_Everest-Base-Camp-trek-1024x682.jpg',
+                    'alt'    => 'The Ultimate Everest Base Camp Experience',
+                    'badge'  => 'Trekking',
+                    'region' => 'Everest',
+                    'diff'   => 'Challenging',
+                    'title'  => 'The Ultimate Everest Base Camp Experience',
+                    'days'   => '15',
+                    'season' => 'Sep – May',
+                ),
+                array(
+                    'id'     => 3,
+                    'url'    => '#',
+                    'img'    => 'https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?auto=format&fit=crop&w=1200&q=80',
+                    'alt'    => 'Annapurna Sanctuary & Poon Hill Panorama',
+                    'badge'  => 'Trekking',
+                    'region' => 'Annapurna',
+                    'diff'   => 'Moderate',
+                    'title'  => 'Annapurna Sanctuary & Poon Hill Panorama',
+                    'days'   => '12',
+                    'season' => 'Oct – Apr',
+                ),
+            );
+        }
 
-                        <h3>
-                            <?php echo esc_html( $c['title'] ); ?>
-                        </h3>
+        $per_page    = max( 1, intval( $atts['per_page'] ) );
+        $total_cards = count( $cards );
 
-                        <p>
-                            <?php echo esc_html( $c['excerpt'] ); ?>
-                        </p>
+        /*
+         * ---------------------------------------------------------
+         * OUTPUT
+         * ---------------------------------------------------------
+         */
+        ob_start();
+        ?>
+        <div class="ya-collection-shell" id="<?php echo esc_attr( $uid ); ?>" data-per-page="<?php echo esc_attr( $per_page ); ?>">
+            <style>
+                #<?php echo esc_attr( $uid ); ?> {
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+                #<?php echo esc_attr( $uid ); ?> * {
+                    box-sizing: border-box;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-collection-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 28px;
+                }
+                /* Premium card matching reference with 10px border radius */
+                #<?php echo esc_attr( $uid ); ?> .ya-related-card {
+                    display: flex;
+                    flex-direction: column;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    background: #ffffff;
+                    border: 1px solid #dce8e3;
+                    box-shadow: 0 4px 20px rgba(7, 94, 84, 0.05);
+                    transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease;
+                    text-decoration: none;
+                    color: inherit;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-card:hover {
+                    transform: translateY(-6px);
+                    box-shadow: 0 20px 52px rgba(7, 94, 84, 0.12);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-card.is-hidden {
+                    display: none !important;
+                }
+                /* Image area */
+                #<?php echo esc_attr( $uid ); ?> .ya-related-image {
+                    position: relative;
+                    height: 226px;
+                    overflow: hidden;
+                    flex-shrink: 0;
+                    border-radius: 10px 10px 0 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-image img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                    transition: transform .55s cubic-bezier(.22, 1, .36, 1);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-card:hover .ya-related-image img {
+                    transform: scale(1.06);
+                }
+                /* Category badge on image */
+                #<?php echo esc_attr( $uid ); ?> .ya-related-img-badge {
+                    position: absolute;
+                    top: 14px;
+                    left: 14px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 5px 12px;
+                    background: rgba(97, 117, 85, 0.92);
+                    border-radius: 50px;
+                    font: 600 11px / 1 "Open Sans", Arial, sans-serif;
+                    letter-spacing: .8px;
+                    text-transform: uppercase;
+                    color: #ffffff;
+                    backdrop-filter: blur(4px);
+                    z-index: 2;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-img-badge svg {
+                    width: 12px;
+                    height: 12px;
+                }
+                /* Location pill on image */
+                #<?php echo esc_attr( $uid ); ?> .ya-related-img-loc {
+                    position: absolute;
+                    bottom: 14px;
+                    left: 14px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 5px;
+                    padding: 4px 10px;
+                    background: rgba(10, 30, 20, 0.75);
+                    border-radius: 50px;
+                    font: 600 10px / 1 "Open Sans", Arial, sans-serif;
+                    letter-spacing: 1.2px;
+                    text-transform: uppercase;
+                    color: #ffffff;
+                    backdrop-filter: blur(4px);
+                    z-index: 2;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-img-loc svg {
+                    width: 11px;
+                    height: 11px;
+                    color: #cfab55;
+                }
+                /* Content area */
+                #<?php echo esc_attr( $uid ); ?> .ya-related-copy {
+                    padding: 22px 22px 20px;
+                    display: flex;
+                    flex-direction: column;
+                    flex-grow: 1;
+                    position: relative;
+                    background: #ffffff;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-eyebrow {
+                    font: 700 10px / 1 "Open Sans", Arial, sans-serif;
+                    letter-spacing: 1.8px;
+                    text-transform: uppercase;
+                    color: #cfab55;
+                    margin-bottom: 8px;
+                    display: block;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-copy h3 {
+                    margin: 0 0 16px;
+                    font: 600 19px / 1.25 "Newsreader", Georgia, serif;
+                    color: #102f35;
+                }
+                /* Info row */
+                #<?php echo esc_attr( $uid ); ?> .ya-related-info-row {
+                    display: flex;
+                    gap: 0;
+                    margin-bottom: 18px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-info-item {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3px;
+                    padding-right: 14px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-info-item:not(:last-child) {
+                    border-right: 1px solid #dce8e3;
+                    margin-right: 14px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-info-label {
+                    font: 500 10px / 1 "Open Sans", Arial, sans-serif;
+                    letter-spacing: .8px;
+                    text-transform: uppercase;
+                    color: #617579;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-info-value {
+                    font: 600 13px / 1.2 "Open Sans", Arial, sans-serif;
+                    color: #102f35;
+                }
+                /* Footer */
+                #<?php echo esc_attr( $uid ); ?> .ya-related-footer {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding-top: 16px;
+                    border-top: 1px solid #eaf5f0;
+                    margin-top: auto;
+                    position: relative;
+                    z-index: 1;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 7px;
+                    font: 700 11px / 1 "Open Sans", Arial, sans-serif;
+                    letter-spacing: 1.2px;
+                    text-transform: uppercase;
+                    color: #617555;
+                    transition: all .2s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-card:hover .ya-related-link {
+                    gap: 11px;
+                    color: #cfab55;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-link svg {
+                    width: 15px;
+                    height: 15px;
+                    transition: transform .2s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-card:hover .ya-related-link svg {
+                    transform: translateX(3px);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-duration-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 5px;
+                    padding: 5px 12px;
+                    background: #eaf5f0;
+                    border-radius: 50px;
+                    font: 600 11px / 1 "Open Sans", Arial, sans-serif;
+                    color: #617555;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-related-duration-pill svg {
+                    width: 12px;
+                    height: 12px;
+                }
+                /* Contour art behind content with 10px bottom radius */
+                #<?php echo esc_attr( $uid ); ?> .ya-related-copy::after {
+                    content: "";
+                    position: absolute;
+                    bottom: 0; left: 0; right: 0;
+                    height: 60px;
+                    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M0 40 Q40 20 80 35 Q120 50 160 30 Q200 10 240 28 Q280 46 320 32 Q360 18 400 38 L400 60 L0 60Z' fill='%23eaf5f0' opacity='0.55'/%3E%3C/svg%3E") bottom / cover no-repeat;
+                    pointer-events: none;
+                    border-radius: 0 0 10px 10px;
+                }
+                /* Load More Button */
+                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-wrap {
+                    text-align: center;
+                    margin-top: 48px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    height: 48px;
+                    padding: 0 34px;
+                    border-radius: 4px;
+                    background: #617555;
+                    border: 1px solid #617555;
+                    color: #ffffff;
+                    font-family: "Open Sans", Arial, sans-serif;
+                    font-size: 13px;
+                    font-weight: 700;
+                    letter-spacing: 1.2px;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    transition: all .25s ease;
+                    box-shadow: 0 4px 18px rgba(97, 117, 85, 0.25);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn:hover {
+                    background: #cfab55;
+                    border-color: #cfab55;
+                    color: #173331;
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 22px rgba(207, 171, 85, 0.35);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn svg {
+                    width: 16px;
+                    height: 16px;
+                    transition: transform .25s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn:hover svg {
+                    transform: translateY(2px);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn.is-disabled {
+                    opacity: 0.65;
+                    cursor: default;
+                    pointer-events: none;
+                    background: #94a3b8;
+                    border-color: #94a3b8;
+                    box-shadow: none;
+                    transform: none;
+                }
 
-                        <div class="ya-card-link">
+                @media (max-width: 992px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-collection-grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 20px;
+                    }
+                }
+                @media (max-width: 600px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-collection-grid {
+                        grid-template-columns: 1fr;
+                        gap: 20px;
+                    }
+                }
+            </style>
 
-                            <span>
-                                <?php esc_html_e( 'View journey', 'trek-content-manager' ); ?>
+            <div class="ya-collection-grid" id="<?php echo esc_attr( $uid ); ?>_grid">
+                <?php foreach ( $cards as $i => $fc ) :
+                    $is_hidden = ( $i >= $per_page );
+                ?>
+                    <a class="ya-related-card ya-reveal<?php echo $is_hidden ? ' is-hidden' : ''; ?>" href="<?php echo esc_url( $fc['url'] ); ?>" data-card-index="<?php echo esc_attr( $i ); ?>">
+                        <div class="ya-related-image">
+                            <img src="<?php echo esc_url( $fc['img'] ); ?>" alt="<?php echo esc_attr( $fc['alt'] ); ?>" loading="lazy">
+                            <span class="ya-related-img-badge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l4-8 4 5 3-3 4 6"/><circle cx="7" cy="4" r="1" fill="currentColor"/></svg>
+                                <?php echo esc_html( $fc['badge'] ); ?>
                             </span>
-
-                            <b>
-                                <svg
-                                    class="ya-icon-arrow"
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                    focusable="false"
-                                >
-                                    <path d="M7 17L17 7M9 7h8v8"/>
-                                </svg>
-                            </b>
-
+                            <span class="ya-related-img-loc">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                                <?php echo esc_html( $fc['region'] ); ?>
+                            </span>
                         </div>
+                        <div class="ya-related-copy">
+                            <span class="ya-related-eyebrow"><?php echo esc_html( $fc['diff'] ); ?> Trek</span>
+                            <h3><?php echo esc_html( $fc['title'] ); ?></h3>
+                            <div class="ya-related-info-row">
+                                <div class="ya-related-info-item">
+                                    <span class="ya-related-info-label">Duration</span>
+                                    <span class="ya-related-info-value"><?php echo esc_html( $fc['days'] ); ?> Days</span>
+                                </div>
+                                <div class="ya-related-info-item">
+                                    <span class="ya-related-info-label">Best Season</span>
+                                    <span class="ya-related-info-value"><?php echo esc_html( $fc['season'] ); ?></span>
+                                </div>
+                            </div>
+                            <div class="ya-related-footer">
+                                <div class="ya-related-link">
+                                    <span>View Journey</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                </div>
+                                <span class="ya-related-duration-pill">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                    <?php echo esc_html( $fc['days'] ); ?>D
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
 
-                    </div>
+            <?php if ( $total_cards > $per_page ) : ?>
+                <div class="ya-collection-load-more-wrap">
+                    <button type="button" class="ya-collection-load-more-btn" id="<?php echo esc_attr( $uid ); ?>_load_more">
+                        <span class="ya-load-more-label">Load More Journeys</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                </div>
+            <?php endif; ?>
 
-                </a>
+            <script>
+                (function() {
+                    const shell = document.getElementById('<?php echo esc_js( $uid ); ?>');
+                    if (!shell) return;
+                    const btn = shell.querySelector('#<?php echo esc_js( $uid ); ?>_load_more');
+                    if (!btn) return;
+                    const perPage = parseInt(shell.getAttribute('data-per-page') || '6', 10);
+                    const cards = Array.from(shell.querySelectorAll('.ya-related-card'));
 
-            <?php endforeach; ?>
+                    btn.addEventListener('click', function() {
+                        const hiddenCards = cards.filter(c => c.classList.contains('is-hidden'));
+                        const toShow = hiddenCards.slice(0, perPage);
+                        toShow.forEach(card => {
+                            card.classList.remove('is-hidden');
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(20px)';
+                            card.style.transition = 'opacity .4s ease, transform .4s ease';
+                            requestAnimationFrame(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            });
+                        });
 
+                        const remainingHidden = cards.filter(c => c.classList.contains('is-hidden'));
+                        if (remainingHidden.length === 0) {
+                            btn.classList.add('is-disabled');
+                            const label = btn.querySelector('.ya-load-more-label');
+                            if (label) label.textContent = 'All Journeys Displayed';
+                            const svg = btn.querySelector('svg');
+                            if (svg) svg.style.display = 'none';
+                        }
+                    });
+                })();
+            </script>
         </div>
-
-        <button
-            class="ya-slider-btn ya-slider-next"
-            type="button"
-            aria-label="<?php esc_attr_e( 'Next journey', 'trek-content-manager' ); ?>"
-        >
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-            >
-                <path d="M9 18l6-6-6-6"/>
-            </svg>
-        </button>
-
-    </div>
-
-    <script>
-        (function() {
-            const shell = document.getElementById('<?php echo esc_js( $uid ); ?>');
-            if (!shell) return;
-            const track = shell.querySelector('#<?php echo esc_js( $uid ); ?>_track');
-            const prev = shell.querySelector('.ya-slider-prev');
-            const next = shell.querySelector('.ya-slider-next');
-            const scrollAmount = () => (track ? Math.max(track.clientWidth * 0.8, 300) : 320);
-
-            if (prev && track) {
-                prev.addEventListener('click', function() {
-                    track.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
-                });
-            }
-            if (next && track) {
-                next.addEventListener('click', function() {
-                    track.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
-                });
-            }
-        })();
-    </script>
-
-    <?php
-    return ob_get_clean();
-}
+        <?php
+        return ob_get_clean();
+    }
 
     /**
      * =========================================================================
