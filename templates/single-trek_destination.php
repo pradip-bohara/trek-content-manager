@@ -246,7 +246,7 @@ $rev_subtext         = get_post_meta( $post_id, '_trek_review_subtext', true ) ?
 // Query approved database reviews for this specific trek
 $db_reviews_query = new WP_Query( array(
     'post_type'      => 'trek_review',
-    'posts_per_page' => 10,
+    'posts_per_page' => 50,
     'post_status'    => 'publish',
     'meta_query'     => array(
         array(
@@ -264,8 +264,51 @@ $db_reviews_query = new WP_Query( array(
     'order'          => 'DESC'
 ) );
 
+// Helper to generate elegant 2-letter initials from traveler name
+if ( ! function_exists( 'ya_get_reviewer_initials' ) ) {
+    function ya_get_reviewer_initials( $name ) {
+        $clean = trim( preg_replace( '/[^\p{L}\s&]/u', '', (string) $name ) );
+        if ( empty( $clean ) ) return 'TR';
+        $parts = preg_split( '/[\s&]+/', $clean );
+        $parts = array_values( array_filter( $parts ) );
+        if ( count( $parts ) >= 2 ) {
+            return strtoupper( mb_substr( $parts[0], 0, 1 ) . mb_substr( $parts[1], 0, 1 ) );
+        } elseif ( ! empty( $parts[0] ) ) {
+            return strtoupper( mb_substr( $parts[0], 0, min( 2, mb_strlen( $parts[0] ) ) ) );
+        }
+        return 'TR';
+    }
+}
+
+// Destination options for review form dropdown
+$dest_options = array();
+$all_trek_destinations = get_posts( array(
+    'post_type'      => 'trek_destination',
+    'post_status'    => 'publish',
+    'posts_per_page' => 50,
+    'orderby'        => 'title',
+    'order'          => 'ASC',
+) );
+if ( ! empty( $all_trek_destinations ) ) {
+    foreach ( $all_trek_destinations as $td_post ) {
+        $dest_options[] = $td_post->post_title;
+    }
+}
+$default_dest_options = array(
+    'Everest Base Camp',
+    'Annapurna Circuit',
+    'Manaslu Circuit',
+    'Upper Mustang',
+    'Kathmandu Valley',
+    'Chitwan & Pokhara',
+    'Custom Bespoke Journey'
+);
+$dest_options = array_values( array_unique( array_merge( $dest_options, $default_dest_options ) ) );
+
 $display_reviews = array();
-if ( $db_reviews_query->have_posts() ) {
+
+// Strictly query approved/published reviews for THIS specific trek destination only
+if ( isset( $db_reviews_query ) && $db_reviews_query->have_posts() ) {
     while ( $db_reviews_query->have_posts() ) {
         $db_reviews_query->the_post();
         $rid = get_the_ID();
@@ -273,77 +316,25 @@ if ( $db_reviews_query->have_posts() ) {
         $country = get_post_meta( $rid, '_trek_country', true );
         $loc = array_filter( array( $city, $country ) );
         $rev_type  = get_post_meta( $rid, '_trek_traveler_type', true ) ?: 'Solo Traveler';
-        $rev_title = get_post_meta( $rid, '_trek_review_title', true ) ?: 'A Truly Exceptional Journey';
+        $rev_title = get_post_meta( $rid, '_trek_review_title', true ) ?: 'An Unforgettable Experience!';
+        $rev_name  = get_post_meta( $rid, '_trek_reviewer_name', true ) ?: get_the_title();
+        $rev_trip  = get_post_meta( $rid, '_trek_trip_name', true ) ?: $title;
+        $rev_date  = get_post_meta( $rid, '_trek_tour_date', true ) ?: get_the_date( 'M j, Y', $rid );
+        $rating_val = floatval( get_post_meta( $rid, '_trek_rating', true ) ?: 5.0 );
         $display_reviews[] = array(
-            'title'    => $rev_title,
-            'name'     => get_the_title(),
-            'location' => ! empty( $loc ) ? implode( ', ', $loc ) : 'Verified Traveller',
-            'rating'   => intval( get_post_meta( $rid, '_trek_rating', true ) ?: 5 ),
-            'quote'    => get_the_content(),
-            'type'     => $rev_type,
+            'title'       => $rev_title,
+            'name'        => $rev_name,
+            'location'    => ! empty( $loc ) ? implode( ', ', $loc ) : ( get_post_meta( $rid, '_trek_city', true ) ?: 'Verified Traveller' ),
+            'rating'      => $rating_val,
+            'quote'       => get_the_content(),
+            'type'        => $rev_type,
+            'trip'        => $rev_trip,
+            'date'        => $rev_date,
         );
     }
     wp_reset_postdata();
 }
-
-// Fallback to curated reviews if no database reviews exist yet
-if ( empty( $display_reviews ) ) {
-    $curated = get_post_meta( $post_id, '_trek_curated_reviews', true );
-    if ( ! empty( $curated ) && is_array( $curated ) ) {
-        $display_reviews = $curated;
-    } else {
-        $display_reviews = array(
-            array(
-                'title'    => 'An Unforgettable Himalayan Experience',
-                'name'     => 'Jo & Laurie Prowse',
-                'location' => 'London, United Kingdom',
-                'rating'   => 5,
-                'type'     => 'Couples Trek',
-                'quote'    => 'They praised their trek manager’s professionalism and said the team made the mountain journey enjoyable from beginning to end. Highly recommended!'
-            ),
-            array(
-                'title'    => 'Challenging, Inspiring & Exceptionally Guided',
-                'name'     => 'Leslie & Cheyenne',
-                'location' => 'New York, United States',
-                'rating'   => 5,
-                'type'     => 'Solo Traveler',
-                'quote'    => 'They described a strong connection with their guide and remembered the scenery, calm atmosphere and physical challenge of the trek.'
-            ),
-            array(
-                'title'    => 'Breathtaking High Altitude Vistas',
-                'name'     => 'Marcus Vance',
-                'location' => 'Melbourne, Australia',
-                'rating'   => 5,
-                'type'     => 'Solo Traveler',
-                'quote'    => 'Every single detail was taken care of seamlessly. The acclimatization schedule was perfect, allowing us to reach the base camp without altitude issues.'
-            ),
-            array(
-                'title'    => 'The Trip of a Lifetime',
-                'name'     => 'Elena Rostova',
-                'location' => 'Geneva, Switzerland',
-                'rating'   => 5,
-                'type'     => 'Small Group',
-                'quote'    => 'Our guide was immensely knowledgeable about the local culture, monasteries, and peaks. The tea house lodges were cozy and welcoming after long trail days.'
-            ),
-            array(
-                'title'    => 'Pure Magic in the High Peaks',
-                'name'     => 'David & Sarah Chen',
-                'location' => 'Vancouver, Canada',
-                'rating'   => 5,
-                'type'     => 'Couples Trek',
-                'quote'    => 'From airport pickup in Kathmandu to the final celebratory dinner, Yeti Adventure went above and beyond. We are already planning our next journey.'
-            ),
-            array(
-                'title'    => 'Flawless Logistics & Warm Hospitality',
-                'name'     => 'Sophie Martin',
-                'location' => 'Paris, France',
-                'rating'   => 5,
-                'type'     => 'Solo Traveler',
-                'quote'    => 'As a solo female trekker, I felt completely safe and supported every step of the trail. The porters and guides are true legends of the mountains.'
-            )
-        );
-    }
-}
+// STRICT DATA INTEGRITY: ZERO fallback reviews. If no approved reviews exist, $display_reviews remains empty.
 
 // 10. Fixed Departure & Contact
 $dep_kicker          = get_post_meta( $post_id, '_trek_dep_kicker', true ) ?: 'Travel Together';
@@ -1137,10 +1128,6 @@ $related_query = new WP_Query( array(
       transition: box-shadow .3s ease, border-color .3s ease;
       position: relative;
     }
-    .yt-day-card{
-      padding-top:20px;
-      padding-bottom:20px;
-    }
     .ya-ebc-page .yt-day-card:hover {
       box-shadow: 0 10px 40px rgba(23, 63, 56, 0.10);
       border-color: #d4cbbc;
@@ -1274,7 +1261,7 @@ $related_query = new WP_Query( array(
     /* Right Column: Image Gallery Carousel — fixed 16:10 aspect */
     .ya-ebc-page .yt-day-gallery {
       position: relative;
-      border-radius: 14px;
+      border-radius: 8px;
       overflow: hidden;
       aspect-ratio: 16 / 10;
       background: #eceae3;
@@ -1335,20 +1322,31 @@ $related_query = new WP_Query( array(
       object-fit: cover;
       display: block;
     }
-    /* Counter + nav badge */
-    .ya-ebc-page .yt-gallery-overlay-badge {
+    /* Bottom gradient scrim on gallery for high contrast of text and dots */
+    .ya-ebc-page .yt-day-gallery::after {
+      content: "";
       position: absolute;
-      bottom: 10px;
-      right: 10px;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(to top, rgba(10, 25, 22, 0.58) 0%, rgba(10, 25, 22, 0.18) 26%, rgba(0, 0, 0, 0) 52%);
+      z-index: 3;
+    }
+
+    /* Counter badge (top-right pill like reference e.g. "1 / 4") */
+    .ya-ebc-page .yt-gallery-counter-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
       z-index: 5;
-      background: rgba(15, 38, 33, 0.80);
+      background: rgba(14, 40, 34, 0.85);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       border-radius: 999px;
-      padding: 5px 6px 5px 12px;
+      padding: 4px 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+      pointer-events: none;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
     }
     .ya-ebc-page .yt-gallery-counter {
       color: #ffffff;
@@ -1356,31 +1354,106 @@ $related_query = new WP_Query( array(
       font-weight: 700;
       font-family: Inter, Arial, sans-serif;
       letter-spacing: 0.5px;
-      min-width: 28px;
+      line-height: 1;
     }
-    .ya-ebc-page .yt-gallery-btns {
+
+    /* Side navigation arrow buttons (left & right side, centered vertically) */
+    .ya-ebc-page .yt-gallery-side-btn,
+    .ya-ebc-page .yt-gallery-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 6;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      color: #17362e;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ya-ebc-page .yt-gallery-prev {
+      left: 12px;
+    }
+    .ya-ebc-page .yt-gallery-next {
+      right: 12px;
+    }
+    .ya-ebc-page .yt-gallery-side-btn:hover,
+    .ya-ebc-page .yt-gallery-nav-btn:hover {
+      background: #ffffff;
+      color: #0b1f1a;
+      transform: translateY(-50%) scale(1.08);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.26);
+      border-color: #ffffff;
+    }
+    .ya-ebc-page .yt-gallery-side-btn:active,
+    .ya-ebc-page .yt-gallery-nav-btn:active {
+      transform: translateY(-50%) scale(0.94);
+    }
+    .ya-ebc-page .yt-gallery-side-btn svg,
+    .ya-ebc-page .yt-gallery-nav-btn svg {
+      display: block;
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+
+    /* Bottom left location tag (e.g. 📍 Kathmandu) */
+    .ya-ebc-page .yt-gallery-location-tag {
+      position: absolute;
+      bottom: 12px;
+      left: 14px;
+      z-index: 5;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-    }
-    .ya-ebc-page .yt-gallery-nav-btn {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      background: rgba(255,255,255,0.12);
+      gap: 5px;
       color: #ffffff;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-      padding: 0;
-      transition: background .2s, border-color .2s;
+      font-size: 11.5px;
+      font-weight: 600;
+      font-family: Inter, Arial, sans-serif;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.85);
+      pointer-events: none;
     }
-    .ya-ebc-page .yt-gallery-nav-btn:hover {
-      background: rgba(255, 255, 255, 0.30);
-      border-color: rgba(255,255,255,0.8);
+    .ya-ebc-page .yt-gallery-location-tag svg {
+      width: 13px;
+      height: 13px;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+    }
+
+    /* Bottom center pagination dots */
+    .ya-ebc-page .yt-gallery-dots {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .ya-ebc-page .yt-gallery-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.65);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      transition: all 0.28s ease;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .ya-ebc-page .yt-gallery-dot.is-active {
+      width: 22px;
+      border-radius: 999px;
+      background: #cba148; /* warm gold matching reference */
+      box-shadow: 0 1px 4px rgba(0,0,0,0.5);
     }
 
     /* Roadmap embed styling */
@@ -1478,143 +1551,368 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-trip-note-copy h3{margin:8px 0 10px;font-size:24px;color:#fff}
     .ya-ebc-page .ya-trip-note-copy p{margin:0 0 18px;color:#cdd8cb;font-size:13px;line-height:1.7}
 
-    /* 7. TRAVEL REVIEWS: Grid of Cards + Modal Pop Up + Load More */
-    .ya-ebc-page .ya-rev-head-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      flex-wrap:wrap;
-      gap:16px;
-      margin-bottom:30px;
+    /* 7. TRAVELER REVIEWS: Bespoke Editorial Stories & Hierarchy */
+    .ya-ebc-page .ya-rev-head-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 36px;
     }
-    .ya-ebc-page .ya-review-cards{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:22px;
+    .ya-ebc-page .ya-rev-head-row h2 {
+      margin: 6px 0 10px;
+      font: 600 clamp(28px, 3.2vw, 42px) / 1.15 "Newsreader", Georgia, serif;
+      color: var(--green);
     }
-    .ya-ebc-page .ya-review-card{
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      padding:24px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:#ffffff;
-      box-shadow:0 4px 16px rgba(27,35,27,.03);
-      transition:transform .25s ease,box-shadow .25s ease;
+    .ya-ebc-page .ya-rev-head-row p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 540px;
+      line-height: 1.6;
     }
-    .ya-ebc-page .ya-review-card:hover{
-      transform:translateY(-3px);
-      box-shadow:0 10px 24px rgba(27,35,27,.07);
+    .ya-ebc-page .ya-write-rev-btn {
+      padding: 10px 22px;
+      font-size: 13.5px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 8px;
+      background: var(--green);
+      color: #ffffff;
+      border: 1px solid var(--green);
+      box-shadow: 0 4px 14px rgba(22, 51, 42, 0.12);
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .ya-ebc-page .ya-rev-card-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:12px;
-    }
-    .ya-ebc-page .ya-stars{
-      display:flex;
-      gap:2px;
-      color:var(--gold);
-    }
-    .ya-ebc-page .ya-stars svg{width:16px;height:16px;fill:currentColor}
-    .ya-ebc-page .ya-rev-type-badge{
-      font-size:11px;
-      font-weight:700;
-      color:var(--green-2);
-      background:rgba(97,117,85,.1);
-      padding:3px 9px;
-      border-radius:999px;
-      white-space:nowrap;
-    }
-    .ya-ebc-page .ya-rev-card-title{
-      margin:0 0 8px;
-      font-size:17px;
-      line-height:1.3;
-      color:var(--ink);
-      font-family:"Newsreader",Georgia,serif;
-      font-weight:600;
-    }
-    .ya-ebc-page .ya-review-card blockquote{
-      font-size:14px;
-      line-height:1.65;
-      color:#505c4f;
-      font-style:normal;
-      margin:0 0 18px;
-      flex-grow:1;
-    }
-    .ya-ebc-page .ya-rev-author{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding-top:14px;
-      border-top:1px solid #f0f4ee;
-    }
-    .ya-ebc-page .ya-rev-avatar{
-      width:38px;
-      height:38px;
-      border-radius:50%;
-      color:#fff;
-      font-size:13px;
-      font-weight:700;
-      display:grid;
-      place-items:center;
-      flex-shrink:0;
-      background:var(--green-2);
-    }
-    .ya-ebc-page .ya-rev-author strong{
-      display:block;
-      font-size:13.5px;
-      color:var(--ink);
-    }
-    .ya-ebc-page .ya-rev-author small{
-      display:block;
-      font-size:11.5px;
-      color:var(--muted);
-    }
-    .ya-ebc-page .ya-rev-load-more-wrap{
-      margin-top:32px;
-      text-align:center;
+    .ya-ebc-page .ya-write-rev-btn:hover {
+      background: #0d231d;
+      border-color: #0d231d;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(22, 51, 42, 0.2);
     }
 
-    /* Review submission popup modal */
-    .ya-ebc-page .ya-modal{
-      position:fixed;
-      inset:0;
-      z-index:100002;
-      display:none;
-      place-items:center;
-      padding:24px;
-      background:rgba(15,22,17,.72);
-      backdrop-filter:blur(6px);
+    /* ── Traveler Reviews Redesign ────────────────────────────────────── */
+    #ya-panel-review {
+      position: relative;
+      background: #ffffff;
+      padding: 64px 0 80px;
     }
-    .ya-ebc-page .ya-modal.is-open{display:grid}
-    .ya-ebc-page .ya-modal-dialog{
-      position:relative;
-      width:min(620px,100%);
-      max-height:calc(100svh - 48px);
-      overflow-y:auto;
-      background:#ffffff;
-      border-radius:14px;
-      box-shadow:0 24px 60px rgba(0,0,0,.3);
-      padding:34px 36px;
+    .ya-ebc-page .ya-rev-head-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
     }
-    .ya-ebc-page .ya-modal-close{
-      position:absolute;
-      top:18px;
-      right:18px;
-      width:34px;
-      height:34px;
-      border-radius:50%;
-      border:1px solid var(--line);
-      background:#fff;
-      color:var(--ink);
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-      transition:all .2s ease;
+    .ya-ebc-page .ya-rev-head-row .ya-kicker {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #b38838;
+      margin-bottom: 6px;
+    }
+    .ya-ebc-page .ya-rev-head-row h2 {
+      margin: 0 0 8px;
+      font: 600 clamp(28px, 3.2vw, 42px) / 1.15 "Newsreader", Georgia, serif;
+      color: #1a2e26;
+    }
+    .ya-ebc-page .ya-rev-head-row p {
+      margin: 0;
+      color: #637069;
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 580px;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      background: #045857;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border: 1px solid #045857;
+      box-shadow: 0 4px 14px rgba(4, 88, 87, 0.15);
+      cursor: pointer;
+      transition: all 0.22s ease;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .ya-ebc-page .ya-rev-cta-btn:hover {
+      background: #022f2e;
+      border-color: #022f2e;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(4, 88, 87, 0.25);
+    }
+    .ya-ebc-page .ya-rev-cta-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Review Cards Desktop/Tablet Grid */
+    .ya-ebc-page .ya-review-cards-wrap {
+      position: relative;
+      width: 100%;
+    }
+    .ya-ebc-page .ya-review-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+      max-width: 1360px;
+      margin: 0 auto;
+    }
+    .ya-ebc-page .ya-review-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 30px;
+      border: 1px solid #eae6de;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 2px 14px rgba(18, 38, 32, 0.035);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+      box-sizing: border-box;
+    }
+    .ya-ebc-page .ya-review-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(18, 38, 32, 0.08);
+      border-color: #dfd9ce;
+    }
+    .ya-ebc-page .ya-rev-card-top {
+      margin-bottom: 16px;
+    }
+    .ya-ebc-page .ya-rev-card-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .ya-ebc-page .ya-rev-card-title {
+      margin: 0;
+      font: 600 18px / 1.35 "Newsreader", Georgia, serif;
+      color: #1a2e26;
+      flex-grow: 1;
+    }
+    .ya-ebc-page .ya-rev-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .ya-ebc-page .ya-star-svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
+    .ya-ebc-page .ya-star-svg.is-full {
+      fill: #c6a45f;
+    }
+    .ya-ebc-page .ya-star-svg.is-empty {
+      fill: #e5e7eb;
+    }
+    .ya-ebc-page .ya-rev-type-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #617555;
+      background: #f4f7f2;
+      border: 1px solid #e1e8dd;
+      border-radius: 999px;
+      padding: 2px 9px;
+      line-height: 1.4;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-card-text {
+      flex-grow: 1;
+      margin: 0 0 20px;
+      padding: 0;
+      border: none;
+    }
+    .ya-ebc-page .ya-rev-card-text p {
+      margin: 0;
+      font-size: 14.5px;
+      line-height: 1.68;
+      color: #4a5651;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-card-bottom {
+      border-top: 1px solid #f0ede6;
+      padding-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .ya-ebc-page .ya-rev-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .ya-ebc-page .ya-rev-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #eef3ec;
+      color: #2d4237;
+      border: 1px solid #dce5da;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-author-meta {
+      min-width: 0;
+    }
+    .ya-ebc-page .ya-rev-author-name {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a2e26;
+      line-height: 1.25;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-author-loc {
+      display: block;
+      font-size: 12px;
+      color: #728079;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-date {
+      font-size: 12px;
+      color: #8c9891;
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Empty State */
+    .ya-ebc-page .ya-review-empty-state {
+      background: #ffffff;
+      border: 1px dashed #d5cebf;
+      border-radius: 20px;
+      padding: 56px 28px;
+      text-align: center;
+      max-width: 580px;
+      margin: 10px auto 0;
+    }
+    .ya-ebc-page .ya-rev-empty-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #f4f6f2;
+      color: #617555;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .ya-ebc-page .ya-rev-empty-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+    .ya-ebc-page .ya-rev-empty-title {
+      margin: 0 0 8px;
+      font: 600 24px / 1.25 "Newsreader", Georgia, serif;
+      color: #1a2e26;
+    }
+    .ya-ebc-page .ya-rev-empty-sub {
+      margin: 0 0 24px;
+      color: #637069;
+      font-size: 14.5px;
+      line-height: 1.6;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-empty-cta {
+      margin: 0 auto;
+    }
+
+    /* Load More Button */
+    .ya-ebc-page .ya-rev-load-more-wrap {
+      margin-top: 40px;
+      text-align: center;
+    }
+    .ya-ebc-page .ya-review-card.ya-review-hidden {
+      display: none !important;
+    }
+
+    /* Tablet (768px - 1024px) */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .ya-ebc-page .ya-review-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+    }
+
+    /* Mobile Carousel (under 768px) */
+    @media (max-width: 768px) {
+      .ya-ebc-page .ya-rev-head-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .ya-ebc-page .ya-rev-cta-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .ya-ebc-page .ya-review-cards-wrap {
+        overflow: hidden;
+      }
+      .ya-ebc-page .ya-review-cards {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 16px;
+        padding: 4px 16px 20px;
+        margin: 0 -16px;
+        scrollbar-width: none;
+      }
+      .ya-ebc-page .ya-review-cards::-webkit-scrollbar {
+        display: none;
+      }
+      .ya-ebc-page .ya-review-card {
+        flex: 0 0 85vw;
+        max-width: 86vw;
+        scroll-snap-align: start;
+        min-width: 0;
+        padding: 24px 22px;
+      }
+      .ya-ebc-page .ya-review-card.ya-review-hidden {
+        display: flex !important;
+      }
+      .ya-ebc-page .ya-rev-load-more-wrap {
+        display: none;
+      }
     }
     .ya-ebc-page .ya-modal-close:hover{background:var(--gold);color:var(--green)}
     .ya-ebc-page .ya-modal-header{margin-bottom:20px}
@@ -2148,13 +2446,33 @@ $related_query = new WP_Query( array(
                     </div>
                   </div>
                   <?php if ( count( $day_images ) > 1 ) : ?>
-                  <div class="yt-gallery-overlay-badge">
-                    <span class="yt-gallery-counter">1 / <?php echo count( $day_images ); ?></span>
-                    <div class="yt-gallery-btns">
-                      <button type="button" class="yt-gallery-nav-btn yt-gallery-prev" aria-label="Previous image">&#8249;</button>
-                      <button type="button" class="yt-gallery-nav-btn yt-gallery-next" aria-label="Next image">&#8250;</button>
+                    <!-- Top-right counter pill (e.g. 1 / 4) -->
+                    <div class="yt-gallery-counter-badge">
+                      <span class="yt-gallery-counter">1 / <?php echo count( $day_images ); ?></span>
                     </div>
-                  </div>
+
+                    <!-- Left & right side navigation buttons -->
+                    <button type="button" class="yt-gallery-side-btn yt-gallery-nav-btn yt-gallery-prev" aria-label="Previous image">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <button type="button" class="yt-gallery-side-btn yt-gallery-nav-btn yt-gallery-next" aria-label="Next image">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+
+                    <!-- Bottom-center dots -->
+                    <div class="yt-gallery-dots" aria-hidden="true">
+                      <?php for ( $dot_i = 0; $dot_i < count( $day_images ); $dot_i++ ) : ?>
+                        <span class="yt-gallery-dot<?php echo 0 === $dot_i ? ' is-active' : ''; ?>"></span>
+                      <?php endfor; ?>
+                    </div>
+                  <?php endif; ?>
+
+                  <?php if ( ! empty( $loc_name ) ) : ?>
+                    <!-- Bottom-left location tag -->
+                    <div class="yt-gallery-location-tag">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                      <span><?php echo esc_html( $loc_name ); ?></span>
+                    </div>
                   <?php endif; ?>
                 </div>
                 <?php else : ?>
@@ -2229,18 +2547,18 @@ $related_query = new WP_Query( array(
         </div>
       </section>
 
-      <!-- Panel 4: Travel Reviews (Grid of Review Cards with Title, Stars, Text, Name, Avatar, Details like Solo Traveler + Write Review Modal button in top right + Load More button) -->
+      <!-- Panel 4: Traveler Reviews (Database-driven, strictly current trek, no fallbacks) -->
       <section class="ya-panel" id="ya-panel-review" role="tabpanel" data-panel="review">
         <div class="ya-inner">
           <div class="ya-section-heading ya-reveal">
             <div class="ya-rev-head-row">
               <div>
                 <span class="ya-kicker"><?php echo esc_html( $rev_kicker ); ?></span>
-                <h2>Travel Reviews</h2>
+                <h2>Traveler Reviews</h2>
                 <p><?php echo esc_html( $rev_subtext ); ?></p>
               </div>
               <div>
-                <button type="button" class="ya-btn ya-btn-primary" id="ya-open-review-modal">
+                <button type="button" class="ya-btn ya-btn-primary ya-rev-cta-btn" id="ya-open-review-modal" aria-haspopup="dialog" aria-controls="ya-write-review-modal">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   Write Your Review
                 </button>
@@ -2248,45 +2566,88 @@ $related_query = new WP_Query( array(
             </div>
           </div>
 
-          <div class="ya-review-cards ya-reveal" id="ya-review-cards-list">
-            <?php foreach ( $display_reviews as $rev_idx => $rev ) : 
-              $star_count = intval( $rev['rating'] ?? 5 );
-              $rev_name   = $rev['name'] ?? 'Traveller';
-              $name_parts = explode(' ', trim($rev_name));
-              $initials   = (isset($name_parts[0][0]) ? $name_parts[0][0] : '') . (isset($name_parts[1][0]) ? $name_parts[1][0] : '');
-              $initials   = strtoupper($initials) ?: 'TR';
-              $avatar_colors = array( '#617555', '#4d6044', '#75896a', '#546b4c', '#3c4c37' );
-              $bg_color   = $avatar_colors[ $rev_idx % count($avatar_colors) ];
-              $rev_type   = $rev['type'] ?? 'Solo Traveler';
-              $rev_title  = $rev['title'] ?? 'Exceptional Himalayan Journey';
-              $is_hidden  = $rev_idx >= 3 ? ' ya-review-hidden' : '';
-            ?>
-              <article class="ya-review-card<?php echo esc_attr( $is_hidden ); ?>">
-                <div class="ya-rev-card-header">
-                  <div class="ya-stars" aria-label="<?php echo esc_attr( $star_count ); ?> out of 5 stars">
-                    <?php for ( $s = 0; $s < $star_count; $s++ ) : ?>
-                      <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
-                    <?php endfor; ?>
-                  </div>
-                  <span class="ya-rev-type-badge"><?php echo esc_html( $rev_type ); ?></span>
-                </div>
-                <h4 class="ya-rev-card-title"><?php echo esc_html( $rev_title ); ?></h4>
-                <blockquote><?php echo esc_html( $rev['quote'] ?? '' ); ?></blockquote>
-                <div class="ya-rev-author">
-                  <span class="ya-rev-avatar" style="background-color:<?php echo esc_attr($bg_color); ?>"><?php echo esc_html($initials); ?></span>
-                  <div>
-                    <strong><?php echo esc_html( $rev_name ); ?></strong>
-                    <small><?php echo esc_html( $rev['location'] ?? 'Verified Traveller' ); ?></small>
-                  </div>
-                </div>
-              </article>
-            <?php endforeach; ?>
-          </div>
-
-          <?php if ( count( $display_reviews ) > 3 ) : ?>
-            <div class="ya-rev-load-more-wrap ya-reveal">
-              <button type="button" class="ya-btn ya-btn-secondary" id="ya-load-more-reviews">Load More Reviews</button>
+          <?php if ( empty( $display_reviews ) ) : ?>
+            <!-- 100% Database-Driven: Empty State when no approved reviews exist yet -->
+            <div class="ya-review-empty-state ya-reveal">
+              <div class="ya-rev-empty-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <h3 class="ya-rev-empty-title"><?php esc_html_e( 'No reviews yet', 'trek-content-manager' ); ?></h3>
+              <p class="ya-rev-empty-sub"><?php esc_html_e( 'Be the first traveler to share your experience.', 'trek-content-manager' ); ?></p>
+              <button type="button" class="ya-btn ya-btn-primary ya-rev-cta-btn ya-rev-empty-cta" onclick="document.querySelector('#ya-open-review-modal')?.click()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <?php esc_html_e( 'Write Your Review', 'trek-content-manager' ); ?>
+              </button>
             </div>
+          <?php else : ?>
+            <!-- Review Cards Grid (3 columns on desktop, horizontal scroll-snap on mobile) -->
+            <div class="ya-review-cards-wrap ya-reveal">
+              <div class="ya-review-cards" id="ya-review-cards-list">
+                <?php foreach ( $display_reviews as $rev_idx => $rev ) : 
+                  $raw_rating  = floatval( $rev['rating'] ?? 5.0 );
+                  $rating_val  = max( 1.0, min( 5.0, $raw_rating ) );
+                  $full_stars  = floor( $rating_val );
+                  $has_half    = ( ( $rating_val - $full_stars ) >= 0.4 );
+                  $empty_stars = max( 0, 5 - $full_stars - ( $has_half ? 1 : 0 ) );
+                  $rev_name    = $rev['name'] ?? 'Traveller';
+                  $initials    = ya_get_reviewer_initials( $rev_name );
+                  $rev_type    = $rev['type'] ?? 'Solo Traveler';
+                  $rev_title   = $rev['title'] ?? 'An Unforgettable Experience!';
+                  $rev_loc     = $rev['location'] ?? 'Verified Traveller';
+                  $rev_date    = $rev['date'] ?? '';
+                  $is_hidden   = $rev_idx >= 6 ? ' ya-review-hidden' : '';
+                ?>
+                  <article class="ya-review-card<?php echo esc_attr( $is_hidden ); ?>" data-index="<?php echo esc_attr( $rev_idx ); ?>">
+                    <div class="ya-rev-card-top">
+                      <div class="ya-rev-card-top-row">
+                        <h4 class="ya-rev-card-title"><?php echo esc_html( $rev_title ); ?></h4>
+                        <div class="ya-rev-stars" aria-label="<?php echo esc_attr( $rating_val ); ?> out of 5 stars">
+                          <?php for ( $s = 0; $s < $full_stars; $s++ ) : ?>
+                            <svg class="ya-star-svg is-full" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
+                          <?php endfor; ?>
+                          <?php if ( $has_half ) : ?>
+                            <svg class="ya-star-svg is-half" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ya-grad-star-<?php echo esc_attr( $rev_idx ); ?>"><stop offset="50%" stop-color="#c6a45f"/><stop offset="50%" stop-color="#e5e7eb"/></linearGradient></defs><path fill="url(#ya-grad-star-<?php echo esc_attr( $rev_idx ); ?>)" d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
+                          <?php endif; ?>
+                          <?php for ( $e = 0; $e < $empty_stars; $e++ ) : ?>
+                            <svg class="ya-star-svg is-empty" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
+                          <?php endfor; ?>
+                        </div>
+                      </div>
+                      <?php if ( ! empty( $rev_type ) ) : ?>
+                        <span class="ya-rev-type-badge"><?php echo esc_html( $rev_type ); ?></span>
+                      <?php endif; ?>
+                    </div>
+
+                    <blockquote class="ya-rev-card-text">
+                      <p><?php echo nl2br( esc_html( $rev['quote'] ?? '' ) ); ?></p>
+                    </blockquote>
+
+                    <div class="ya-rev-card-bottom">
+                      <div class="ya-rev-author">
+                        <div class="ya-rev-avatar" aria-hidden="true">
+                          <span><?php echo esc_html( $initials ); ?></span>
+                        </div>
+                        <div class="ya-rev-author-meta">
+                          <strong class="ya-rev-author-name"><?php echo esc_html( $rev_name ); ?></strong>
+                          <span class="ya-rev-author-loc"><?php echo esc_html( $rev_loc ); ?></span>
+                        </div>
+                      </div>
+                      <?php if ( ! empty( $rev_date ) ) : ?>
+                        <span class="ya-rev-date"><?php echo esc_html( $rev_date ); ?></span>
+                      <?php endif; ?>
+                    </div>
+                  </article>
+                <?php endforeach; ?>
+              </div>
+            </div>
+
+            <?php if ( count( $display_reviews ) > 6 ) : ?>
+              <div class="ya-rev-load-more-wrap ya-reveal">
+                <button type="button" class="ya-btn ya-btn-secondary" id="ya-load-more-reviews">
+                  <?php esc_html_e( 'Load More Reviews', 'trek-content-manager' ); ?>
+                </button>
+              </div>
+            <?php endif; ?>
           <?php endif; ?>
         </div>
       </section>
@@ -3082,42 +3443,346 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-enquiry-honeypot{position:absolute!important;left:-9999px!important}
     @media(max-width:760px){.ya-ebc-page .ya-enquiry-modal{padding:14px}.ya-ebc-page .ya-enquiry-dialog{grid-template-columns:1fr;max-height:calc(100svh - 28px)}.ya-ebc-page .ya-enquiry-image{min-height:210px}.ya-ebc-page .ya-enquiry-image-copy{right:24px;bottom:22px;left:24px}.ya-ebc-page .ya-enquiry-content{padding:30px 24px}.ya-ebc-page .ya-enquiry-form{grid-template-columns:1fr}.ya-ebc-page .ya-enquiry-form .ya-field-full{grid-column:auto}}
 
-    /* Write Your Review Modal Styles (#cfab55 and #617555 only) */
-    .ya-ebc-page .ya-review-modal{position:fixed;inset:0;z-index:100002;display:none;place-items:center;padding:24px;background:rgba(15,25,18,.75);backdrop-filter:blur(8px)}
-    .ya-ebc-page .ya-review-modal.is-open{display:grid}
-    .ya-ebc-page .ya-review-modal-dialog{position:relative;width:min(640px,100%);max-height:calc(100svh - 48px);overflow-y:auto;background:#fff;border-radius:20px;box-shadow:0 32px 90px rgba(0,0,0,.35);padding:40px 44px}
-    .ya-ebc-page .ya-review-modal-close{position:absolute;top:18px;right:18px;width:38px;height:38px;display:grid;place-items:center;border:1px solid #dfe4dc;border-radius:50%;background:#fff;color:#617555;cursor:pointer;transition:all .2s ease}
-    .ya-ebc-page .ya-review-modal-close:hover{background:#cfab55;color:#fff;border-color:#cfab55;transform:rotate(90deg)}
-    .ya-ebc-page .ya-review-modal-close svg{width:18px;height:18px}
-    .ya-ebc-page .ya-review-modal-header{margin-bottom:24px;text-align:center}
-    .ya-ebc-page .ya-review-modal-header .ya-kicker{display:block;margin-bottom:6px;color:#cfab55;font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase}
-    .ya-ebc-page .ya-review-modal-header h2{margin:0 0 8px;font:600 clamp(22px,3vw,30px)/1.2 "Newsreader",Georgia,serif;color:#1e261e}
-    .ya-ebc-page .ya-review-modal-header p{margin:0;color:#606a61;font-size:14px;line-height:1.6}
-    .ya-ebc-page .ya-star-rating-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:24px;padding:16px;background:#fbfaf7;border-radius:12px;border:1px solid #dfe4dc}
-    .ya-ebc-page .ya-star-rating-label{font-size:12px;font-weight:700;color:#617555;text-transform:uppercase;letter-spacing:1px}
-    .ya-ebc-page .ya-star-select{display:inline-flex;flex-direction:row-reverse;gap:6px}
-    .ya-ebc-page .ya-star-select input{display:none}
-    .ya-ebc-page .ya-star-select label{cursor:pointer;color:#dfe4dc;transition:color .18s ease;margin:0;padding:0 2px}
-    .ya-ebc-page .ya-star-select label svg{width:28px;height:28px;fill:currentColor}
+    /* ── Write Your Review Modal (z-index: 1000000) ─────────────────── */
+    .ya-ebc-page .ya-review-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000000;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(12, 28, 22, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .ya-ebc-page .ya-review-modal.is-open {
+      display: grid;
+    }
+    .ya-ebc-page .ya-review-modal-dialog {
+      position: relative;
+      width: min(880px, 96vw);
+      max-height: calc(100svh - 40px);
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.4);
+      border: 1px solid #eae5db;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      overflow: hidden;
+      animation: yaRevModalIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes yaRevModalIn {
+      from { opacity: 0; transform: scale(0.97) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .ya-ebc-page .ya-review-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #dcd7cc;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #617555;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 10;
+      padding: 0;
+    }
+    .ya-ebc-page .ya-review-modal-close:hover {
+      background: #045857;
+      color: #ffffff;
+      border-color: #045857;
+      transform: rotate(90deg);
+    }
+    .ya-ebc-page .ya-review-modal-close svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Modal Left: Destination Info */
+    .ya-ebc-page .ya-rev-modal-left {
+      background: #fbfaf7;
+      border-right: 1px solid #ede8df;
+      padding: 32px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+    .ya-ebc-page .ya-rev-modal-img {
+      width: 100%;
+      height: 160px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      display: block;
+      background: #ede8df;
+    }
+    .ya-ebc-page .ya-rev-modal-kicker {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #b38838;
+      margin-bottom: 4px;
+    }
+    .ya-ebc-page .ya-rev-modal-dest-title {
+      margin: 0 0 6px;
+      font: 600 20px / 1.25 "Newsreader", Georgia, serif;
+      color: #1a2e26;
+    }
+    .ya-ebc-page .ya-rev-modal-dest-desc {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #5c6863;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Modal Right: Review Form */
+    .ya-ebc-page .ya-rev-modal-right {
+      padding: 34px 36px;
+      overflow-y: auto;
+      max-height: calc(100svh - 40px);
+    }
+    .ya-ebc-page .ya-rev-modal-header {
+      margin-bottom: 22px;
+    }
+    .ya-ebc-page .ya-rev-modal-header h2 {
+      margin: 0 0 6px;
+      font: 600 24px / 1.2 "Newsreader", Georgia, serif;
+      color: #1a2e26;
+    }
+    .ya-ebc-page .ya-rev-modal-header p {
+      margin: 0;
+      color: #637069;
+      font-size: 14px;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Rating Selector */
+    .ya-ebc-page .ya-star-rating-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 14px 18px;
+      background: #fbfaf7;
+      border-radius: 12px;
+      border: 1px solid #eae5db;
+    }
+    .ya-ebc-page .ya-star-rating-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a2e26;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-star-select {
+      display: inline-flex;
+      flex-direction: row-reverse;
+      gap: 4px;
+    }
+    .ya-ebc-page .ya-star-select input {
+      display: none;
+    }
+    .ya-ebc-page .ya-star-select label {
+      cursor: pointer;
+      color: #dcd7cb;
+      transition: color 0.15s ease, transform 0.15s ease;
+      margin: 0;
+      padding: 0 2px;
+    }
+    .ya-ebc-page .ya-star-select label svg {
+      width: 26px;
+      height: 26px;
+      fill: currentColor;
+      display: block;
+    }
     .ya-ebc-page .ya-star-select label:hover,
     .ya-ebc-page .ya-star-select label:hover ~ label,
-    .ya-ebc-page .ya-star-select input:checked ~ label{color:#cfab55}
-    .ya-ebc-page .ya-review-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .ya-ebc-page .ya-review-form-grid .ya-field-full{grid-column:1/-1}
-    .ya-ebc-page .ya-review-modal .ya-field label{display:block;margin:0 0 6px;color:#1e261e;font-size:13px;font-weight:600}
+    .ya-ebc-page .ya-star-select input:checked ~ label {
+      color: #c6a45f;
+    }
+    .ya-ebc-page .ya-star-select label:hover {
+      transform: scale(1.15);
+    }
+
+    /* Form Fields */
+    .ya-ebc-page .ya-review-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .ya-ebc-page .ya-review-form-grid .ya-field-full {
+      grid-column: 1 / -1;
+    }
+    .ya-ebc-page .ya-review-modal .ya-field label {
+      display: block;
+      margin: 0 0 6px;
+      color: #1a2e26;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
     .ya-ebc-page .ya-review-modal input,
     .ya-ebc-page .ya-review-modal select,
-    .ya-ebc-page .ya-review-modal textarea{width:100%;border:1px solid #dfe4dc;border-radius:10px;background:#fbfaf7;color:#1e261e;font-size:14px;padding:12px 14px;box-sizing:border-box;transition:all .2s ease;font-family:inherit}
+    .ya-ebc-page .ya-review-modal textarea {
+      width: 100%;
+      border: 1px solid #dcd7cc;
+      border-radius: 9px;
+      background: #fbfaf7;
+      color: #1a2e26;
+      font-size: 14px;
+      padding: 11px 13px;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
     .ya-ebc-page .ya-review-modal input:focus,
     .ya-ebc-page .ya-review-modal select:focus,
-    .ya-ebc-page .ya-review-modal textarea:focus{border-color:#617555;outline:0;background:#fff;box-shadow:0 0 0 3px rgba(97,117,85,.15)}
-    .ya-ebc-page .ya-review-modal textarea{min-height:100px;resize:vertical}
-    .ya-ebc-page .ya-rev-modal-alert{display:none;padding:12px 16px;border-radius:8px;font-size:14px;margin-bottom:16px}
-    .ya-ebc-page .ya-rev-modal-alert.is-success{display:block;background:#f5faf7;color:#617555;border:1px solid #dfe4dc}
-    .ya-ebc-page .ya-rev-modal-alert.is-error{display:block;background:#fff1ee;color:#a34231;border:1px solid #fad2cb}
-    @media(max-width:640px){
-      .ya-ebc-page .ya-review-modal-dialog{padding:30px 20px}
-      .ya-ebc-page .ya-review-form-grid{grid-template-columns:1fr}
+    .ya-ebc-page .ya-review-modal textarea:focus {
+      border-color: #045857;
+      outline: 0;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(4, 88, 87, 0.12);
+    }
+    .ya-ebc-page .ya-review-modal textarea {
+      min-height: 95px;
+      resize: vertical;
+    }
+
+    /* Submit Button */
+    .ya-ebc-page .ya-rev-submit-btn {
+      width: 100%;
+      justify-content: center;
+      height: 48px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 9px;
+      background: #045857;
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-submit-btn:hover {
+      background: #022f2e;
+    }
+    .ya-ebc-page .ya-rev-submit-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    /* Alert / Error Message */
+    .ya-ebc-page .ya-rev-modal-alert {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-modal-alert.is-error {
+      display: block;
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    /* Success State View */
+    .ya-ebc-page .ya-rev-modal-success {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+    .ya-ebc-page .ya-rev-modal-success.is-visible {
+      display: block;
+    }
+    .ya-ebc-page .ya-rev-success-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #eef7ee;
+      color: #15803d;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .ya-ebc-page .ya-rev-success-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+    .ya-ebc-page .ya-rev-modal-success h3 {
+      margin: 0 0 10px;
+      font: 600 24px / 1.2 "Newsreader", Georgia, serif;
+      color: #1a2e26;
+    }
+    .ya-ebc-page .ya-rev-modal-success p {
+      margin: 0 0 14px;
+      color: #55625c;
+      font-size: 14.5px;
+      line-height: 1.6;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-success-note {
+      font-size: 13.5px;
+      color: #718079;
+      background: #f8faf8;
+      border: 1px solid #e2ebe2;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin: 16px 0 24px;
+      text-align: left;
+    }
+    .ya-ebc-page .ya-rev-success-close-btn {
+      padding: 11px 32px;
+      border-radius: 999px;
+      background: #045857;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .ya-ebc-page .ya-rev-success-close-btn:hover {
+      background: #022f2e;
+    }
+
+    /* Modal Responsive (Mobile < 768px) */
+    @media (max-width: 768px) {
+      .ya-ebc-page .ya-review-modal-dialog {
+        grid-template-columns: 1fr;
+        max-height: calc(100svh - 24px);
+        overflow-y: auto;
+      }
+      .ya-ebc-page .ya-rev-modal-left {
+        padding: 24px 20px;
+        border-right: none;
+        border-bottom: 1px solid #ede8df;
+      }
+      .ya-ebc-page .ya-rev-modal-img {
+        height: 130px;
+      }
+      .ya-ebc-page .ya-rev-modal-right {
+        padding: 24px 20px;
+        max-height: none;
+      }
+      .ya-ebc-page .ya-review-form-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 
@@ -3149,89 +3814,123 @@ $related_query = new WP_Query( array(
     </div>
   </div>
 
-  <!-- Write Your Review Modal -->
+  <!-- Write Your Review Modal (z-index: 1000000) -->
   <div class="ya-review-modal" id="ya-write-review-modal" role="dialog" aria-modal="true" aria-labelledby="ya-write-review-title" aria-hidden="true">
     <div class="ya-review-modal-dialog" role="document">
       <button class="ya-review-modal-close" type="button" aria-label="Close review form">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
 
-      <div class="ya-review-modal-header">
-        <span class="ya-kicker">COMMUNITY STORIES</span>
-        <h2 id="ya-write-review-title">Write Your Review</h2>
-        <p>Share your authentic experiences from the trail to inspire fellow adventurers.</p>
+      <div class="ya-rev-modal-left">
+        <?php
+        $modal_cover_img = ! empty( $hero_slider_images[0] ) ? $hero_slider_images[0] : ( ! empty( $hero_bg_img ) ? $hero_bg_img : '' );
+        if ( $modal_cover_img ) :
+        ?>
+          <img src="<?php echo esc_url( $modal_cover_img ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="ya-rev-modal-img" loading="lazy">
+        <?php endif; ?>
+        <div>
+          <span class="ya-rev-modal-kicker"><?php echo esc_html( $breadcrumb_region ?: 'HIMALAYAN EXPEDITION' ); ?></span>
+          <h3 class="ya-rev-modal-dest-title"><?php echo esc_html( $title ); ?></h3>
+          <p class="ya-rev-modal-dest-desc">
+            Your authentic experiences and trail insights help fellow adventurers prepare for their journey. All reviews are checked for authenticity.
+          </p>
+        </div>
       </div>
 
-      <div class="ya-rev-modal-alert" id="ya-rev-modal-alert" role="status" aria-live="polite"></div>
-
-      <form id="ya-modal-review-form" novalidate>
-        <input type="hidden" id="ya-modal-rev-trek-id" value="<?php echo esc_attr( $post_id ); ?>">
-
-        <div class="ya-star-rating-wrap">
-          <span class="ya-star-rating-label">Overall Rating</span>
-          <div class="ya-star-select" role="radiogroup" aria-label="Star Rating">
-            <input type="radio" id="ya-star-5" name="ya-modal-rating" value="5" checked>
-            <label for="ya-star-5" title="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
-            <input type="radio" id="ya-star-4" name="ya-modal-rating" value="4">
-            <label for="ya-star-4" title="4 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
-            <input type="radio" id="ya-star-3" name="ya-modal-rating" value="3">
-            <label for="ya-star-3" title="3 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
-            <input type="radio" id="ya-star-2" name="ya-modal-rating" value="2">
-            <label for="ya-star-2" title="2 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
-            <input type="radio" id="ya-star-1" name="ya-modal-rating" value="1">
-            <label for="ya-star-1" title="1 star"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
-          </div>
+      <div class="ya-rev-modal-right">
+        <div class="ya-rev-modal-header">
+          <span class="ya-kicker">COMMUNITY STORIES</span>
+          <h2 id="ya-write-review-title">Write Your Review</h2>
+          <p>Share your authentic experiences from the trail.</p>
         </div>
 
-        <div class="ya-review-form-grid">
-          <div class="ya-field ya-field-full">
-            <label for="ya-modal-rev-title">Review Title *</label>
-            <input type="text" id="ya-modal-rev-title" required placeholder="e.g. Life changing Himalayan expedition">
+        <div class="ya-rev-modal-alert" id="ya-rev-modal-alert" role="status" aria-live="polite"></div>
+
+        <form id="ya-modal-review-form" novalidate>
+          <input type="hidden" id="ya-modal-rev-trek-id" value="<?php echo esc_attr( $post_id ); ?>">
+          <input type="hidden" id="ya-modal-rev-nonce" value="<?php echo esc_attr( wp_create_nonce( 'trek_review_nonce' ) ); ?>">
+
+          <div class="ya-star-rating-wrap">
+            <span class="ya-star-rating-label">Overall Rating *</span>
+            <div class="ya-star-select" role="radiogroup" aria-label="Star Rating">
+              <input type="radio" id="ya-star-5" name="ya-modal-rating" value="5" checked>
+              <label for="ya-star-5" title="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+              <input type="radio" id="ya-star-4" name="ya-modal-rating" value="4">
+              <label for="ya-star-4" title="4 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+              <input type="radio" id="ya-star-3" name="ya-modal-rating" value="3">
+              <label for="ya-star-3" title="3 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+              <input type="radio" id="ya-star-2" name="ya-modal-rating" value="2">
+              <label for="ya-star-2" title="2 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+              <input type="radio" id="ya-star-1" name="ya-modal-rating" value="1">
+              <label for="ya-star-1" title="1 star"><svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg></label>
+            </div>
           </div>
 
-          <div class="ya-field">
-            <label for="ya-modal-rev-type">Traveler Type</label>
-            <select id="ya-modal-rev-type">
-              <option value="Solo Traveler">Solo Traveler</option>
-              <option value="Couples Trek">Couples Trek</option>
-              <option value="Small Group">Small Group</option>
-              <option value="Family Traveler">Family Traveler</option>
-              <option value="Guided Group">Guided Group</option>
-            </select>
-          </div>
+          <div class="ya-review-form-grid">
+            <div class="ya-field ya-field-full">
+              <label for="ya-modal-rev-title">Review Title *</label>
+              <input type="text" id="ya-modal-rev-title" required placeholder="e.g. Unforgettable journey through the Himalayas">
+            </div>
 
-          <div class="ya-field">
-            <label for="ya-modal-rev-date">Tour Date / Season</label>
-            <input type="text" id="ya-modal-rev-date" placeholder="e.g. October 2025">
-          </div>
+            <div class="ya-field">
+              <label for="ya-modal-rev-type">Traveler Type</label>
+              <select id="ya-modal-rev-type">
+                <option value="Solo Traveler">Solo Traveler</option>
+                <option value="Couples Trek">Couples Trek</option>
+                <option value="Small Group">Small Group</option>
+                <option value="Family Trek">Family Trek</option>
+                <option value="Guided Expedition">Guided Expedition</option>
+              </select>
+            </div>
 
-          <div class="ya-field">
-            <label for="ya-modal-rev-name">Your Full Name *</label>
-            <input type="text" id="ya-modal-rev-name" required placeholder="e.g. Marcus Vance">
-          </div>
+            <div class="ya-field">
+              <label for="ya-modal-rev-date">Tour Date / Season</label>
+              <input type="text" id="ya-modal-rev-date" placeholder="e.g. October 2025">
+            </div>
 
-          <div class="ya-field">
-            <label for="ya-modal-rev-email">Email Address *</label>
-            <input type="email" id="ya-modal-rev-email" required placeholder="name@domain.com">
-          </div>
+            <div class="ya-field">
+              <label for="ya-modal-rev-name">Your Full Name *</label>
+              <input type="text" id="ya-modal-rev-name" required placeholder="e.g. Marcus Vance">
+            </div>
 
-          <div class="ya-field ya-field-full">
-            <label for="ya-modal-rev-location">Location / City</label>
-            <input type="text" id="ya-modal-rev-location" placeholder="e.g. Melbourne, Australia">
-          </div>
+            <div class="ya-field">
+              <label for="ya-modal-rev-email">Email Address *</label>
+              <input type="email" id="ya-modal-rev-email" required placeholder="name@domain.com">
+            </div>
 
-          <div class="ya-field ya-field-full">
-            <label for="ya-modal-rev-comment">Your Story / Review *</label>
-            <textarea id="ya-modal-rev-comment" required placeholder="Tell us about the views, guides, pace, teahouses, and memorable moments..."></textarea>
-          </div>
+            <div class="ya-field ya-field-full">
+              <label for="ya-modal-rev-location">Location / Country</label>
+              <input type="text" id="ya-modal-rev-location" placeholder="e.g. Melbourne, Australia">
+            </div>
 
-          <div class="ya-field ya-field-full" style="margin-top:8px;">
-            <button type="submit" class="ya-btn ya-btn-primary" id="ya-modal-rev-submit" style="width:100%;justify-content:center;height:48px;font-size:15px;">
-              Submit Review
-            </button>
+            <div class="ya-field ya-field-full">
+              <label for="ya-modal-rev-comment">Your Story / Review *</label>
+              <textarea id="ya-modal-rev-comment" required placeholder="Share your experience regarding the route, accommodation, acclimatization, and overall expedition..."></textarea>
+            </div>
+
+            <div class="ya-field ya-field-full" style="margin-top:6px;">
+              <button type="submit" class="ya-rev-submit-btn" id="ya-modal-rev-submit">
+                <span>Submit Review for Moderation</span>
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </div>
           </div>
+        </form>
+
+        <div class="ya-rev-modal-success" id="ya-rev-modal-success" role="status" aria-live="polite">
+          <div class="ya-rev-success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h3>Review Submitted!</h3>
+          <p>Thank you for taking the time to share your trail story with our community.</p>
+          <div class="ya-rev-success-note">
+            <strong>Pending Moderation:</strong> To ensure honest and verified traveler experiences, your review will be published once reviewed by our expedition team.
+          </div>
+          <button type="button" class="ya-rev-success-close-btn" id="ya-rev-success-close">Close Window</button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 
@@ -3583,24 +4282,35 @@ $related_query = new WP_Query( array(
 
       // 3. Day-by-Day Interactive Image Carousels (.yt-day-gallery)
       root.querySelectorAll('[data-day-gallery]').forEach(gallery => {
-        const slides    = [...gallery.querySelectorAll('.yt-day-carousel-slide')];
-        const counter   = gallery.querySelector('.yt-gallery-counter');
-        const prevBtn   = gallery.querySelector('.yt-gallery-prev');
-        const nextBtn   = gallery.querySelector('.yt-gallery-next');
-        const total     = slides.length;
+        const slides  = [...gallery.querySelectorAll('.yt-day-carousel-slide')];
+        const dots    = [...gallery.querySelectorAll('.yt-gallery-dot')];
+        const prevBtn = gallery.querySelector('.yt-gallery-prev');
+        const nextBtn = gallery.querySelector('.yt-gallery-next');
+        const counter = gallery.querySelector('.yt-gallery-counter');
+        const total   = slides.length;
         if (total <= 1) return;
 
         let cur = 0;
 
         const goTo = idx => {
           slides[cur].classList.remove('is-active');
+          dots[cur]?.classList.remove('is-active');
           cur = (idx + total) % total;
           slides[cur].classList.add('is-active');
+          dots[cur]?.classList.add('is-active');
           if (counter) counter.textContent = `${cur + 1} / ${total}`;
         };
 
         prevBtn?.addEventListener('click', e => { e.stopPropagation(); goTo(cur - 1); });
         nextBtn?.addEventListener('click', e => { e.stopPropagation(); goTo(cur + 1); });
+
+        // Dot click support
+        dots.forEach((dot, dIdx) => {
+          dot.addEventListener('click', e => {
+            e.stopPropagation();
+            goTo(dIdx);
+          });
+        });
 
         // Keyboard navigation when gallery is focused
         gallery.setAttribute('tabindex', '0');
@@ -3630,19 +4340,30 @@ $related_query = new WP_Query( array(
 
 
 
-      // 6. Travel Reviews: Modal & AJAX Submission
-      const reviewModal = root.querySelector('#ya-write-review-modal');
-      const openReviewBtn = root.querySelector('#ya-open-review-modal');
+      // 6. Travel Reviews: Modal, Validation & AJAX Submission
+      const reviewModal = document.querySelector('#ya-write-review-modal');
+      const openReviewBtns = root.querySelectorAll('#ya-open-review-modal, [data-open-review-modal], .ya-write-review-btn');
       const closeReviewBtn = reviewModal?.querySelector('.ya-review-modal-close');
-      const reviewFormModal = root.querySelector('#ya-modal-review-form');
-      const reviewAlert = root.querySelector('#ya-rev-modal-alert');
+      const successCloseBtn = reviewModal?.querySelector('#ya-rev-success-close');
+      const reviewFormModal = reviewModal?.querySelector('#ya-modal-review-form');
+      const reviewAlert = reviewModal?.querySelector('#ya-rev-modal-alert');
+      const reviewSuccess = reviewModal?.querySelector('#ya-rev-modal-success');
+      const ajaxUrl = '<?php echo esc_url_raw( admin_url( 'admin-ajax.php' ) ); ?>';
 
       const openRevModal = () => {
         if (!reviewModal) return;
+        // Reset form & success state on open
+        if (reviewSuccess) reviewSuccess.classList.remove('is-visible');
+        if (reviewFormModal) reviewFormModal.style.display = '';
+        if (reviewAlert) {
+          reviewAlert.style.display = 'none';
+          reviewAlert.className = 'ya-rev-modal-alert';
+          reviewAlert.textContent = '';
+        }
         reviewModal.classList.add('is-open');
         reviewModal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
-        setTimeout(() => root.querySelector('#ya-modal-rev-title')?.focus(), 50);
+        setTimeout(() => reviewModal.querySelector('#ya-modal-rev-title')?.focus(), 80);
       };
 
       const closeRevModal = () => {
@@ -3652,107 +4373,111 @@ $related_query = new WP_Query( array(
         document.body.style.overflow = '';
       };
 
-      openReviewBtn?.addEventListener('click', openRevModal);
+      openReviewBtns.forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          openRevModal();
+        });
+      });
+
       closeReviewBtn?.addEventListener('click', closeRevModal);
+      successCloseBtn?.addEventListener('click', closeRevModal);
+
       reviewModal?.addEventListener('click', e => {
         if (e.target === reviewModal) closeRevModal();
       });
+
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && reviewModal?.classList.contains('is-open')) closeRevModal();
       });
 
-      // Submit Review Form via REST API
+      // Submit Review Form via WordPress AJAX
       reviewFormModal?.addEventListener('submit', async event => {
         event.preventDefault();
-        const submitBtn = root.querySelector('#ya-modal-rev-submit');
-        const rating = root.querySelector('input[name="ya-modal-rating"]:checked')?.value || '5';
-        const titleVal = getValue('#ya-modal-rev-title');
-        const nameVal = getValue('#ya-modal-rev-name');
-        const emailVal = getValue('#ya-modal-rev-email');
-        const locVal = getValue('#ya-modal-rev-location');
-        const typeVal = getValue('#ya-modal-rev-type');
-        const commentVal = getValue('#ya-modal-rev-comment');
-        const dateVal = getValue('#ya-modal-rev-date');
-        const trekId = root.querySelector('#ya-modal-rev-trek-id')?.value || '';
+        const submitBtn = reviewModal.querySelector('#ya-modal-rev-submit');
+        const rating = reviewModal.querySelector('input[name="ya-modal-rating"]:checked')?.value || '5';
+        const titleVal = reviewModal.querySelector('#ya-modal-rev-title')?.value?.trim() || '';
+        const nameVal = reviewModal.querySelector('#ya-modal-rev-name')?.value?.trim() || '';
+        const emailVal = reviewModal.querySelector('#ya-modal-rev-email')?.value?.trim() || '';
+        const locVal = reviewModal.querySelector('#ya-modal-rev-location')?.value?.trim() || '';
+        const typeVal = reviewModal.querySelector('#ya-modal-rev-type')?.value?.trim() || '';
+        const commentVal = reviewModal.querySelector('#ya-modal-rev-comment')?.value?.trim() || '';
+        const dateVal = reviewModal.querySelector('#ya-modal-rev-date')?.value?.trim() || '';
+        const trekId = reviewModal.querySelector('#ya-modal-rev-trek-id')?.value || '';
+        const nonce = reviewModal.querySelector('#ya-modal-rev-nonce')?.value || '';
 
-        if (!nameVal || !emailVal || !commentVal || !titleVal) {
+        // Validation: Required fields
+        if (!titleVal || !nameVal || !emailVal || !commentVal) {
           if (reviewAlert) {
             reviewAlert.className = 'ya-rev-modal-alert is-error';
-            reviewAlert.textContent = 'Please fill in all required fields (title, your name, email, and review).';
+            reviewAlert.textContent = 'Please complete all required fields (Review Title, Your Name, Email Address, and Review).';
+            reviewAlert.style.display = 'block';
           }
+          if (!titleVal) reviewModal.querySelector('#ya-modal-rev-title')?.focus();
+          else if (!nameVal) reviewModal.querySelector('#ya-modal-rev-name')?.focus();
+          else if (!emailVal) reviewModal.querySelector('#ya-modal-rev-email')?.focus();
+          else reviewModal.querySelector('#ya-modal-rev-comment')?.focus();
+          return;
+        }
+
+        // Validation: Email format
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(emailVal)) {
+          if (reviewAlert) {
+            reviewAlert.className = 'ya-rev-modal-alert is-error';
+            reviewAlert.textContent = 'Please enter a valid email address (e.g. name@example.com).';
+            reviewAlert.style.display = 'block';
+          }
+          reviewModal.querySelector('#ya-modal-rev-email')?.focus();
           return;
         }
 
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.textContent = 'Submitting your review…';
+          submitBtn.innerHTML = '<span>Submitting review…</span>';
         }
         if (reviewAlert) reviewAlert.style.display = 'none';
 
-        const payload = {
-          trek_id: trekId,
-          name: nameVal,
-          email: emailVal,
-          city: locVal,
-          tour_date: dateVal,
-          rating: rating,
-          comment: commentVal,
-          title: titleVal,
-          type: typeVal
-        };
+        const formData = new FormData();
+        formData.append('action', 'ya_submit_trek_review');
+        formData.append('security', nonce);
+        formData.append('trek_id', trekId);
+        formData.append('title', titleVal);
+        formData.append('name', nameVal);
+        formData.append('email', emailVal);
+        formData.append('rating', rating);
+        formData.append('traveler_type', typeVal);
+        formData.append('city', locVal);
+        formData.append('tour_date', dateVal);
+        formData.append('comment', commentVal);
 
         try {
-          const response = await fetch(`${restUrl}reviews`, {
+          const response = await fetch(ajaxUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: formData
           });
-          const data = await response.json();
+          const result = await response.json();
 
-          if (reviewAlert) {
-            reviewAlert.className = 'ya-rev-modal-alert is-success';
-            reviewAlert.innerHTML = `<strong>✔ Thank you, ${nameVal}!</strong> Your review has been saved successfully.`;
+          if (result.success) {
+            // Switch to success view (do NOT auto-add card since review is pending moderation)
+            reviewFormModal.style.display = 'none';
+            reviewFormModal.reset();
+            if (reviewSuccess) {
+              reviewSuccess.classList.add('is-visible');
+            }
+          } else {
+            throw new Error(result.data?.message || result.message || 'We could not submit your review. Please try again.');
           }
-
-          // Prepend new review card to grid
-          const grid = root.querySelector('#ya-reviews-grid');
-          if (grid) {
-            const starsSvg = '<svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>'.repeat(parseInt(rating) || 5);
-            const initials = nameVal.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'U';
-            const card = document.createElement('article');
-            card.className = 'ya-review-card ya-reveal is-visible';
-            card.innerHTML = `
-              <div class="ya-review-top">
-                <div class="ya-review-stars" aria-label="${rating} out of 5 stars">${starsSvg}</div>
-                <span class="ya-review-type-badge">${typeVal || 'Solo Traveler'}</span>
-              </div>
-              <h3 class="ya-review-card-title">${titleVal}</h3>
-              <p class="ya-review-text">${commentVal}</p>
-              <div class="ya-review-author">
-                <div class="ya-review-avatar"><span>${initials}</span></div>
-                <div class="ya-review-author-info">
-                  <strong>${nameVal}</strong>
-                  <small>${locVal || 'Verified Traveller'}</small>
-                </div>
-              </div>
-            `;
-            grid.insertBefore(card, grid.firstChild);
-          }
-
-          reviewFormModal.reset();
-          setTimeout(() => {
-            closeRevModal();
-            if (reviewAlert) reviewAlert.style.display = 'none';
-          }, 1800);
         } catch (err) {
           if (reviewAlert) {
             reviewAlert.className = 'ya-rev-modal-alert is-error';
-            reviewAlert.textContent = err.message || 'An error occurred while saving your review.';
+            reviewAlert.textContent = err.message || 'An error occurred while submitting your review. Please try again.';
+            reviewAlert.style.display = 'block';
           }
         } finally {
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Review';
+            submitBtn.innerHTML = '<span>Submit Review for Moderation</span><svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>';
           }
         }
       });

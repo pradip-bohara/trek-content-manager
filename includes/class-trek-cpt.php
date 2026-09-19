@@ -33,7 +33,11 @@ class Trek_CPT {
         add_action( 'manage_trek_enquiry_posts_custom_column', array( __CLASS__, 'render_enquiry_column' ), 10, 2 );
         add_action( 'admin_post_trek_export_enquiries', array( __CLASS__, 'export_enquiries_csv' ) );
         add_filter( 'post_row_actions', array( __CLASS__, 'add_destination_row_actions' ), 10, 2 );
+        add_filter( 'post_row_actions', array( __CLASS__, 'add_review_row_actions' ), 10, 2 );
+        add_action( 'admin_post_trek_toggle_review_approval', array( __CLASS__, 'admin_toggle_review_approval' ) );
         add_action( 'admin_post_trek_export_single_json', array( __CLASS__, 'export_single_json' ) );
+        add_action( 'wp_ajax_ya_submit_trek_review', array( __CLASS__, 'ajax_submit_review' ), 1 );
+        add_action( 'wp_ajax_nopriv_ya_submit_trek_review', array( __CLASS__, 'ajax_submit_review' ), 1 );
     }
 
     /**
@@ -249,8 +253,12 @@ class Trek_CPT {
                 }
                 break;
             case 'trek_rating':
-                $rating = intval( get_post_meta( $post_id, '_trek_rating', true ) ?: 5 );
-                echo '<span style="color:#c6a45f; font-size:16px;">' . str_repeat( '★', $rating ) . '</span> (' . $rating . '/5)';
+                $rating = floatval( get_post_meta( $post_id, '_trek_rating', true ) ?: 5 );
+                $full_stars = floor( $rating );
+                $half_star  = ( ( $rating - $full_stars ) >= 0.4 );
+                $empty_stars = max( 0, 5 - $full_stars - ( $half_star ? 1 : 0 ) );
+                $stars_str = str_repeat( '★', $full_stars ) . ( $half_star ? '½' : '' ) . str_repeat( '☆', $empty_stars );
+                echo '<span style="color:#c6a45f; font-size:16px;">' . esc_html( $stars_str ) . '</span> (' . esc_html( $rating ) . '/5)';
                 break;
             case 'trek_location':
                 $city = get_post_meta( $post_id, '_trek_city', true );
@@ -402,6 +410,145 @@ class Trek_CPT {
         header( 'Content-Disposition: attachment; filename=' . sanitize_file_name( $filename ) );
         echo wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
         exit;
+    }
+
+    /**
+     * Add "Approve" / "Unapprove" quick actions to trek review rows in WP Admin
+     */
+    public static function add_review_row_actions( $actions, $post ) {
+        if ( 'trek_review' === $post->post_type && current_user_can( 'edit_post', $post->ID ) ) {
+            $approved = get_post_meta( $post->ID, '_trek_approved', true );
+            $is_approved = ( '1' === $approved && 'publish' === $post->post_status );
+            $action_type = $is_approved ? 'unapprove' : 'approve';
+            $url = wp_nonce_url( admin_url( 'admin-post.php?action=trek_toggle_review_approval&id=' . $post->ID . '&toggle=' . $action_type ), 'trek_toggle_review_' . $post->ID );
+            if ( $is_approved ) {
+                $actions['trek_unapprove'] = '<a href="' . esc_url( $url ) . '" style="color:#d97706;font-weight:600;">' . esc_html__( 'Unapprove', 'trek-content-manager' ) . '</a>';
+            } else {
+                $actions['trek_approve'] = '<a href="' . esc_url( $url ) . '" style="color:#059669;font-weight:700;">' . esc_html__( '✓ Approve & Publish', 'trek-content-manager' ) . '</a>';
+            }
+        }
+        return $actions;
+    }
+
+    /**
+     * Admin action to toggle review approval status
+     */
+    public static function admin_toggle_review_approval() {
+        $post_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+        $toggle  = isset( $_GET['toggle'] ) && 'unapprove' === $_GET['toggle'] ? 'unapprove' : 'approve';
+        if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) || ! check_admin_referer( 'trek_toggle_review_' . $post_id ) ) {
+            wp_die( esc_html__( 'You do not have permission to moderate this review.', 'trek-content-manager' ) );
+        }
+
+        if ( 'approve' === $toggle ) {
+            update_post_meta( $post_id, '_trek_approved', '1' );
+            wp_update_post( array(
+                'ID'          => $post_id,
+                'post_status' => 'publish',
+            ) );
+        } else {
+            update_post_meta( $post_id, '_trek_approved', '0' );
+            wp_update_post( array(
+                'ID'          => $post_id,
+                'post_status' => 'pending',
+            ) );
+        }
+
+        wp_safe_redirect( wp_get_referer() ?: admin_url( 'edit.php?post_type=trek_review' ) );
+        exit;
+    }
+
+    /**
+     * Public AJAX Review Submission Handler
+     * Strictly stores reviews with post_status = 'pending' and _trek_approved = '0'.
+     * Never automatically published.
+     */
+    public static function ajax_submit_review() {
+        // Verify nonce
+        $nonce_valid = false;
+        if ( isset( $_POST['security'] ) && wp_verify_nonce( $_POST['security'], 'trek_review_nonce' ) ) {
+            $nonce_valid = true;
+        } elseif ( isset( $_POST['security'] ) && wp_verify_nonce( $_POST['security'], 'wp_rest' ) ) {
+            $nonce_valid = true;
+        } elseif ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) && wp_verify_nonce( $_SERVER['HTTP_X_WP_NONCE'], 'wp_rest' ) ) {
+            $nonce_valid = true;
+        } elseif ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'trek_review_nonce' ) ) {
+            $nonce_valid = true;
+        }
+
+        if ( ! $nonce_valid ) {
+            wp_send_json_error( array( 'message' => __( 'Security verification failed. Please refresh the page and try again.', 'trek-content-manager' ) ), 403 );
+            return;
+        }
+
+        $name       = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+        $email      = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+        $title      = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
+        $comment    = isset( $_POST['comment'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comment'] ) ) : '';
+        $rating_raw = isset( $_POST['rating'] ) ? floatval( $_POST['rating'] ) : 5.0;
+        $rating     = max( 1.0, min( 5.0, $rating_raw ) );
+        $type       = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : 'Solo Traveler';
+        $city       = isset( $_POST['city'] ) ? sanitize_text_field( wp_unslash( $_POST['city'] ) ) : '';
+        $country    = isset( $_POST['country'] ) ? sanitize_text_field( wp_unslash( $_POST['country'] ) ) : '';
+        $tour_date  = isset( $_POST['tour_date'] ) ? sanitize_text_field( wp_unslash( $_POST['tour_date'] ) ) : '';
+        $trek_id    = isset( $_POST['trek_id'] ) ? absint( $_POST['trek_id'] ) : 0;
+
+        // Server-side field validation
+        if ( empty( $name ) ) {
+            wp_send_json_error( array( 'message' => __( 'Please enter your full name.', 'trek-content-manager' ) ), 400 );
+            return;
+        }
+
+        if ( empty( $email ) || ! is_email( $email ) ) {
+            wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'trek-content-manager' ) ), 400 );
+            return;
+        }
+
+        if ( empty( $title ) ) {
+            wp_send_json_error( array( 'message' => __( 'Please enter a review title.', 'trek-content-manager' ) ), 400 );
+            return;
+        }
+
+        if ( empty( $comment ) ) {
+            wp_send_json_error( array( 'message' => __( 'Please write your review.', 'trek-content-manager' ) ), 400 );
+            return;
+        }
+
+        if ( ! $trek_id || 'trek_destination' !== get_post_type( $trek_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid trek destination selected.', 'trek-content-manager' ) ), 400 );
+            return;
+        }
+
+        // Insert as PENDING review (Never automatically published!)
+        $review_post_id = wp_insert_post( array(
+            'post_type'    => 'trek_review',
+            'post_title'   => $name . ' – ' . $title,
+            'post_content' => $comment,
+            'post_status'  => 'pending',
+        ) );
+
+        if ( is_wp_error( $review_post_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Failed to save review in database. Please try again.', 'trek-content-manager' ) ), 500 );
+            return;
+        }
+
+        // Store all associated review meta
+        update_post_meta( $review_post_id, '_trek_id', $trek_id );
+        update_post_meta( $review_post_id, '_trek_rating', $rating );
+        update_post_meta( $review_post_id, '_trek_reviewer_name', $name );
+        update_post_meta( $review_post_id, '_trek_reviewer_email', $email );
+        update_post_meta( $review_post_id, '_trek_review_title', $title );
+        update_post_meta( $review_post_id, '_trek_traveler_type', $type );
+        update_post_meta( $review_post_id, '_trek_city', $city );
+        update_post_meta( $review_post_id, '_trek_country', $country );
+        update_post_meta( $review_post_id, '_trek_tour_date', $tour_date );
+        update_post_meta( $review_post_id, '_trek_approved', '0' ); // Explicitly pending moderation
+
+        wp_send_json_success( array(
+            'success'   => true,
+            'review_id' => $review_post_id,
+            'message'   => __( 'Thank you for sharing your travel experience. Your review has been submitted successfully and is now awaiting approval. Once approved, it will appear in the traveler reviews section.', 'trek-content-manager' ),
+        ) );
     }
 
     public static function add_meta_boxes() {
@@ -3095,16 +3242,22 @@ class Trek_CPT {
     public static function render_review_detail_metabox( $post ) {
         wp_nonce_field( 'save_review_details_action', 'review_details_nonce' );
 
-        $trek_id  = get_post_meta( $post->ID, '_trek_id', true );
-        $rating   = get_post_meta( $post->ID, '_trek_rating', true ) ?: 5;
-        $email    = get_post_meta( $post->ID, '_trek_reviewer_email', true );
-        $city     = get_post_meta( $post->ID, '_trek_city', true );
-        $country  = get_post_meta( $post->ID, '_trek_country', true );
-        $tour_date= get_post_meta( $post->ID, '_trek_tour_date', true );
-        $moment   = get_post_meta( $post->ID, '_trek_moment', true );
-        $leader   = get_post_meta( $post->ID, '_trek_leader', true );
-        $advice   = get_post_meta( $post->ID, '_trek_advice', true );
-        $approved = get_post_meta( $post->ID, '_trek_approved', true ) ?: '1';
+        $trek_id   = get_post_meta( $post->ID, '_trek_id', true );
+        $rating    = get_post_meta( $post->ID, '_trek_rating', true ) ?: 5;
+        $rev_title = get_post_meta( $post->ID, '_trek_review_title', true );
+        $rev_name  = get_post_meta( $post->ID, '_trek_reviewer_name', true ) ?: $post->post_title;
+        $rev_type  = get_post_meta( $post->ID, '_trek_traveler_type', true ) ?: 'Solo Traveler';
+        $email     = get_post_meta( $post->ID, '_trek_reviewer_email', true );
+        $city      = get_post_meta( $post->ID, '_trek_city', true );
+        $country   = get_post_meta( $post->ID, '_trek_country', true );
+        $tour_date = get_post_meta( $post->ID, '_trek_tour_date', true );
+        $moment    = get_post_meta( $post->ID, '_trek_moment', true );
+        $leader    = get_post_meta( $post->ID, '_trek_leader', true );
+        $advice    = get_post_meta( $post->ID, '_trek_advice', true );
+        $approved  = get_post_meta( $post->ID, '_trek_approved', true );
+        if ( '' === $approved ) {
+            $approved = ( 'publish' === $post->post_status ) ? '1' : '0';
+        }
 
         $treks = get_posts( array( 'post_type' => 'trek_destination', 'posts_per_page' => -1, 'post_status' => 'publish' ) );
         ?>
@@ -3122,10 +3275,33 @@ class Trek_CPT {
                 <label style="font-weight:600; display:block; margin-bottom:4px;">Rating (1 - 5 Stars)</label>
                 <select name="review_rating" style="width:100%;">
                     <option value="5" <?php selected( $rating, 5 ); ?>>★★★★★ (5 Stars)</option>
+                    <option value="4.5" <?php selected( strval($rating), '4.5' ); ?>>★★★★½ (4.5 Stars)</option>
                     <option value="4" <?php selected( $rating, 4 ); ?>>★★★★☆ (4 Stars)</option>
+                    <option value="3.5" <?php selected( strval($rating), '3.5' ); ?>>★★★½☆ (3.5 Stars)</option>
                     <option value="3" <?php selected( $rating, 3 ); ?>>★★★☆☆ (3 Stars)</option>
                     <option value="2" <?php selected( $rating, 2 ); ?>>★★☆☆☆ (2 Stars)</option>
                     <option value="1" <?php selected( $rating, 1 ); ?>>★☆☆☆☆ (1 Star)</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin-bottom:14px;">
+            <div>
+                <label style="font-weight:600; display:block; margin-bottom:4px;">Review Title</label>
+                <input type="text" name="review_title" value="<?php echo esc_attr( $rev_title ); ?>" placeholder="e.g. Life changing Himalayan expedition" style="width:100%;">
+            </div>
+            <div>
+                <label style="font-weight:600; display:block; margin-bottom:4px;">Reviewer Name</label>
+                <input type="text" name="review_name" value="<?php echo esc_attr( $rev_name ); ?>" placeholder="e.g. Sarah Jenkins" style="width:100%;">
+            </div>
+            <div>
+                <label style="font-weight:600; display:block; margin-bottom:4px;">Traveler Type</label>
+                <select name="review_type" style="width:100%;">
+                    <option value="Solo Traveler" <?php selected( $rev_type, 'Solo Traveler' ); ?>>Solo Traveler</option>
+                    <option value="Couples Trek" <?php selected( $rev_type, 'Couples Trek' ); ?>>Couples Trek</option>
+                    <option value="Small Group" <?php selected( $rev_type, 'Small Group' ); ?>>Small Group</option>
+                    <option value="Family Traveler" <?php selected( $rev_type, 'Family Traveler' ); ?>>Family Traveler</option>
+                    <option value="Guided Group" <?php selected( $rev_type, 'Guided Group' ); ?>>Guided Group</option>
                 </select>
             </div>
         </div>
@@ -3170,6 +3346,9 @@ class Trek_CPT {
                 <input type="checkbox" name="review_approved" value="1" <?php checked( $approved, '1' ); ?>>
                 <?php esc_html_e( 'Approved / Published to Frontend View Page', 'trek-content-manager' ); ?>
             </label>
+            <p style="margin:4px 0 0; font-size:12px; color:#6b7280;">
+                <?php esc_html_e( 'When checked, this review will be marked as Approved (Published) and will appear on the linked trek destination page.', 'trek-content-manager' ); ?>
+            </p>
         </div>
         <?php
     }
@@ -3187,6 +3366,9 @@ class Trek_CPT {
         $fields = array(
             'review_trek_id'   => '_trek_id',
             'review_rating'    => '_trek_rating',
+            'review_title'     => '_trek_review_title',
+            'review_name'      => '_trek_reviewer_name',
+            'review_type'      => '_trek_traveler_type',
             'review_email'     => '_trek_reviewer_email',
             'review_city'      => '_trek_city',
             'review_country'   => '_trek_country',

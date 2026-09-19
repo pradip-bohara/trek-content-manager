@@ -1344,6 +1344,45 @@ class Trek_Importer {
                 if ( ! empty( $clean_revs ) ) {
                     update_post_meta( $post_id, '_trek_curated_reviews', $clean_revs );
                     update_post_meta( $post_id, '_trek_reviews_list', $clean_revs );
+
+                    // Also store imported reviews as published trek_review CPT records if not already created
+                    foreach ( $clean_revs as $c_rev ) {
+                        $existing_review = get_posts( array(
+                            'post_type'      => 'trek_review',
+                            'post_status'    => array( 'publish', 'pending' ),
+                            'posts_per_page' => 1,
+                            'meta_query'     => array(
+                                array(
+                                    'key'     => '_trek_id',
+                                    'value'   => $post_id,
+                                    'compare' => '=',
+                                ),
+                                array(
+                                    'key'     => '_trek_reviewer_name',
+                                    'value'   => $c_rev['name'],
+                                    'compare' => '=',
+                                ),
+                            ),
+                        ) );
+
+                        if ( empty( $existing_review ) ) {
+                            $rev_cpt_id = wp_insert_post( array(
+                                'post_type'    => 'trek_review',
+                                'post_title'   => $c_rev['name'] . ' – ' . ( $c_rev['title'] ?? 'Himalayan Journey' ),
+                                'post_content' => $c_rev['quote'],
+                                'post_status'  => 'publish',
+                            ) );
+                            if ( $rev_cpt_id && ! is_wp_error( $rev_cpt_id ) ) {
+                                update_post_meta( $rev_cpt_id, '_trek_id', $post_id );
+                                update_post_meta( $rev_cpt_id, '_trek_rating', floatval( $c_rev['rating'] ?? 5.0 ) );
+                                update_post_meta( $rev_cpt_id, '_trek_reviewer_name', $c_rev['name'] );
+                                update_post_meta( $rev_cpt_id, '_trek_review_title', $c_rev['title'] ?? 'An Unforgettable Experience!' );
+                                update_post_meta( $rev_cpt_id, '_trek_traveler_type', $c_rev['type'] ?? 'Solo Traveler' );
+                                update_post_meta( $rev_cpt_id, '_trek_city', $c_rev['location'] ?? '' );
+                                update_post_meta( $rev_cpt_id, '_trek_approved', '1' );
+                            }
+                        }
+                    }
                 }
             }
 
