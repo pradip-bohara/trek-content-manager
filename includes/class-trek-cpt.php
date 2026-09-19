@@ -234,9 +234,12 @@ class Trek_CPT {
         $new_columns = array();
         $new_columns['cb'] = $columns['cb'];
         $new_columns['title'] = __( 'Reviewer Name', 'trek-content-manager' );
+        $new_columns['trek_review_title'] = __( 'Review Title', 'trek-content-manager' );
+        $new_columns['trek_email'] = __( 'Email', 'trek-content-manager' );
         $new_columns['trek_name'] = __( 'Trek Destination', 'trek-content-manager' );
         $new_columns['trek_rating'] = __( 'Rating', 'trek-content-manager' );
         $new_columns['trek_location'] = __( 'Location', 'trek-content-manager' );
+        $new_columns['trek_tour_date'] = __( 'Tour Date', 'trek-content-manager' );
         $new_columns['trek_status'] = __( 'Status', 'trek-content-manager' );
         $new_columns['date'] = $columns['date'];
         return $new_columns;
@@ -244,6 +247,14 @@ class Trek_CPT {
 
     public static function render_review_column( $column, $post_id ) {
         switch ( $column ) {
+            case 'trek_review_title':
+                $rev_title = get_post_meta( $post_id, '_trek_review_title', true );
+                echo '<strong>' . esc_html( $rev_title ?: get_the_title( $post_id ) ) . '</strong>';
+                break;
+            case 'trek_email':
+                $email = get_post_meta( $post_id, '_trek_reviewer_email', true ) ?: get_post_meta( $post_id, '_trek_email', true );
+                echo $email ? '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>' : '—';
+                break;
             case 'trek_name':
                 $trek_id = get_post_meta( $post_id, '_trek_id', true );
                 if ( $trek_id && get_post( $trek_id ) ) {
@@ -258,7 +269,7 @@ class Trek_CPT {
                 $half_star  = ( ( $rating - $full_stars ) >= 0.4 );
                 $empty_stars = max( 0, 5 - $full_stars - ( $half_star ? 1 : 0 ) );
                 $stars_str = str_repeat( '★', $full_stars ) . ( $half_star ? '½' : '' ) . str_repeat( '☆', $empty_stars );
-                echo '<span style="color:#c6a45f; font-size:16px;">' . esc_html( $stars_str ) . '</span> (' . esc_html( $rating ) . '/5)';
+                echo '<span style="color:#cfab55; font-size:16px;">' . esc_html( $stars_str ) . '</span> (' . esc_html( $rating ) . '/5)';
                 break;
             case 'trek_location':
                 $city = get_post_meta( $post_id, '_trek_city', true );
@@ -266,12 +277,16 @@ class Trek_CPT {
                 $loc = array_filter( array( $city, $country ) );
                 echo esc_html( ! empty( $loc ) ? implode( ', ', $loc ) : '—' );
                 break;
+            case 'trek_tour_date':
+                $tour_date = get_post_meta( $post_id, '_trek_tour_date', true );
+                echo esc_html( $tour_date ?: '—' );
+                break;
             case 'trek_status':
                 $approved = get_post_meta( $post_id, '_trek_approved', true );
                 if ( '1' === $approved && 'publish' === get_post_status( $post_id ) ) {
-                    echo '<span style="color:#0a7a3b; font-weight:700; background:#e6f6ec; padding:3px 8px; border-radius:4px;">' . esc_html__( 'Approved', 'trek-content-manager' ) . '</span>';
+                    echo '<span style="color:#617555; font-weight:700; background:#f4f6f2; padding:3px 8px; border-radius:4px; border:1px solid #dce5da;">' . esc_html__( 'Approved', 'trek-content-manager' ) . '</span>';
                 } else {
-                    echo '<span style="color:#b26b00; font-weight:700; background:#fff8e6; padding:3px 8px; border-radius:4px;">' . esc_html__( 'Pending Moderation', 'trek-content-manager' ) . '</span>';
+                    echo '<span style="color:#b26b00; font-weight:700; background:#fff8e6; padding:3px 8px; border-radius:4px; border:1px solid #fed7aa;">' . esc_html__( 'Pending Moderation', 'trek-content-manager' ) . '</span>';
                 }
                 break;
         }

@@ -238,12 +238,12 @@ if ( empty( $accordions ) ) {
 }
 
 // 9. Reviews
-$rev_kicker          = get_post_meta( $post_id, '_trek_review_kicker', true ) ?: 'Traveller Stories';
+$rev_kicker          = get_post_meta( $post_id, '_trek_review_kicker', true ) ?: 'GUEST STORIES';
 $rev_script          = get_post_meta( $post_id, '_trek_review_script', true ) ?: 'From the Trail';
-$rev_heading         = get_post_meta( $post_id, '_trek_review_heading', true ) ?: ( $title . ' Reviews' );
-$rev_subtext         = get_post_meta( $post_id, '_trek_review_subtext', true ) ?: 'Read verified traveller reviews or share your feedback directly with our team.';
+$rev_heading         = get_post_meta( $post_id, '_trek_review_heading', true ) ?: 'Traveler Reviews';
+$rev_subtext         = get_post_meta( $post_id, '_trek_review_subtext', true ) ?: '';
 
-// Query approved database reviews for this specific trek
+// 1. Query approved database reviews for this specific trek
 $db_reviews_query = new WP_Query( array(
     'post_type'      => 'trek_review',
     'posts_per_page' => 50,
@@ -280,34 +280,25 @@ if ( ! function_exists( 'ya_get_reviewer_initials' ) ) {
     }
 }
 
-// Destination options for review form dropdown
-$dest_options = array();
-$all_trek_destinations = get_posts( array(
-    'post_type'      => 'trek_destination',
-    'post_status'    => 'publish',
-    'posts_per_page' => 50,
-    'orderby'        => 'title',
-    'order'          => 'ASC',
-) );
-if ( ! empty( $all_trek_destinations ) ) {
-    foreach ( $all_trek_destinations as $td_post ) {
-        $dest_options[] = $td_post->post_title;
+// Avatar pastel color palette cycle (matching reference design)
+if ( ! function_exists( 'ya_get_avatar_colors' ) ) {
+    function ya_get_avatar_colors( $index ) {
+        $palettes = array(
+            array( 'bg' => '#fef3c7', 'color' => '#b45309' ), // Warm yellow / amber (SJ)
+            array( 'bg' => '#fce7f3', 'color' => '#be185d' ), // Soft pink / rose (ME)
+            array( 'bg' => '#dbeafe', 'color' => '#1d4ed8' ), // Soft blue (DC)
+            array( 'bg' => '#fef3c7', 'color' => '#d97706' ), // Amber (HT)
+            array( 'bg' => '#d1fae5', 'color' => '#047857' ), // Soft mint / green (RJ)
+            array( 'bg' => '#ede9fe', 'color' => '#6d28d9' ), // Soft lavender / purple (WR)
+        );
+        return $palettes[ $index % count( $palettes ) ];
     }
 }
-$default_dest_options = array(
-    'Everest Base Camp',
-    'Annapurna Circuit',
-    'Manaslu Circuit',
-    'Upper Mustang',
-    'Kathmandu Valley',
-    'Chitwan & Pokhara',
-    'Custom Bespoke Journey'
-);
-$dest_options = array_values( array_unique( array_merge( $dest_options, $default_dest_options ) ) );
 
 $display_reviews = array();
+$seen_authors = array();
 
-// Strictly query approved/published reviews for THIS specific trek destination only
+// 2. Add approved reviews from the database
 if ( isset( $db_reviews_query ) && $db_reviews_query->have_posts() ) {
     while ( $db_reviews_query->have_posts() ) {
         $db_reviews_query->the_post();
@@ -319,22 +310,71 @@ if ( isset( $db_reviews_query ) && $db_reviews_query->have_posts() ) {
         $rev_title = get_post_meta( $rid, '_trek_review_title', true ) ?: 'An Unforgettable Experience!';
         $rev_name  = get_post_meta( $rid, '_trek_reviewer_name', true ) ?: get_the_title();
         $rev_trip  = get_post_meta( $rid, '_trek_trip_name', true ) ?: $title;
-        $rev_date  = get_post_meta( $rid, '_trek_tour_date', true ) ?: get_the_date( 'M j, Y', $rid );
+        $rev_date  = get_post_meta( $rid, '_trek_tour_date', true ) ?: get_the_date( 'M Y', $rid );
         $rating_val = floatval( get_post_meta( $rid, '_trek_rating', true ) ?: 5.0 );
+        
+        $author_key = strtolower( trim( $rev_name ) );
+        $seen_authors[ $author_key ] = true;
+
         $display_reviews[] = array(
-            'title'       => $rev_title,
-            'name'        => $rev_name,
-            'location'    => ! empty( $loc ) ? implode( ', ', $loc ) : ( get_post_meta( $rid, '_trek_city', true ) ?: 'Verified Traveller' ),
-            'rating'      => $rating_val,
-            'quote'       => get_the_content(),
-            'type'        => $rev_type,
-            'trip'        => $rev_trip,
-            'date'        => $rev_date,
+            'title'    => $rev_title,
+            'name'     => $rev_name,
+            'location' => ! empty( $loc ) ? implode( ', ', $loc ) : ( $city ?: 'Verified Traveller' ),
+            'rating'   => $rating_val,
+            'quote'    => get_the_content(),
+            'type'     => $rev_type,
+            'trip'     => $rev_trip,
+            'date'     => $rev_date,
         );
     }
     wp_reset_postdata();
 }
-// STRICT DATA INTEGRITY: ZERO fallback reviews. If no approved reviews exist, $display_reviews remains empty.
+
+// 3. Add curated reviews from Admin Menu or JSON file (_trek_curated_reviews / _trek_reviews_list)
+$curated_reviews = get_post_meta( $post_id, '_trek_curated_reviews', true );
+if ( empty( $curated_reviews ) || ! is_array( $curated_reviews ) ) {
+    $curated_reviews = get_post_meta( $post_id, '_trek_reviews_list', true );
+}
+if ( ! empty( $curated_reviews ) && is_array( $curated_reviews ) ) {
+    foreach ( $curated_reviews as $c_rev ) {
+        $c_name = trim( $c_rev['name'] ?? '' );
+        if ( empty( $c_name ) ) continue;
+        $author_key = strtolower( $c_name );
+        // Avoid duplicate if already added via database review
+        if ( isset( $seen_authors[ $author_key ] ) ) continue;
+        $seen_authors[ $author_key ] = true;
+
+        $c_rating = floatval( $c_rev['rating'] ?? 5.0 );
+        $c_title  = ! empty( $c_rev['title'] ) ? $c_rev['title'] : 'An Unforgettable Experience!';
+        $c_type   = ! empty( $c_rev['type'] ) ? $c_rev['type'] : 'Solo Traveler';
+        $c_date   = ! empty( $c_rev['date'] ) ? $c_rev['date'] : ( ! empty( $c_rev['tour_date'] ) ? $c_rev['tour_date'] : '' );
+        $c_loc    = ! empty( $c_rev['location'] ) ? $c_rev['location'] : '';
+        $c_quote  = ! empty( $c_rev['quote'] ) ? $c_rev['quote'] : ( $c_rev['comment'] ?? '' );
+
+        $display_reviews[] = array(
+            'title'    => $c_title,
+            'name'     => $c_name,
+            'location' => $c_loc,
+            'rating'   => $c_rating,
+            'quote'    => $c_quote,
+            'type'     => $c_type,
+            'trip'     => $title,
+            'date'     => $c_date,
+        );
+    }
+}
+
+// Calculate dynamic average rating
+$total_rating = 0;
+if ( ! empty( $display_reviews ) ) {
+    foreach ( $display_reviews as $r ) {
+        $total_rating += floatval( $r['rating'] );
+    }
+    $avg_rating_num = round( $total_rating / count( $display_reviews ), 1 );
+    $avg_rating_formatted = number_format( $avg_rating_num, 1 );
+} else {
+    $avg_rating_formatted = '4.9';
+}
 
 // 10. Fixed Departure & Contact
 $dep_kicker          = get_post_meta( $post_id, '_trek_dep_kicker', true ) ?: 'Travel Together';
@@ -841,7 +881,7 @@ $related_query = new WP_Query( array(
         justify-content:flex-start;
         padding:10px 14px;
         border:0;
-        border-radius:8px;
+        border-radius:0;
         background:transparent;
         color:#525f51;
         font-size:14px;
@@ -946,41 +986,103 @@ $related_query = new WP_Query( array(
     }
     .ya-ebc-page .ya-overview-text p{margin:0 0 16px}
 
-    /* Vertical highlights list with green checkmarks */
-    .ya-ebc-page .ya-inclusions-checklist{
-      margin:28px 0 0;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
+    /* ── Trip Highlights / Inclusions Checklist (Clean, Editorial & Responsive) ── */
+    .ya-ebc-page .ya-inclusions-checklist {
+      margin-top: 40px;
+      padding-top: 36px;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 100px;
     }
-    .ya-ebc-page .ya-check-item{
-      display:flex;
-      align-items:flex-start;
-      gap:12px;
+    .ya-ebc-page .ya-highlights-header {
+      margin-bottom: 24px;
     }
-    .ya-ebc-page .ya-check-icon{
-      flex-shrink:0;
-      width:22px;
-      height:22px;
-      border-radius:50%;
-      background:rgba(97,117,85,.14);
-      color:var(--green-2);
-      display:grid;
-      place-items:center;
-      margin-top:2px;
+    .ya-ebc-page .ya-highlights-header .ya-kicker {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: #cfab55;
+      margin-bottom: 8px;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    .ya-ebc-page .ya-check-icon svg{width:13px;height:13px;stroke:var(--green-2)}
-    .ya-ebc-page .ya-check-content strong{
-      display:block;
-      font-size:14.5px;
-      font-weight:700;
-      color:var(--ink);
-      line-height:1.35;
+    .ya-ebc-page .ya-highlights-header h3 {
+      margin: 0 0 8px;
+      font: 600 clamp(24px, 2.6vw, 32px) / 1.2 "Newsreader", Georgia, serif;
+      color: #16332a;
+      letter-spacing: -0.01em;
     }
-    .ya-ebc-page .ya-check-desc{
-      font-size:13px;
-      color:var(--muted);
-      margin-top:2px;
+    .ya-ebc-page .ya-highlights-header p {
+      margin: 0;
+      color: #637069;
+      font-size: 14.5px;
+      line-height: 1.6;
+      max-width: 640px;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px 28px;
+    }
+    .ya-ebc-page .ya-check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid #f0eee9;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .ya-ebc-page .ya-check-item:hover {
+      border-color: #dfd7cb;
+      transform: translateY(-1px);
+    }
+    .ya-ebc-page .ya-check-icon {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(97, 117, 85, 0.1);
+      color: #617555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .ya-ebc-page .ya-check-item:hover .ya-check-icon {
+      background: #617555;
+      color: #ffffff;
+    }
+    .ya-ebc-page .ya-check-icon svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+    }
+    .ya-ebc-page .ya-check-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .ya-ebc-page .ya-check-content strong {
+      display: block;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #1a2e26;
+      line-height: 1.4;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-check-desc {
+      font-size: 13px;
+      color: #637069;
+      line-height: 1.6;
+      margin-top: 4px;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-check-desc p {
+      margin: 0;
     }
 
     /* Right Column: Landscape Photo + Trip Facts Card */
@@ -1058,26 +1160,125 @@ $related_query = new WP_Query( array(
       font-style:italic;
     }
 
-    /* Roadmap Section */
+    /* Roadmap Section (Clean, Editorial & Transparent) */
     .ya-ebc-page .ya-roadmap-section{
-      margin-top:36px;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:10px;
-      padding:24px;
-      box-shadow:0 6px 20px rgba(27,35,27,.03);
+      margin-top:48px;
+      padding-top:36px;
+      border-top:1px solid var(--line);
+      background:transparent;
+      border-radius:0;
+      padding-left:0;
+      padding-right:0;
+      padding-bottom:0;
+      box-shadow:none;
+      scroll-margin-top:100px;
     }
-    .ya-ebc-page .ya-roadmap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
-    .ya-ebc-page .ya-roadmap-header h3{margin:4px 0 0;font:600 22px/1.2 "Newsreader",Georgia,serif;color:var(--ink)}
-    .ya-ebc-page .ya-roadmap-frame{position:relative;border-radius:8px;overflow:hidden;background:#eee;max-height:500px}
-    .ya-ebc-page .ya-roadmap-frame img{width:100%;height:auto;display:block;object-fit:cover}
-    .ya-ebc-page .ya-roadmap-caption{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12.5px;color:var(--muted)}
-    .ya-ebc-page .ya-roadmap-caption svg{width:16px;height:16px;color:var(--gold);flex-shrink:0}
+    .ya-ebc-page .ya-roadmap-header{
+      margin-bottom:22px;
+    }
+    .ya-ebc-page .ya-roadmap-header .ya-kicker{
+      display:block;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:1.8px;
+      text-transform:uppercase;
+      color:#cfab55;
+      margin-bottom:8px;
+      font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;
+    }
+    .ya-ebc-page .ya-roadmap-header h3{
+      margin:0;
+      font:600 clamp(24px,2.6vw,32px)/1.2 "Newsreader",Georgia,serif;
+      color:#16332a;
+      letter-spacing:-0.01em;
+    }
+    .ya-ebc-page .ya-roadmap-frame{
+      position:relative;
+      border-radius:4px;
+      overflow:hidden;
+    }
+    .ya-ebc-page .ya-roadmap-frame img{
+      width:100%;
+      height:auto;
+      display:block;
+      object-fit:contain;
+      max-height:600px;
+      margin:0 auto;
+    }
+    .ya-ebc-page .ya-roadmap-trail-strip{
+      display:flex;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:12px 24px;
+      margin-top:18px;
+      padding:16px 22px;
+      border-radius:8px;
+      font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;
+    }
+    .ya-ebc-page .ya-trail-point{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .ya-ebc-page .ya-trail-label{
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:0.8px;
+      text-transform:uppercase;
+      color:#718079;
+    }
+    .ya-ebc-page .ya-trail-point strong{
+      font-size:14.5px;
+      font-weight:700;
+      color:#1a2e26;
+    }
+    .ya-ebc-page .ya-trail-point--highlight strong{
+      color:#617555;
+    }
+    .ya-ebc-page .ya-trail-sep{
+      color:#cfab55;
+      display:flex;
+      align-items:center;
+    }
+    .ya-ebc-page .ya-trail-sep svg{
+      width:16px;
+      height:16px;
+    }
+    .ya-ebc-page .ya-trail-dist{
+      margin-left:auto;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      text-align:right;
+    }
+    .ya-ebc-page .ya-trail-dist strong{
+      font-size:14.5px;
+      font-weight:700;
+      color:#cfab55;
+    }
+    .ya-ebc-page .ya-map-file-cta .ya-btn{
+      background:#617555;
+      color:#ffffff;
+      border-radius:8px;
+      font-size:13.5px;
+      font-weight:600;
+      padding:10px 22px;
+      border:1px solid #617555;
+      transition:all 0.2s ease;
+      box-shadow:0 2px 8px rgba(97,117,85,0.15);
+    }
+    .ya-ebc-page .ya-map-file-cta .ya-btn:hover{
+      background:#cfab55;
+      border-color:#cfab55;
+      color:#ffffff;
+      transform:translateY(-1px);
+      box-shadow:0 4px 14px rgba(207,171,85,0.25);
+    }
 
     /* 5. ITINERARY SECTION: Luxury Editorial 3-Column Cards */
     .ya-ebc-page .yt-itin-header {
-      margin-bottom: 44px;
-      padding-bottom: 28px;
+      margin-bottom: 36px;
+      padding-bottom: 24px;
       border-bottom: 1px solid var(--line);
     }
     .ya-ebc-page .yt-itin-eyebrow {
@@ -1089,26 +1290,22 @@ $related_query = new WP_Query( array(
       font-weight: 800;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--gold);
-      font-family: Inter, Arial, sans-serif;
-    }
-    .ya-ebc-page .yt-itin-dash {
-      width: 24px;
-      height: 2px;
-      background: var(--gold);
-      border-radius: 1px;
+      color: #cfab55;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .ya-ebc-page .yt-itin-h2 {
       margin: 0 0 10px;
-      font: 600 clamp(28px, 3.4vw, 40px) / 1.15 "Newsreader", Georgia, serif;
-      color: var(--green);
+      font: 600 clamp(28px, 3.2vw, 38px) / 1.15 "Newsreader", Georgia, serif;
+      color: #16332a;
+      letter-spacing: -0.01em;
     }
     .ya-ebc-page .yt-itin-desc {
       margin: 0;
-      font-size: 15.5px;
-      line-height: 1.75;
-      color: var(--muted);
-      max-width: 700px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #637069;
+      max-width: 680px;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .ya-ebc-page .yt-days-list {
       display: flex;
@@ -1119,7 +1316,7 @@ $related_query = new WP_Query( array(
     /* Itinerary Day Editorial Card */
     .ya-ebc-page .yt-day-card {
      
-      padding: 28px 28px 28px 24px;
+      padding: 20px 10px 20px 15px !important;
       display: grid;
       grid-template-columns: 140px minmax(0, 1fr) 340px;
       gap: 0;
@@ -1127,10 +1324,11 @@ $related_query = new WP_Query( array(
       overflow: hidden;
       transition: box-shadow .3s ease, border-color .3s ease;
       position: relative;
+      box-sizing: border-box !important;
     }
     .ya-ebc-page .yt-day-card:hover {
-      box-shadow: 0 10px 40px rgba(23, 63, 56, 0.10);
-      border-color: #d4cbbc;
+      box-shadow: 0 10px 32px rgba(22, 51, 42, 0.08);
+      border-color: #dfd7cc;
     }
     /* Subtle left accent line per card */
     .ya-ebc-page .yt-day-card::before {
@@ -1223,7 +1421,7 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .yt-day-pills {
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
+      gap: 8px;
       margin-top: auto;
       padding-top: 14px;
       border-top: 1px solid #f0ece3;
@@ -1231,31 +1429,34 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .yt-pill {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      background: #f2f6ef;
-      border-radius: 999px;
-      padding: 5px 12px 5px 9px;
-      font-size: 11.5px;
+      gap: 6px;
+      background: transparent;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
       font-weight: 600;
-      color: var(--green);
-      border: 1px solid #dde8de;
+      color: #485648;
+      border: 1px solid #d5cebf;
       letter-spacing: 0.01em;
+      transition: border-color 0.2s ease, color 0.2s ease;
     }
     .ya-ebc-page .yt-pill:hover {
-      background: #e8f0e8;
+      background: transparent;
+      border-color: #cfab55;
+      color: #16332a;
     }
     .ya-ebc-page .yt-pill-icon {
-      width: 13px;
-      height: 13px;
+      width: 14px;
+      height: 14px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      opacity: 0.8;
+      color: #617555;
     }
     .ya-ebc-page .yt-pill-icon svg {
-      width: 12px;
-      height: 12px;
+      width: 13px;
+      height: 13px;
     }
 
     /* Right Column: Image Gallery Carousel — fixed 16:10 aspect */
@@ -1581,86 +1782,104 @@ $related_query = new WP_Query( array(
       align-items: center;
       gap: 8px;
       border-radius: 8px;
-      background: var(--green);
+      background: #617555;
       color: #ffffff;
-      border: 1px solid var(--green);
-      box-shadow: 0 4px 14px rgba(22, 51, 42, 0.12);
+      border: 1px solid #617555;
+      box-shadow: 0 4px 14px rgba(97, 117, 85, 0.12);
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .ya-ebc-page .ya-write-rev-btn:hover {
-      background: #0d231d;
-      border-color: #0d231d;
+      background: #cfab55;
+      border-color: #cfab55;
+      color: #ffffff;
       transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(22, 51, 42, 0.2);
+      box-shadow: 0 6px 18px rgba(207, 171, 85, 0.25);
     }
 
-    /* ── Traveler Reviews Redesign ────────────────────────────────────── */
+    /* ── Traveler Reviews (Exact Reference Match) ────────────────────── */
     #ya-panel-review {
       position: relative;
       background: #ffffff;
-      padding: 64px 0 80px;
+      padding: 36px 0 48px;
     }
     .ya-ebc-page .ya-rev-head-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      gap: 24px;
-      margin-bottom: 40px;
+      gap: 20px;
+      margin-bottom: 32px;
       flex-wrap: wrap;
     }
-    .ya-ebc-page .ya-rev-head-row .ya-kicker {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #b38838;
-      margin-bottom: 6px;
-    }
-    .ya-ebc-page .ya-rev-head-row h2 {
-      margin: 0 0 8px;
-      font: 600 clamp(28px, 3.2vw, 42px) / 1.15 "Newsreader", Georgia, serif;
-      color: #1a2e26;
-    }
-    .ya-ebc-page .ya-rev-head-row p {
-      margin: 0;
-      color: #637069;
-      font-size: 15px;
-      line-height: 1.6;
-      max-width: 580px;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    .ya-ebc-page .ya-rev-cta-btn {
+    .ya-ebc-page .ya-rev-kicker-row {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 24px;
-      border-radius: 999px;
-      background: #045857;
+      margin-bottom: 8px;
+    }
+    .ya-ebc-page .ya-rev-kicker {
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #cfab55;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-kicker-sep {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #d1d5db;
+    }
+    .ya-ebc-page .ya-rev-kicker-rating {
+      font-size: 13px;
+      font-weight: 700;
+      color: #cfab55;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ya-ebc-page .ya-rev-star-sym {
+      color: #cfab55;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .ya-ebc-page .ya-rev-heading {
+      margin: 0;
+      font: 700 clamp(30px, 3.6vw, 40px) / 1.15 "Newsreader", Georgia, serif;
+      color: #18181b;
+      letter-spacing: -0.015em;
+    }
+    .ya-ebc-page .ya-rev-write-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 24px;
+      border-radius: 8px;
+      background: #617555;
       color: #ffffff;
       font-size: 14px;
       font-weight: 600;
-      letter-spacing: 0.02em;
-      border: 1px solid #045857;
-      box-shadow: 0 4px 14px rgba(4, 88, 87, 0.15);
+      letter-spacing: 0.01em;
+      border: 1px solid #617555;
+      box-shadow: 0 1px 3px rgba(97, 117, 85, 0.15);
       cursor: pointer;
-      transition: all 0.22s ease;
+      transition: all 0.2s ease;
       white-space: nowrap;
       text-decoration: none;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    .ya-ebc-page .ya-rev-cta-btn:hover {
-      background: #022f2e;
-      border-color: #022f2e;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(4, 88, 87, 0.25);
-    }
-    .ya-ebc-page .ya-rev-cta-btn svg {
-      width: 16px;
-      height: 16px;
+    .ya-ebc-page .ya-rev-write-btn:hover {
+      background: #cfab55;
+      border-color: #cfab55;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(207, 171, 85, 0.25);
     }
 
-    /* Review Cards Desktop/Tablet Grid */
+    /* Review Cards 3-Column Grid */
     .ya-ebc-page .ya-review-cards-wrap {
       position: relative;
       width: 100%;
@@ -1676,87 +1895,62 @@ $related_query = new WP_Query( array(
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 30px;
-      border: 1px solid #eae6de;
-      border-radius: 18px;
+      padding: 24px !important;
+      border: 1px solid #ede8e3;
+      border-radius: 14px;
       background: #ffffff;
-      box-shadow: 0 2px 14px rgba(18, 38, 32, 0.035);
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
-      box-sizing: border-box;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.025);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      box-sizing: border-box !important;
+      min-height: 220px;
     }
     .ya-ebc-page .ya-review-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(18, 38, 32, 0.08);
-      border-color: #dfd9ce;
-    }
-    .ya-ebc-page .ya-rev-card-top {
-      margin-bottom: 16px;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+      border-color: #dfd7cc;
     }
     .ya-ebc-page .ya-rev-card-top-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       gap: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     .ya-ebc-page .ya-rev-card-title {
       margin: 0;
-      font: 600 18px / 1.35 "Newsreader", Georgia, serif;
-      color: #1a2e26;
+      font-size: 15.5px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: #18181b;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
       flex-grow: 1;
     }
-    .ya-ebc-page .ya-rev-stars {
+    .ya-ebc-page .ya-rev-card-score {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #cfab55;
       display: inline-flex;
       align-items: center;
-      gap: 2px;
+      gap: 4px;
       flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .ya-ebc-page .ya-star-svg {
-      width: 14px;
-      height: 14px;
-      display: block;
-    }
-    .ya-ebc-page .ya-star-svg.is-full {
-      fill: #c6a45f;
-    }
-    .ya-ebc-page .ya-star-svg.is-empty {
-      fill: #e5e7eb;
-    }
-    .ya-ebc-page .ya-rev-type-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #617555;
-      background: #f4f7f2;
-      border: 1px solid #e1e8dd;
-      border-radius: 999px;
-      padding: 2px 9px;
-      line-height: 1.4;
       font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .ya-ebc-page .ya-rev-card-text {
       flex-grow: 1;
       margin: 0 0 20px;
-      padding: 0;
-      border: none;
     }
     .ya-ebc-page .ya-rev-card-text p {
       margin: 0;
-      font-size: 14.5px;
-      line-height: 1.68;
-      color: #4a5651;
+      font-size: 13.5px;
+      line-height: 1.62;
+      color: #4b5563;
       font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .ya-ebc-page .ya-rev-card-bottom {
-      border-top: 1px solid #f0ede6;
-      padding-top: 16px;
+      padding-top: 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
     }
     .ya-ebc-page .ya-rev-author {
       display: flex;
@@ -1765,12 +1959,9 @@ $related_query = new WP_Query( array(
       min-width: 0;
     }
     .ya-ebc-page .ya-rev-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: #eef3ec;
-      color: #2d4237;
-      border: 1px solid #dce5da;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1787,7 +1978,7 @@ $related_query = new WP_Query( array(
       display: block;
       font-size: 14px;
       font-weight: 700;
-      color: #1a2e26;
+      color: #18181b;
       line-height: 1.25;
       margin-bottom: 2px;
       white-space: nowrap;
@@ -1795,22 +1986,14 @@ $related_query = new WP_Query( array(
       text-overflow: ellipsis;
       font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    .ya-ebc-page .ya-rev-author-loc {
+    .ya-ebc-page .ya-rev-author-sub {
       display: block;
       font-size: 12px;
-      color: #728079;
-      line-height: 1.2;
+      color: #9ca3af;
+      line-height: 1.25;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    .ya-ebc-page .ya-rev-date {
-      font-size: 12px;
-      color: #8c9891;
-      font-weight: 500;
-      white-space: nowrap;
-      flex-shrink: 0;
       font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
@@ -1818,47 +2001,66 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-review-empty-state {
       background: #ffffff;
       border: 1px dashed #d5cebf;
-      border-radius: 20px;
-      padding: 56px 28px;
+      border-radius: 14px;
+      padding: 48px 24px;
       text-align: center;
       max-width: 580px;
       margin: 10px auto 0;
     }
     .ya-ebc-page .ya-rev-empty-icon {
-      width: 54px;
-      height: 54px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       background: #f4f6f2;
       color: #617555;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .ya-ebc-page .ya-rev-empty-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
     }
     .ya-ebc-page .ya-rev-empty-title {
       margin: 0 0 8px;
-      font: 600 24px / 1.25 "Newsreader", Georgia, serif;
+      font: 600 22px / 1.25 "Newsreader", Georgia, serif;
       color: #1a2e26;
     }
     .ya-ebc-page .ya-rev-empty-sub {
-      margin: 0 0 24px;
+      margin: 0 0 20px;
       color: #637069;
-      font-size: 14.5px;
+      font-size: 14px;
       line-height: 1.6;
       font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    .ya-ebc-page .ya-rev-empty-cta {
-      margin: 0 auto;
     }
 
     /* Load More Button */
     .ya-ebc-page .ya-rev-load-more-wrap {
-      margin-top: 40px;
+      margin-top: 32px;
       text-align: center;
+    }
+    .ya-ebc-page .ya-rev-load-more-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 28px;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #617555;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid #617555;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .ya-ebc-page .ya-rev-load-more-btn:hover {
+      background: #cfab55;
+      border-color: #cfab55;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(207, 171, 85, 0.25);
     }
     .ya-ebc-page .ya-review-card.ya-review-hidden {
       display: none !important;
@@ -1872,19 +2074,18 @@ $related_query = new WP_Query( array(
       }
     }
 
-    /* Mobile Carousel (under 768px) */
+    /* Mobile (max-width: 768px): Horizontal scroll-snap carousel */
     @media (max-width: 768px) {
-      .ya-ebc-page .ya-rev-head-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-        margin-bottom: 24px;
+      #ya-panel-review {
+        padding: 24px 0 36px;
       }
-      .ya-ebc-page .ya-rev-cta-btn {
-        width: 100%;
-        justify-content: center;
+      .ya-ebc-page .ya-rev-head-row {
+        align-items: flex-start;
+        margin-bottom: 20px;
       }
       .ya-ebc-page .ya-review-cards-wrap {
+        margin: 0 -16px;
+        padding: 0 16px 16px;
         overflow: hidden;
       }
       .ya-ebc-page .ya-review-cards {
@@ -1893,19 +2094,20 @@ $related_query = new WP_Query( array(
         scroll-snap-type: x mandatory;
         -webkit-overflow-scrolling: touch;
         gap: 16px;
-        padding: 4px 16px 20px;
-        margin: 0 -16px;
+        padding: 4px 0 16px;
         scrollbar-width: none;
       }
       .ya-ebc-page .ya-review-cards::-webkit-scrollbar {
         display: none;
       }
       .ya-ebc-page .ya-review-card {
-        flex: 0 0 85vw;
-        max-width: 86vw;
+        flex: 0 0 84vw;
+        width: 84vw;
+        min-width: 280px;
+        max-width: 360px;
         scroll-snap-align: start;
-        min-width: 0;
-        padding: 24px 22px;
+        padding: 22px 20px !important;
+        box-sizing: border-box !important;
       }
       .ya-ebc-page .ya-review-card.ya-review-hidden {
         display: flex !important;
@@ -1981,7 +2183,6 @@ $related_query = new WP_Query( array(
         padding:15px 20px;
         background:#ffffff;
         border:1px solid var(--line);
-        border-radius:12px;
         font-size:15.5px;
         font-weight:700;
         color:var(--green);
@@ -2000,8 +2201,6 @@ $related_query = new WP_Query( array(
       }
       .ya-ebc-page .ya-tab.is-active{
         background:#f5f8f3;
-        border-color:var(--gold);
-        border-left:4px solid var(--gold);
       }
       .ya-ebc-page .ya-tab.is-active::after{
         transform:rotate(-135deg);
@@ -2009,7 +2208,7 @@ $related_query = new WP_Query( array(
       /* Panels moved inside .ya-tabs (mobile accordion) */
       .ya-ebc-page .ya-tabs > .ya-panel{
         display:none;
-        padding:20px 16px 32px;
+        padding:20px 0px 32px;
         background:var(--cream);
         border:1px solid var(--line);
         border-top:0;
@@ -2034,35 +2233,63 @@ $related_query = new WP_Query( array(
     }
 
     @media(max-width:860px){
+      .ya-ebc-page .ya-highlights-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .ya-ebc-page .ya-check-item {
+        padding: 12px 14px;
+      }
+      .ya-ebc-page .ya-roadmap-section {
+        margin-top: 32px;
+        padding-top: 24px;
+      }
+      .ya-ebc-page .ya-roadmap-trail-strip {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+      }
+      .ya-ebc-page .ya-trail-sep {
+        display: none;
+      }
+      .ya-ebc-page .ya-trail-dist {
+        margin-left: 0;
+        text-align: left;
+        border-top: 1px dashed #ede8e3;
+        padding-top: 8px;
+        width: 100%;
+      }
       /* Full single-column stack on mobile */
       .ya-ebc-page .yt-day-card{
-        grid-template-columns:1fr;
-        padding:22px 18px;
-        border-radius:16px;
-        gap:0;
+        grid-template-columns: 1fr;
+        padding: 20px 16px !important;
+        border-radius: 12px;
+        gap: 0;
+        box-sizing: border-box !important;
       }
       .ya-ebc-page .yt-day-card::before{display:none}
       /* Gallery moves to top */
       .ya-ebc-page .yt-day-gallery{
-        order:-1;
-        border-radius:10px;
-        aspect-ratio:16/9;
-        margin-bottom:16px;
+        order: -1;
+        border-radius: 8px;
+        aspect-ratio: 16/10;
+        margin-bottom: 16px;
       }
-      .ya-ebc-page .yt-day-no-image{min-height:160px}
+      .ya-ebc-page .yt-day-no-image{min-height:140px}
       /* Left strip becomes horizontal row */
       .ya-ebc-page .yt-day-left{
-        border-right:0;
-        border-bottom:1px solid #ece8df;
-        padding:0 0 14px;
-        flex-direction:row;
-        flex-wrap:wrap;
-        align-items:center;
-        gap:14px;
-        margin-bottom:14px;
+        border-right: 0;
+        border-bottom: 1px solid #ece8df;
+        padding: 0 0 12px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
       }
       .ya-ebc-page .yt-day-gold-dash{display:none}
-      .ya-ebc-page .yt-day-num-tag{font-size:10px}
+      .ya-ebc-page .yt-day-num-tag{font-size:11px}
       /* Center gets no side padding */
       .ya-ebc-page .yt-day-center{padding:0}
       .ya-ebc-page .ya-review-cards{grid-template-columns:1fr}
@@ -2183,6 +2410,11 @@ $related_query = new WP_Query( array(
         <button class="ya-tab" type="button" role="tab" aria-selected="false" data-tab="overview" data-scroll-target=".ya-inclusions-checklist">
           Highlights
         </button>
+        <?php if ( ! empty( $map_embed_code ) || ! empty( $map_file_url ) || ! empty( $route_img ) ) : ?>
+        <button class="ya-tab" type="button" role="tab" aria-selected="false" data-tab="overview" data-scroll-target=".ya-roadmap-section">
+          Route Map 
+        </button>
+        <?php endif; ?>
         <button class="ya-tab" type="button" role="tab" aria-selected="false" aria-controls="ya-panel-itinerary" data-tab="itinerary">
           Itinerary
         </button>
@@ -2219,23 +2451,6 @@ $related_query = new WP_Query( array(
               <h3><?php echo esc_html( $overview_subheading ); ?></h3>
               <div class="ya-overview-text">
                 <?php echo wp_kses_post( wpautop( $overview_content ) ); ?>
-              </div>
-
-              <!-- Vertical list of trip highlights with green checkmarks -->
-              <div class="ya-inclusions-checklist">
-                <?php foreach ( $inclusions as $inc_point ) : 
-                  $inc_title = is_array( $inc_point ) ? ( $inc_point['title'] ?? '' ) : $inc_point;
-                  $inc_desc  = is_array( $inc_point ) ? ( $inc_point['desc'] ?? '' ) : '';
-                  if ( empty( $inc_title ) && empty( $inc_desc ) ) continue;
-                ?>
-                  <div class="ya-check-item">
-                    <span class="ya-check-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg></span>
-                    <div class="ya-check-content">
-                      <?php if ( ! empty( $inc_title ) ) : ?><strong><?php echo esc_html( $inc_title ); ?></strong><?php endif; ?>
-                      <?php if ( ! empty( $inc_desc ) ) : ?><div class="ya-check-desc"><?php echo wp_kses_post( wpautop( $inc_desc ) ); ?></div><?php endif; ?>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
               </div>
             </div>
 
@@ -2282,18 +2497,45 @@ $related_query = new WP_Query( array(
           </div>
 
           <!-- Highlight Quote Banner -->
+          <?php if ( ! empty( $overview_highlight ) ) : ?>
           <div class="ya-quote-banner ya-reveal">
             <blockquote><?php echo wp_kses_post( wp_strip_all_tags( $overview_highlight ) ); ?></blockquote>
           </div>
+          <?php endif; ?>
+
+          <!-- Trip Highlights Section -->
+          <?php if ( ! empty( $inclusions ) && is_array( $inclusions ) ) : ?>
+          <div class="ya-inclusions-checklist ya-reveal">
+            <div class="ya-highlights-header">
+              <span class="ya-kicker">KEY EXPERIENCES</span>
+              <h3>Trip Highlights & Inclusions</h3>
+            </div>
+            <div class="ya-highlights-grid">
+              <?php foreach ( $inclusions as $inc_point ) : 
+                $inc_title = is_array( $inc_point ) ? ( $inc_point['title'] ?? '' ) : $inc_point;
+                $inc_desc  = is_array( $inc_point ) ? ( $inc_point['desc'] ?? '' ) : '';
+                if ( empty( $inc_title ) && empty( $inc_desc ) ) continue;
+              ?>
+                <div class="ya-check-item">
+                  <span class="ya-check-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                  <div class="ya-check-content">
+                    <?php if ( ! empty( $inc_title ) ) : ?><strong><?php echo esc_html( $inc_title ); ?></strong><?php endif; ?>
+                    <?php if ( ! empty( $inc_desc ) ) : ?><div class="ya-check-desc"><?php echo wp_kses_post( wpautop( $inc_desc ) ); ?></div><?php endif; ?>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+          <?php endif; ?>
 
           <!-- Roadmap Section -->
           <?php if ( ! empty( $map_embed_code ) || ! empty( $map_file_url ) || ! empty( $route_img ) ) : ?>
           <div class="ya-roadmap-section ya-reveal">
             <div class="ya-roadmap-header">
-              <div>
-                <span class="ya-kicker"><?php echo esc_html( $route_caption_sub ); ?></span>
-                <h3><?php echo esc_html( $route_caption_h3 ); ?></h3>
-              </div>
+              <span class="ya-kicker"><?php echo esc_html( $route_caption_sub ); ?></span>
+              <h3><?php echo esc_html( $route_caption_h3 ); ?></h3>
             </div>
             <div class="ya-roadmap-frame">
               <?php if ( ! empty( $map_embed_code ) ) : ?>
@@ -2317,21 +2559,48 @@ $related_query = new WP_Query( array(
                   <?php if ( ! empty( $route_img ) ) : ?>
                     <img src="<?php echo esc_url( $route_img ); ?>" alt="<?php echo esc_attr( $title ); ?> route map" loading="lazy">
                   <?php endif; ?>
-                  <div class="ya-map-file-cta" style="margin-top:14px; text-align:center;">
-                    <a href="<?php echo esc_url( $map_file_url ); ?>" target="_blank" rel="noopener noreferrer" class="ya-btn ya-btn-sm ya-btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
-                      View / Download Interactive Route File (<?php echo esc_html( strtoupper( pathinfo( parse_url( $map_file_url, PHP_URL_PATH ), PATHINFO_EXTENSION ) ?: 'MAP' ) ); ?>)
-                    </a>
-                  </div>
                 </div>
               <?php elseif ( ! empty( $route_img ) ) : ?>
                 <img src="<?php echo esc_url( $route_img ); ?>" alt="<?php echo esc_attr( $title ); ?> route map" loading="lazy">
               <?php endif; ?>
             </div>
-            <div class="ya-roadmap-caption">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.2 7-12a7 7 0 10-14 0c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
-              <span>Route: <?php echo esc_html( $fact_start ); ?> → <?php echo esc_html( $fact_high_point ); ?> → <?php echo esc_html( $fact_end ); ?> · Total distance ~<?php echo esc_html( $fact_distance ); ?></span>
+            <?php if ( ! empty( $fact_start ) || ! empty( $fact_high_point ) || ! empty( $fact_end ) ) : ?>
+            <div class="ya-roadmap-trail-strip">
+              <?php if ( ! empty( $fact_start ) ) : ?>
+              <div class="ya-trail-point">
+                <span class="ya-trail-label">Starting Point</span>
+                <strong><?php echo esc_html( $fact_start ); ?></strong>
+              </div>
+              <?php endif; ?>
+
+              <?php if ( ! empty( $fact_high_point ) ) : ?>
+              <div class="ya-trail-sep" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="ya-trail-point ya-trail-point--highlight">
+                <span class="ya-trail-label">Elevation / Summit</span>
+                <strong><?php echo esc_html( $fact_high_point ); ?></strong>
+              </div>
+              <?php endif; ?>
+
+              <?php if ( ! empty( $fact_end ) ) : ?>
+              <div class="ya-trail-sep" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="ya-trail-point">
+                <span class="ya-trail-label">Ending Point</span>
+                <strong><?php echo esc_html( $fact_end ); ?></strong>
+              </div>
+              <?php endif; ?>
+
+              <?php if ( ! empty( $fact_distance ) ) : ?>
+              <div class="ya-trail-dist">
+                <span class="ya-trail-label">Total Distance</span>
+                <strong>~<?php echo esc_html( $fact_distance ); ?></strong>
+              </div>
+              <?php endif; ?>
             </div>
+            <?php endif; ?>
           </div>
           <?php endif; ?>
         </div>
@@ -2347,7 +2616,6 @@ $related_query = new WP_Query( array(
         <div class="ya-inner">
           <div class="yt-itin-header ya-reveal">
             <div class="yt-itin-eyebrow">
-              <span class="yt-itin-dash"></span>
               <span><?php echo esc_html( $itin_script ?: 'YOUR JOURNEY' ); ?></span>
             </div>
             <h2 class="yt-itin-h2"><?php echo esc_html( $itin_heading ?: 'Day by Day Itinerary' ); ?></h2>
@@ -2389,7 +2657,7 @@ $related_query = new WP_Query( array(
                 $pills_items = array_values( array_filter( array_map( 'trim', preg_split( '/[,;]+/', $pills_raw ) ) ) );
               }
             ?>
-              <article class="yt-day-card ya-reveal" id="day-<?php echo esc_attr( $day_num ); ?>">
+              <div class="yt-day-card ya-reveal" id="day-<?php echo esc_attr( $day_num ); ?>">
 
                 <!-- Left: Day number, location, altitude -->
                 <div class="yt-day-left">
@@ -2488,7 +2756,7 @@ $related_query = new WP_Query( array(
                 </div>
                 <?php endif; ?>
 
-              </article>
+              </div>
             <?php endforeach; ?>
           </div>
         </div>
@@ -2547,19 +2815,21 @@ $related_query = new WP_Query( array(
         </div>
       </section>
 
-      <!-- Panel 4: Traveler Reviews (Database-driven, strictly current trek, no fallbacks) -->
+      <!-- Panel 4: Traveler Reviews (Exact Reference Match) -->
       <section class="ya-panel" id="ya-panel-review" role="tabpanel" data-panel="review">
         <div class="ya-inner">
           <div class="ya-section-heading ya-reveal">
             <div class="ya-rev-head-row">
-              <div>
-                <span class="ya-kicker"><?php echo esc_html( $rev_kicker ); ?></span>
-                <h2>Traveler Reviews</h2>
-                <p><?php echo esc_html( $rev_subtext ); ?></p>
+              <div class="ya-rev-head-left">
+                <div class="ya-rev-kicker-row">
+                  <span class="ya-rev-kicker"><?php echo esc_html( $rev_kicker ); ?></span>
+                  <span class="ya-rev-kicker-sep"></span>
+                  <span class="ya-rev-kicker-rating"><span class="ya-rev-star-sym">★</span> <?php echo esc_html( $avg_rating_formatted ); ?> out of 5</span>
+                </div>
+                <h2 class="ya-rev-heading"><?php echo esc_html( $rev_heading ?: 'Traveler Reviews' ); ?></h2>
               </div>
-              <div>
-                <button type="button" class="ya-btn ya-btn-primary ya-rev-cta-btn" id="ya-open-review-modal" aria-haspopup="dialog" aria-controls="ya-write-review-modal">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <div class="ya-rev-head-right">
+                <button type="button" class="ya-rev-write-btn" id="ya-open-review-modal" aria-haspopup="dialog" aria-controls="ya-write-review-modal">
                   Write Your Review
                 </button>
               </div>
@@ -2567,83 +2837,75 @@ $related_query = new WP_Query( array(
           </div>
 
           <?php if ( empty( $display_reviews ) ) : ?>
-            <!-- 100% Database-Driven: Empty State when no approved reviews exist yet -->
+            <!-- Empty State when no reviews exist yet -->
             <div class="ya-review-empty-state ya-reveal">
               <div class="ya-rev-empty-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </div>
               <h3 class="ya-rev-empty-title"><?php esc_html_e( 'No reviews yet', 'trek-content-manager' ); ?></h3>
-              <p class="ya-rev-empty-sub"><?php esc_html_e( 'Be the first traveler to share your experience.', 'trek-content-manager' ); ?></p>
-              <button type="button" class="ya-btn ya-btn-primary ya-rev-cta-btn ya-rev-empty-cta" onclick="document.querySelector('#ya-open-review-modal')?.click()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                <?php esc_html_e( 'Write Your Review', 'trek-content-manager' ); ?>
+              <p class="ya-rev-empty-sub"><?php esc_html_e( 'Be the first traveler to share your experience from this journey.', 'trek-content-manager' ); ?></p>
+              <button type="button" class="ya-rev-write-btn" style="margin:0 auto;" onclick="document.querySelector('#ya-open-review-modal')?.click()">
+                Write Your Review
               </button>
             </div>
           <?php else : ?>
-            <!-- Review Cards Grid (3 columns on desktop, horizontal scroll-snap on mobile) -->
+            <!-- Review Cards Grid (3 columns matching reference image) -->
             <div class="ya-review-cards-wrap ya-reveal">
               <div class="ya-review-cards" id="ya-review-cards-list">
                 <?php foreach ( $display_reviews as $rev_idx => $rev ) : 
                   $raw_rating  = floatval( $rev['rating'] ?? 5.0 );
                   $rating_val  = max( 1.0, min( 5.0, $raw_rating ) );
-                  $full_stars  = floor( $rating_val );
-                  $has_half    = ( ( $rating_val - $full_stars ) >= 0.4 );
-                  $empty_stars = max( 0, 5 - $full_stars - ( $has_half ? 1 : 0 ) );
+                  $rating_disp = number_format( $rating_val, 1 );
                   $rev_name    = $rev['name'] ?? 'Traveller';
                   $initials    = ya_get_reviewer_initials( $rev_name );
-                  $rev_type    = $rev['type'] ?? 'Solo Traveler';
-                  $rev_title   = $rev['title'] ?? 'An Unforgettable Experience!';
-                  $rev_loc     = $rev['location'] ?? 'Verified Traveller';
-                  $rev_date    = $rev['date'] ?? '';
-                  $is_hidden   = $rev_idx >= 6 ? ' ya-review-hidden' : '';
+                  $colors      = ya_get_avatar_colors( $rev_idx );
+                  $rev_type    = ! empty( $rev['type'] ) ? $rev['type'] : 'Solo Traveler';
+                  $rev_title   = ! empty( $rev['title'] ) ? $rev['title'] : 'An Unforgettable Experience!';
+                  $rev_date    = ! empty( $rev['date'] ) ? $rev['date'] : ( ! empty( $rev['location'] ) ? $rev['location'] : '' );
+                  
+                  // Build author subline e.g. "Solo Traveler • Oct 2023"
+                  $meta_parts = array();
+                  if ( ! empty( $rev_type ) ) $meta_parts[] = $rev_type;
+                  if ( ! empty( $rev_date ) ) $meta_parts[] = $rev_date;
+                  $subline = implode( ' • ', $meta_parts );
+
+                  // Format quote with quotation marks
+                  $quote_text = trim( (string)( $rev['quote'] ?? '' ) );
+                  if ( $quote_text && ! ( mb_substr( $quote_text, 0, 1 ) === '"' || mb_substr( $quote_text, 0, 1 ) === '“' ) ) {
+                    $quote_text = '“' . $quote_text . '”';
+                  }
+
+                  $is_hidden = $rev_idx >= 6 ? ' ya-review-hidden' : '';
                 ?>
-                  <article class="ya-review-card<?php echo esc_attr( $is_hidden ); ?>" data-index="<?php echo esc_attr( $rev_idx ); ?>">
-                    <div class="ya-rev-card-top">
-                      <div class="ya-rev-card-top-row">
-                        <h4 class="ya-rev-card-title"><?php echo esc_html( $rev_title ); ?></h4>
-                        <div class="ya-rev-stars" aria-label="<?php echo esc_attr( $rating_val ); ?> out of 5 stars">
-                          <?php for ( $s = 0; $s < $full_stars; $s++ ) : ?>
-                            <svg class="ya-star-svg is-full" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
-                          <?php endfor; ?>
-                          <?php if ( $has_half ) : ?>
-                            <svg class="ya-star-svg is-half" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ya-grad-star-<?php echo esc_attr( $rev_idx ); ?>"><stop offset="50%" stop-color="#c6a45f"/><stop offset="50%" stop-color="#e5e7eb"/></linearGradient></defs><path fill="url(#ya-grad-star-<?php echo esc_attr( $rev_idx ); ?>)" d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
-                          <?php endif; ?>
-                          <?php for ( $e = 0; $e < $empty_stars; $e++ ) : ?>
-                            <svg class="ya-star-svg is-empty" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3L5.8 21 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
-                          <?php endfor; ?>
-                        </div>
-                      </div>
-                      <?php if ( ! empty( $rev_type ) ) : ?>
-                        <span class="ya-rev-type-badge"><?php echo esc_html( $rev_type ); ?></span>
-                      <?php endif; ?>
+                  <div class="ya-review-card<?php echo esc_attr( $is_hidden ); ?>" data-index="<?php echo esc_attr( $rev_idx ); ?>">
+                    <div class="ya-rev-card-top-row">
+                      <h4 class="ya-rev-card-title"><?php echo esc_html( $rev_title ); ?></h4>
+                      <span class="ya-rev-card-score"><?php echo esc_html( $rating_disp ); ?> <span class="ya-rev-star-sym">★</span></span>
                     </div>
 
-                    <blockquote class="ya-rev-card-text">
-                      <p><?php echo nl2br( esc_html( $rev['quote'] ?? '' ) ); ?></p>
-                    </blockquote>
+                    <div class="ya-rev-card-text">
+                      <p><?php echo nl2br( esc_html( $quote_text ) ); ?></p>
+                    </div>
 
                     <div class="ya-rev-card-bottom">
                       <div class="ya-rev-author">
-                        <div class="ya-rev-avatar" aria-hidden="true">
+                        <div class="ya-rev-avatar" style="background-color:<?php echo esc_attr( $colors['bg'] ); ?>;color:<?php echo esc_attr( $colors['color'] ); ?>;" aria-hidden="true">
                           <span><?php echo esc_html( $initials ); ?></span>
                         </div>
                         <div class="ya-rev-author-meta">
                           <strong class="ya-rev-author-name"><?php echo esc_html( $rev_name ); ?></strong>
-                          <span class="ya-rev-author-loc"><?php echo esc_html( $rev_loc ); ?></span>
+                          <span class="ya-rev-author-sub"><?php echo esc_html( $subline ); ?></span>
                         </div>
                       </div>
-                      <?php if ( ! empty( $rev_date ) ) : ?>
-                        <span class="ya-rev-date"><?php echo esc_html( $rev_date ); ?></span>
-                      <?php endif; ?>
                     </div>
-                  </article>
+                  </div>
                 <?php endforeach; ?>
               </div>
             </div>
 
             <?php if ( count( $display_reviews ) > 6 ) : ?>
               <div class="ya-rev-load-more-wrap ya-reveal">
-                <button type="button" class="ya-btn ya-btn-secondary" id="ya-load-more-reviews">
+                <button type="button" class="ya-rev-load-more-btn" id="ya-load-more-reviews">
                   <?php esc_html_e( 'Load More Reviews', 'trek-content-manager' ); ?>
                 </button>
               </div>
@@ -3607,7 +3869,7 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-star-select label:hover,
     .ya-ebc-page .ya-star-select label:hover ~ label,
     .ya-ebc-page .ya-star-select input:checked ~ label {
-      color: #c6a45f;
+      color: #cfab55;
     }
     .ya-ebc-page .ya-star-select label:hover {
       transform: scale(1.15);
@@ -3635,7 +3897,7 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-review-modal textarea {
       width: 100%;
       border: 1px solid #dcd7cc;
-      border-radius: 9px;
+      border-radius: 8px;
       background: #fbfaf7;
       color: #1a2e26;
       font-size: 14px;
@@ -3647,10 +3909,10 @@ $related_query = new WP_Query( array(
     .ya-ebc-page .ya-review-modal input:focus,
     .ya-ebc-page .ya-review-modal select:focus,
     .ya-ebc-page .ya-review-modal textarea:focus {
-      border-color: #045857;
+      border-color: #617555;
       outline: 0;
       background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(4, 88, 87, 0.12);
+      box-shadow: 0 0 0 3px rgba(97, 117, 85, 0.15);
     }
     .ya-ebc-page .ya-review-modal textarea {
       min-height: 95px;
@@ -3664,8 +3926,8 @@ $related_query = new WP_Query( array(
       height: 48px;
       font-size: 15px;
       font-weight: 600;
-      border-radius: 9px;
-      background: #045857;
+      border-radius: 8px;
+      background: #617555;
       color: #ffffff;
       border: none;
       cursor: pointer;
@@ -3676,7 +3938,8 @@ $related_query = new WP_Query( array(
       font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .ya-ebc-page .ya-rev-submit-btn:hover {
-      background: #022f2e;
+      background: #cfab55;
+      border-color: #cfab55;
     }
     .ya-ebc-page .ya-rev-submit-btn:disabled {
       opacity: 0.65;
@@ -3741,15 +4004,15 @@ $related_query = new WP_Query( array(
       color: #718079;
       background: #f8faf8;
       border: 1px solid #e2ebe2;
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 12px 16px;
       margin: 16px 0 24px;
       text-align: left;
     }
     .ya-ebc-page .ya-rev-success-close-btn {
       padding: 11px 32px;
-      border-radius: 999px;
-      background: #045857;
+      border-radius: 8px;
+      background: #617555;
       color: #ffffff;
       font-size: 14px;
       font-weight: 600;
@@ -3758,7 +4021,7 @@ $related_query = new WP_Query( array(
       transition: all 0.2s ease;
     }
     .ya-ebc-page .ya-rev-success-close-btn:hover {
-      background: #022f2e;
+      background: #cfab55;
     }
 
     /* Modal Responsive (Mobile < 768px) */
@@ -3873,22 +4136,6 @@ $related_query = new WP_Query( array(
             </div>
 
             <div class="ya-field">
-              <label for="ya-modal-rev-type">Traveler Type</label>
-              <select id="ya-modal-rev-type">
-                <option value="Solo Traveler">Solo Traveler</option>
-                <option value="Couples Trek">Couples Trek</option>
-                <option value="Small Group">Small Group</option>
-                <option value="Family Trek">Family Trek</option>
-                <option value="Guided Expedition">Guided Expedition</option>
-              </select>
-            </div>
-
-            <div class="ya-field">
-              <label for="ya-modal-rev-date">Tour Date / Season</label>
-              <input type="text" id="ya-modal-rev-date" placeholder="e.g. October 2025">
-            </div>
-
-            <div class="ya-field">
               <label for="ya-modal-rev-name">Your Full Name *</label>
               <input type="text" id="ya-modal-rev-name" required placeholder="e.g. Marcus Vance">
             </div>
@@ -3898,7 +4145,12 @@ $related_query = new WP_Query( array(
               <input type="email" id="ya-modal-rev-email" required placeholder="name@domain.com">
             </div>
 
-            <div class="ya-field ya-field-full">
+            <div class="ya-field">
+              <label for="ya-modal-rev-date">Tour Date / Season</label>
+              <input type="text" id="ya-modal-rev-date" placeholder="e.g. October 2025">
+            </div>
+
+            <div class="ya-field">
               <label for="ya-modal-rev-location">Location / Country</label>
               <input type="text" id="ya-modal-rev-location" placeholder="e.g. Melbourne, Australia">
             </div>
@@ -4191,8 +4443,8 @@ $related_query = new WP_Query( array(
         mobileTabs.addListener(syncMobileTabLayout);
       }
 
-      const setActiveTab = name => {
-        const targetTab = tabs.find(tab => tab.dataset.tab === name);
+      const setActiveTab = (name, specificTab = null) => {
+        const targetTab = specificTab || tabs.find(tab => tab.dataset.tab === name);
         const targetPanel = panels.find(panel => panel.dataset.panel === name);
         if (!targetTab) return;
 
@@ -4211,7 +4463,7 @@ $related_query = new WP_Query( array(
         const targetTab = clickedTab || tabs.find(tab => tab.dataset.tab === name);
         if (!targetTab) return;
 
-        const active = setActiveTab(name);
+        const active = setActiveTab(name, targetTab);
         if (!active) return;
         const { targetPanel } = active;
         if (!mobileTabs.matches) {
@@ -4232,13 +4484,30 @@ $related_query = new WP_Query( array(
           // Accordion behaviour on mobile: toggle the panel, don't close others
           const targetPanel = panels.find(p => p.dataset.panel === tab.dataset.tab);
           if (!targetPanel) return;
-          const isNowOpen = !targetPanel.classList.contains('is-active');
-          targetPanel.classList.toggle('is-active', isNowOpen);
-          tab.classList.toggle('is-active', isNowOpen);
-          tab.setAttribute('aria-selected', String(isNowOpen));
-          if (isNowOpen) {
-            // Smooth scroll to the tab header
-            setTimeout(() => tab.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+          const scrollTarget = tab.dataset.scrollTarget ? document.querySelector(tab.dataset.scrollTarget) : null;
+
+          if (scrollTarget) {
+            // For sub-targets (Highlights, Route Map), ensure panel is open and scroll to target
+            targetPanel.classList.add('is-active');
+            tab.classList.add('is-active');
+            tab.setAttribute('aria-selected', 'true');
+            setTimeout(() => {
+              const y = scrollTarget.getBoundingClientRect().top + window.pageYOffset - 30;
+              window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+            }, 80);
+          } else {
+            const isNowOpen = !targetPanel.classList.contains('is-active');
+            targetPanel.classList.toggle('is-active', isNowOpen);
+            tab.classList.toggle('is-active', isNowOpen);
+            tab.setAttribute('aria-selected', String(isNowOpen));
+            if (isNowOpen) {
+              // Smooth scroll to the tab header with offset
+              setTimeout(() => {
+                const yOffset = -20;
+                const y = tab.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+              }, 60);
+            }
           }
         } else {
           activateTab(tab.dataset.tab, true, tab);
@@ -4246,18 +4515,56 @@ $related_query = new WP_Query( array(
       }));
       root.querySelectorAll('.ya-jump-tab').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.target, true)));
 
-      // Keep the visual navigation state aligned with the visible long-form section.
-      if ('IntersectionObserver' in window) {
-        const sectionObserver = new IntersectionObserver(entries => {
-          const visible = entries
-            .filter(entry => entry.isIntersecting)
-            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-          if (visible?.target?.dataset?.panel) {
-            setActiveTab(visible.target.dataset.panel);
+      // Auto-track active navigation tab on scroll (including Highlights and Route Map)
+      const getTrackableItems = () => [
+        { el: root.querySelector('#ya-panel-overview .ya-overview-grid'), tab: tabs.find(t => t.dataset.tab === 'overview' && !t.dataset.scrollTarget) },
+        { el: root.querySelector('.ya-inclusions-checklist'), tab: tabs.find(t => t.dataset.scrollTarget === '.ya-inclusions-checklist') },
+        { el: root.querySelector('.ya-roadmap-section'), tab: tabs.find(t => t.dataset.scrollTarget === '.ya-roadmap-section') },
+        { el: root.querySelector('#ya-panel-itinerary'), tab: tabs.find(t => t.dataset.tab === 'itinerary') },
+        { el: root.querySelector('#ya-panel-essential-info'), tab: tabs.find(t => t.dataset.tab === 'essential-info') },
+        { el: root.querySelector('#ya-panel-review'), tab: tabs.find(t => t.dataset.tab === 'review') },
+        { el: root.querySelector('#ya-departures'), tab: tabs.find(t => t.dataset.tab === 'departures') }
+      ].filter(item => item.el && item.tab);
+
+      let trackableItems = getTrackableItems();
+
+      const updateActiveTabOnScroll = () => {
+        if (mobileTabs.matches) return;
+        if (!trackableItems.length) trackableItems = getTrackableItems();
+        const scrollPosition = window.scrollY + 160;
+
+        let currentActiveTab = null;
+        for (let i = trackableItems.length - 1; i >= 0; i--) {
+          const item = trackableItems[i];
+          const top = item.el.getBoundingClientRect().top + window.scrollY;
+          if (scrollPosition >= top - 20) {
+            currentActiveTab = item.tab;
+            break;
           }
-        }, { rootMargin: '-18% 0px -65% 0px', threshold: 0.01 });
-        panels.forEach(panel => sectionObserver.observe(panel));
-      }
+        }
+        if (!currentActiveTab && trackableItems.length) {
+          currentActiveTab = trackableItems[0].tab;
+        }
+
+        if (currentActiveTab) {
+          tabs.forEach(tab => {
+            const isActive = tab === currentActiveTab;
+            tab.classList.toggle('is-active', isActive);
+            tab.setAttribute('aria-selected', String(isActive));
+          });
+        }
+      };
+
+      let scrollTimer;
+      window.addEventListener('scroll', () => {
+        if (!scrollTimer) {
+          scrollTimer = window.requestAnimationFrame(() => {
+            updateActiveTabOnScroll();
+            scrollTimer = null;
+          });
+        }
+      }, { passive: true });
+      updateActiveTabOnScroll();
 
       // Reading progress for the long-form content, shown directly below the fixed left navigation.
       const readingProgress = root.querySelector('.ya-reading-progress-bar');
@@ -4400,7 +4707,7 @@ $related_query = new WP_Query( array(
         const nameVal = reviewModal.querySelector('#ya-modal-rev-name')?.value?.trim() || '';
         const emailVal = reviewModal.querySelector('#ya-modal-rev-email')?.value?.trim() || '';
         const locVal = reviewModal.querySelector('#ya-modal-rev-location')?.value?.trim() || '';
-        const typeVal = reviewModal.querySelector('#ya-modal-rev-type')?.value?.trim() || '';
+        const typeVal = '';
         const commentVal = reviewModal.querySelector('#ya-modal-rev-comment')?.value?.trim() || '';
         const dateVal = reviewModal.querySelector('#ya-modal-rev-date')?.value?.trim() || '';
         const trekId = reviewModal.querySelector('#ya-modal-rev-trek-id')?.value || '';

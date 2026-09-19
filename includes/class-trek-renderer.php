@@ -188,7 +188,7 @@ class Trek_Renderer {
         }
 
         $overview_img        = get_post_meta( $post_id, '_trek_overview_img', true ) ?: ( $featured_image ?: '' );
-        $route_img           = get_post_meta( $post_id, '_trek_route_img', true ) ?: ( $featured_image ?: '' );
+        $route_img           = get_post_meta( $post_id, '_trek_route_img', true ) ?: '';
         $map_embed_code      = get_post_meta( $post_id, '_trek_map_embed_code', true ) ?: '';
         $map_file_url        = get_post_meta( $post_id, '_trek_map_file_url', true ) ?: '';
         $route_caption_sub   = get_post_meta( $post_id, '_trek_route_caption_sub', true ) ?: 'Route Map';
