@@ -195,45 +195,60 @@ if ( ! function_exists( 'ya_parse_day_stage_meta' ) ) {
 }
 
 // 6. Gallery
-$gal_kicker          = get_post_meta( $post_id, '_trek_gallery_kicker', true ) ?: 'Visual Journey';
-$gal_script          = get_post_meta( $post_id, '_trek_gallery_script', true ) ?: 'Above the Clouds';
-$gal_heading         = get_post_meta( $post_id, '_trek_gallery_heading', true ) ?: ( 'Landscapes of ' . $title );
-$gal_subtext         = get_post_meta( $post_id, '_trek_gallery_subtext', true ) ?: 'Select any photograph to view it at a larger size.';
-$gallery             = get_post_meta( $post_id, '_trek_gallery_list', true ) ?: array();
-if ( empty( $gallery ) ) {
-    $gallery = array(
-        array( 'url' => $hero_bg_img, 'label' => $title ),
-        array( 'url' => 'https://yetiadventure.com/wp-content/uploads/2022/02/NAMCHE-BAZAAR-1024x576.jpg', 'label' => 'Mountain Village' ),
-        array( 'url' => 'https://yetiadventure.com/wp-content/uploads/2022/02/AERIAL-VIEW-OF-THE-EVEREST-BASE-CAMP.jpg', 'label' => 'High Altitude Panorama' ),
-        array( 'url' => 'https://yetiadventure.com/wp-content/uploads/2022/02/CHORTEIN-ON-THE-WAY-TO-TENGBOCHE-1024x476.jpg', 'label' => 'Sacred Chortens' ),
-        array( 'url' => 'https://yetiadventure.com/wp-content/uploads/2022/02/KHUMBU-GLACIER-1024x683.jpg', 'label' => 'Glacial Landscapes' )
-    );
+// 7. Essential Info & Inclusions/Exclusions
+$inclusions_full     = get_post_meta( $post_id, '_trek_inclusions_full', true );
+if ( empty( $inclusions_full ) || ! is_array( $inclusions_full ) ) {
+    $inclusions_full = get_post_meta( $post_id, '_trek_inclusions', true );
 }
+if ( is_string( $inclusions_full ) ) {
+    $decoded = json_decode( $inclusions_full, true );
+    if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+        $inclusions_full = $decoded;
+    } elseif ( is_serialized( $inclusions_full ) ) {
+        $inclusions_full = maybe_unserialize( $inclusions_full );
+    }
+}
+
+$exclusions_full     = get_post_meta( $post_id, '_trek_exclusions_full', true );
+if ( empty( $exclusions_full ) || ! is_array( $exclusions_full ) ) {
+    $exclusions_full = get_post_meta( $post_id, '_trek_exclusions', true );
+}
+if ( is_string( $exclusions_full ) ) {
+    $decoded = json_decode( $exclusions_full, true );
+    if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+        $exclusions_full = $decoded;
+    } elseif ( is_serialized( $exclusions_full ) ) {
+        $exclusions_full = maybe_unserialize( $exclusions_full );
+    }
+}
+
+$inex_heading        = get_post_meta( $post_id, '_trek_inex_heading', true );
+$card_file           = get_post_meta( $post_id, '_trek_ess_card_file', true ) ?: ( get_post_meta( $post_id, '_trek_trip_notes_file', true ) ?: get_post_meta( $post_id, '_trek_pdf_url', true ) );
 
 // 7. Essential Info
 $ess_kicker          = get_post_meta( $post_id, '_trek_ess_kicker', true ) ?: 'Before You Go';
 $ess_script          = get_post_meta( $post_id, '_trek_ess_script', true ) ?: 'Prepare Well';
-$ess_heading         = get_post_meta( $post_id, '_trek_ess_heading', true ) ?: ( 'Essential ' . $title . ' Information' );
+$ess_heading         = get_post_meta( $post_id, '_trek_ess_heading', true ) ?: 'Essential Information';
 $ess_intro           = get_post_meta( $post_id, '_trek_ess_intro', true );
 if ( empty( $ess_intro ) ) {
-    $ess_intro = '<p>Requirements and conditions can change. Confirm final visa, health, insurance and equipment guidance in your departure-specific trip notes.</p>';
+    $ess_intro = '<p>Careful preparation and sound health awareness ensure a safe, successful, and deeply rewarding Himalayan journey. Here you\'ll find key information to help you get ready for your adventure.</p>';
 }
-$card_img            = get_post_meta( $post_id, '_trek_ess_card_img', true ) ?: 'https://yetiadventure.com/wp-content/uploads/2022/02/KHUMBU-GLACIER-1024x683.jpg';
-$card_kicker         = get_post_meta( $post_id, '_trek_ess_card_kicker', true ) ?: 'Detailed Preparation';
-$card_title          = get_post_meta( $post_id, '_trek_ess_card_title', true ) ?: 'Request the current trip notes';
-$card_desc           = get_post_meta( $post_id, '_trek_ess_card_desc', true ) ?: 'Departure-specific notes contain the final kit list, inclusions, practical guidance and route updates.';
-$card_btn            = get_post_meta( $post_id, '_trek_ess_card_btn', true ) ?: 'Email Yeti Adventure';
+$card_img            = get_post_meta( $post_id, '_trek_ess_card_img', true ) ?: ( $hero_bg_img ?: 'https://yetiadventure.com/wp-content/uploads/2022/02/KHUMBU-GLACIER-1024x683.jpg' );
+$card_kicker         = get_post_meta( $post_id, '_trek_ess_card_kicker', true ) ?: 'TRIP DOSSIER';
+$card_title          = get_post_meta( $post_id, '_trek_ess_card_title', true ) ?: 'Download Your Complete Route Notes';
+$card_desc           = get_post_meta( $post_id, '_trek_ess_card_desc', true ) ?: 'Includes detailed packing checklist, altitude acclimatization schedule, Nepal visa guidelines, medical preparation advice, and seasonal weather data.';
+$card_btn            = get_post_meta( $post_id, '_trek_ess_card_btn', true ) ?: 'Request Route Notes';
 $card_email          = get_post_meta( $post_id, '_trek_ess_card_email', true ) ?: 'sales@yetiadventure.com';
 
-$accordions          = get_post_meta( $post_id, '_trek_essential_list', true ) ?: array();
-if ( empty( $accordions ) ) {
+$accordions          = get_post_meta( $post_id, '_trek_essential_list', true );
+if ( empty( $accordions ) || ! is_array( $accordions ) ) {
+    $accordions = get_post_meta( $post_id, '_trek_faqs', true );
+}
+if ( empty( $accordions ) || ! is_array( $accordions ) ) {
     $accordions = array(
-        array( 'title' => 'Visa and travel documents', 'content' => '<p>Many visitors require a Nepal visa, available either online before travel or upon arrival at Tribhuvan International Airport depending on nationality. Carry a passport with at least 6 months validity.</p>' ),
-        array( 'title' => 'Health, altitude and acclimatisation', 'content' => '<p>This itinerary reaches high elevations. The schedule includes dedicated acclimatisation days, but every traveller should understand altitude symptoms, hydrate well and follow the guide’s instructions.</p><p>Consult a qualified travel physician regarding recommended vaccinations and medication before departure.</p>' ),
-        array( 'title' => 'Meals and drinking water', 'content' => '<p>Tea-house menus include fresh dal bhat, soups, pasta, noodles, rice dishes and warm breakfasts. Hydration is vital at altitude. Always use treated, filtered or boiled drinking water.</p>' ),
-        array( 'title' => 'Weather and best trekking seasons', 'content' => '<p>Autumn (Sep–Nov) and Spring (Mar–May) provide the clearest skies and most stable weather. Mountain weather can change quickly, so multi-layer clothing is essential.</p>' ),
-        array( 'title' => 'Equipment checklist', 'content' => '<ul><li>Sturdy, worn-in waterproof trekking boots</li><li>Thermal base layers, fleece and down insulated jacket</li><li>Waterproof/windproof outer shell jacket and trousers</li><li>Warm hat, UV sunglasses, sun hat, and gloves</li><li>Quality sleeping bag rated for sub-zero temperatures</li><li>Daypack, trekking poles, headlamp and personal first aid</li></ul>' ),
-        array( 'title' => 'Lodge accommodation & facilities', 'content' => '<p>Nights in Kathmandu feature comfortable hotels. During the trek, stay in authentic mountain teahouses and lodges. Hot showers, Wi-Fi, and device charging are available along most routes.</p>' )
+        array( 'title' => 'What is the best season to undertake the Everest Base Camp trek?', 'content' => '<p>The optimal seasons are spring (March through May) for clear skies and blooming rhododendrons, and autumn (September through December) for crisp mountain visibility and stable weather.</p>' ),
+        array( 'title' => 'How fit do I need to be, and how is altitude sickness managed?', 'content' => '<p>A good level of cardiovascular fitness is recommended. Our itineraries are structured with gradual altitude gain, scheduled acclimatisation days, and daily health monitoring by certified guides.</p>' ),
+        array( 'title' => 'What type of accommodation and food can I expect on the trail?', 'content' => '<p>In Kathmandu, you will stay in high-quality boutique hotels. During the trek, accommodation is in comfortable teahouses and lodges offering fresh, hearty multi-course meals.</p>' )
     );
 }
 
@@ -1665,12 +1680,18 @@ $related_query = new WP_Query( array(
       display: block;
     }
 
-    /* 6. ESSENTIAL INFORMATION: Clean Collapsible Panels with Icons */
+    /* 6. ESSENTIAL INFORMATION: Clean Collapsible Panels with Icons & Micro-Animations */
     .ya-ebc-page .ya-essential-layout{
       display:grid;
       grid-template-columns:1fr 340px;
       gap:40px;
       align-items:start;
+    }
+    @media (max-width:960px){
+      .ya-ebc-page .ya-essential-layout{
+        grid-template-columns:1fr;
+        gap:32px;
+      }
     }
     .ya-ebc-page .ya-info-list{
       display:flex;
@@ -1678,13 +1699,23 @@ $related_query = new WP_Query( array(
       gap:12px;
     }
     .ya-ebc-page .ya-info-item{
-      border:1px solid var(--line);
-      border-radius:8px;
+      border:1px solid var(--line, #e2e8e0);
+      border-left:3px solid transparent;
       background:#ffffff;
       overflow:hidden;
-      transition:border-color .2s ease;
+      box-sizing:border-box !important;
+      padding:0 !important;
+      transition:border-color .25s ease, border-left .25s ease, box-shadow .25s ease;
     }
-    .ya-ebc-page .ya-info-item:hover{border-color:var(--green-2)}
+    .ya-ebc-page .ya-info-item:hover{
+      border-color:#617555;
+      box-shadow:0 3px 12px rgba(0,0,0,0.04);
+    }
+    .ya-ebc-page .ya-info-item.is-open{
+      border-color:#d1d9cf;
+      border-left:3px solid #617555;
+      box-shadow:0 3px 14px rgba(97, 117, 85, 0.07);
+    }
     .ya-ebc-page .ya-info-head{
       padding:16px 20px;
       background:#ffffff;
@@ -1695,37 +1726,42 @@ $related_query = new WP_Query( array(
       align-items:center;
       cursor:pointer;
       text-align:left;
+      transition:background .15s ease;
+    }
+    .ya-ebc-page .ya-info-head:hover{
+      background:#fafbfa;
     }
     .ya-ebc-page .ya-info-head span{
       font-size:16px;
       font-weight:600;
-      color:var(--ink);
+      color:var(--ink, #173f38);
       display:flex;
       align-items:center;
       gap:12px;
       font-family:"Newsreader",Georgia,serif;
     }
     .ya-ebc-page .ya-info-icon{
-      width:26px;
-      height:26px;
+      width:28px;
+      height:28px;
+      border-radius:6px;
+      color:var(--green-2, #617555);
       display:grid;
       place-items:center;
-      color:var(--green-2);
       flex-shrink:0;
     }
-    .ya-ebc-page .ya-info-icon svg{width:20px;height:20px}
+    .ya-ebc-page .ya-info-icon svg{width:18px;height:18px}
     .ya-ebc-page .ya-info-arrow{
       width:18px;
       height:18px;
-      color:var(--muted);
-      transition:transform .3s ease;
+      color:#7b8878;
+      transition:transform .35s cubic-bezier(0.4, 0, 0.2, 1), color .2s ease;
       flex-shrink:0;
     }
-    .ya-ebc-page .ya-info-item.is-open .ya-info-arrow{transform:rotate(180deg);color:var(--green-2)}
+    .ya-ebc-page .ya-info-item.is-open .ya-info-arrow{transform:rotate(180deg);color:#617555}
     .ya-ebc-page .ya-info-body{
       display:grid;
       grid-template-rows:0fr;
-      transition:grid-template-rows .35s ease;
+      transition:grid-template-rows .35s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .ya-ebc-page .ya-info-item.is-open .ya-info-body{grid-template-rows:1fr}
     .ya-ebc-page .ya-info-body>div{overflow:hidden}
@@ -1734,23 +1770,225 @@ $related_query = new WP_Query( array(
       color:#505c4f;
       font-size:14px;
       line-height:1.8;
+      box-sizing:border-box;
     }
     .ya-ebc-page .ya-info-content p{margin:0 0 10px}
     .ya-ebc-page .ya-info-content ul{margin:0;padding-left:18px}
     .ya-ebc-page .ya-info-content li{margin:5px 0}
 
-    .ya-ebc-page .ya-trip-note-card{
-      border-radius:10px;
-      background:var(--green);
-      color:#fff;
-      overflow:hidden;
-      box-shadow:0 8px 24px rgba(0,0,0,.1);
+    /* Inclusions & Exclusions list inside accordions */
+    .ya-ebc-page .ya-inex-list-wrap{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-top:2px;
     }
-    .ya-ebc-page .ya-trip-note-image{height:200px;background:center/cover no-repeat}
-    .ya-ebc-page .ya-trip-note-copy{padding:24px}
-    .ya-ebc-page .ya-trip-note-copy small{color:var(--gold);font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
-    .ya-ebc-page .ya-trip-note-copy h3{margin:8px 0 10px;font-size:24px;color:#fff}
-    .ya-ebc-page .ya-trip-note-copy p{margin:0 0 18px;color:#cdd8cb;font-size:13px;line-height:1.7}
+    .ya-ebc-page .ya-inex-row{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      line-height:1.55;
+      padding-bottom:10px;
+      border-bottom:1px dashed #edf0ea;
+    }
+    .ya-ebc-page .ya-inex-row:last-child{
+      padding-bottom:0;
+      border-bottom:0;
+    }
+    .ya-ebc-page .ya-inex-row-icon{
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+      margin-top:2px;
+    }
+    .ya-ebc-page .ya-inex-row-icon--inc{
+      background:rgba(97, 117, 85, 0.12);
+      color:#617555;
+    }
+    .ya-ebc-page .ya-inex-row-icon--exc{
+      background:rgba(185, 28, 28, 0.08);
+      color:#b91c1c;
+    }
+    .ya-ebc-page .ya-inex-row-icon svg{
+      width:11px;
+      height:11px;
+    }
+    .ya-ebc-page .ya-inex-row-text{
+      flex:1;
+      min-width:0;
+    }
+    .ya-ebc-page .ya-inex-row-text strong{
+      color:#1e2a1d;
+      font-size:14px;
+      font-weight:600;
+      display:block;
+    }
+    .ya-ebc-page .ya-inex-row-desc{
+      margin-top:3px;
+      font-size:13px;
+      color:#556353;
+      line-height:1.5;
+    }
+    .ya-ebc-page .ya-inex-row-desc p{
+      margin:0 0 4px;
+    }
+    .ya-ebc-page .ya-inex-row-desc p:last-child{
+      margin-bottom:0;
+    }
+
+    /* Right Side Trip Notes Card - Clean White Card with strict 8px radius */
+    .ya-ebc-page .ya-trip-note-card{
+      border-radius:8px;
+      background:#ffffff;
+      border:1px solid var(--line, #e2e8e0);
+      color:#173f38;
+      overflow:hidden;
+      box-shadow:0 4px 18px rgba(0,0,0,0.04);
+      display:flex;
+      flex-direction:column;
+      transition:transform .25s ease, box-shadow .25s ease;
+    }
+    .ya-ebc-page .ya-trip-note-card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 8px 24px rgba(0,0,0,0.08);
+    }
+    .ya-ebc-page .ya-trip-note-image{
+      position:relative;
+      height:190px;
+      width:100%;
+      background:center/cover no-repeat;
+      border-radius:8px 8px 0 0;
+      overflow:hidden;
+      transition:transform .4s ease;
+    }
+    .ya-ebc-page .ya-trip-note-card:hover .ya-trip-note-image{
+      transform:scale(1.03);
+    }
+    .ya-ebc-page .ya-trip-note-overlay{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(0,0,0,0.01) 0%, rgba(0,0,0,0.12) 100%);
+    }
+    .ya-ebc-page .ya-trip-note-copy{
+      padding:22px 24px 24px;
+      box-sizing:border-box;
+      display:flex;
+      flex-direction:column;
+      flex-grow:1;
+    }
+    .ya-ebc-page .ya-trip-note-copy small{
+      color:#cfab55;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:1.5px;
+      text-transform:uppercase;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .ya-ebc-page .ya-trip-note-copy small::after{
+      content:"";
+      display:inline-block;
+      width:24px;
+      height:1.5px;
+      background:#cfab55;
+    }
+    .ya-ebc-page .ya-trip-note-copy h3{
+      margin:0 0 10px;
+      font-size:21px;
+      line-height:1.35;
+      color:#173f38;
+      font-family:"Newsreader",Georgia,serif;
+      font-weight:600;
+    }
+    .ya-ebc-page .ya-trip-note-copy p{
+      margin:0 0 16px;
+      color:#556353;
+      font-size:13.5px;
+      line-height:1.65;
+    }
+
+    /* Action Buttons in Trip Notes Card */
+    .ya-ebc-page .ya-btn-download,
+    .ya-ebc-page .ya-btn-request{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      width:100%;
+      padding:12px 18px;
+      border-radius:8px;
+      font-size:13.5px;
+      font-weight:700;
+      letter-spacing:0.02em;
+      text-decoration:none;
+      box-sizing:border-box;
+      cursor:pointer;
+      transition:all .25s cubic-bezier(0.4, 0, 0.2, 1);
+      background:#617555;
+      color:#ffffff;
+      border:1px solid #617555;
+      box-shadow:0 3px 10px rgba(97,117,85,0.2);
+    }
+    .ya-ebc-page .ya-btn-download:hover,
+    .ya-ebc-page .ya-btn-request:hover{
+      background:#cfab55;
+      border-color:#cfab55;
+      color:#ffffff;
+      transform:translateY(-1.5px);
+      box-shadow:0 6px 18px rgba(207,171,85,0.35);
+    }
+    .ya-ebc-page .ya-btn-download svg,
+    .ya-ebc-page .ya-btn-request svg{
+      width:16px;
+      height:16px;
+      flex-shrink:0;
+    }
+    .ya-ebc-page .ya-trip-note-file-info{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      font-size:11.5px;
+      color:#617555;
+      margin-top:10px;
+      text-align:center;
+    }
+    .ya-ebc-page .ya-trip-note-file-info svg{
+      width:13px;
+      height:13px;
+      flex-shrink:0;
+    }
+    .ya-ebc-page .ya-trip-note-notice{
+      background:#f7f9f6;
+      border:1px solid #e2e8e0;
+      border-radius:8px;
+      padding:12px 14px;
+      margin-bottom:16px;
+      font-size:12.5px;
+      color:#556353;
+      line-height:1.55;
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .ya-ebc-page .ya-note-notice-icon{
+      width:18px;
+      height:18px;
+      color:#617555;
+      flex-shrink:0;
+      margin-top:2px;
+    }
+    .ya-ebc-page .ya-trip-note-notice p{
+      margin:0;
+      color:#556353;
+      font-size:12.5px;
+    }
 
     /* 7. TRAVELER REVIEWS: Bespoke Editorial Stories & Hierarchy */
     .ya-ebc-page .ya-rev-head-row {
@@ -2457,7 +2695,7 @@ $related_query = new WP_Query( array(
             <!-- Right Column: Top Stunning Landscape Photograph + Bottom Trip Facts Card -->
             <div class="ya-overview-side ya-reveal">
               <div class="ya-side-scenic-photo">
-                <img src="<?php echo esc_url( $hero_slider_images[1] ?? ( $gallery[0]['url'] ?? $hero_bg_img ) ); ?>" alt="<?php echo esc_attr( $title ); ?> Mountain Vista" loading="lazy">
+                <img src="<?php echo esc_url( $hero_slider_images[1] ?? $hero_bg_img ); ?>" alt="<?php echo esc_attr( $title ); ?> Mountain Vista" loading="lazy">
               </div>
 
               <div class="ya-trip-facts-card">
@@ -2605,12 +2843,8 @@ $related_query = new WP_Query( array(
           <?php endif; ?>
         </div>
       </section>
-
-      <!-- Panel 2: Itinerary — day-specific images only; no external fallbacks -->
       <?php
-      // NOTE: No gallery pool / external fallback images.
-      // Each day shows ONLY its own uploaded photos.
-      // If a day has no image, a styled placeholder is shown instead.
+    
       ?>
       <section class="ya-panel" id="ya-panel-itinerary" role="tabpanel" data-panel="itinerary">
         <div class="ya-inner">
@@ -2766,7 +3000,6 @@ $related_query = new WP_Query( array(
       <section class="ya-panel" id="ya-panel-essential-info" role="tabpanel" data-panel="essential-info">
         <div class="ya-inner">
           <div class="ya-section-heading ya-reveal">
-            <span class="ya-kicker"><?php echo esc_html( $ess_kicker ); ?></span>
             <h2>Essential Information</h2>
             <div class="ya-ess-intro-p">
               <?php echo wp_kses_post( wpautop( $ess_intro ) ); ?>
@@ -2775,6 +3008,79 @@ $related_query = new WP_Query( array(
 
           <div class="ya-essential-layout">
             <div class="ya-info-list ya-reveal">
+              <!-- 1. What's Included Accordion (Collapsible) -->
+              <?php if ( ! empty( $inclusions_full ) && is_array( $inclusions_full ) ) : ?>
+                <div class="ya-info-item is-open">
+                  <button class="ya-info-head" type="button" aria-expanded="true">
+                    <span>
+                      <span class="ya-info-icon ya-info-icon--inc">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg>
+                      </span>
+                      What’s Included in the Trip
+                    </span>
+                    <svg class="ya-info-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                  </button>
+                  <div class="ya-info-body"><div><div class="ya-info-content">
+                    <div class="ya-inex-list-wrap">
+                      <?php foreach ( $inclusions_full as $inc_item ) : 
+                        $inc_title = is_array( $inc_item ) ? ( $inc_item['title'] ?? '' ) : $inc_item;
+                        $inc_desc  = is_array( $inc_item ) ? ( $inc_item['desc'] ?? ( $inc_item['description'] ?? '' ) ) : '';
+                        if ( empty( $inc_title ) ) continue;
+                      ?>
+                        <div class="ya-inex-row">
+                          <span class="ya-inex-row-icon ya-inex-row-icon--inc">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                          </span>
+                          <div class="ya-inex-row-text">
+                            <strong><?php echo esc_html( $inc_title ); ?></strong>
+                            <?php if ( ! empty( $inc_desc ) ) : ?>
+                              <div class="ya-inex-row-desc"><?php echo wp_kses_post( $inc_desc ); ?></div>
+                            <?php endif; ?>
+                          </div>
+                        </div>
+                      <?php endforeach; ?>
+                    </div>
+                  </div></div></div>
+                </div>
+              <?php endif; ?>
+
+              <!-- 2. What's Not Included / Exclusions Accordion (Collapsible) -->
+              <?php if ( ! empty( $exclusions_full ) && is_array( $exclusions_full ) ) : ?>
+                <div class="ya-info-item">
+                  <button class="ya-info-head" type="button" aria-expanded="false">
+                    <span>
+                      <span class="ya-info-icon ya-info-icon--exc">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      </span>
+                      What’s Not Included (Exclusions)
+                    </span>
+                    <svg class="ya-info-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                  </button>
+                  <div class="ya-info-body"><div><div class="ya-info-content">
+                    <div class="ya-inex-list-wrap">
+                      <?php foreach ( $exclusions_full as $exc_item ) : 
+                        $exc_title = is_array( $exc_item ) ? ( $exc_item['title'] ?? '' ) : $exc_item;
+                        $exc_desc  = is_array( $exc_item ) ? ( $exc_item['desc'] ?? ( $exc_item['description'] ?? '' ) ) : '';
+                        if ( empty( $exc_title ) ) continue;
+                      ?>
+                        <div class="ya-inex-row">
+                          <span class="ya-inex-row-icon ya-inex-row-icon--exc">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                          </span>
+                          <div class="ya-inex-row-text">
+                            <strong><?php echo esc_html( $exc_title ); ?></strong>
+                            <?php if ( ! empty( $exc_desc ) ) : ?>
+                              <div class="ya-inex-row-desc"><?php echo wp_kses_post( $exc_desc ); ?></div>
+                            <?php endif; ?>
+                          </div>
+                        </div>
+                      <?php endforeach; ?>
+                    </div>
+                  </div></div></div>
+                </div>
+              <?php endif; ?>
+
+              <!-- 3. Essential Information Accordions (Visa, Health, Weather, etc.) -->
               <?php 
               $ess_icons = array(
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>',
@@ -2787,8 +3093,8 @@ $related_query = new WP_Query( array(
               foreach ( $accordions as $a_idx => $acc ) : 
                 $icon_svg = $ess_icons[ $a_idx % count($ess_icons) ];
               ?>
-                <article class="ya-info-item <?php echo 0 === $a_idx ? 'is-open' : ''; ?>">
-                  <button class="ya-info-head" type="button" aria-expanded="<?php echo 0 === $a_idx ? 'true' : 'false'; ?>">
+                <div class="ya-info-item">
+                  <button class="ya-info-head" type="button" aria-expanded="false">
                     <span>
                       <span class="ya-info-icon"><?php echo $icon_svg; ?></span>
                       <?php echo esc_html( $acc['title'] ?? '' ); ?>
@@ -2798,17 +3104,36 @@ $related_query = new WP_Query( array(
                   <div class="ya-info-body"><div><div class="ya-info-content">
                     <?php echo wp_kses_post( $acc['content'] ?? '' ); ?>
                   </div></div></div>
-                </article>
+                </div>
               <?php endforeach; ?>
             </div>
 
+            <!-- Right: Downloadable Trip Notes / Newsletter Card -->
             <aside class="ya-trip-note-card ya-reveal">
-              <div class="ya-trip-note-image" style="background-image:url('<?php echo esc_url( $card_img ); ?>');" role="img" aria-label="<?php echo esc_attr( $card_title ); ?>"></div>
+              <?php if ( ! empty( $card_img ) ) : ?>
+                <div class="ya-trip-note-image" style="background-image:url('<?php echo esc_url( $card_img ); ?>');" role="img" aria-label="<?php echo esc_attr( $card_title ); ?>">
+                  <div class="ya-trip-note-overlay"></div>
+                </div>
+              <?php endif; ?>
               <div class="ya-trip-note-copy">
-                <small><?php echo esc_html( $card_kicker ); ?></small>
+               
                 <h3><?php echo esc_html( $card_title ); ?></h3>
                 <p><?php echo esc_html( $card_desc ); ?></p>
-                <a class="ya-btn ya-btn-light" href="mailto:<?php echo esc_attr( $card_email ); ?>?subject=<?php echo rawurlencode( 'Request for Current ' . $title . ' Trip Notes' ); ?>"><?php echo esc_html( $card_btn ); ?></a>
+                <?php if ( ! empty( $card_file ) ) : ?>
+                  <a class="ya-btn ya-btn-download" href="<?php echo esc_url( $card_file ); ?>" download target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span><?php echo esc_html( $card_btn ?: 'Download Route Notes (PDF)' ); ?></span>
+                  </a>
+                  <div class="ya-trip-note-file-info">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Official PDF Dossier • Instant Download</span>
+                  </div>
+                <?php else : ?>
+                  <a class="ya-btn ya-btn-request" href="mailto:<?php echo esc_attr( $card_email ); ?>?subject=<?php echo rawurlencode( 'Request for Current ' . $title . ' Route Notes' ); ?>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    <span><?php echo esc_html( $card_btn ?: 'Request Route Notes' ); ?></span>
+                  </a>
+                <?php endif; ?>
               </div>
             </aside>
           </div>

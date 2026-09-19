@@ -329,16 +329,20 @@ class Trek_Renderer {
         }
 
         // 9. Essential Info & FAQs (Accordions)
-        $ess_kicker          = get_post_meta( $post_id, '_trek_ess_kicker', true ) ?: 'Travel Advice';
-        $ess_script          = get_post_meta( $post_id, '_trek_ess_script', true ) ?: 'Good to Know';
+        $ess_kicker          = get_post_meta( $post_id, '_trek_ess_kicker', true ) ?: 'Before You Go';
+        $ess_script          = get_post_meta( $post_id, '_trek_ess_script', true ) ?: 'Prepare Well';
         $ess_heading         = get_post_meta( $post_id, '_trek_ess_heading', true ) ?: 'Essential Information';
         $ess_intro           = get_post_meta( $post_id, '_trek_ess_intro', true );
-        $ess_card_img        = get_post_meta( $post_id, '_trek_ess_card_img', true ) ?: $card_image_url;
-        $ess_card_kicker     = get_post_meta( $post_id, '_trek_ess_card_kicker', true ) ?: 'Trip Dossier';
-        $ess_card_title      = get_post_meta( $post_id, '_trek_ess_card_title', true ) ?: 'Download Comprehensive Route Notes';
-        $ess_card_desc       = get_post_meta( $post_id, '_trek_ess_card_desc', true ) ?: 'Detailed packing checklist, altitude profile, visa guidelines and weather notes.';
-        $ess_card_btn        = get_post_meta( $post_id, '_trek_ess_card_btn', true ) ?: 'Request Trip Notes';
+        if ( empty( $ess_intro ) ) {
+            $ess_intro = '<p>Careful preparation and sound health awareness ensure a safe, successful, and deeply rewarding Himalayan journey. Here you\'ll find key information to help you get ready for your adventure.</p>';
+        }
+        $ess_card_img        = get_post_meta( $post_id, '_trek_ess_card_img', true ) ?: ( $hero_bg_img ?: $card_image_url );
+        $ess_card_kicker     = get_post_meta( $post_id, '_trek_ess_card_kicker', true ) ?: 'TRIP DOSSIER';
+        $ess_card_title      = get_post_meta( $post_id, '_trek_ess_card_title', true ) ?: 'Download Your Complete Route Notes';
+        $ess_card_desc       = get_post_meta( $post_id, '_trek_ess_card_desc', true ) ?: 'Includes detailed packing checklist, altitude acclimatization schedule, Nepal visa guidelines, medical preparation advice, and seasonal weather data.';
+        $ess_card_btn        = get_post_meta( $post_id, '_trek_ess_card_btn', true ) ?: 'Request Route Notes';
         $ess_card_email      = get_post_meta( $post_id, '_trek_ess_card_email', true ) ?: 'sales@yetiadventure.com';
+        $ess_card_file       = get_post_meta( $post_id, '_trek_ess_card_file', true ) ?: ( get_post_meta( $post_id, '_trek_trip_notes_file', true ) ?: get_post_meta( $post_id, '_trek_pdf_url', true ) );
 
         $faqs_list = get_post_meta( $post_id, '_trek_essential_list', true );
         if ( empty( $faqs_list ) || ! is_array( $faqs_list ) ) {
@@ -614,6 +618,7 @@ class Trek_Renderer {
                 'card_desc'    => $ess_card_desc,
                 'card_btn'     => $ess_card_btn,
                 'card_email'   => $ess_card_email,
+                'card_file'    => $ess_card_file,
             ),
             'faqs'             => $normalized_faqs,
 

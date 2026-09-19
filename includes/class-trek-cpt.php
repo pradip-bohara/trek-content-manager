@@ -1471,6 +1471,7 @@ class Trek_CPT {
                 if (ess.card_desc || data.ess_card_desc) { yaSetFieldValue('trek_ess_card_desc', ess.card_desc || data.ess_card_desc); fieldsCount++; }
                 if (ess.card_btn || data.ess_card_btn) { yaSetFieldValue('trek_ess_card_btn', ess.card_btn || data.ess_card_btn); fieldsCount++; }
                 if (ess.card_email || data.ess_card_email) { yaSetFieldValue('trek_ess_card_email', ess.card_email || data.ess_card_email); fieldsCount++; }
+                if (ess.card_file || data.ess_card_file) { yaSetFieldValue('trek_ess_card_file', ess.card_file || data.ess_card_file); fieldsCount++; }
 
                 const faqs = data.faqs || data.accordions || data.essential_list || [];
                 if (Array.isArray(faqs) && faqs.length) {
@@ -2691,6 +2692,7 @@ class Trek_CPT {
         $card_desc   = get_post_meta( $post->ID, '_trek_ess_card_desc', true );
         $card_btn    = get_post_meta( $post->ID, '_trek_ess_card_btn', true );
         $card_email  = get_post_meta( $post->ID, '_trek_ess_card_email', true );
+        $card_file   = get_post_meta( $post->ID, '_trek_ess_card_file', true );
 
         $accordions = get_post_meta( $post->ID, '_trek_essential_list', true );
         if ( empty( $accordions ) || ! is_array( $accordions ) ) {
@@ -2756,6 +2758,14 @@ class Trek_CPT {
             <div class="ya-admin-field">
                 <label>Side Card Description</label>
                 <textarea name="trek_ess_card_desc" rows="2" placeholder="e.g. Departure-specific notes should contain the final kit list, inclusions, practical guidance and any updates affecting your chosen date."><?php echo esc_textarea( $card_desc ); ?></textarea>
+            </div>
+            <div class="ya-admin-field" style="margin-top:12px;">
+                <label><strong>Trip Notes / Newsletter PDF File (Direct Download for Travelers)</strong></label>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="text" name="trek_ess_card_file" id="trek_ess_card_file" value="<?php echo esc_attr( $card_file ); ?>" style="flex-grow:1;" placeholder="Upload PDF or enter download URL (e.g. https://.../trip-notes.pdf)">
+                    <button type="button" class="button button-secondary" onclick="yaOpenFileUploader(this, 'trek_ess_card_file')">Upload PDF / File</button>
+                </div>
+                <p class="description" style="margin:4px 0 0 0; font-size:12px; color:#64748b;">If uploaded, travelers will see a direct "Download Trip Notes (PDF)" button. If left empty, a helpful notice stating that current season notes are being updated will appear with an email request button.</p>
             </div>
         </div>
 
@@ -3488,6 +3498,7 @@ class Trek_CPT {
             'trek_ess_card_desc',
             'trek_ess_card_btn',
             'trek_ess_card_email',
+            'trek_ess_card_file',
             'trek_review_kicker',
             'trek_review_script',
             'trek_review_heading',
