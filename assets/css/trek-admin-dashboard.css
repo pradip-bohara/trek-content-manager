@@ -1,0 +1,989 @@
+/**
+ * Trek Manager - Production Admin Dashboard CSS
+ * Scoped strictly under .trek-dashboard-wrap
+ * Single Native WordPress Sidebar Architecture
+ */
+
+.trek-dashboard-wrap {
+    --trek-bg: #f8fafc;
+    --trek-card-bg: #ffffff;
+    --trek-text-main: #0f172a;
+    --trek-text-secondary: #475569;
+    --trek-text-muted: #64748b;
+    --trek-text-light: #94a3b8;
+    --trek-border: #e2e8f0;
+    --trek-border-subtle: #f1f5f9;
+    --trek-blue: #2563eb;
+    --trek-blue-dark: #1d4ed8;
+    --trek-blue-soft: #eff6ff;
+    --trek-green: #10b981;
+    --trek-green-dark: #059669;
+    --trek-green-soft: #ecfdf5;
+    --trek-amber: #f59e0b;
+    --trek-amber-soft: #fffbeb;
+    --trek-rose: #ef4444;
+    --trek-rose-soft: #fef2f2;
+    --trek-purple: #8b5cf6;
+    --trek-purple-soft: #f5f3ff;
+    --trek-teal: #06b6d4;
+    --trek-teal-soft: #ecfeff;
+    --trek-slate: #64748b;
+    --trek-slate-soft: #f1f5f9;
+    --trek-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --trek-radius-sm: 6px;
+    --trek-radius-md: 10px;
+    --trek-radius-lg: 14px;
+    --trek-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+    --trek-shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+
+    font-family: var(--trek-font);
+    background-color: var(--trek-bg);
+    color: var(--trek-text-main);
+    margin: 16px 20px 48px 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+.trek-dashboard-wrap *,
+.trek-dashboard-wrap *::before,
+.trek-dashboard-wrap *::after {
+    box-sizing: border-box;
+}
+
+.trek-dashboard-wrap a {
+    text-decoration: none;
+    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* ==========================================================================
+   1. DASHBOARD HEADER & CONTROLS
+   ========================================================================== */
+.trek-dashboard-header {
+    margin-bottom: 24px;
+}
+
+.trek-header-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.trek-header-brand-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.trek-header-logo-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.trek-header-brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.trek-brand-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.trek-main-brand-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--trek-text-main);
+    letter-spacing: -0.5px;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.trek-main-brand-tag {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--trek-text-muted);
+}
+
+.trek-brand-desc {
+    font-size: 13px;
+    color: var(--trek-text-muted);
+    margin: 3px 0 0;
+}
+
+.trek-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.trek-search-box {
+    position: relative;
+    width: 320px;
+}
+
+.trek-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    color: var(--trek-text-light);
+    pointer-events: none;
+}
+
+.trek-search-input {
+    width: 100%;
+    height: 38px;
+    background-color: #ffffff;
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-md);
+    padding: 6px 14px 6px 36px;
+    font-size: 12.5px;
+    color: var(--trek-text-main);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease;
+}
+
+.trek-search-input:focus {
+    outline: none;
+    border-color: var(--trek-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.trek-search-dropdown {
+    position: absolute;
+    top: 44px;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-md);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+    z-index: 50;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 6px;
+}
+
+.trek-search-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: var(--trek-radius-sm);
+    color: var(--trek-text-main);
+    font-size: 12.5px;
+}
+
+.trek-search-result-item:hover {
+    background-color: var(--trek-bg);
+}
+
+.trek-search-result-type {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--trek-blue);
+    background: var(--trek-blue-soft);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.trek-btn-view-website {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--trek-text-secondary);
+    background: #ffffff;
+    border: 1px solid var(--trek-border);
+    padding: 8px 14px;
+    border-radius: var(--trek-radius-md);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.trek-btn-view-website:hover {
+    color: var(--trek-blue);
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+}
+
+.trek-notification-btn {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-md);
+    padding: 8px 10px;
+    color: var(--trek-text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trek-notification-btn:hover {
+    color: var(--trek-blue);
+    background-color: #f8fafc;
+}
+
+.trek-notification-pill {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: var(--trek-rose);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+}
+
+.trek-user-profile-badge {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding-left: 8px;
+    border-left: 1px solid var(--trek-border);
+}
+
+.trek-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--trek-border);
+}
+
+.trek-user-name-text {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--trek-text-main);
+}
+
+/* Panoramic Mountain Banner */
+.trek-panoramic-banner {
+    position: relative;
+    width: 100%;
+    height: 110px;
+    border-radius: var(--trek-radius-lg);
+    overflow: hidden;
+    background-size: cover;
+    background-position: center 35%;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.trek-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.25) 60%, rgba(255, 255, 255, 0.8) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 40px;
+}
+
+.trek-banner-script-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.trek-script-line1 {
+    font-family: 'Caveat', cursive, var(--trek-font);
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e3a2f;
+    line-height: 1.1;
+    transform: rotate(-3deg);
+    letter-spacing: 0.2px;
+}
+
+.trek-script-line2 {
+    font-family: 'Caveat', cursive, var(--trek-font);
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e3a2f;
+    line-height: 1.1;
+    transform: rotate(-2deg);
+    padding-right: 8px;
+    letter-spacing: 0.2px;
+}
+
+/* ==========================================================================
+   2. FOUR STATISTICS CARDS
+   ========================================================================== */
+.trek-stats-section {
+    margin-bottom: 24px;
+}
+
+.trek-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.trek-stat-card {
+    background-color: var(--trek-card-bg);
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--trek-shadow);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.trek-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--trek-shadow-hover);
+    border-color: #cbd5e1;
+}
+
+.trek-stat-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.trek-stat-badge-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.trek-stat-icon-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--trek-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.trek-stat-icon-circle svg {
+    width: 18px;
+    height: 18px;
+}
+
+.trek-stat-icon-circle.blue {
+    background-color: var(--trek-blue-soft);
+    color: var(--trek-blue);
+}
+
+.trek-stat-icon-circle.green {
+    background-color: var(--trek-green-soft);
+    color: var(--trek-green);
+}
+
+.trek-stat-icon-circle.amber {
+    background-color: var(--trek-amber-soft);
+    color: var(--trek-amber);
+}
+
+.trek-stat-icon-circle.rose {
+    background-color: var(--trek-rose-soft);
+    color: var(--trek-rose);
+}
+
+.trek-stat-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--trek-text-main);
+}
+
+.trek-stat-arrow {
+    color: var(--trek-text-light);
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.trek-stat-value {
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--trek-text-main);
+    line-height: 1;
+    margin-bottom: 14px;
+    letter-spacing: -0.5px;
+}
+
+.trek-stat-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--trek-text-muted);
+    border-top: 1px solid var(--trek-border-subtle);
+    padding-top: 10px;
+}
+
+.trek-stat-breakdown {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.trek-stat-separator {
+    color: var(--trek-border);
+}
+
+.trek-stat-trend-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--trek-green);
+    font-weight: 600;
+    font-size: 11.5px;
+    white-space: nowrap;
+}
+
+.trek-stat-trend-badge::before {
+    content: '•';
+    font-size: 14px;
+    color: var(--trek-green);
+}
+
+/* ==========================================================================
+   3. GENERAL CARD & GRID LAYOUT
+   ========================================================================== */
+.trek-content-grid-row {
+    display: grid;
+    grid-template-columns: 1.55fr 0.95fr 1.1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.trek-content-grid-row.bottom-row {
+    grid-template-columns: 1.55fr 1fr 0.95fr;
+}
+
+.trek-dashboard-card {
+    background-color: var(--trek-card-bg);
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-lg);
+    box-shadow: var(--trek-shadow);
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+}
+
+.trek-card-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.trek-card-heading-wrap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.trek-card-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.trek-card-icon.green {
+    color: var(--trek-green);
+}
+
+.trek-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--trek-text-main);
+    margin: 0;
+}
+
+.trek-link-view-all {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--trek-blue);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.trek-link-view-all:hover {
+    color: var(--trek-blue-dark);
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   4. DATA TABLES (Destinations, Enquiries, Reviews)
+   ========================================================================== */
+.trek-table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.trek-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.trek-data-table th {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--trek-text-muted);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--trek-border);
+    white-space: nowrap;
+}
+
+.trek-data-table td {
+    padding: 11px 10px;
+    font-size: 12.5px;
+    color: var(--trek-text-secondary);
+    border-bottom: 1px solid var(--trek-border-subtle);
+    vertical-align: middle;
+}
+
+.trek-data-table tbody tr:hover td {
+    background-color: #f8fafc;
+}
+
+.trek-row-thumbnail {
+    width: 46px;
+    height: 32px;
+    border-radius: var(--trek-radius-sm);
+    object-fit: cover;
+    display: block;
+    border: 1px solid var(--trek-border);
+}
+
+.trek-row-title-link {
+    font-weight: 600;
+    color: var(--trek-text-main);
+    display: block;
+    line-height: 1.3;
+}
+
+.trek-row-title-link:hover {
+    color: var(--trek-blue);
+}
+
+/* Status Pills */
+.trek-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2.5px 9px;
+    border-radius: 12px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.trek-pill.published,
+.trek-pill.contacted {
+    background-color: var(--trek-green-soft);
+    color: var(--trek-green);
+    border: 1px solid #a7f3d0;
+}
+
+.trek-pill.draft,
+.trek-pill.follow-up,
+.trek-pill.pending {
+    background-color: var(--trek-amber-soft);
+    color: var(--trek-amber);
+    border: 1px solid #fde68a;
+}
+
+.trek-pill.new {
+    background-color: var(--trek-blue-soft);
+    color: var(--trek-blue);
+    border: 1px solid #bfdbfe;
+}
+
+.trek-pill.closed {
+    background-color: var(--trek-slate-soft);
+    color: var(--trek-slate);
+    border: 1px solid #cbd5e1;
+}
+
+/* Action Icons */
+.trek-td-actions {
+    white-space: nowrap;
+}
+
+.trek-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--trek-radius-sm);
+    color: var(--trek-text-light);
+    transition: all 0.15s ease;
+    margin-left: 2px;
+}
+
+.trek-action-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.trek-action-icon.view:hover {
+    color: var(--trek-blue);
+    background-color: var(--trek-blue-soft);
+}
+
+.trek-action-icon.edit:hover {
+    color: var(--trek-text-main);
+    background-color: var(--trek-border-subtle);
+}
+
+.trek-action-icon.delete:hover {
+    color: var(--trek-rose);
+    background-color: var(--trek-rose-soft);
+}
+
+.trek-btn-add-destination {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--trek-blue);
+    margin-top: 14px;
+    align-self: flex-start;
+}
+
+.trek-btn-add-destination:hover {
+    color: var(--trek-blue-dark);
+    text-decoration: underline;
+}
+
+/* Star Ratings in Reviews */
+.trek-stars {
+    color: #f59e0b;
+    font-size: 13px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   5. QUICK ACTIONS CARD
+   ========================================================================== */
+.trek-quick-action-items {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.trek-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    border-radius: var(--trek-radius-md);
+    background-color: #ffffff;
+    border: 1px solid var(--trek-border);
+    transition: all 0.15s ease;
+    text-decoration: none;
+    color: var(--trek-text-main);
+}
+
+.trek-action-row:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+    transform: translateX(2px);
+}
+
+.trek-action-label-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.trek-action-icon-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--trek-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.trek-action-icon-circle svg {
+    width: 15px;
+    height: 15px;
+}
+
+.trek-action-icon-circle.green {
+    background-color: var(--trek-green-soft);
+    color: var(--trek-green);
+}
+
+.trek-action-icon-circle.blue {
+    background-color: var(--trek-blue-soft);
+    color: var(--trek-blue);
+}
+
+.trek-action-icon-circle.purple {
+    background-color: var(--trek-purple-soft);
+    color: var(--trek-purple);
+}
+
+.trek-action-icon-circle.teal {
+    background-color: var(--trek-teal-soft);
+    color: var(--trek-teal);
+}
+
+.trek-action-icon-circle.slate {
+    background-color: var(--trek-slate-soft);
+    color: var(--trek-slate);
+}
+
+.trek-action-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--trek-text-main);
+}
+
+.trek-action-arrow {
+    color: var(--trek-text-light);
+    font-size: 14px;
+}
+
+/* ==========================================================================
+   6. TRAVELLER ACTIVITY CARD
+   ========================================================================== */
+.trek-activity-items-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.trek-activity-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--trek-border-subtle);
+}
+
+.trek-activity-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.trek-activity-row:first-child {
+    padding-top: 0;
+}
+
+.trek-activity-left {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.trek-activity-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.trek-activity-avatar svg {
+    width: 16px;
+    height: 16px;
+}
+
+.trek-activity-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.trek-activity-name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--trek-text-main);
+    line-height: 1.2;
+}
+
+.trek-activity-action {
+    font-size: 11.5px;
+    color: var(--trek-text-muted);
+    margin-top: 2px;
+}
+
+.trek-activity-timestamp {
+    text-align: right;
+    font-size: 10.5px;
+    color: var(--trek-text-light);
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   7. QUICK STATS CARD
+   ========================================================================== */
+.trek-quick-stats-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.trek-quick-stat-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--trek-border-subtle);
+}
+
+.trek-quick-stat-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.trek-quick-stat-item:first-child {
+    padding-top: 0;
+}
+
+.trek-stat-label-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.trek-stat-icon-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.trek-stat-icon-dot svg {
+    width: 14px;
+    height: 14px;
+}
+
+.trek-quick-stat-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--trek-text-secondary);
+}
+
+.trek-stat-num-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.trek-quick-stat-val {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--trek-text-main);
+}
+
+.trek-quick-stat-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--trek-green);
+    background-color: var(--trek-green-soft);
+    padding: 1px 6px;
+    border-radius: 8px;
+}
+
+/* Helpers */
+.text-right {
+    text-align: right;
+}
+
+.trek-hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   8. RESPONSIVE DESIGN
+   ========================================================================== */
+@media (max-width: 1440px) {
+    .trek-stats-grid {
+        gap: 14px;
+    }
+    .trek-stat-value {
+        font-size: 30px;
+    }
+    .trek-panoramic-banner {
+        height: 100px;
+    }
+}
+
+@media (max-width: 1280px) {
+    .trek-content-grid-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    .trek-content-grid-row .trek-card-destinations {
+        grid-column: span 2;
+    }
+    .trek-content-grid-row.bottom-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    .trek-content-grid-row.bottom-row .trek-card-enquiries {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 1024px) {
+    .trek-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .trek-header-top-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .trek-header-controls {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .trek-search-box {
+        width: 100%;
+        order: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .trek-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .trek-content-grid-row,
+    .trek-content-grid-row.bottom-row {
+        grid-template-columns: 1fr;
+    }
+    .trek-content-grid-row .trek-card-destinations,
+    .trek-content-grid-row.bottom-row .trek-card-enquiries {
+        grid-column: span 1;
+    }
+}

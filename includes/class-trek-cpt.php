@@ -116,7 +116,7 @@ class Trek_CPT {
             'hierarchical'          => false,
             'public'                => false,
             'show_ui'               => true,
-            'show_in_menu'          => 'edit.php?post_type=trek_destination',
+            'show_in_menu'          => false,
             'show_in_admin_bar'     => false,
             'show_in_nav_menus'     => false,
             'can_export'            => true,
@@ -149,7 +149,7 @@ class Trek_CPT {
             'hierarchical'          => false,
             'public'                => false,
             'show_ui'               => true,
-            'show_in_menu'          => 'edit.php?post_type=trek_destination',
+            'show_in_menu'          => false,
             'show_in_admin_bar'     => false,
             'show_in_nav_menus'     => false,
             'can_export'            => true,
@@ -206,7 +206,7 @@ class Trek_CPT {
             __( 'Quick Guide', 'trek-content-manager' ),
             'edit_posts',
             'trek-manager-guide',
-            array( __CLASS__, 'render_guide_page' )
+            array( 'Trek_Dashboard', 'render_guide_page' )
         );
         add_submenu_page(
             'edit.php?post_type=trek_destination',
@@ -214,7 +214,7 @@ class Trek_CPT {
             __( 'Export Enquiries', 'trek-content-manager' ),
             'edit_posts',
             'trek-export-enquiries',
-            array( __CLASS__, 'render_enquiry_export_page' )
+            array( 'Trek_Dashboard', 'render_export_page' )
         );
     }
 

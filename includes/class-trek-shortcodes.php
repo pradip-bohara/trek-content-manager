@@ -411,225 +411,7 @@ class Trek_Shortcodes {
         );
     }
 
-    /**
-     * Fallback demo trips when database is empty
-     */
-    private static function get_fallback_country_trips( $country = 'nepal' ) {
-        $country_lower = strtolower( trim( $country ) );
 
-        if ( strpos( $country_lower, 'india' ) !== false ) {
-            return array(
-                array(
-                    'id'             => 101,
-                    'number'         => '01',
-                    'title'          => 'Mughals, Maharajas & Mystics',
-                    'excerpt'        => 'Explore the royal forts of Rajasthan, the spiritual ghats of Varanasi and timeless cultural wonders.',
-                    'image'          => 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1400&q=86',
-                    'permalink'      => home_url( '/all-trips/mughals-maharajas-mystics/' ),
-                    'duration_val'   => '14',
-                    'duration_meta'  => '14 Days',
-                    'duration_label' => '14-Day Trip',
-                    'country'        => 'India',
-                    'country_slug'   => 'india',
-                    'tag'            => 'India · Cultural Heritage',
-                    'tag_primary'    => 'Culture',
-                    'tag_secondary'  => 'Rajasthan',
-                    'category_slugs' => 'culture luxury',
-                    'all_slugs'      => 'india culture luxury'
-                ),
-                array(
-                    'id'             => 102,
-                    'number'         => '02',
-                    'title'          => 'Taj, Tiger & Tea',
-                    'excerpt'        => 'Journey from Delhi and the Taj Mahal through Ranthambhore National Park to the scenic tea hills of Darjeeling.',
-                    'image'          => 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1400&q=86',
-                    'permalink'      => home_url( '/all-trips/taj-tiger-tea/' ),
-                    'duration_val'   => '12',
-                    'duration_meta'  => '12 Days',
-                    'duration_label' => '12-Day Trip',
-                    'country'        => 'India',
-                    'country_slug'   => 'india',
-                    'tag'            => 'India · Wildlife & Culture',
-                    'tag_primary'    => 'Wildlife',
-                    'tag_secondary'  => 'Darjeeling',
-                    'category_slugs' => 'wildlife culture',
-                    'all_slugs'      => 'india wildlife culture'
-                ),
-                array(
-                    'id'             => 103,
-                    'number'         => '03',
-                    'title'          => 'The Buddhist Circuit',
-                    'excerpt'        => 'Follow the sacred footsteps of Buddha from Lumbini to Bodhgaya, Varanasi, Rajgir and Sarnath.',
-                    'image'          => 'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=1400&q=86',
-                    'permalink'      => home_url( '/all-trips/the-buddhist-circuit/' ),
-                    'duration_val'   => '14',
-                    'duration_meta'  => '14 Days',
-                    'duration_label' => '14-Day Trip',
-                    'country'        => 'India',
-                    'country_slug'   => 'india',
-                    'tag'            => 'India & Nepal · Spiritual',
-                    'tag_primary'    => 'Spiritual',
-                    'tag_secondary'  => 'Varanasi',
-                    'category_slugs' => 'spiritual culture',
-                    'all_slugs'      => 'india spiritual culture'
-                )
-            );
-        } elseif ( strpos( $country_lower, 'bhutan' ) !== false ) {
-            return array(
-                array(
-                    'id'             => 201,
-                    'number'         => '01',
-                    'title'          => 'Jhomolhari Base Camp Trek',
-                    'excerpt'        => 'A classic Bhutanese trek into high alpine valleys under the dramatic peak of Mount Jhomolhari.',
-                    'image'          => 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=86',
-                    'permalink'      => home_url( '/all-trips/jhomolhari-trek/' ),
-                    'duration_val'   => '11',
-                    'duration_meta'  => '11 Days',
-                    'duration_label' => '11-Day Trip',
-                    'country'        => 'Bhutan',
-                    'country_slug'   => 'bhutan',
-                    'tag'            => 'Bhutan · Himalayan Trek',
-                    'tag_primary'    => 'Trekking',
-                    'tag_secondary'  => 'Jhomolhari',
-                    'category_slugs' => 'trekking himalayan',
-                    'all_slugs'      => 'bhutan trekking himalayan'
-                ),
-                array(
-                    'id'             => 202,
-                    'number'         => '02',
-                    'title'          => 'Cultural Kingdom of Bhutan',
-                    'excerpt'        => 'Discover the iconic Tiger’s Nest monastery, sacred dzongs and pristine valleys of Paro and Punakha.',
-                    'image'          => 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1400&q=86',
-                    'permalink'      => home_url( '/all-trips/cultural-bhutan/' ),
-                    'duration_val'   => '8',
-                    'duration_meta'  => '8 Days',
-                    'duration_label' => '8-Day Trip',
-                    'country'        => 'Bhutan',
-                    'country_slug'   => 'bhutan',
-                    'tag'            => 'Bhutan · Cultural Immersion',
-                    'tag_primary'    => 'Culture',
-                    'tag_secondary'  => 'Paro',
-                    'category_slugs' => 'culture luxury',
-                    'all_slugs'      => 'bhutan culture luxury'
-                )
-            );
-        } elseif ( strpos( $country_lower, 'tibet' ) !== false || strpos( $country_lower, 'tibit' ) !== false ) {
-            return array(
-                array(
-                    'id'             => 301,
-                    'number'         => '01',
-                    'title'          => 'Mount Kailash & Lake Manasarovar',
-                    'excerpt'        => 'The sacred pilgrimage circuit around Mount Kailash crossing high trans-Himalayan passes.',
-                    'image'          => 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=86',
-                    'permalink'      => home_url( '/all-trips/kailash-kora/' ),
-                    'duration_val'   => '16',
-                    'duration_meta'  => '16 Days',
-                    'duration_label' => '16-Day Trip',
-                    'country'        => 'Tibet',
-                    'country_slug'   => 'tibet',
-                    'tag'            => 'Tibet · Sacred Kora',
-                    'tag_primary'    => 'Spiritual',
-                    'tag_secondary'  => 'Kailash',
-                    'category_slugs' => 'spiritual trekking',
-                    'all_slugs'      => 'tibet spiritual trekking'
-                ),
-                array(
-                    'id'             => 302,
-                    'number'         => '02',
-                    'title'          => 'Lhasa to Kathmandu Overland',
-                    'excerpt'        => 'Traverse the Tibetan Plateau from the Potala Palace to Everest North Face and into the Kathmandu Valley.',
-                    'image'          => 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=86',
-                    'permalink'      => home_url( '/all-trips/lhasa-kathmandu-overland/' ),
-                    'duration_val'   => '13',
-                    'duration_meta'  => '13 Days',
-                    'duration_label' => '13-Day Trip',
-                    'country'        => 'Tibet',
-                    'country_slug'   => 'tibet',
-                    'tag'            => 'Tibet · Overland Expedition',
-                    'tag_primary'    => 'Expedition',
-                    'tag_secondary'  => 'Lhasa',
-                    'category_slugs' => 'expedition culture',
-                    'all_slugs'      => 'tibet expedition culture'
-                )
-            );
-        }
-
-        // Default Nepal Fallbacks
-        return array(
-            array(
-                'id'             => 1,
-                'number'         => '01',
-                'title'          => 'The Ultimate Everest Base Camp Trek',
-                'excerpt'        => 'Walk through the legendary Khumbu, visit Sherpa villages and stand beneath the world’s highest mountain.',
-                'image'          => 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1400&q=84',
-                'permalink'      => home_url( '/all-trips/everest-basecamp-trek/' ),
-                'duration_val'   => '15',
-                'duration_meta'  => '15 Days',
-                'duration_label' => '15-Day Trip',
-                'country'        => 'Nepal',
-                'country_slug'   => 'nepal',
-                'tag'            => 'Nepal · Signature Trek',
-                'tag_primary'    => 'Trekking',
-                'tag_secondary'  => 'Everest',
-                'category_slugs' => 'trekking himalayan',
-                'all_slugs'      => 'nepal trekking himalayan'
-            ),
-            array(
-                'id'             => 2,
-                'number'         => '02',
-                'title'          => 'A Himalayan Sanctuary: Annapurna’s Heart',
-                'excerpt'        => 'Walk through terraced settlements and rhododendron forests into a natural amphitheatre of Himalayan peaks.',
-                'image'          => 'https://images.unsplash.com/photo-1531719555052-632b0348c404?auto=format&fit=crop&w=1400&q=84',
-                'permalink'      => home_url( '/all-trips/annapurna-sanctuary/' ),
-                'duration_val'   => '13',
-                'duration_meta'  => '13 Days',
-                'duration_label' => '13-Day Trip',
-                'country'        => 'Nepal',
-                'country_slug'   => 'nepal',
-                'tag'            => 'Nepal · Moderate Trek',
-                'tag_primary'    => 'Trekking',
-                'tag_secondary'  => 'Annapurna',
-                'category_slugs' => 'trekking himalayan',
-                'all_slugs'      => 'nepal trekking himalayan'
-            ),
-            array(
-                'id'             => 3,
-                'number'         => '03',
-                'title'          => 'Sky Caves & Ancient Trails: Upper Mustang',
-                'excerpt'        => 'Cross an arid trans-Himalayan landscape where cliff villages, monasteries and old trade routes still shape daily life.',
-                'image'          => 'https://images.unsplash.com/photo-1540876508220-988a11575ed6?auto=format&fit=crop&w=1400&q=84',
-                'permalink'      => home_url( '/all-trips/upper-mustang/' ),
-                'duration_val'   => '12',
-                'duration_meta'  => '12 Days',
-                'duration_label' => '12-Day Trip',
-                'country'        => 'Nepal',
-                'country_slug'   => 'nepal',
-                'tag'            => 'Nepal · Cultural Trek',
-                'tag_primary'    => 'Culture',
-                'tag_secondary'  => 'Mustang',
-                'category_slugs' => 'culture trekking',
-                'all_slugs'      => 'nepal culture trekking'
-            ),
-            array(
-                'id'             => 4,
-                'number'         => '04',
-                'title'          => 'Where Culture Meets the Wild: Nepal’s Treasures',
-                'excerpt'        => 'Combine Kathmandu’s living heritage, Himalayan sunrise views and wildlife safaris in Chitwan National Park.',
-                'image'          => 'https://images.unsplash.com/photo-1583079903715-10d17697cd92?auto=format&fit=crop&w=1400&q=84',
-                'permalink'      => home_url( '/all-trips/nepal-wild-trio/' ),
-                'duration_val'   => '12',
-                'duration_meta'  => '12 Days',
-                'duration_label' => '12-Day Trip',
-                'country'        => 'Nepal',
-                'country_slug'   => 'nepal',
-                'tag'            => 'Nepal · Wildlife & Culture',
-                'tag_primary'    => 'Wildlife',
-                'tag_secondary'  => 'Culture',
-                'category_slugs' => 'wildlife culture soft',
-                'all_slugs'      => 'nepal wildlife culture soft'
-            )
-        );
-    }
 
     /**
      * =========================================================================
@@ -735,6 +517,10 @@ class Trek_Shortcodes {
                 }
                 wp_reset_postdata();
             }
+        }
+
+        if ( empty( $cards ) ) {
+            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
         }
 
         ob_start();
@@ -1006,7 +792,7 @@ class Trek_Shortcodes {
         );
 
         if ( ! $query->have_posts() ) {
-            return '<p class="ya-journal-empty">No journal stories are available yet.</p>';
+            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
         }
 
         $posts = $query->posts;
@@ -1116,7 +902,7 @@ class Trek_Shortcodes {
         );
 
         if ( ! $query->have_posts() ) {
-            return '';
+            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
         }
 
         ob_start();
@@ -1254,6 +1040,10 @@ class Trek_Shortcodes {
                 }
             }
             wp_reset_postdata();
+        }
+
+        if ( empty( $trips ) ) {
+            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
         }
 
         // Fetch dynamic categories from the database — only show categories that
@@ -1484,6 +1274,10 @@ class Trek_Shortcodes {
                 }
             }
             wp_reset_postdata();
+        }
+
+        if ( empty( $cards ) ) {
+            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
         }
 
         $cols = max( 1, min( 4, intval( $atts['columns'] ) ) );
@@ -1892,46 +1686,8 @@ class Trek_Shortcodes {
             wp_reset_postdata();
         }
 
-        // Fallback sample cards if database has 0 published treks
         if ( empty( $cards ) ) {
-            $cards = array(
-                array(
-                    'id'     => 1,
-                    'url'    => '#',
-                    'img'    => 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80',
-                    'alt'    => 'Kathmandu Valley & Himalayan Foothills',
-                    'badge'  => 'Trekking',
-                    'region' => 'Nepal',
-                    'diff'   => 'Moderate',
-                    'title'  => 'Kathmandu Valley & Himalayan Foothills',
-                    'days'   => '5',
-                    'season' => 'Mar – Nov',
-                ),
-                array(
-                    'id'     => 2,
-                    'url'    => '#',
-                    'img'    => 'https://yetiadventure.com/wp-content/uploads/2022/02/15-Days_Everest-Base-Camp-trek-1024x682.jpg',
-                    'alt'    => 'The Ultimate Everest Base Camp Experience',
-                    'badge'  => 'Trekking',
-                    'region' => 'Everest',
-                    'diff'   => 'Challenging',
-                    'title'  => 'The Ultimate Everest Base Camp Experience',
-                    'days'   => '15',
-                    'season' => 'Sep – May',
-                ),
-                array(
-                    'id'     => 3,
-                    'url'    => '#',
-                    'img'    => 'https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?auto=format&fit=crop&w=1200&q=80',
-                    'alt'    => 'Annapurna Sanctuary & Poon Hill Panorama',
-                    'badge'  => 'Trekking',
-                    'region' => 'Annapurna',
-                    'diff'   => 'Moderate',
-                    'title'  => 'Annapurna Sanctuary & Poon Hill Panorama',
-                    'days'   => '12',
-                    'season' => 'Oct – Apr',
-                ),
-            );
+            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
         }
 
         $per_page    = max( 1, intval( $atts['per_page'] ) );
@@ -1962,10 +1718,10 @@ class Trek_Shortcodes {
                 #<?php echo esc_attr( $uid ); ?> .ya-related-card {
                     display: flex;
                     flex-direction: column;
-                    border-radius: 10px;
+                    border-radius: 8px;
                     overflow: hidden;
                     background: #ffffff;
-                    border: 1px solid #dce8e3;
+                    border: 1px solid #011b18ff;
                     box-shadow: 0 4px 20px rgba(7, 94, 84, 0.05);
                     transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease;
                     text-decoration: none;

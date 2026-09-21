@@ -54,7 +54,7 @@ class Trek_Importer {
         add_submenu_page(
             'edit.php?post_type=trek_destination',
             __( 'JSON Importer & Schema Guide', 'trek-content-manager' ),
-            __( '📥 JSON Importer', 'trek-content-manager' ),
+            __( 'JSON Importer', 'trek-content-manager' ),
             'edit_posts',
             'trek-json-importer',
             array( __CLASS__, 'render_importer_page' )

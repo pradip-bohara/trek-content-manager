@@ -1,0 +1,528 @@
+/**
+ * Trek Manager - All Travellers Management Stylesheet
+ * Scoped strictly under .trek-travellers-wrap
+ */
+
+.trek-travellers-wrap {
+    --trek-bg: #f8fafc;
+    --trek-card-bg: #ffffff;
+    --trek-text-main: #0f172a;
+    --trek-text-secondary: #475569;
+    --trek-text-muted: #64748b;
+    --trek-text-light: #94a3b8;
+    --trek-border: #e2e8f0;
+    --trek-border-subtle: #f1f5f9;
+    --trek-blue: #2563eb;
+    --trek-blue-soft: #eff6ff;
+    --trek-green: #10b981;
+    --trek-green-soft: #ecfdf5;
+    --trek-amber: #f59e0b;
+    --trek-amber-soft: #fffbeb;
+    --trek-purple: #8b5cf6;
+    --trek-purple-soft: #f5f3ff;
+    --trek-rose: #ef4444;
+    --trek-rose-soft: #fef2f2;
+    --trek-slate: #64748b;
+    --trek-slate-soft: #f1f5f9;
+    --trek-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --trek-radius-sm: 6px;
+    --trek-radius-md: 10px;
+    --trek-radius-lg: 14px;
+    --trek-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+
+    font-family: var(--trek-font);
+    color: var(--trek-text-main);
+    margin: 20px 20px 48px 0;
+    box-sizing: border-box;
+}
+
+.trek-travellers-wrap * {
+    box-sizing: border-box;
+}
+
+/* Header */
+.trek-travellers-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.trek-travellers-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--trek-text-main);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.trek-travellers-subtitle {
+    font-size: 13px;
+    color: var(--trek-text-muted);
+    margin: 4px 0 0;
+}
+
+.trek-travellers-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.trek-selected-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+/* Toolbar */
+.trek-travellers-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.trek-filter-tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.trek-filter-tabs li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--trek-text-secondary);
+    text-decoration: none;
+    border-radius: var(--trek-radius-md);
+    transition: all 0.15s ease;
+}
+
+.trek-filter-tabs li a:hover {
+    background-color: #f1f5f9;
+    color: var(--trek-text-main);
+}
+
+.trek-filter-tabs li.active a {
+    background-color: var(--trek-blue);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.trek-tab-count {
+    font-size: 11.5px;
+    opacity: 0.85;
+}
+
+.trek-search-input-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.trek-input-search {
+    min-width: 280px;
+    padding: 6px 12px 6px 14px;
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-md);
+    font-size: 13px;
+    background-color: #ffffff;
+    transition: all 0.15s ease;
+}
+
+.trek-input-search:focus {
+    border-color: var(--trek-blue);
+    box-shadow: 0 0 0 1px var(--trek-blue);
+    outline: none;
+}
+
+/* Table Card */
+.trek-table-card {
+    background: var(--trek-card-bg);
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-lg);
+    box-shadow: var(--trek-shadow);
+    overflow: hidden;
+}
+
+.trek-custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+}
+
+.trek-custom-table thead th {
+    background-color: #f8fafc;
+    color: var(--trek-text-secondary);
+    font-weight: 600;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--trek-border);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.trek-custom-table tbody tr {
+    border-bottom: 1px solid var(--trek-border-subtle);
+    transition: background-color 0.15s ease;
+}
+
+.trek-custom-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.trek-custom-table tbody tr:hover {
+    background-color: #fbfcfe;
+}
+
+.trek-custom-table tbody tr.is-selected {
+    background-color: #f0f7ff;
+}
+
+.trek-custom-table td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    color: var(--trek-text-secondary);
+}
+
+.trek-custom-table .check-column {
+    padding-left: 16px;
+    padding-right: 8px;
+    text-align: center;
+}
+
+/* Traveller Info Cell */
+.trek-traveller-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.trek-traveller-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #e2e8f0;
+    border: 1px solid var(--trek-border);
+}
+
+.trek-traveller-name-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.trek-traveller-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--trek-text-main);
+    line-height: 1.3;
+}
+
+/* Links */
+.trek-traveller-link {
+    color: var(--trek-text-main);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+.trek-traveller-link:hover {
+    color: var(--trek-blue);
+    text-decoration: underline;
+}
+
+.trek-phone-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.trek-wa-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 5px;
+    border-radius: 4px;
+    background: #ecfdf5;
+    transition: background 0.15s ease;
+}
+
+.trek-wa-icon:hover {
+    background: #d1fae5;
+}
+
+/* Source Badges */
+.trek-source-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.trek-source-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.trek-badge-enquiry {
+    background: var(--trek-purple-soft);
+    color: var(--trek-purple);
+    border: 1px solid #ddd6fe;
+}
+
+.trek-badge-review {
+    background: var(--trek-amber-soft);
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.trek-badge-user {
+    background: var(--trek-green-soft);
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+/* Activity & Date */
+.trek-activity-stats {
+    font-size: 12.5px;
+    color: var(--trek-text-muted);
+}
+
+.trek-date-text {
+    font-size: 12.5px;
+    color: var(--trek-text-muted);
+}
+
+.trek-text-muted {
+    color: var(--trek-text-light);
+    font-style: italic;
+    font-size: 12px;
+}
+
+/* Actions */
+.trek-td-actions {
+    white-space: nowrap;
+}
+
+.trek-td-actions .button {
+    margin-left: 4px;
+    font-size: 12px;
+    padding: 2px 10px;
+    height: 28px;
+    line-height: 26px;
+    border-radius: var(--trek-radius-sm);
+}
+
+/* ==================================================================
+   MODAL WINDOWS
+   ================================================================== */
+.trek-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: trekFadeIn 0.2s ease-out;
+}
+
+@keyframes trekFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.trek-modal-dialog {
+    background: #ffffff;
+    border-radius: var(--trek-radius-lg);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    width: 100%;
+    max-width: 520px;
+    overflow: hidden;
+    animation: trekSlideUp 0.2s ease-out;
+}
+
+@keyframes trekSlideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.trek-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--trek-border);
+}
+
+.trek-modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--trek-text-main);
+    margin: 0;
+}
+
+.trek-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--trek-text-light);
+    cursor: pointer;
+    padding: 0;
+}
+
+.trek-modal-close:hover {
+    color: var(--trek-rose);
+}
+
+.trek-modal-body {
+    padding: 20px 24px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.trek-form-field {
+    margin-bottom: 16px;
+}
+
+.trek-form-field:last-child {
+    margin-bottom: 0;
+}
+
+.trek-form-field label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--trek-text-secondary);
+    margin-bottom: 6px;
+}
+
+.trek-form-field .required {
+    color: var(--trek-rose);
+}
+
+.trek-form-field input[type="text"],
+.trek-form-field input[type="email"],
+.trek-form-field textarea {
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-sm);
+    padding: 8px 12px;
+    font-size: 13.5px;
+    box-shadow: none;
+    transition: border-color 0.15s ease;
+}
+
+.trek-form-field input:focus,
+.trek-form-field textarea:focus {
+    border-color: var(--trek-blue);
+    box-shadow: 0 0 0 1px var(--trek-blue);
+    outline: none;
+}
+
+.trek-recipient-preview {
+    background: #f8fafc;
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-sm);
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--trek-text-main);
+    font-weight: 500;
+}
+
+.trek-bulk-recipients-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 100px;
+    overflow-y: auto;
+    padding: 8px;
+    background: #f8fafc;
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-sm);
+}
+
+.trek-recipient-chip {
+    background: #e2e8f0;
+    color: var(--trek-text-main);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    font-weight: 500;
+}
+
+.trek-modal-status {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: var(--trek-radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.trek-modal-status.success {
+    background: var(--trek-green-soft);
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.trek-modal-status.error {
+    background: var(--trek-rose-soft);
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.trek-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--trek-border);
+    background: #f8fafc;
+}
+
+.trek-modal-footer .button {
+    height: 34px;
+    line-height: 32px;
+    padding: 0 16px;
+    font-size: 13px;
+    border-radius: var(--trek-radius-sm);
+}
+
+.trek-hidden {
+    display: none !important;
+}

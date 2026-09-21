@@ -1,0 +1,314 @@
+/**
+ * Trek Manager - All Reviews Custom CRUD Stylesheet
+ * Scoped strictly under .trek-reviews-wrap
+ */
+
+.trek-reviews-wrap {
+    --trek-bg: #f8fafc;
+    --trek-card-bg: #ffffff;
+    --trek-text-main: #0f172a;
+    --trek-text-secondary: #475569;
+    --trek-text-muted: #64748b;
+    --trek-text-light: #94a3b8;
+    --trek-border: #e2e8f0;
+    --trek-border-subtle: #f1f5f9;
+    --trek-blue: #2563eb;
+    --trek-blue-soft: #eff6ff;
+    --trek-green: #10b981;
+    --trek-green-soft: #ecfdf5;
+    --trek-amber: #f59e0b;
+    --trek-amber-soft: #fffbeb;
+    --trek-rose: #ef4444;
+    --trek-rose-soft: #fef2f2;
+    --trek-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --trek-radius-sm: 6px;
+    --trek-radius-md: 10px;
+    --trek-radius-lg: 14px;
+    --trek-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+
+    font-family: var(--trek-font);
+    color: var(--trek-text-main);
+    margin: 20px 20px 48px 0;
+    box-sizing: border-box;
+}
+
+.trek-reviews-wrap * {
+    box-sizing: border-box;
+}
+
+/* Header */
+.trek-reviews-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.trek-reviews-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--trek-text-main);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.trek-reviews-subtitle {
+    font-size: 13px;
+    color: var(--trek-text-muted);
+    margin: 4px 0 0;
+}
+
+/* Toolbar */
+.trek-reviews-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.trek-filter-tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.trek-filter-tabs li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--trek-text-secondary);
+    text-decoration: none;
+    border-radius: var(--trek-radius-md);
+    transition: all 0.15s ease;
+}
+
+.trek-filter-tabs li a:hover {
+    background-color: #f1f5f9;
+    color: var(--trek-text-main);
+}
+
+.trek-filter-tabs li.active a {
+    background-color: var(--trek-blue);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.trek-tab-count {
+    font-size: 11.5px;
+    opacity: 0.85;
+}
+
+.trek-toolbar-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.trek-rating-select {
+    height: 36px;
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-md);
+    padding: 0 10px;
+    font-size: 12.5px;
+    background-color: #ffffff;
+    color: var(--trek-text-main);
+}
+
+.trek-search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.trek-input-search {
+    height: 36px;
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-md);
+    padding: 0 12px;
+    font-size: 12.5px;
+    min-width: 220px;
+    background-color: #ffffff;
+}
+
+.trek-input-search:focus,
+.trek-rating-select:focus {
+    outline: none;
+    border-color: var(--trek-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Table Card */
+.trek-table-card {
+    background-color: var(--trek-card-bg);
+    border: 1px solid var(--trek-border);
+    border-radius: var(--trek-radius-lg);
+    box-shadow: var(--trek-shadow);
+    overflow: hidden;
+}
+
+.trek-custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.trek-custom-table th {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--trek-text-muted);
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--trek-border);
+    background-color: #fcfcfd;
+}
+
+.trek-custom-table td {
+    padding: 13px 14px;
+    font-size: 13px;
+    color: var(--trek-text-secondary);
+    border-bottom: 1px solid var(--trek-border-subtle);
+    vertical-align: middle;
+}
+
+.trek-custom-table tbody tr:hover td {
+    background-color: #f8fafc;
+}
+
+.font-semibold {
+    font-weight: 600;
+    color: var(--trek-text-main);
+}
+
+.font-medium {
+    font-weight: 500;
+    color: var(--trek-blue);
+}
+
+.text-muted {
+    color: var(--trek-text-light);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.trek-stars {
+    color: #f59e0b;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.trek-review-content-cell {
+    max-width: 280px;
+    line-height: 1.4;
+    font-size: 12.5px;
+}
+
+/* Status Pills */
+.trek-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+.trek-pill.published {
+    background-color: var(--trek-green-soft);
+    color: var(--trek-green);
+    border: 1px solid #a7f3d0;
+}
+
+.trek-pill.pending {
+    background-color: var(--trek-amber-soft);
+    color: var(--trek-amber);
+    border: 1px solid #fde68a;
+}
+
+/* Action Buttons */
+.trek-td-actions {
+    white-space: nowrap;
+}
+
+.trek-btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--trek-radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--trek-text-light);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-left: 2px;
+}
+
+.trek-btn-action svg {
+    width: 15px;
+    height: 15px;
+}
+
+.trek-btn-action.approve:hover {
+    color: var(--trek-green);
+    background-color: var(--trek-green-soft);
+    border-color: #a7f3d0;
+}
+
+.trek-btn-action.reject:hover {
+    color: var(--trek-amber);
+    background-color: var(--trek-amber-soft);
+    border-color: #fde68a;
+}
+
+.trek-btn-action.edit:hover {
+    color: var(--trek-text-main);
+    background-color: #f1f5f9;
+}
+
+.trek-btn-action.delete:hover {
+    color: var(--trek-rose);
+    background-color: var(--trek-rose-soft);
+    border-color: #fecaca;
+}
+
+/* Pagination */
+.trek-pagination {
+    padding: 14px 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    border-top: 1px solid var(--trek-border-subtle);
+}
+
+.trek-pagination a,
+.trek-pagination span {
+    padding: 6px 12px;
+    border-radius: var(--trek-radius-sm);
+    font-size: 12.5px;
+    color: var(--trek-text-secondary);
+    text-decoration: none;
+    border: 1px solid var(--trek-border);
+}
+
+.trek-pagination .current {
+    background-color: var(--trek-blue);
+    color: #ffffff;
+    border-color: var(--trek-blue);
+}
