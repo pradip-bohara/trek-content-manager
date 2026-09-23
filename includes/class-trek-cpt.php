@@ -596,7 +596,9 @@ class Trek_CPT {
             'high'
         );
 
-        // 2. Quick Facts
+        // 2. Quick Facts - Consolidated into Section 4: "⚡ Trip Facts Dive (Specifications & Key Parameters)" in ya_trek_hero_metabox.
+        // Disabled duplicate metabox to prevent duplicate form input names and ensure Trip Facts Dive is the single authoritative source.
+        /*
         add_meta_box(
             'ya_trek_facts_metabox',
             __( '📊 2. Trip Facts Grid (Duration, Route, Difficulty, Group Size & More)', 'trek-content-manager' ),
@@ -605,6 +607,7 @@ class Trek_CPT {
             'normal',
             'high'
         );
+        */
 
         // 3. Overview & Route Visual Map
         add_meta_box(
@@ -675,6 +678,7 @@ class Trek_CPT {
             'normal',
             'low'
         );
+
 
         // Review Details Metabox for `trek_review` post type
         add_meta_box(
@@ -2111,8 +2115,8 @@ class Trek_CPT {
         $fact_distance   = get_post_meta( $post->ID, '_trek_fact_distance', true );
         $fact_start      = get_post_meta( $post->ID, '_trek_fact_start', true );
         $fact_end        = get_post_meta( $post->ID, '_trek_fact_end', true );
-        $fact_season     = get_post_meta( $post->ID, '_trek_fact_season', true ) ?: 'Autumn (Sep–Nov) & Spring (Mar–May)';
-        $fact_group_size = get_post_meta( $post->ID, '_trek_fact_group_size', true ) ?: '2–12 Travellers';
+        $fact_season     = get_post_meta( $post->ID, '_trek_fact_season', true );
+        $fact_group_size = get_post_meta( $post->ID, '_trek_fact_group_size', true );
         $trip_status     = get_post_meta( $post->ID, '_trek_trip_status', true ) ?: 'open';
         
         $price           = get_post_meta( $post->ID, '_trek_price', true ) ?: get_post_meta( $post->ID, '_trek_cost', true );
@@ -3196,6 +3200,97 @@ class Trek_CPT {
         <?php
     }
 
+    /**
+     * 10. Journey Matching Keywords Metabox (Explore, Feel & Pace)
+     */
+    public static function render_matching_metabox( $post ) {
+        if ( ! class_exists( 'Trek_Journey_Matcher' ) ) {
+            echo '<p style="color:#b32d2e;">' . esc_html__( 'Trek_Journey_Matcher class is required.', 'trek-content-manager' ) . '</p>';
+            return;
+        }
+
+        $categories = Trek_Journey_Matcher::get_categories();
+        $keywords   = Trek_Journey_Matcher::get_destination_keywords( $post->ID );
+        ?>
+        <div class="ya-matching-metabox-wrap" style="font-size:12px; color:#334155; line-height:1.4;">
+            <p style="margin:0 0 12px; color:#64748b; font-size:12px; line-height:1.5;">
+                <?php esc_html_e( 'Select matching tags for this destination. When travellers take the quiz, our algorithm compares their choices with these keywords to find their best match.', 'trek-content-manager' ); ?>
+            </p>
+
+            <!-- 1. Explore Keywords -->
+            <details open style="margin-bottom:10px; border:1px solid #e2e8f0; border-radius:6px; background:#fff; overflow:hidden;">
+                <summary style="padding:8px 10px; background:#f8fafc; cursor:pointer; font-weight:700; font-size:12px; color:#0f172a; display:flex; align-items:center; justify-content:space-between; user-select:none; border-bottom:1px solid #e2e8f0;">
+                    <span style="display:flex; align-items:center; gap:6px;">🧭 <?php echo esc_html( $categories['explore']['label'] ); ?></span>
+                    <span style="font-weight:600; color:#b45309; background:#fef3c7; font-size:10px; padding:1px 6px; border-radius:999px;">
+                        <?php printf( esc_html__( '%d pts', 'trek-content-manager' ), intval( $categories['explore']['weight'] ) ); ?>
+                    </span>
+                </summary>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(135px, 1fr)); gap:6px; padding:8px 10px;">
+                    <?php foreach ( $categories['explore']['options'] as $key => $label ) : 
+                        $is_checked = in_array( $key, $keywords['explore'], true );
+                    ?>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:#1e293b; background:<?php echo $is_checked ? '#fef3c7' : '#f8fafc'; ?>; padding:5px 8px; border-radius:5px; border:1px solid <?php echo $is_checked ? '#f59e0b' : '#e2e8f0'; ?>; cursor:pointer;">
+                            <input type="checkbox" name="trek_match_explore[]" value="<?php echo esc_attr( $key ); ?>" <?php checked( $is_checked ); ?> style="margin:0;" />
+                            <span><?php echo esc_html( $label ); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </details>
+
+            <!-- 2. Feel Keywords -->
+            <details open style="margin-bottom:10px; border:1px solid #e2e8f0; border-radius:6px; background:#fff; overflow:hidden;">
+                <summary style="padding:8px 10px; background:#f8fafc; cursor:pointer; font-weight:700; font-size:12px; color:#0f172a; display:flex; align-items:center; justify-content:space-between; user-select:none; border-bottom:1px solid #e2e8f0;">
+                    <span style="display:flex; align-items:center; gap:6px;">✨ <?php echo esc_html( $categories['feel']['label'] ); ?></span>
+                    <span style="font-weight:600; color:#1e40af; background:#dbeafe; font-size:10px; padding:1px 6px; border-radius:999px;">
+                        <?php printf( esc_html__( '%d pts', 'trek-content-manager' ), intval( $categories['feel']['weight'] ) ); ?>
+                    </span>
+                </summary>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(135px, 1fr)); gap:6px; padding:8px 10px;">
+                    <?php foreach ( $categories['feel']['options'] as $key => $label ) : 
+                        $is_checked = in_array( $key, $keywords['feel'], true );
+                    ?>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:#1e293b; background:<?php echo $is_checked ? '#dbeafe' : '#f8fafc'; ?>; padding:5px 8px; border-radius:5px; border:1px solid <?php echo $is_checked ? '#3b82f6' : '#e2e8f0'; ?>; cursor:pointer;">
+                            <input type="checkbox" name="trek_match_feel[]" value="<?php echo esc_attr( $key ); ?>" <?php checked( $is_checked ); ?> style="margin:0;" />
+                            <span><?php echo esc_html( $label ); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </details>
+
+            <!-- 3. Pace Keywords -->
+            <details open style="margin-bottom:10px; border:1px solid #e2e8f0; border-radius:6px; background:#fff; overflow:hidden;">
+                <summary style="padding:8px 10px; background:#f8fafc; cursor:pointer; font-weight:700; font-size:12px; color:#0f172a; display:flex; align-items:center; justify-content:space-between; user-select:none; border-bottom:1px solid #e2e8f0;">
+                    <span style="display:flex; align-items:center; gap:6px;">⚡ <?php echo esc_html( $categories['pace']['label'] ); ?></span>
+                    <span style="font-weight:600; color:#15803d; background:#dcfce7; font-size:10px; padding:1px 6px; border-radius:999px;">
+                        <?php printf( esc_html__( '%d pts', 'trek-content-manager' ), intval( $categories['pace']['weight'] ) ); ?>
+                    </span>
+                </summary>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(135px, 1fr)); gap:6px; padding:8px 10px;">
+                    <?php foreach ( $categories['pace']['options'] as $key => $label ) : 
+                        $is_checked = in_array( $key, $keywords['pace'], true );
+                    ?>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:#1e293b; background:<?php echo $is_checked ? '#dcfce7' : '#f8fafc'; ?>; padding:5px 8px; border-radius:5px; border:1px solid <?php echo $is_checked ? '#22c55e' : '#e2e8f0'; ?>; cursor:pointer;">
+                            <input type="checkbox" name="trek_match_pace[]" value="<?php echo esc_attr( $key ); ?>" <?php checked( $is_checked ); ?> style="margin:0;" />
+                            <span><?php echo esc_html( $label ); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </details>
+
+            <!-- Default Fallback Option -->
+            <div style="padding:10px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; margin-top:8px;">
+                <label style="font-weight:600; color:#166534; font-size:11.5px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                    <input type="checkbox" name="trek_match_default" value="1" <?php checked( $keywords['is_default'] ); ?> style="margin:0;" />
+                    <span>⭐ <?php esc_html_e( 'Default Discovery Fallback (Optional)', 'trek-content-manager' ); ?></span>
+                </label>
+                <p style="margin:4px 0 0 20px; color:#15803d; font-size:11px; line-height:1.4;">
+                    <?php esc_html_e( 'Optional: If a traveller selects answers that match 0 destinations, this destination is recommended. If left unchecked, the algorithm directly ranks destinations by keyword match score.', 'trek-content-manager' ); ?>
+                </p>
+            </div>
+        </div>
+        <?php
+    }
+
     /** Read-only details for enquiries saved from the trip planning popup or journey finder. */
     public static function render_enquiry_detail_metabox( $post ) {
         $trek_id     = absint( get_post_meta( $post->ID, '_trek_enquiry_trek_id', true ) );
@@ -3654,6 +3749,25 @@ class Trek_CPT {
         $featured_home = isset( $_POST['trek_featured_home'] ) ? '1' : '0';
         update_post_meta( $post_id, '_trek_featured_home', $featured_home );
 
+        // Journey Matching Keywords (Explore, Feel, Pace & Default Fallback)
+        $explore_raw = isset( $_POST['trek_match_explore'] ) && is_array( $_POST['trek_match_explore'] )
+            ? array_values( array_filter( array_map( 'sanitize_key', $_POST['trek_match_explore'] ) ) )
+            : array();
+        update_post_meta( $post_id, '_trek_match_explore', $explore_raw );
+
+        $feel_raw = isset( $_POST['trek_match_feel'] ) && is_array( $_POST['trek_match_feel'] )
+            ? array_values( array_filter( array_map( 'sanitize_key', $_POST['trek_match_feel'] ) ) )
+            : array();
+        update_post_meta( $post_id, '_trek_match_feel', $feel_raw );
+
+        $pace_raw = isset( $_POST['trek_match_pace'] ) && is_array( $_POST['trek_match_pace'] )
+            ? array_values( array_filter( array_map( 'sanitize_key', $_POST['trek_match_pace'] ) ) )
+            : array();
+        update_post_meta( $post_id, '_trek_match_pace', $pace_raw );
+
+        $match_default = ! empty( $_POST['trek_match_default'] ) ? '1' : '0';
+        update_post_meta( $post_id, '_trek_match_default', $match_default );
+
         // Textarea fields
         if ( isset( $_POST['trek_hero_subtitle'] ) ) {
             $value = sanitize_textarea_field( wp_unslash( $_POST['trek_hero_subtitle'] ) );
@@ -3664,10 +3778,41 @@ class Trek_CPT {
             }
         }
 
-        // Interactive Map Embed Code (HTML / iFrame / Mapbox / Leaflet)
+        // Interactive Map Embed Code (HTML / iFrame / Mapbox / Leaflet / JS / SVG)
         if ( isset( $_POST['trek_map_embed_code'] ) ) {
             $raw_embed = wp_unslash( $_POST['trek_map_embed_code'] );
-            $embed_code = current_user_can( 'unfiltered_html' ) ? $raw_embed : wp_kses_post( $raw_embed );
+            if ( current_user_can( 'unfiltered_html' ) ) {
+                $embed_code = $raw_embed;
+            } else {
+                $allowed_embed_tags = wp_kses_allowed_html( 'post' );
+                $allowed_embed_tags['iframe'] = array(
+                    'src'             => true,
+                    'width'           => true,
+                    'height'          => true,
+                    'frameborder'     => true,
+                    'allowfullscreen' => true,
+                    'style'           => true,
+                    'loading'         => true,
+                    'title'           => true,
+                    'allow'           => true,
+                    'scrolling'       => true,
+                );
+                $allowed_embed_tags['script'] = array(
+                    'src'   => true,
+                    'type'  => true,
+                    'async' => true,
+                    'defer' => true,
+                );
+                $allowed_embed_tags['style'] = array( 'type' => true );
+                $allowed_embed_tags['link']  = array( 'rel' => true, 'href' => true, 'type' => true );
+                $allowed_embed_tags['svg']   = array( 'viewbox' => true, 'width' => true, 'height' => true, 'fill' => true, 'stroke' => true, 'style' => true, 'class' => true );
+                $allowed_embed_tags['path']  = array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'style' => true, 'class' => true );
+                $allowed_embed_tags['g']     = array( 'id' => true, 'class' => true, 'style' => true );
+                $allowed_embed_tags['circle'] = array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true, 'stroke' => true );
+                $allowed_embed_tags['polyline'] = array( 'points' => true, 'fill' => true, 'stroke' => true );
+                $allowed_embed_tags['img']   = array( 'src' => true, 'alt' => true, 'width' => true, 'height' => true, 'style' => true, 'class' => true, 'loading' => true );
+                $embed_code = wp_kses( $raw_embed, $allowed_embed_tags );
+            }
             if ( '' === trim( $embed_code ) ) {
                 delete_post_meta( $post_id, '_trek_map_embed_code' );
             } else {

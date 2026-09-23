@@ -1458,6 +1458,24 @@ class Trek_Importer {
                 update_post_meta( $post_id, '_trek_currency', sanitize_text_field( $pricing_obj['currency'] ) );
             }
 
+            // 11d. Journey Matching Keywords (matching{})
+            $matching_obj = is_array( $item['matching'] ?? null ) ? $item['matching'] : array();
+            if ( ! empty( $matching_obj ) ) {
+                if ( isset( $matching_obj['explore'] ) && is_array( $matching_obj['explore'] ) ) {
+                    update_post_meta( $post_id, '_trek_match_explore', array_values( array_filter( array_map( 'sanitize_key', $matching_obj['explore'] ) ) ) );
+                }
+                if ( isset( $matching_obj['feel'] ) && is_array( $matching_obj['feel'] ) ) {
+                    update_post_meta( $post_id, '_trek_match_feel', array_values( array_filter( array_map( 'sanitize_key', $matching_obj['feel'] ) ) ) );
+                }
+                if ( isset( $matching_obj['pace'] ) && is_array( $matching_obj['pace'] ) ) {
+                    update_post_meta( $post_id, '_trek_match_pace', array_values( array_filter( array_map( 'sanitize_key', $matching_obj['pace'] ) ) ) );
+                }
+                if ( isset( $matching_obj['is_default'] ) ) {
+                    $is_def = ! empty( $matching_obj['is_default'] ) ? '1' : '0';
+                    update_post_meta( $post_id, '_trek_match_default', $is_def );
+                }
+            }
+
             // 12. Compile & Save Master JSON Payload (_trek_structured_data)
             if ( class_exists( 'Trek_Renderer' ) ) {
                 $full_data = Trek_Renderer::get_full_trek_data( $post_id );

@@ -62,6 +62,11 @@ class Trek_Shortcodes {
         // Granular Field Shortcode: [trek_field id="123" field="price"]
         add_shortcode( 'trek_field',                 array( __CLASS__, 'render_trek_field' ) );
 
+        // Traveller Matcher Discovery Experience
+        add_shortcode( 'ya_traveller_matcher',       array( __CLASS__, 'render_traveller_matcher' ) );
+        add_shortcode( 'trek_traveller_matcher',     array( __CLASS__, 'render_traveller_matcher' ) );
+        add_shortcode( 'traveller_matcher',          array( __CLASS__, 'render_traveller_matcher' ) );
+
         // Modular Section Shortcodes
         add_shortcode( 'trek_hero',                  array( __CLASS__, 'render_trek_hero_section' ) );
         add_shortcode( 'trek_facts',                 array( __CLASS__, 'render_trek_facts_section' ) );
@@ -80,8 +85,12 @@ class Trek_Shortcodes {
         add_shortcode( 'trek_card',                  array( __CLASS__, 'render_trek_card_shortcode' ) );
 
         add_action( 'rest_api_init', array( __CLASS__, 'register_journal_comment_routes' ) );
+        add_action( 'wp_ajax_ya_match_journey',               array( __CLASS__, 'ajax_match_journey' ) );
+        add_action( 'wp_ajax_nopriv_ya_match_journey',        array( __CLASS__, 'ajax_match_journey' ) );
         add_action( 'wp_ajax_ya_submit_journey_lead',        array( __CLASS__, 'ajax_submit_journey_lead' ) );
         add_action( 'wp_ajax_nopriv_ya_submit_journey_lead', array( __CLASS__, 'ajax_submit_journey_lead' ) );
+        add_action( 'wp_ajax_ya_submit_traveller_matcher',        array( __CLASS__, 'ajax_submit_traveller_matcher' ) );
+        add_action( 'wp_ajax_nopriv_ya_submit_traveller_matcher', array( __CLASS__, 'ajax_submit_traveller_matcher' ) );
     }
 
     /**
@@ -305,20 +314,17 @@ class Trek_Shortcodes {
             $card_image = get_post_meta( $post_id, '_trek_hero_bg_img', true );
         }
         if ( empty( $card_image ) ) {
-            $card_image = 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1400&q=85';
+            $card_image = '';
         }
 
         // 4. Duration & Days Meta
         $hero_days = get_post_meta( $post_id, '_trek_hero_days', true );
         $card_meta = get_post_meta( $post_id, '_trek_card_meta', true );
         if ( empty( $card_meta ) ) {
-            $card_meta = ! empty( $hero_days ) ? trim( $hero_days ) . ' Days' : '12 Days';
+            $card_meta = ! empty( $hero_days ) ? trim( $hero_days ) . ' Days' : '';
         }
 
-        $duration_val = ! empty( $hero_days ) ? preg_replace( '/[^0-9]/', '', $hero_days ) : '12';
-        if ( empty( $duration_val ) ) {
-            $duration_val = '12';
-        }
+        $duration_val = ! empty( $hero_days ) ? preg_replace( '/[^0-9]/', '', $hero_days ) : '';
 
         // 5. Taxonomy Terms (Categories & Regions)
         $cat_terms = get_the_terms( $post_id, 'trek_category' );
@@ -347,7 +353,7 @@ class Trek_Shortcodes {
             $country_meta = $region_names[0];
         }
         if ( empty( $country_meta ) ) {
-            $country_meta = 'Nepal';
+            $country_meta = get_post_meta( $post_id, '_trek_country', true );
         }
 
         // 6. Primary Category & Tag formatting
@@ -379,15 +385,12 @@ class Trek_Shortcodes {
             }
         }
 
-        $primary_tag   = ! empty( $primary_cat_name ) ? $primary_cat_name : ( ! empty( $cat_names[0] ) ? $cat_names[0] : 'Trek' );
+        $primary_tag   = ! empty( $primary_cat_name ) ? $primary_cat_name : ( ! empty( $cat_names[0] ) ? $cat_names[0] : '' );
         $secondary_tag = ! empty( $region_names[0] ) ? $region_names[0] : ( ! empty( $cat_names[1] ) ? $cat_names[1] : '' );
 
         $trip_city = get_post_meta( $post_id, '_trek_city', true );
         $trip_country = get_post_meta( $post_id, '_trek_country', true );
-        $trip_address = implode( ', ', array_filter( array( $trip_city, $trip_country ) ) );
-        if ( empty( $trip_address ) ) {
-            $trip_address = $country_meta . ', Nepal';
-        }
+        $trip_address = implode( ', ', array_filter( array( $trip_city, $trip_country, $country_meta ) ) );
 
         return array(
             'id'             => $post_id,
@@ -874,9 +877,9 @@ class Trek_Shortcodes {
         $uid = 'ya_home_notes_' . self::$instance_counter;
         $atts = shortcode_atts(
             array(
-                'count'          => 6,
-                'view_all_url'   => get_permalink( get_option( 'page_for_posts' ) ),
-                'view_all_label' => 'View All',
+                'count'          => 4,
+                'view_all_url'   => '',
+                'view_all_label' => 'View All Inspiration',
             ),
             $atts,
             'ya_home_notes'
@@ -884,7 +887,13 @@ class Trek_Shortcodes {
         $count = max( 1, min( 30, absint( $atts['count'] ) ) );
 
         if ( empty( $atts['view_all_url'] ) ) {
-            $atts['view_all_url'] = home_url( '/' );
+            $blog_page_id = get_option( 'page_for_posts' );
+            if ( $blog_page_id ) {
+                $atts['view_all_url'] = get_permalink( $blog_page_id );
+            } else {
+                $journal_page = get_page_by_path( 'journal' ) ?: get_page_by_path( 'blog' ) ?: get_page_by_path( 'articles' );
+                $atts['view_all_url'] = $journal_page ? get_permalink( $journal_page->ID ) : home_url( '/journal/' );
+            }
         }
 
         $query = new WP_Query(
@@ -911,31 +920,252 @@ class Trek_Shortcodes {
             <style>
                 #<?php echo esc_attr( $uid ); ?>,
                 #<?php echo esc_attr( $uid ); ?> * { box-sizing: border-box; }
-                #<?php echo esc_attr( $uid ); ?> { color: #333; font-family: "Open Sans", Arial, sans-serif; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card { display: flex; min-width: 0; flex-direction: column; padding: 0 14px 20px; border-left: 1px solid #e8e8e8; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card:first-child { border-left: 0; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-image { display: block; aspect-ratio: 1.48 / 1; overflow: hidden; background: #e9e5de; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-image img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card:hover .ya-inspiration-image img { transform: scale(1.045); }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-body { display: flex; flex: 1; flex-direction: column; padding: 16px 0 0; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-meta { display: flex; flex-wrap: wrap; gap: 0; margin: 0 0 16px; color: #999; font-size: 11px; line-height: 1.35; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-meta span + span::before { padding: 0 4px; color: #b7b7b7; content: "|"; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-title { margin: 0; color: #3d3d3d; font-family: "Newsreader", Georgia, serif; font-size: clamp(20px, 1.7vw, 25px); font-weight: 400; line-height: 1.18; letter-spacing: -.025em; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-excerpt { display: -webkit-box; margin: 14px 0 0; overflow: hidden; color: #5f5f5f; font-size: 13px; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link { margin-top: auto; padding-top: 28px; color: #444; font-size: 14px; line-height: 1.2; text-decoration: none; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link:hover { color: #022f2e; text-decoration: underline; text-underline-offset: 4px; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link span { margin-left: 4px; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-all { display: table; margin: 44px auto 0; padding: 11px 19px; border: 1px solid #858585; color: #022f2e; font-size: 14px; line-height: 1.2; text-decoration: none; transition: background-color .25s ease, color .25s ease; }
-                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-all:hover { background: #022f2e; color: #fff; }
-                @media (max-width: 760px) { #<?php echo esc_attr( $uid ); ?> .ya-inspiration-grid { grid-template-columns: 1fr; gap: 30px; } #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card { padding: 0 0 30px; border-top: 1px solid #e8e8e8; border-left: 0; } #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card:first-child { border-top: 0; } }
+                #<?php echo esc_attr( $uid ); ?> {
+                    color: #333;
+                    font-family: var(--te-font-body, "Open Sans", Arial, sans-serif);
+                    width: 100%;
+                }
+
+                /* 4-Card Desktop Grid */
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 28px;
+                    width: 100%;
+                }
+
+                /* Sharp, non-curved modern card styling */
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card {
+                    display: flex;
+                    min-width: 0;
+                    flex-direction: column;
+                    padding: 0;
+                    border: none;
+                    border-radius: 0 !important;
+                    background: transparent;
+                    transition: transform 0.3s ease;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-image {
+                    display: block;
+                    aspect-ratio: 1.48 / 1;
+                    overflow: hidden;
+                    background: #e9e5de;
+                    border-radius: 0 !important;
+                    position: relative;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-image img {
+                    display: block;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    border-radius: 0 !important;
+                    transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card:hover .ya-inspiration-image img {
+                    transform: scale(1.06);
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-body {
+                    display: flex;
+                    flex: 1;
+                    flex-direction: column;
+                    padding: 18px 0 0;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-meta {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 0;
+                    margin: 0 0 12px;
+                    color: #8c8c8c;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.8px;
+                    line-height: 1.35;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-meta span + span::before {
+                    padding: 0 6px;
+                    color: #617654;
+                    content: "•";
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-title {
+                    margin: 0;
+                    color: #111111;
+                    font-family: var(--te-font-display, "Newsreader", Georgia, serif);
+                    font-size: clamp(18px, 1.35vw, 22px);
+                    font-weight: 500;
+                    line-height: 1.25;
+                    letter-spacing: -0.02em;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-title a {
+                    color: inherit;
+                    text-decoration: none;
+                    transition: color 0.2s ease;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-title a:hover {
+                    color: #d1ad54;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-excerpt {
+                    display: -webkit-box;
+                    margin: 10px 0 0;
+                    overflow: hidden;
+                    color: #222222;
+                    font-size: 13px;
+                    line-height: 1.55;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 3;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    margin-top: auto;
+                    padding-top: 18px;
+                    color: #d1ad54;
+                    font-size: 13px;
+                    font-weight: 600;
+                    line-height: 1.2;
+                    text-decoration: none;
+                    transition: color 0.2s ease, transform 0.2s ease;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link:hover {
+                    color: #617654;
+                    transform: translateX(3px);
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link span {
+                    transition: transform 0.2s ease;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-link:hover span {
+                    transform: translateX(2px);
+                }
+
+                /* Center Wrap for View All Button */
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-cta-wrap {
+                    text-align: center;
+                    margin-top: 50px;
+                }
+
+                /* View All Button matching Hero Section CTA style (solid color, no gradient) */
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-btn {
+                    position: relative;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 16px;
+                    min-height: 54px;
+                    padding: 6px 8px 6px 30px;
+                    border-radius: 0 !important; /* Sharp / non-curved border */
+                    background: #d1ad54 !important;
+                    color: #ffffff;
+                    border: 1px solid #d1ad54;
+                    box-shadow: 0 10px 28px rgba(209, 173, 84, 0.25), 0 2px 6px rgba(0, 0, 0, 0.12);
+                    font-family: var(--te-font-body, "Open Sans", Arial, sans-serif);
+                    font-size: 11.5px;
+                    font-weight: 700;
+                    line-height: 1;
+                    letter-spacing: 2.2px;
+                    text-decoration: none;
+                    text-transform: uppercase;
+                    overflow: hidden;
+                    cursor: pointer;
+                    transition: transform 0.4s cubic-bezier(.22, .61, .36, 1), background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s cubic-bezier(.22, .61, .36, 1);
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-btn:hover {
+                    background: #617654 !important;
+                    border-color: #617654 !important;
+                    box-shadow: 0 16px 36px rgba(97, 118, 84, 0.35), 0 4px 10px rgba(0, 0, 0, 0.2);
+                    transform: translateY(-3px);
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-btn__text {
+                    position: relative;
+                    z-index: 1;
+                    color: #ffffff;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-btn__icon {
+                    position: relative;
+                    z-index: 1;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.22);
+                    backdrop-filter: blur(4px);
+                    -webkit-backdrop-filter: blur(4px);
+                    color: #ffffff;
+                    transition: transform 0.4s cubic-bezier(.22, .61, .36, 1), background-color 0.35s ease;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-btn__icon svg {
+                    width: 16px;
+                    height: 16px;
+                    stroke: currentColor;
+                    transition: transform 0.35s cubic-bezier(.22, .61, .36, 1);
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-btn:hover .ya-inspiration-btn__icon {
+                    background: rgba(255, 255, 255, 0.32);
+                    transform: scale(1.06);
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-inspiration-btn:hover .ya-inspiration-btn__icon svg {
+                    transform: translateX(3px);
+                }
+
+                /* Mobile & Tablet: Horizontal Scrollable Strip (Snap Scroll) */
+                @media (max-width: 1023px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-inspiration-grid {
+                        display: flex;
+                        overflow-x: auto;
+                        scroll-snap-type: x mandatory;
+                        -webkit-overflow-scrolling: touch;
+                        gap: 20px;
+                        padding: 0 4px 20px;
+                        margin: 0 -16px;
+                        padding-left: 16px;
+                        padding-right: 16px;
+                        scrollbar-width: none;
+                    }
+
+                    #<?php echo esc_attr( $uid ); ?> .ya-inspiration-grid::-webkit-scrollbar {
+                        display: none;
+                    }
+
+                    #<?php echo esc_attr( $uid ); ?> .ya-inspiration-card {
+                        flex: 0 0 280px;
+                        max-width: 80vw;
+                        scroll-snap-align: start;
+                    }
+
+                    #<?php echo esc_attr( $uid ); ?> .ya-inspiration-cta-wrap {
+                        margin-top: 36px;
+                    }
+                }
             </style>
             <div class="ya-inspiration-grid">
                 <?php foreach ( $query->posts as $post ) :
                     $categories = get_the_category( $post->ID );
                     $category   = ! empty( $categories ) ? $categories[0]->name : 'Journal';
                     $content    = has_excerpt( $post->ID ) ? get_the_excerpt( $post->ID ) : $post->post_content;
-                    $excerpt    = wp_trim_words( wp_strip_all_tags( $content ), 28, '...' );
+                    $excerpt    = wp_trim_words( wp_strip_all_tags( $content ), 24, '...' );
                     $image      = get_the_post_thumbnail_url( $post->ID, 'large' );
                     ?>
                     <article class="ya-inspiration-card ya-reveal">
@@ -945,15 +1175,34 @@ class Trek_Shortcodes {
                             <?php endif; ?>
                         </a>
                         <div class="ya-inspiration-body">
-                            <div class="ya-inspiration-meta"><span><?php echo esc_html( get_the_date( 'M j, Y', $post->ID ) ); ?></span><span><?php echo esc_html( $category ); ?></span></div>
-                            <h3 class="ya-inspiration-title"><?php echo esc_html( get_the_title( $post->ID ) ); ?></h3>
+                            <div class="ya-inspiration-meta">
+                                <span><?php echo esc_html( get_the_date( 'M j, Y', $post->ID ) ); ?></span>
+                                <span><?php echo esc_html( $category ); ?></span>
+                            </div>
+                            <h3 class="ya-inspiration-title">
+                                <a href="<?php echo esc_url( get_permalink( $post->ID ) ); ?>">
+                                    <?php echo esc_html( get_the_title( $post->ID ) ); ?>
+                                </a>
+                            </h3>
                             <p class="ya-inspiration-excerpt"><?php echo esc_html( $excerpt ); ?></p>
-                            <a class="ya-inspiration-link" href="<?php echo esc_url( get_permalink( $post->ID ) ); ?>"><?php esc_html_e( 'Read More', 'trek-content-manager' ); ?><span aria-hidden="true">↗</span></a>
+                            <a class="ya-inspiration-link" href="<?php echo esc_url( get_permalink( $post->ID ) ); ?>">
+                                <?php esc_html_e( 'Read More', 'trek-content-manager' ); ?>
+                                <span aria-hidden="true">→</span>
+                            </a>
                         </div>
                     </article>
                 <?php endforeach; ?>
             </div>
-            <a class="ya-inspiration-all" href="<?php echo esc_url( $atts['view_all_url'] ); ?>"><?php echo esc_html( $atts['view_all_label'] ); ?></a>
+            <div class="ya-inspiration-cta-wrap">
+                <a class="ya-inspiration-btn" href="<?php echo esc_url( $atts['view_all_url'] ); ?>">
+                    <span class="ya-inspiration-btn__text"><?php echo esc_html( $atts['view_all_label'] ); ?></span>
+                    <span class="ya-inspiration-btn__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14M13 6l6 6-6 6"></path>
+                        </svg>
+                    </span>
+                </a>
+            </div>
         </div>
         <?php
         wp_reset_postdata();
@@ -1481,10 +1730,6 @@ class Trek_Shortcodes {
      * =========================================================================
      * SHORTCODE 4: [ya_signature_journeys]
      * =========================================================================
-     * Generates the 2027 Trip Collection card grid matching the premium editorial
-     * related-card design with 10px border radius, brand colors #cfab55 and #617555,
-     * Open Sans and Newsreader typography, full CPT dynamic data, and a smooth
-     * Load More Journeys button.
      */
     public static function render_signature_journeys( $atts ) {
         self::$instance_counter++;
@@ -1492,126 +1737,78 @@ class Trek_Shortcodes {
 
         $atts = shortcode_atts(
             array(
-                'category'       => '',
-                'region'         => 'nepal',   // Default region: Nepal
-                'default_region' => 'nepal',   // Fallback default region
-                'featured'       => '',        // Empty by default to display all Nepal journeys
-                'count'          => -1,        // Fetch all matching posts
-                'per_page'       => 6,         // Visible per page before load more
-                'orderby'        => 'menu_order title',
-                'order'          => 'ASC',
+                'default_country' => 'nepal',
+                'orderby'         => 'menu_order title',
+                'order'           => 'ASC',
             ),
             $atts,
             'ya_signature_journeys'
         );
 
-        $posts_count = intval( $atts['count'] );
-        if ( $posts_count === 0 ) {
-            $posts_count = -1;
-        }
-
         /*
          * ---------------------------------------------------------
-         * BASE QUERY
+         * FETCH ALL PUBLISHED DESTINATIONS
          * ---------------------------------------------------------
          */
         $query_args = array(
             'post_type'      => 'trek_destination',
             'post_status'    => 'publish',
-            'posts_per_page' => $posts_count,
+            'posts_per_page' => -1,
             'orderby'        => sanitize_sql_orderby( $atts['orderby'] ) ?: 'menu_order title',
             'order'          => strtoupper( $atts['order'] ) === 'DESC' ? 'DESC' : 'ASC',
             'no_found_rows'  => true,
         );
 
-        /*
-         * FEATURED FILTER (Optional)
-         */
-        if ( '1' === $atts['featured'] || 'yes' === strtolower( $atts['featured'] ) || 'true' === strtolower( $atts['featured'] ) ) {
-            $query_args['meta_query'] = array(
-                'relation' => 'OR',
-                array(
-                    'key'     => '_trek_featured_home',
-                    'value'   => '1',
-                    'compare' => '=',
-                ),
-                array(
-                    'key'     => '_trek_is_featured',
-                    'value'   => '1',
-                    'compare' => '=',
-                ),
-            );
-        }
-
-        /*
-         * TAXONOMY FILTERS
-         */
-        $tax_query = array();
-
-        // Category filter
-        if ( ! empty( $atts['category'] ) && 'all' !== strtolower( $atts['category'] ) ) {
-            $cat_terms = array_filter( array_map( 'sanitize_title', explode( ',', $atts['category'] ) ) );
-            if ( ! empty( $cat_terms ) ) {
-                $tax_query[] = array(
-                    'taxonomy' => 'trek_category',
-                    'field'    => 'slug',
-                    'terms'    => $cat_terms,
-                    'operator' => 'IN',
-                );
-            }
-        }
-
-        // Region filter (defaults to 'nepal' unless 'all' is passed)
-        $effective_region = ! empty( $atts['region'] ) ? sanitize_title( $atts['region'] ) : sanitize_title( $atts['default_region'] );
-        if ( 'all' !== $effective_region && ! empty( $effective_region ) ) {
-            $reg_terms = array_filter( array_map( 'sanitize_title', explode( ',', $effective_region ) ) );
-            if ( ! empty( $reg_terms ) ) {
-                $tax_query[] = array(
-                    'taxonomy' => 'trek_region',
-                    'field'    => 'slug',
-                    'terms'    => $reg_terms,
-                    'operator' => 'IN',
-                );
-            }
-        }
-
-        if ( ! empty( $tax_query ) ) {
-            if ( count( $tax_query ) > 1 ) {
-                $tax_query['relation'] = 'AND';
-            }
-            $query_args['tax_query'] = $tax_query;
-        }
-
         $query = new WP_Query( $query_args );
 
-        // Fallback: If region taxonomy returned 0 posts (e.g. taxonomy terms not yet assigned to posts), query all published trek destinations
-        if ( ! $query->have_posts() && ! empty( $query_args['tax_query'] ) ) {
-            unset( $query_args['tax_query'] );
-            $query = new WP_Query( $query_args );
-        }
-
-        // Second fallback: If featured was active and yielded no posts, remove featured
-        if ( ! $query->have_posts() && isset( $query_args['meta_query'] ) ) {
-            unset( $query_args['meta_query'] );
-            $query = new WP_Query( $query_args );
-        }
-
-        /*
-         * ---------------------------------------------------------
-         * BUILD CARDS WITH FULL CPT METADATA
-         * ---------------------------------------------------------
-         */
         $cards = array();
         if ( $query->have_posts() ) {
             while ( $query->have_posts() ) {
                 $query->the_post();
                 $p_id = get_the_ID();
 
+                // Country slug identification
+                $reg_slugs = wp_get_post_terms( $p_id, 'trek_region', array( 'fields' => 'slugs' ) );
+                $country_slug = '';
+                if ( ! empty( $reg_slugs ) && ! is_wp_error( $reg_slugs ) ) {
+                    foreach ( array( 'nepal', 'bhutan', 'india', 'tibet' ) as $c_cand ) {
+                        if ( in_array( $c_cand, $reg_slugs, true ) ) {
+                            $country_slug = $c_cand;
+                            break;
+                        }
+                    }
+                }
+
+                // Check meta if slug wasn't matched in terms
+                if ( empty( $country_slug ) ) {
+                    $meta_country = strtolower( trim( (string) get_post_meta( $p_id, '_trek_country', true ) ) );
+                    foreach ( array( 'nepal', 'bhutan', 'india', 'tibet' ) as $c_cand ) {
+                        if ( strpos( $meta_country, $c_cand ) !== false ) {
+                            $country_slug = $c_cand;
+                            break;
+                        }
+                    }
+                }
+
+                // Fallback check in title / fact region if still empty
+                if ( empty( $country_slug ) ) {
+                    $haystack = strtolower( get_the_title( $p_id ) . ' ' . get_post_meta( $p_id, '_trek_fact_region', true ) . ' ' . get_post_meta( $p_id, '_trek_breadcrumb_region', true ) );
+                    if ( strpos( $haystack, 'bhutan' ) !== false ) {
+                        $country_slug = 'bhutan';
+                    } elseif ( strpos( $haystack, 'india' ) !== false || strpos( $haystack, 'rajasthan' ) !== false || strpos( $haystack, 'kerala' ) !== false || strpos( $haystack, 'varanasi' ) !== false || strpos( $haystack, 'ladakh' ) !== false ) {
+                        $country_slug = 'india';
+                    } elseif ( strpos( $haystack, 'tibet' ) !== false || strpos( $haystack, 'lhasa' ) !== false || strpos( $haystack, 'kailash' ) !== false ) {
+                        $country_slug = 'tibet';
+                    } elseif ( strpos( $haystack, 'nepal' ) !== false ) {
+                        $country_slug = 'nepal';
+                    }
+                }
+
                 // Title & URL
                 $c_title = get_the_title( $p_id );
                 $c_url   = get_permalink( $p_id );
 
-                // Image
+                // Image - strictly from database
                 $c_img = get_the_post_thumbnail_url( $p_id, 'large' );
                 if ( empty( $c_img ) ) {
                     $c_img = get_post_meta( $p_id, '_trek_card_image_url', true );
@@ -1620,14 +1817,14 @@ class Trek_Shortcodes {
                     $c_img = get_post_meta( $p_id, '_trek_hero_bg_img', true );
                 }
                 if ( empty( $c_img ) ) {
-                    $c_img = 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80';
+                    $c_img = '';
                 }
 
-                // Category badge
+                // Category badge - strictly from database
                 $cat_terms = get_the_terms( $p_id, 'trek_category' );
-                $badge     = ( ! empty( $cat_terms ) && ! is_wp_error( $cat_terms ) ) ? $cat_terms[0]->name : 'Trekking';
+                $badge     = ( ! empty( $cat_terms ) && ! is_wp_error( $cat_terms ) ) ? $cat_terms[0]->name : '';
 
-                // Region / Country
+                // Region / Country Display - strictly from database
                 $c_region = get_post_meta( $p_id, '_trek_fact_region', true );
                 if ( empty( $c_region ) ) {
                     $c_region = get_post_meta( $p_id, '_trek_breadcrumb_region', true );
@@ -1639,419 +1836,803 @@ class Trek_Shortcodes {
                     }
                 }
                 if ( empty( $c_region ) ) {
-                    $c_region = 'Nepal';
+                    $c_region = get_post_meta( $p_id, '_trek_country', true );
                 }
 
-                // Difficulty
+                // Difficulty - strictly from database
                 $diff_terms = get_the_terms( $p_id, 'trek_difficulty' );
                 $c_diff     = ( ! empty( $diff_terms ) && ! is_wp_error( $diff_terms ) ) ? $diff_terms[0]->name : get_post_meta( $p_id, '_trek_difficulty', true );
-                if ( empty( $c_diff ) ) {
-                    $c_diff = 'Moderate';
-                }
-                // Strip redundant " Trek" suffix if present
-                $c_diff = preg_replace( '/\s*trek$/i', '', trim( $c_diff ) );
+                $c_diff     = ! empty( $c_diff ) ? preg_replace( '/\s*trek$/i', '', trim( $c_diff ) ) : '';
 
-                // Duration / Days
+                // Duration - strictly from database
                 $days_raw = get_post_meta( $p_id, '_trek_hero_days', true );
                 if ( empty( $days_raw ) ) {
                     $days_raw = get_post_meta( $p_id, '_trek_fact_duration', true );
                 }
-                $c_days = preg_replace( '/[^0-9]/', '', (string) $days_raw );
-                if ( empty( $c_days ) ) {
-                    $c_days = '12';
-                }
+                $c_days = ! empty( $days_raw ) ? preg_replace( '/[^0-9]/', '', (string) $days_raw ) : '';
 
-                // Best Season
+                // Best Season - strictly from database
                 $c_season = get_post_meta( $p_id, '_trek_fact_season', true );
                 if ( empty( $c_season ) ) {
                     $c_season = get_post_meta( $p_id, '_trek_fact_best_season', true );
                 }
-                if ( empty( $c_season ) ) {
-                    $c_season = 'Mar – Nov';
+                $c_season = ! empty( $c_season ) ? trim( (string) $c_season ) : '';
+
+                // Location / Region display string - strictly from database
+                $country_name     = ! empty( $country_slug ) ? ucfirst( $country_slug ) : '';
+                $location_display = $c_region;
+                if ( ! empty( $c_region ) && ! empty( $country_name ) && strtolower( $c_region ) !== strtolower( $country_name ) && stripos( $c_region, $country_name ) === false ) {
+                    $location_display = $c_region . ', ' . $country_name;
+                } elseif ( empty( $location_display ) ) {
+                    $location_display = $country_name;
                 }
 
                 $cards[] = array(
-                    'id'     => $p_id,
-                    'url'    => $c_url,
-                    'img'    => $c_img,
-                    'alt'    => $c_title,
-                    'badge'  => $badge,
-                    'region' => $c_region,
-                    'diff'   => $c_diff,
-                    'title'  => $c_title,
-                    'days'   => $c_days,
-                    'season' => $c_season,
+                    'id'               => $p_id,
+                    'country_slug'     => $country_slug,
+                    'url'              => $c_url,
+                    'img'              => $c_img,
+                    'alt'              => $c_title,
+                    'badge'            => $badge,
+                    'region'           => $c_region,
+                    'location_display' => $location_display,
+                    'diff'             => $c_diff,
+                    'title'            => $c_title,
+                    'days'             => $c_days,
+                    'season'           => $c_season,
                 );
             }
             wp_reset_postdata();
         }
 
         if ( empty( $cards ) ) {
-            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
+            return '<div class="ya-empty" style="text-align:center; padding:60px 20px; color:#617579; font-family:\'Open Sans\',Arial,sans-serif; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
         }
 
-        $per_page    = max( 1, intval( $atts['per_page'] ) );
-        $total_cards = count( $cards );
+        $default_country = sanitize_title( $atts['default_country'] );
+        if ( ! in_array( $default_country, array( 'nepal', 'bhutan', 'india', 'tibet' ), true ) ) {
+            $default_country = 'nepal';
+        }
 
-        /*
-         * ---------------------------------------------------------
-         * OUTPUT
-         * ---------------------------------------------------------
-         */
+        $yeti_logo_url = 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/yeti_logo_active.gif';
+
         ob_start();
         ?>
-        <div class="ya-collection-shell" id="<?php echo esc_attr( $uid ); ?>" data-per-page="<?php echo esc_attr( $per_page ); ?>">
+        <div class="ya-collection-shell" id="<?php echo esc_attr( $uid ); ?>" data-default-country="<?php echo esc_attr( $default_country ); ?>">
             <style>
                 #<?php echo esc_attr( $uid ); ?> {
                     width: 100%;
                     box-sizing: border-box;
+                    position: relative;
                 }
                 #<?php echo esc_attr( $uid ); ?> * {
                     box-sizing: border-box;
                 }
-                #<?php echo esc_attr( $uid ); ?> .ya-collection-grid {
-                    display: grid;
-                    grid-template-columns: repeat(3, minmax(0, 1fr));
-                    gap: 28px;
-                }
-                /* Premium card matching reference with 10px border radius */
-                #<?php echo esc_attr( $uid ); ?> .ya-related-card {
+
+                /* =========================================================================
+                   COUNTRY FILTER TABS (Pure white, 0 border radius, 1px border)
+                   ========================================================================= */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-tabs {
                     display: flex;
-                    flex-direction: column;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    background: #ffffff;
-                    border: 1px solid #011b18ff;
-                    box-shadow: 0 4px 20px rgba(7, 94, 84, 0.05);
-                    transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease;
-                    text-decoration: none;
-                    color: inherit;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0;
+                    flex-wrap: wrap;
+                    margin: 0 auto clamp(24px, 3.5vw, 44px);
+                    max-width: 900px;
+                    padding: 0 16px;
                 }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-card:hover {
-                    transform: translateY(-6px);
-                    box-shadow: 0 20px 52px rgba(7, 94, 84, 0.12);
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-card.is-hidden {
-                    display: none !important;
-                }
-                /* Image area */
-                #<?php echo esc_attr( $uid ); ?> .ya-related-image {
-                    position: relative;
-                    height: 226px;
-                    overflow: hidden;
-                    flex-shrink: 0;
-                    border-radius: 10px 10px 0 0;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-image img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    display: block;
-                    transition: transform .55s cubic-bezier(.22, 1, .36, 1);
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-card:hover .ya-related-image img {
-                    transform: scale(1.06);
-                }
-                /* Category badge on image */
-                #<?php echo esc_attr( $uid ); ?> .ya-related-img-badge {
-                    position: absolute;
-                    top: 14px;
-                    left: 14px;
+                #<?php echo esc_attr( $uid ); ?> .ya-col-tab {
+                    appearance: none;
+                    -webkit-appearance: none;
+                    background: #ffffff !important;
+                    border-radius: 0 !important;
+                    border: 1px solid rgba(17, 17, 17, 0.16) !important;
+                    box-shadow: none !important;
+                    height: 46px;
+                    padding: 0 clamp(22px, 2.5vw, 34px);
+                    font-family: "Open Sans", Arial, sans-serif;
+                    font-size: 13px;
+                    font-weight: 700;
+                    letter-spacing: 1.4px;
+                    text-transform: uppercase;
+                    color: #102f35;
+                    cursor: pointer;
                     display: inline-flex;
                     align-items: center;
-                    gap: 6px;
-                    padding: 5px 12px;
-                    background: rgba(97, 117, 85, 0.92);
-                    border-radius: 50px;
-                    font: 600 11px / 1 "Open Sans", Arial, sans-serif;
+                    justify-content: center;
+                    gap: 0px;
+                    transition: all .25s ease;
+                    position: relative;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-tab:hover {
+                    border-color: #d1ad54 !important;
+                    color: #d1ad54;
+                    transform: translateY(-1px);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-tab.is-active {
+                    background: #ffffff !important;
+                    border-color: #d1ad54 !important;
+                    color: #d1ad54;
+                    font-weight: 800;
+                    box-shadow: inset 0 -3px 0 #d1ad54, 0 3px 12px rgba(209, 173, 84, 0.12) !important;
+                }
+               
+
+                /* =========================================================================
+                   CAROUSEL CONTAINER & ARROWS
+                   ========================================================================= */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-carousel-wrap {
+                    position: relative;
+                    width: 100%;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-nav-btn {
+                    position: absolute;
+                    top: 45%;
+                    transform: translateY(-50%);
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    background: #ffffff;
+                    border: 1px solid rgba(17, 17, 17, 0.14);
+                    box-shadow: 0 6px 24px rgba(16, 47, 53, 0.14);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #102f35;
+                    cursor: pointer;
+                    z-index: 10;
+                    transition: all .25s cubic-bezier(.22, 1, .36, 1);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-nav-btn:hover {
+                    background: #617654;
+                    border-color: #617654;
+                    color: #ffffff;
+                    transform: translateY(-50%) scale(1.08);
+                    box-shadow: 0 10px 28px rgba(97, 118, 84, 0.28);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-nav-btn:active {
+                    transform: translateY(-50%) scale(0.96);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-nav-btn.is-disabled {
+                    opacity: 0.35;
+                    cursor: not-allowed;
+                    pointer-events: none;
+                    box-shadow: none;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-prev {
+                    left: -22px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-next {
+                    right: -22px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-nav-btn svg {
+                    width: 20px;
+                    height: 20px;
+                }
+
+                /* =========================================================================
+                   1-ROW SCROLLABLE TRACK
+                   ========================================================================= */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-track {
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    gap: 28px;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                    scroll-snap-type: x mandatory;
+                    scroll-behavior: smooth;
+                    -webkit-overflow-scrolling: touch;
+                    padding: 12px 12px 28px;
+                    margin: 0;
+                    scrollbar-width: none; /* Firefox */
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-track::-webkit-scrollbar {
+                    display: none; /* Safari & Chrome */
+                }
+
+                /* =========================================================================
+                   DOMINANT LUXURY CARD (6px Border Radius, Modern Layout)
+                   ========================================================================= */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card {
+                    flex: 0 0 350px;
+                    min-width: 280px;
+                    max-width: 350px;
+                    scroll-snap-align: start;
+                    display: flex;
+                    flex-direction: column;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    background: #ffffff;
+                    border: 2px solid rgba(97, 118, 84, 0.2);
+                    box-shadow: 0 4px 20px rgba(7, 94, 84, 0.05);
+                    transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease, border-color .35s ease;
+                    text-decoration: none;
+                    color: inherit;
+                    position: relative;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card:hover {
+                    transform: translateY(-6px);
+                    border-color: #d1ad54;
+                    box-shadow: 0 20px 52px rgba(7, 94, 84, 0.14);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card.is-hidden {
+                    display: none !important;
+                }
+
+                /* Card Media */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__media {
+                    position: relative;
+                    height: 236px;
+                    overflow: hidden;
+                    flex-shrink: 0;
+                    background: #102f35;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__img {
+                    width: 100% !important;
+                    height: 100% !important;
+                    object-fit: cover !important;
+                    display: block !important;
+                    transition: transform .65s cubic-bezier(.22, 1, .36, 1);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card:hover .ya-col-card__img {
+                    transform: scale(1.06);
+                }
+
+                /* Top-Right Badge: { Yeti Logo | Category } with Transparent/Glassy Background */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-badge {
+                    position: absolute;
+                    top: 14px;
+                    right: 14px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    border-radius: 10px;
+                    padding: 5px 12px 5px 8px;
+                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+                    z-index: 3;
+                    transition: background .25s ease, border-color .25s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card:hover .ya-col-card__top-badge {
+                    background: #617654;
+                    border-color: #617654;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-logo {
+                    width: 21px !important;
+                    height: 21px !important;
+                    max-width: 24px !important;
+                    max-height: 24px !important;
+                    object-fit: contain !important;
+                    display: block !important;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-sep {
+                    color: rgba(255, 255, 255, 0.4);
+                    font-size: 11px;
+                    font-weight: 300;
+                    line-height: 1;
+                    user-select: none;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-cat {
+                    font-family: "Open Sans", Arial, sans-serif;
+                    font-size: 10.5px;
+                    font-weight: 700;
                     letter-spacing: .8px;
                     text-transform: uppercase;
                     color: #ffffff;
-                    backdrop-filter: blur(4px);
-                    z-index: 2;
+                    line-height: 1;
                 }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-img-badge svg {
-                    width: 12px;
-                    height: 12px;
-                }
-                /* Location pill on image */
-                #<?php echo esc_attr( $uid ); ?> .ya-related-img-loc {
-                    position: absolute;
-                    bottom: 14px;
-                    left: 14px;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 5px;
-                    padding: 4px 10px;
-                    background: rgba(10, 30, 20, 0.75);
-                    border-radius: 50px;
-                    font: 600 10px / 1 "Open Sans", Arial, sans-serif;
-                    letter-spacing: 1.2px;
-                    text-transform: uppercase;
-                    color: #ffffff;
-                    backdrop-filter: blur(4px);
-                    z-index: 2;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-img-loc svg {
-                    width: 11px;
-                    height: 11px;
-                    color: #cfab55;
-                }
-                /* Content area */
-                #<?php echo esc_attr( $uid ); ?> .ya-related-copy {
-                    padding: 22px 22px 20px;
+
+                /* Card Body */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__body {
+                    padding: 22px 20px 20px;
                     display: flex;
                     flex-direction: column;
                     flex-grow: 1;
                     position: relative;
                     background: #ffffff;
                 }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-eyebrow {
-                    font: 700 10px / 1 "Open Sans", Arial, sans-serif;
-                    letter-spacing: 1.8px;
-                    text-transform: uppercase;
-                    color: #cfab55;
-                    margin-bottom: 8px;
-                    display: block;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-copy h3 {
-                    margin: 0 0 16px;
-                    font: 600 19px / 1.25 "Newsreader", Georgia, serif;
-                    color: #102f35;
-                }
-                /* Info row */
-                #<?php echo esc_attr( $uid ); ?> .ya-related-info-row {
-                    display: flex;
-                    gap: 0;
-                    margin-bottom: 18px;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-info-item {
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 3px;
-                    padding-right: 14px;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-info-item:not(:last-child) {
-                    border-right: 1px solid #dce8e3;
-                    margin-right: 14px;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-info-label {
-                    font: 500 10px / 1 "Open Sans", Arial, sans-serif;
-                    letter-spacing: .8px;
-                    text-transform: uppercase;
-                    color: #617579;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-info-value {
-                    font: 600 13px / 1.2 "Open Sans", Arial, sans-serif;
-                    color: #102f35;
-                }
-                /* Footer */
-                #<?php echo esc_attr( $uid ); ?> .ya-related-footer {
-                    display: flex;
+
+                /* Location / Region Line (Below image, no background) */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__loc {
+                    display: inline-flex;
                     align-items: center;
-                    justify-content: space-between;
-                    padding-top: 16px;
-                    border-top: 1px solid #eaf5f0;
+                    gap: 6px;
+                    margin-bottom: 8px;
+                    background: transparent !important;
+                    padding: 0 !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    position: static !important;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__loc-icon {
+                    width: 13px;
+                    height: 13px;
+                    color: #617654;
+                    flex-shrink: 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__loc-text {
+                    font-family: "Open Sans", Arial, sans-serif;
+                    font-size: 11px;
+                    font-weight: 600;
+                    letter-spacing: .9px;
+                    text-transform: uppercase;
+                    color: #617654;
+                }
+
+                /* Title Heading (Below location) */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__title {
+                    margin: 0 0 18px;
+                    font-family: "Newsreader", Georgia, serif;
+                    font-size: 20px;
+                    font-weight: 600;
+                    line-height: 1.28;
+                    color: #111111;
+                    transition: color .25s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card:hover .ya-col-card__title {
+                    color: #d1ad54;
+                }
+
+                /* 3-Column Meta Info Row (Wrappable) */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 12px 14px;
                     margin-top: auto;
+                    padding-top: 14px;
+                    border-top: 1px solid #eef5f2;
                     position: relative;
                     z-index: 1;
                 }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-link {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 7px;
-                    font: 700 11px / 1 "Open Sans", Arial, sans-serif;
-                    letter-spacing: 1.2px;
-                    text-transform: uppercase;
-                    color: #617555;
-                    transition: all .2s ease;
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta-item {
+                    flex: 1 1 calc(33.333% - 10px);
+                    min-width: 80px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3px;
+                    padding: 0;
                 }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-card:hover .ya-related-link {
-                    gap: 11px;
-                    color: #cfab55;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-link svg {
-                    width: 15px;
-                    height: 15px;
-                    transition: transform .2s ease;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-card:hover .ya-related-link svg {
-                    transform: translateX(3px);
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-duration-pill {
-                    display: inline-flex;
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta-head {
+                    display: flex;
                     align-items: center;
                     gap: 5px;
-                    padding: 5px 12px;
-                    background: #eaf5f0;
-                    border-radius: 50px;
-                    font: 600 11px / 1 "Open Sans", Arial, sans-serif;
-                    color: #617555;
                 }
-                #<?php echo esc_attr( $uid ); ?> .ya-related-duration-pill svg {
+                #<?php echo esc_attr( $uid ); ?> .ya-col-meta-icon {
                     width: 12px;
                     height: 12px;
+                    color: #617654;
+                    flex-shrink: 0;
                 }
-                /* Contour art behind content with 10px bottom radius */
-                #<?php echo esc_attr( $uid ); ?> .ya-related-copy::after {
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta-label {
+                    font-family: "Open Sans", Arial, sans-serif;
+                    font-size: 9.5px;
+                    font-weight: 600;
+                    letter-spacing: .6px;
+                    text-transform: uppercase;
+                    color: #617654;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta-val {
+                    font-family: "Open Sans", Arial, sans-serif;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: #111111;
+                    white-space: normal;
+                    word-break: break-word;
+                    line-height: 1.35;
+                }
+
+                /* Subtle contour art behind content */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__body::after {
                     content: "";
                     position: absolute;
                     bottom: 0; left: 0; right: 0;
-                    height: 60px;
-                    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M0 40 Q40 20 80 35 Q120 50 160 30 Q200 10 240 28 Q280 46 320 32 Q360 18 400 38 L400 60 L0 60Z' fill='%23eaf5f0' opacity='0.55'/%3E%3C/svg%3E") bottom / cover no-repeat;
+                    height: 50px;
+                    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M0 40 Q40 20 80 35 Q120 50 160 30 Q200 10 240 28 Q280 46 320 32 Q360 18 400 38 L400 60 L0 60Z' fill='%23eaf5f0' opacity='0.4'/%3E%3C/svg%3E") bottom / cover no-repeat;
                     pointer-events: none;
-                    border-radius: 0 0 10px 10px;
-                }
-                /* Load More Button */
-                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-wrap {
-                    text-align: center;
-                    margin-top: 48px;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn {
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    height: 48px;
-                    padding: 0 34px;
-                    border-radius: 4px;
-                    background: #617555;
-                    border: 1px solid #617555;
-                    color: #ffffff;
-                    font-family: "Open Sans", Arial, sans-serif;
-                    font-size: 13px;
-                    font-weight: 700;
-                    letter-spacing: 1.2px;
-                    text-transform: uppercase;
-                    cursor: pointer;
-                    transition: all .25s ease;
-                    box-shadow: 0 4px 18px rgba(97, 117, 85, 0.25);
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn:hover {
-                    background: #cfab55;
-                    border-color: #cfab55;
-                    color: #173331;
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 22px rgba(207, 171, 85, 0.35);
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn svg {
-                    width: 16px;
-                    height: 16px;
-                    transition: transform .25s ease;
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn:hover svg {
-                    transform: translateY(2px);
-                }
-                #<?php echo esc_attr( $uid ); ?> .ya-collection-load-more-btn.is-disabled {
-                    opacity: 0.65;
-                    cursor: default;
-                    pointer-events: none;
-                    background: #94a3b8;
-                    border-color: #94a3b8;
-                    box-shadow: none;
-                    transform: none;
                 }
 
-                @media (max-width: 992px) {
-                    #<?php echo esc_attr( $uid ); ?> .ya-collection-grid {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                        gap: 20px;
+                /* =========================================================================
+                   BOTTOM PAGINATION DOTS
+                   ========================================================================= */
+                #<?php echo esc_attr( $uid ); ?> .ya-col-dots {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    margin: 28px auto 0;
+                    width: 100%;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-dot {
+                    appearance: none;
+                    -webkit-appearance: none;
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: rgba(16, 47, 53, 0.2);
+                    border: none;
+                    padding: 0;
+                    cursor: pointer;
+                    transition: all .25s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-dot:hover {
+                    background: #d1ad54;
+                    transform: scale(1.2);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-dot.is-active,
+                #<?php echo esc_attr( $uid ); ?> .ya-col-dot.is-active:hover,
+                #<?php echo esc_attr( $uid ); ?> .ya-col-dot.is-active:focus {
+                    background: #d1ad54;
+                    width: 24px;
+                    border-radius: 12px;
+                    transform: scale(1);
+                    box-shadow: 0 0 10px rgba(209, 173, 84, 0.5);
+                }
+
+                /* =========================================================================
+                   RESPONSIVE ADJUSTMENTS
+                   ========================================================================= */
+                @media (max-width: 1200px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-card {
+                        flex: 0 0 330px;
+                        max-width: 350px;
+                        min-width: 280px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-prev {
+                        left: -12px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-next {
+                        right: -12px;
                     }
                 }
-                @media (max-width: 600px) {
-                    #<?php echo esc_attr( $uid ); ?> .ya-collection-grid {
-                        grid-template-columns: 1fr;
-                        gap: 20px;
+                @media (max-width: 768px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-card {
+                        flex: 0 0 85vw;
+                        max-width: 340px;
+                        min-width: 280px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-track {
+                        gap: 16px;
+                        padding: 8px 4px 20px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-tabs {
+                        gap: 8px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-tab {
+                        height: 42px;
+                        padding: 0 18px;
+                        font-size: 12px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-nav-btn {
+                        width: 40px;
+                        height: 40px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-prev {
+                        left: -6px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-col-next {
+                        right: -6px;
                     }
                 }
             </style>
 
-            <div class="ya-collection-grid" id="<?php echo esc_attr( $uid ); ?>_grid">
-                <?php foreach ( $cards as $i => $fc ) :
-                    $is_hidden = ( $i >= $per_page );
+            <!-- 4 Country Filter Buttons (Pure white, 0 border radius, 1px border) -->
+            <div class="ya-col-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Filter Journeys by Country', 'trek-content-manager' ); ?>">
+                <?php
+                $countries = array(
+                    'nepal'  => __( 'Nepal', 'trek-content-manager' ),
+                    'bhutan' => __( 'Bhutan', 'trek-content-manager' ),
+                    'india'  => __( 'India', 'trek-content-manager' ),
+                    'tibet'  => __( 'Tibet', 'trek-content-manager' ),
+                );
+                foreach ( $countries as $c_slug => $c_name ) :
+                    $is_tab_active = ( $c_slug === $default_country );
+                    $count_for_c = 0;
+                    foreach ( $cards as $c ) {
+                        if ( $c['country_slug'] === $c_slug ) {
+                            $count_for_c++;
+                        }
+                    }
                 ?>
-                    <a class="ya-related-card ya-reveal<?php echo $is_hidden ? ' is-hidden' : ''; ?>" href="<?php echo esc_url( $fc['url'] ); ?>" data-card-index="<?php echo esc_attr( $i ); ?>">
-                        <div class="ya-related-image">
-                            <img src="<?php echo esc_url( $fc['img'] ); ?>" alt="<?php echo esc_attr( $fc['alt'] ); ?>" loading="lazy">
-                            <span class="ya-related-img-badge">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l4-8 4 5 3-3 4 6"/><circle cx="7" cy="4" r="1" fill="currentColor"/></svg>
-                                <?php echo esc_html( $fc['badge'] ); ?>
-                            </span>
-                            <span class="ya-related-img-loc">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-                                <?php echo esc_html( $fc['region'] ); ?>
-                            </span>
-                        </div>
-                        <div class="ya-related-copy">
-                            <span class="ya-related-eyebrow"><?php echo esc_html( $fc['diff'] ); ?> Trek</span>
-                            <h3><?php echo esc_html( $fc['title'] ); ?></h3>
-                            <div class="ya-related-info-row">
-                                <div class="ya-related-info-item">
-                                    <span class="ya-related-info-label">Duration</span>
-                                    <span class="ya-related-info-value"><?php echo esc_html( $fc['days'] ); ?> Days</span>
-                                </div>
-                                <div class="ya-related-info-item">
-                                    <span class="ya-related-info-label">Best Season</span>
-                                    <span class="ya-related-info-value"><?php echo esc_html( $fc['season'] ); ?></span>
-                                </div>
-                            </div>
-                            <div class="ya-related-footer">
-                                <div class="ya-related-link">
-                                    <span>View Journey</span>
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                                </div>
-                                <span class="ya-related-duration-pill">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                                    <?php echo esc_html( $fc['days'] ); ?>D
-                                </span>
-                            </div>
-                        </div>
-                    </a>
+                    <button type="button"
+                            class="ya-col-tab<?php echo $is_tab_active ? ' is-active' : ''; ?>"
+                            data-country="<?php echo esc_attr( $c_slug ); ?>"
+                            role="tab"
+                            aria-selected="<?php echo $is_tab_active ? 'true' : 'false'; ?>">
+                        <span><?php echo esc_html( $c_name ); ?></span>
+                    </button>
                 <?php endforeach; ?>
             </div>
 
-            <?php if ( $total_cards > $per_page ) : ?>
-                <div class="ya-collection-load-more-wrap">
-                    <button type="button" class="ya-collection-load-more-btn" id="<?php echo esc_attr( $uid ); ?>_load_more">
-                        <span class="ya-load-more-label">Load More Journeys</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg>
-                    </button>
+            <!-- Carousel Area -->
+            <div class="ya-col-carousel-wrap">
+                <!-- Navigation Arrows -->
+                <button type="button" class="ya-col-nav-btn ya-col-prev" aria-label="<?php esc_attr_e( 'Previous Journeys', 'trek-content-manager' ); ?>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button type="button" class="ya-col-nav-btn ya-col-next" aria-label="<?php esc_attr_e( 'Next Journeys', 'trek-content-manager' ); ?>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+
+                <!-- 1-Row Scrollable Track -->
+                <div class="ya-col-track" id="<?php echo esc_attr( $uid ); ?>_track">
+                    <?php foreach ( $cards as $i => $fc ) :
+                        $is_initial_hidden = ( $fc['country_slug'] !== $default_country );
+                    ?>
+                        <a class="ya-col-card<?php echo $is_initial_hidden ? ' is-hidden' : ''; ?>"
+                           href="<?php echo esc_url( $fc['url'] ); ?>"
+                           data-country="<?php echo esc_attr( $fc['country_slug'] ); ?>"
+                           data-card-index="<?php echo esc_attr( $i ); ?>">
+                            <div class="ya-col-card__media">
+                                <?php if ( ! empty( $fc['img'] ) ) : ?>
+                                    <img src="<?php echo esc_url( $fc['img'] ); ?>" alt="<?php echo esc_attr( $fc['alt'] ); ?>" loading="lazy" class="ya-col-card__img">
+                                <?php else : ?>
+                                    <div class="ya-col-card__img-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, #102f35 0%, #1d4d57 100%);color:rgba(255,255,255,0.4);">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Top-Right: { Yeti Logo | Category } with Transparent Background -->
+                                <div class="ya-col-card__top-badge">
+                                    <img src="<?php echo esc_url( $yeti_logo_url ); ?>" alt="Yeti Adventure" class="ya-col-card__top-logo">
+                                    <?php if ( ! empty( $fc['badge'] ) ) : ?>
+                                        <span class="ya-col-card__top-sep" aria-hidden="true">|</span>
+                                        <span class="ya-col-card__top-cat"><?php echo esc_html( $fc['badge'] ); ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <div class="ya-col-card__body">
+                                <!-- Location & Region (below image, no background) -->
+                                <?php if ( ! empty( $fc['location_display'] ) ) : ?>
+                                    <div class="ya-col-card__loc">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ya-col-card__loc-icon"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                                        <span class="ya-col-card__loc-text"><?php echo esc_html( $fc['location_display'] ); ?></span>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Name Heading -->
+                                <h3 class="ya-col-card__title"><?php echo esc_html( $fc['title'] ); ?></h3>
+
+                                <!-- 3 Columns: Duration, Difficulty, Best Season -->
+                                <div class="ya-col-card__meta">
+                                    <div class="ya-col-card__meta-item">
+                                        <div class="ya-col-card__meta-head">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ya-col-meta-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                            <span class="ya-col-card__meta-label"><?php esc_html_e( 'Duration', 'trek-content-manager' ); ?></span>
+                                        </div>
+                                        <span class="ya-col-card__meta-val"><?php echo ! empty( $fc['days'] ) ? esc_html( $fc['days'] ) . ' ' . esc_html__( 'Days', 'trek-content-manager' ) : '—'; ?></span>
+                                    </div>
+                                    <div class="ya-col-card__meta-item">
+                                        <div class="ya-col-card__meta-head">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ya-col-meta-icon"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+                                            <span class="ya-col-card__meta-label"><?php esc_html_e( 'Difficulty', 'trek-content-manager' ); ?></span>
+                                        </div>
+                                        <span class="ya-col-card__meta-val"><?php echo ! empty( $fc['diff'] ) ? esc_html( $fc['diff'] ) : '—'; ?></span>
+                                    </div>
+                                    <div class="ya-col-card__meta-item">
+                                        <div class="ya-col-card__meta-head">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ya-col-meta-icon"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                                            <span class="ya-col-card__meta-label"><?php esc_html_e( 'Best Season', 'trek-content-manager' ); ?></span>
+                                        </div>
+                                        <span class="ya-col-card__meta-val"><?php echo ! empty( $fc['season'] ) ? esc_html( $fc['season'] ) : '—'; ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
                 </div>
-            <?php endif; ?>
+
+                <!-- Empty state when a specific country tab has 0 trips -->
+                <div class="ya-col-empty" id="<?php echo esc_attr( $uid ); ?>_empty" style="display: none; text-align: center; padding: 60px 20px; color: #617654; font-family: 'Open Sans', Arial, sans-serif; font-size: 15px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 42px; height: 42px; margin: 0 auto 12px; color: #617654; display: block; opacity: 0.8;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <p style="margin: 0; font-weight: 600;"><?php esc_html_e( 'No data found.', 'trek-content-manager' ); ?></p>
+                </div>
+
+                <!-- Bottom Pagination Dots -->
+                <div class="ya-col-dots" id="<?php echo esc_attr( $uid ); ?>_dots" role="tablist" aria-label="<?php esc_attr_e( 'Journey slides', 'trek-content-manager' ); ?>"></div>
+            </div>
 
             <script>
                 (function() {
                     const shell = document.getElementById('<?php echo esc_js( $uid ); ?>');
                     if (!shell) return;
-                    const btn = shell.querySelector('#<?php echo esc_js( $uid ); ?>_load_more');
-                    if (!btn) return;
-                    const perPage = parseInt(shell.getAttribute('data-per-page') || '6', 10);
-                    const cards = Array.from(shell.querySelectorAll('.ya-related-card'));
 
-                    btn.addEventListener('click', function() {
-                        const hiddenCards = cards.filter(c => c.classList.contains('is-hidden'));
-                        const toShow = hiddenCards.slice(0, perPage);
-                        toShow.forEach(card => {
-                            card.classList.remove('is-hidden');
-                            card.style.opacity = '0';
-                            card.style.transform = 'translateY(20px)';
-                            card.style.transition = 'opacity .4s ease, transform .4s ease';
-                            requestAnimationFrame(() => {
-                                card.style.opacity = '1';
-                                card.style.transform = 'translateY(0)';
+                    const track = shell.querySelector('#<?php echo esc_js( $uid ); ?>_track');
+                    const dotsWrap = shell.querySelector('#<?php echo esc_js( $uid ); ?>_dots');
+                    const prevBtn = shell.querySelector('.ya-col-prev');
+                    const nextBtn = shell.querySelector('.ya-col-next');
+                    const tabs = Array.from(shell.querySelectorAll('.ya-col-tab'));
+                    const cards = Array.from(shell.querySelectorAll('.ya-col-card'));
+                    const emptyEl = shell.querySelector('#<?php echo esc_js( $uid ); ?>_empty');
+
+                    let activeCountry = shell.getAttribute('data-default-country') || 'nepal';
+
+                    function getVisibleCards() {
+                        return cards.filter(c => c.getAttribute('data-country') === activeCountry);
+                    }
+
+                    function updateNavArrows() {
+                        if (!track) return;
+                        const sl = track.scrollLeft;
+                        const maxScroll = track.scrollWidth - track.clientWidth - 4;
+                        if (prevBtn) {
+                            if (sl <= 4) {
+                                prevBtn.classList.add('is-disabled');
+                            } else {
+                                prevBtn.classList.remove('is-disabled');
+                            }
+                        }
+                        if (nextBtn) {
+                            if (sl >= maxScroll) {
+                                nextBtn.classList.add('is-disabled');
+                            } else {
+                                nextBtn.classList.remove('is-disabled');
+                            }
+                        }
+                    }
+
+                    function buildDots() {
+                        if (!dotsWrap) return;
+                        dotsWrap.innerHTML = '';
+                        const visible = getVisibleCards();
+                        if (visible.length <= 1) {
+                            dotsWrap.style.display = 'none';
+                            return;
+                        }
+                        dotsWrap.style.display = 'flex';
+
+                        visible.forEach((card, idx) => {
+                            const dot = document.createElement('button');
+                            dot.type = 'button';
+                            dot.className = 'ya-col-dot' + (idx === 0 ? ' is-active' : '');
+                            dot.setAttribute('aria-label', 'Slide ' + (idx + 1));
+                            dot.addEventListener('click', () => {
+                                const cardCenter = (card.offsetLeft - track.offsetLeft) - Math.max(0, (track.clientWidth - card.offsetWidth) / 2);
+                                track.scrollTo({ left: Math.max(0, cardCenter), behavior: 'smooth' });
                             });
+                            dotsWrap.appendChild(dot);
+                        });
+                    }
+
+                    function syncDotsOnScroll() {
+                        if (!dotsWrap || !track) return;
+                        const visible = getVisibleCards();
+                        if (visible.length === 0) return;
+                        const dots = Array.from(dotsWrap.querySelectorAll('.ya-col-dot'));
+
+                        // Check if scrolled to the very end
+                        const maxScroll = track.scrollWidth - track.clientWidth - 10;
+                        if (track.scrollLeft >= maxScroll) {
+                            dots.forEach((d, idx) => d.classList.toggle('is-active', idx === visible.length - 1));
+                            return;
+                        }
+
+                        // Determine which card is closest to the center of the visible track viewport
+                        const viewCenter = track.scrollLeft + (track.clientWidth / 2);
+                        let closestIdx = 0;
+                        let minDistance = Infinity;
+
+                        visible.forEach((card, idx) => {
+                            const cardCenter = (card.offsetLeft - track.offsetLeft) + (card.offsetWidth / 2);
+                            const dist = Math.abs(viewCenter - cardCenter);
+                            if (dist < minDistance) {
+                                minDistance = dist;
+                                closestIdx = idx;
+                            }
                         });
 
-                        const remainingHidden = cards.filter(c => c.classList.contains('is-hidden'));
-                        if (remainingHidden.length === 0) {
-                            btn.classList.add('is-disabled');
-                            const label = btn.querySelector('.ya-load-more-label');
-                            if (label) label.textContent = 'All Journeys Displayed';
-                            const svg = btn.querySelector('svg');
-                            if (svg) svg.style.display = 'none';
+                        dots.forEach((d, idx) => {
+                            d.classList.toggle('is-active', idx === closestIdx);
+                        });
+                    }
+
+                    function filterByCountry(countrySlug) {
+                        activeCountry = countrySlug;
+
+                        // Update tabs
+                        tabs.forEach(t => {
+                            const isCurrent = t.getAttribute('data-country') === countrySlug;
+                            t.classList.toggle('is-active', isCurrent);
+                            t.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+                        });
+
+                        const visible = getVisibleCards();
+
+                        if (visible.length === 0) {
+                            if (emptyEl) emptyEl.style.display = 'block';
+                            if (track) track.style.display = 'none';
+                            if (prevBtn) prevBtn.style.display = 'none';
+                            if (nextBtn) nextBtn.style.display = 'none';
+                            if (dotsWrap) dotsWrap.style.display = 'none';
+                        } else {
+                            if (emptyEl) emptyEl.style.display = 'none';
+                            if (track) track.style.display = 'flex';
+                            if (prevBtn) prevBtn.style.display = 'flex';
+                            if (nextBtn) nextBtn.style.display = 'flex';
+
+                            // Show/Hide cards with subtle animation
+                            cards.forEach(card => {
+                                if (card.getAttribute('data-country') === countrySlug) {
+                                    card.classList.remove('is-hidden');
+                                    card.style.opacity = '0';
+                                    card.style.transform = 'translateY(12px)';
+                                    card.style.transition = 'opacity .35s ease, transform .35s ease';
+                                    requestAnimationFrame(() => {
+                                        card.style.opacity = '1';
+                                        card.style.transform = 'translateY(0)';
+                                    });
+                                } else {
+                                    card.classList.add('is-hidden');
+                                }
+                            });
+
+                            // Scroll track back to start
+                            if (track) {
+                                track.scrollTo({ left: 0, behavior: 'smooth' });
+                            }
+
+                            // Rebuild dots & nav state
+                            setTimeout(() => {
+                                buildDots();
+                                updateNavArrows();
+                            }, 50);
                         }
+                    }
+
+                    // Tab clicks
+                    tabs.forEach(tab => {
+                        tab.addEventListener('click', function() {
+                            const country = this.getAttribute('data-country');
+                            if (country && country !== activeCountry) {
+                                filterByCountry(country);
+                            }
+                        });
                     });
+
+                    // Arrow Navigation
+                    if (prevBtn && track) {
+                        prevBtn.addEventListener('click', () => {
+                            const card = track.querySelector('.ya-col-card:not(.is-hidden)');
+                            const scrollAmount = card ? (card.offsetWidth + 28) : 340;
+                            track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                        });
+                    }
+                    if (nextBtn && track) {
+                        nextBtn.addEventListener('click', () => {
+                            const card = track.querySelector('.ya-col-card:not(.is-hidden)');
+                            const scrollAmount = card ? (card.offsetWidth + 28) : 340;
+                            track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                        });
+                    }
+
+                    // Scroll event throttling
+                    if (track) {
+                        let isScrolling = false;
+                        track.addEventListener('scroll', () => {
+                            if (!isScrolling) {
+                                window.requestAnimationFrame(() => {
+                                    updateNavArrows();
+                                    syncDotsOnScroll();
+                                    isScrolling = false;
+                                });
+                                isScrolling = true;
+                            }
+                        }, { passive: true });
+                    }
+
+                    // Initialize
+                    const initialVisible = getVisibleCards();
+                    if (initialVisible.length === 0) {
+                        if (emptyEl) emptyEl.style.display = 'block';
+                        if (track) track.style.display = 'none';
+                        if (prevBtn) prevBtn.style.display = 'none';
+                        if (nextBtn) nextBtn.style.display = 'none';
+                        if (dotsWrap) dotsWrap.style.display = 'none';
+                    } else {
+                        buildDots();
+                        updateNavArrows();
+                    }
                 })();
             </script>
         </div>
@@ -2082,26 +2663,16 @@ class Trek_Shortcodes {
         );
 
         $section_id = sanitize_html_class( $atts['id'] );
+        $ajax_url   = admin_url( 'admin-ajax.php' );
+        $nonce      = wp_create_nonce( 'trek_journey_lead_nonce' );
 
-        // Map published destinations if available to provide direct links
-        $published_treks = get_posts( array(
-            'post_type'      => 'trek_destination',
-            'post_status'    => 'publish',
-            'posts_per_page' => 100,
-            'fields'         => 'ids',
-        ) );
-        $trek_links_map = array();
-        if ( ! empty( $published_treks ) ) {
-            foreach ( $published_treks as $tid ) {
-                $t_title = get_the_title( $tid );
-                if ( ! empty( $t_title ) ) {
-                    $trek_links_map[ trim( mb_strtolower( $t_title ) ) ] = get_permalink( $tid );
-                }
-            }
-        }
+        $categories = class_exists( 'Trek_Journey_Matcher' ) ? Trek_Journey_Matcher::get_categories() : array();
 
-        $ajax_url = admin_url( 'admin-ajax.php' );
-        $nonce    = wp_create_nonce( 'trek_journey_lead_nonce' );
+        // Calculate initial match (default fallback or first published journey)
+        $initial_match = class_exists( 'Trek_Journey_Matcher' ) ? Trek_Journey_Matcher::match( array() ) : array();
+        $initial_dest  = ( ! empty( $initial_match['destination_id'] ) && class_exists( 'Trek_Journey_Matcher' ) )
+            ? Trek_Journey_Matcher::get_destination_display_data( $initial_match['destination_id'], $initial_match )
+            : array();
 
         ob_start();
         ?>
@@ -2113,34 +2684,37 @@ class Trek_Shortcodes {
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> {
-                    --forest: #022f2e;
-                    --gold: #c7a767;
-                    --paper: #fbf9f4;
+                    --gold: #d1ad54;
+                    --gold-hover: #b8933f;
+                    --forest: #617654;
+                    --forest-dark: #4e5e44;
+                    --paper: #ffffff;
+                    --card-bg: #ffffff;
                     --text: #111111;
-                    --muted: #666666;
-                    --line: rgba(17, 17, 17, .14);
-                    --font-display: "Newsreader", "Cormorant Garamond", Georgia, serif;
-                    --font-sans: "Open Sans", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    --muted: #444444;
+                    --line: rgba(17, 17, 17, .09);
+                    --font-display: var(--te-font-heading, "Newsreader", "Cormorant Garamond", Georgia, serif);
+                    --font-sans: var(--te-font-body, "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
 
                     width: 100%;
-                    padding: 100px 0;
-                    background: var(--paper);
+                    padding: clamp(60px, 6vw, 95px) 0;
+                    background: #ffffff;
                     color: var(--text);
                     font-family: var(--font-sans);
-                    overflow: hidden;
+                    overflow: visible;
                     position: relative;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-inner {
                     position: relative;
-                    width: min(1240px, calc(100% - 56px));
+                    width: min(1280px, calc(100% - 56px));
                     margin: 0 auto;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-selector-grid {
                     display: grid;
                     grid-template-columns: .85fr 1.15fr;
-                    gap: 70px;
+                    gap: clamp(40px, 5vw, 70px);
                     align-items: center;
                 }
 
@@ -2148,216 +2722,551 @@ class Trek_Shortcodes {
                     margin: 0;
                     color: var(--text);
                     font-family: var(--font-display);
-                    font-size: clamp(38px, 4.8vw, 68px);
+                    font-size: clamp(44px, 5.2vw, 76px);
                     font-weight: 400;
-                    line-height: 1.05;
+                    line-height: 1.06;
                     letter-spacing: -.035em;
                 }
 
+                #<?php echo esc_attr( $section_id ); ?> .ya-rotator-wrap {
+                    display: inline-block;
+                    position: relative;
+                    overflow: hidden;
+                    vertical-align: bottom;
+                    padding-bottom: 4px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-rotator-word {
+                    display: inline-block;
+                    color: var(--gold);
+                    font-family: var(--font-display);
+                    font-style: italic;
+                    font-weight: 500;
+                    border-bottom: 2.5px solid var(--gold);
+                    transition: transform 0.38s cubic-bezier(.22, .61, .36, 1), opacity 0.38s ease;
+                    will-change: transform, opacity;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-rotator-word.is-animating-out {
+                    transform: translateY(-80%);
+                    opacity: 0;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-rotator-word.is-entering {
+                    transform: translateY(80%);
+                    opacity: 0;
+                    transition: none !important;
+                }
+
                 #<?php echo esc_attr( $section_id ); ?> .ya-selector-copy p {
-                    max-width: 540px;
+                    max-width: 500px;
                     margin: 22px 0 0;
                     color: var(--muted);
-                    font-size: 15.5px;
+                    font-size: 16px;
                     line-height: 1.8;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-choice-box {
-                    padding: 34px;
-                    border-radius: 28px;
-                    background: #ffffff;
-                    box-shadow: 0 24px 70px rgba(2, 47, 46, .10);
-                    border: 1px solid rgba(17, 17, 17, .08);
+                    padding: 0;
+                    border-radius: 0;
+                    background: transparent;
+                    box-shadow: none;
+                    border: none;
+                    position: relative;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row {
-                    display: grid;
-                    grid-template-columns: 180px 1fr;
-                    gap: 25px;
-                    align-items: center;
-                    padding: 18px 0;
-                    border-bottom: 1px solid var(--line);
+                /* Multi-Select Dropdown Container */
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 14px;
+                    position: relative;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row:first-child {
-                    padding-top: 0;
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown {
+                    position: relative;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row label {
-                    color: var(--muted);
-                    font-size: 13px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown[data-category="explore"] {
+                    z-index: 35;
+                }
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown[data-category="feel"] {
+                    z-index: 30;
+                }
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown[data-category="pace"] {
+                    z-index: 25;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row select {
-                    width: 100%;
-                    padding: 6px 35px 6px 0;
-                    border: 0;
-                    outline: 0;
-                    appearance: none;
-                    background:
-                        linear-gradient(45deg, transparent 50%, var(--forest) 50%) calc(100% - 16px) 53% / 6px 6px no-repeat,
-                        linear-gradient(135deg, var(--forest) 50%, transparent 50%) calc(100% - 11px) 53% / 6px 6px no-repeat;
-                    color: var(--text);
-                    cursor: pointer;
-                    font-family: var(--font-display);
-                    font-size: 24px;
-                    font-weight: 500;
-                    border-bottom: 2px solid transparent;
-                    transition: border-color .2s;
-                }
-
-                #<?php echo esc_attr( $section_id ); ?> .ya-choice-row select:focus {
-                    border-bottom-color: var(--gold);
-                }
-
-                #<?php echo esc_attr( $section_id ); ?> .ya-match {
-                    display: grid;
-                    grid-template-columns: 1fr auto;
-                    gap: 24px;
-                    align-items: center;
-                    margin-top: 26px;
-                    padding: 24px;
-                    border-radius: 20px;
-                    background: var(--forest);
-                    color: #ffffff;
-                }
-
-                #<?php echo esc_attr( $section_id ); ?> .ya-match small {
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__label {
                     display: block;
-                    margin-bottom: 6px;
-                    color: rgba(255, 255, 255, .72);
-                    font: 700 9.5px/1 var(--font-sans);
-                    letter-spacing: 2px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 1.6px;
                     text-transform: uppercase;
-                }
-
-                #<?php echo esc_attr( $section_id ); ?> .ya-match strong {
-                    display: block;
-                    font-family: var(--font-display);
-                    font-size: clamp(22px, 2.3vw, 29px);
-                    font-weight: 500;
-                    line-height: 1.15;
-                    color: #ffffff;
-                }
-
-                #<?php echo esc_attr( $section_id ); ?> .ya-match a {
-                    display: grid;
-                    width: 50px;
-                    height: 50px;
-                    place-items: center;
-                    border-radius: 50%;
-                    background: #ffffff;
                     color: var(--forest);
-                    text-decoration: none;
-                    transition: background .3s ease, transform .3s ease, color .3s ease;
-                    flex-shrink: 0;
+                    margin-bottom: 6px;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-match a:hover {
-                    background: var(--gold);
-                    color: #ffffff;
-                    transform: rotate(-35deg) scale(1.05);
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__control {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    min-height: 56px;
+                    padding: 0 20px;
+                    border-radius: 12px;
+                    border: 1px solid rgba(17, 17, 17, .12);
+                    background: rgba(255, 255, 255, 0.88);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    box-shadow: 0 4px 18px rgba(0, 0, 0, .03);
+                    cursor: pointer;
+                    user-select: none;
+                    transition: all .28s cubic-bezier(.22, .61, .36, 1);
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-icon-arrow {
-                    width: 20px;
-                    height: 20px;
-                    fill: none;
-                    stroke: currentColor;
-                    stroke-linecap: round;
-                    stroke-linejoin: round;
-                    stroke-width: 2;
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__control:hover {
+                    border-color: var(--gold);
+                    background: #ffffff;
+                    box-shadow: 0 8px 24px rgba(207, 171, 85, .16);
+                    transform: translateY(-1px);
                 }
 
-                /* Email Collection Box */
-                #<?php echo esc_attr( $section_id ); ?> .ya-email-collect {
-                    margin-top: 22px;
-                    padding-top: 22px;
-                    border-top: 1px solid var(--line);
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown.is-open .ya-dropdown__control {
+                    border-color: var(--gold);
+                    background: #ffffff;
+                    box-shadow: 0 0 0 3px rgba(207, 171, 85, .18), 0 8px 24px rgba(0, 0, 0, .06);
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-email-header {
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__text-wrap {
                     display: flex;
                     align-items: center;
                     gap: 8px;
-                    margin-bottom: 12px;
-                    color: var(--forest);
-                    font-size: 13px;
-                    font-weight: 600;
-                    letter-spacing: 0.2px;
+                    overflow: hidden;
+                    flex: 1;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-email-icon {
-                    width: 16px;
-                    height: 16px;
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__placeholder {
+                    font-size: 14px;
+                    color: #888888;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__value {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: var(--text);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__badge {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 22px;
+                    height: 22px;
+                    padding: 0 7px;
+                    border-radius: 999px;
+                    background: var(--forest);
+                    color: #ffffff;
+                    font-size: 11.5px;
+                    font-weight: 700;
+                    flex-shrink: 0;
+                    line-height: 1;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__arrow {
+                    width: 18px;
+                    height: 18px;
+                    stroke: var(--forest);
+                    transition: transform .3s cubic-bezier(.22, .61, .36, 1), stroke .25s ease;
+                    flex-shrink: 0;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown.is-open .ya-dropdown__arrow {
+                    transform: rotate(180deg);
+                    stroke: var(--gold);
+                }
+
+                /* Dropdown Menu (Animated Floating Panel) */
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__menu {
+                    position: absolute;
+                    top: calc(100% + 6px);
+                    left: 0;
+                    right: 0;
+                    background: #ffffff;
+                    border-radius: 10px;
+                    border: 1px solid rgba(17, 17, 17, .10);
+                    box-shadow: 0 16px 40px rgba(0, 0, 0, .14);
+                    max-height: 240px;
+                    overflow-y: auto;
+                    padding: 6px;
+                    opacity: 0;
+                    visibility: hidden;
+                    transform: translateY(-8px) scale(.98);
+                    pointer-events: none;
+                    transition: opacity .25s ease, transform .25s ease, visibility .25s ease;
+                    scrollbar-width: thin;
+                    scrollbar-color: rgba(17, 17, 17, .2) transparent;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__menu::-webkit-scrollbar {
+                    width: 5px;
+                }
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__menu::-webkit-scrollbar-thumb {
+                    background: rgba(17, 17, 17, .2);
+                    border-radius: 4px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown.is-open .ya-dropdown__menu {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: translateY(0) scale(1);
+                    pointer-events: auto;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__option {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 9px 14px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    user-select: none;
+                    font-size: 13.5px;
+                    color: #333333;
+                    transition: background-color .18s ease, color .18s ease;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__option:hover {
+                    background: rgba(207, 171, 85, .10);
+                    color: var(--text);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__option.is-checked {
+                    background: rgba(97, 117, 85, .09);
+                    font-weight: 600;
+                    color: var(--forest);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__checkbox {
+                    display: none;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__check-custom {
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 4px;
+                    border: 1.5px solid rgba(17, 17, 17, .25);
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all .2s ease;
+                    flex-shrink: 0;
+                    background: #ffffff;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__check-custom svg {
+                    width: 12px;
+                    height: 12px;
+                    stroke: #ffffff;
+                    opacity: 0;
+                    transform: scale(.6);
+                    transition: all .2s ease;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__option.is-checked .ya-dropdown__check-custom {
+                    background: var(--forest);
+                    border-color: var(--forest);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__option.is-checked .ya-dropdown__check-custom svg {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+
+                /* Matched Result Area */
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-result {
+                    margin-top: 24px;
+                    padding-top: 22px;
+                    border-top: 1px solid rgba(17, 17, 17, .10);
+                    background: transparent;
+                    transition: opacity .25s ease;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-result.is-loading {
+                    opacity: 0.5;
+                    pointer-events: none;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-preview {
+                    display: flex;
+                    align-items: center;
+                    gap: 18px;
+                    padding: 14px 16px;
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    border-radius: 12px;
+                    border: 1px solid rgba(207, 171, 85, 0.35);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+                    margin-bottom: 16px;
+                    animation: yaFadeSlideIn .4s ease;
+                }
+
+                @keyframes yaFadeSlideIn {
+                    from { opacity: 0; transform: translateY(8px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-thumb {
+                    position: relative;
+                    width: 110px;
+                    height: 82px;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    flex-shrink: 0;
+                    background: #18231a;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-thumb img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-tag {
+                    position: absolute;
+                    bottom: 4px;
+                    left: 4px;
+                    right: 4px;
+                    background: rgba(24, 35, 26, 0.88);
+                    backdrop-filter: blur(4px);
+                    color: var(--gold);
+                    font-size: 8px;
+                    font-weight: 700;
+                    letter-spacing: 1px;
+                    text-align: center;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                    text-transform: uppercase;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-details {
+                    flex: 1;
+                    min-width: 0;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-title {
+                    margin: 0 0 6px;
+                    font-family: var(--font-display);
+                    font-size: clamp(20px, 2.2vw, 25px);
+                    font-weight: 600;
+                    line-height: 1.25;
+                    color: var(--text);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-meta-line {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    margin-top: 4px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-meta-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 5px;
+                    padding: 3px 10px;
+                    border-radius: 999px;
+                    background: rgba(97, 117, 85, 0.10);
+                    color: var(--forest-dark);
+                    font-size: 12px;
+                    font-weight: 600;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-meta-pill svg {
+                    color: var(--forest);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-eyebrow {
+                    display: block;
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                    color: var(--gold);
+                    margin-bottom: 6px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-prompt-title {
+                    margin: 0 0 8px;
+                    font-family: var(--font-display);
+                    font-size: clamp(23px, 2.5vw, 29px);
+                    font-weight: 500;
+                    line-height: 1.22;
+                    color: var(--text);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-message-box {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 12px;
+                    padding: 14px 18px;
+                    background: rgba(207, 171, 85, 0.09);
+                    border: 1px solid rgba(207, 171, 85, 0.25);
+                    border-radius: 10px;
+                    margin: 16px 0 22px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-message-icon {
+                    width: 20px;
+                    height: 20px;
                     color: var(--gold);
                     flex-shrink: 0;
+                    margin-top: 2px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-callout {
+                    margin: 0;
+                    font-size: 13.5px;
+                    line-height: 1.6;
+                    color: var(--muted);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-match-callout strong {
+                    color: var(--forest);
+                    font-weight: 600;
+                }
+
+                /* Email Collection Box & Button */
+                #<?php echo esc_attr( $section_id ); ?> .ya-email-collect {
+                    position: relative;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-email-group {
                     display: flex;
-                    gap: 10px;
-                    align-items: center;
+                    gap: 12px;
+                    align-items: stretch;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-email-input {
                     flex: 1;
-                    height: 48px;
-                    padding: 0 18px;
-                    border: 1px solid rgba(2, 47, 46, .20);
+                    height: 58px;
+                    padding: 0 24px;
+                    border: 1.5px solid rgba(17, 17, 17, .14);
                     border-radius: 999px;
-                    background: #fdfdfd;
+                    background: rgba(255, 255, 255, 0.95);
                     color: var(--text);
                     font-family: var(--font-sans);
-                    font-size: 14px;
+                    font-size: 14.5px;
                     outline: none;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
                     transition: border-color .25s ease, box-shadow .25s ease, background-color .25s ease;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-email-input:focus {
-                    border-color: var(--forest);
-                    box-shadow: 0 0 0 3px rgba(2, 47, 46, .08);
+                    border-color: var(--gold);
+                    box-shadow: 0 0 0 3px rgba(207, 171, 85, .20);
                     background: #ffffff;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-email-btn {
-                    height: 48px;
-                    padding: 0 24px;
+                /* Modern Luxury Button with Reverse Hover Effect */
+                #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn {
+                    position: relative;
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 8px;
-                    border: 0;
+                    gap: 14px;
+                    min-height: 58px;
+                    height: 58px;
+                    margin: 0;
+                    padding: 6px 8px 6px 28px;
                     border-radius: 999px;
-                    background: var(--forest);
+                    background: #d1ad54;
                     color: #ffffff;
+                    border: 1.5px solid #d1ad54;
+                    box-shadow: 0 8px 24px rgba(209, 173, 84, 0.35);
                     font-family: var(--font-sans);
-                    font-size: 13.5px;
-                    font-weight: 600;
+                    font-size: 11.5px;
+                    font-weight: 700;
+                    line-height: 1;
+                    letter-spacing: 1.8px;
+                    text-decoration: none;
+                    text-transform: uppercase;
+                    overflow: hidden;
                     cursor: pointer;
                     white-space: nowrap;
-                    transition: background-color .3s ease, transform .2s ease, opacity .2s ease;
                     flex-shrink: 0;
+                    transition: all 0.35s ease;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-email-btn:hover {
-                    background: var(--gold);
-                    transform: translateY(-1px);
+                #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn .ya-hero-cta__text {
+                    position: relative;
+                    z-index: 1;
+                    color: #ffffff;
+                    transition: color 0.35s ease;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-email-btn:disabled {
+                #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn .ya-hero-cta__icon {
+                    position: relative;
+                    z-index: 1;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.22);
+                    color: #ffffff;
+                    transition: all 0.35s ease;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn .ya-hero-cta__icon svg {
+                    width: 17px;
+                    height: 17px;
+                    stroke: currentColor;
+                    transition: transform 0.35s ease;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn:hover {
+                    background: #617654;
+                    border-color: #617654;
+                    box-shadow: 0 12px 30px rgba(97, 118, 84, 0.45);
+                    transform: translateY(-2px);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn:hover .ya-hero-cta__text {
+                    color: #ffffff;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn:hover .ya-hero-cta__icon {
+                    background: rgba(255, 255, 255, 0.32);
+                    color: #ffffff;
+                    transform: scale(1.06);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn:hover .ya-hero-cta__icon svg {
+                    transform: translateX(3px);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn:disabled {
                     opacity: 0.65;
                     cursor: not-allowed;
                     transform: none;
+                    box-shadow: none;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-btn-loader {
-                    width: 14px;
-                    height: 14px;
-                    border: 2px solid rgba(255, 255, 255, .3);
+                    width: 16px;
+                    height: 16px;
+                    border: 2px solid rgba(255, 255, 255, .35);
                     border-top-color: #ffffff;
                     border-radius: 50%;
                     animation: yaFinderSpin 0.7s infinite linear;
@@ -2368,9 +3277,9 @@ class Trek_Shortcodes {
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-email-feedback {
-                    margin-top: 12px;
-                    padding: 12px 16px;
-                    border-radius: 12px;
+                    margin-top: 14px;
+                    padding: 12px 18px;
+                    border-radius: 8px;
                     font-size: 13.5px;
                     line-height: 1.5;
                 }
@@ -2390,7 +3299,7 @@ class Trek_Shortcodes {
                 /* Reveal animations */
                 #<?php echo esc_attr( $section_id ); ?> .ya-reveal {
                     opacity: 0;
-                    transform: translateY(30px);
+                    transform: translateY(28px);
                     transition: opacity .85s cubic-bezier(.2, .7, .2, 1), transform .85s cubic-bezier(.2, .7, .2, 1);
                 }
 
@@ -2402,45 +3311,36 @@ class Trek_Shortcodes {
                 @media (max-width: 1100px) {
                     #<?php echo esc_attr( $section_id ); ?> .ya-selector-grid {
                         grid-template-columns: 1fr;
-                        gap: 50px;
+                        gap: 45px;
                     }
                 }
 
                 @media (max-width: 820px) {
                     #<?php echo esc_attr( $section_id ); ?> {
-                        padding: 70px 0;
+                        padding: 60px 0;
                     }
                     #<?php echo esc_attr( $section_id ); ?> .ya-inner {
-                        width: min(100% - 30px, 1240px);
-                    }
-                    #<?php echo esc_attr( $section_id ); ?> .ya-choice-row {
-                        grid-template-columns: 1fr;
-                        gap: 8px;
-                    }
-                    #<?php echo esc_attr( $section_id ); ?> .ya-choice-row select {
-                        font-size: 22px;
+                        width: min(100% - 32px, 1280px);
                     }
                 }
 
-                @media (max-width: 560px) {
+                @media (max-width: 600px) {
                     #<?php echo esc_attr( $section_id ); ?> .ya-choice-box {
-                        padding: 24px 18px;
-                        border-radius: 20px;
-                    }
-                    #<?php echo esc_attr( $section_id ); ?> .ya-match {
-                        grid-template-columns: 1fr;
-                        padding: 20px 18px;
-                    }
-                    #<?php echo esc_attr( $section_id ); ?> .ya-match a {
-                        width: 100%;
-                        border-radius: 999px;
-                        height: 44px;
+                        padding: 0;
                     }
                     #<?php echo esc_attr( $section_id ); ?> .ya-email-group {
                         flex-direction: column;
                     }
-                    #<?php echo esc_attr( $section_id ); ?> .ya-email-btn {
+                    #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn {
                         width: 100%;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-match-preview {
+                        flex-direction: column;
+                        align-items: flex-start;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-match-thumb {
+                        width: 100%;
+                        height: 140px;
                     }
                 }
 
@@ -2458,80 +3358,177 @@ class Trek_Shortcodes {
 
             <div class="ya-inner ya-selector-grid">
                 <div class="ya-selector-copy ya-reveal">
-                    <h2><?php echo esc_html( $atts['title'] ); ?></h2>
+                    <h2>
+                        <?php esc_html_e( "Let's choose your desire story from", 'trek-content-manager' ); ?><br />
+                        <span class="ya-rotator-wrap">
+                            <span class="ya-rotator-word">Nepal</span>
+                        </span>
+                    </h2>
                     <p>
                         <?php echo esc_html( $atts['subtitle'] ); ?>
                     </p>
                 </div>
 
                 <div class="ya-choice-box ya-reveal">
-                    <div class="ya-choice-row">
-                        <label for="<?php echo esc_attr( $uid ); ?>_region"><?php esc_html_e( 'I want to explore', 'trek-content-manager' ); ?></label>
-                        <select id="<?php echo esc_attr( $uid ); ?>_region" class="ya-select-region">
-                            <option value="everest"><?php esc_html_e( 'Everest Region', 'trek-content-manager' ); ?></option>
-                            <option value="annapurna"><?php esc_html_e( 'Annapurna Region', 'trek-content-manager' ); ?></option>
-                            <option value="mustang"><?php esc_html_e( 'Upper Mustang', 'trek-content-manager' ); ?></option>
-                            <option value="chitwan"><?php esc_html_e( 'Chitwan & the Lowlands', 'trek-content-manager' ); ?></option>
-                            <option value="culture"><?php esc_html_e( 'Kathmandu Valley', 'trek-content-manager' ); ?></option>
-                        </select>
+                    <!-- 3 MULTI-SELECT DROPDOWNS -->
+                    <div class="ya-dropdown-group">
+                        <!-- CATEGORY 1: EXPLORE -->
+                        <?php if ( ! empty( $categories['explore'] ) ) : ?>
+                            <div class="ya-dropdown" data-category="explore">
+                                <label class="ya-dropdown__label"><?php echo esc_html( $categories['explore']['label'] ); ?></label>
+                                <div class="ya-dropdown__control" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                                    <div class="ya-dropdown__text-wrap">
+                                        <span class="ya-dropdown__placeholder"><?php esc_html_e( 'Select landscapes & interests...', 'trek-content-manager' ); ?></span>
+                                        <span class="ya-dropdown__value" style="display:none;"></span>
+                                        <span class="ya-dropdown__badge" style="display:none;">0</span>
+                                    </div>
+                                    <svg class="ya-dropdown__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="ya-dropdown__menu" role="listbox">
+                                    <?php foreach ( $categories['explore']['options'] as $key => $label ) : ?>
+                                        <label class="ya-dropdown__option" data-key="<?php echo esc_attr( $key ); ?>">
+                                            <input type="checkbox" class="ya-dropdown__checkbox" value="<?php echo esc_attr( $key ); ?>" />
+                                            <span class="ya-dropdown__check-custom">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </span>
+                                            <span class="ya-dropdown__opt-text"><?php echo esc_html( $label ); ?></span>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- CATEGORY 2: FEEL -->
+                        <?php if ( ! empty( $categories['feel'] ) ) : ?>
+                            <div class="ya-dropdown" data-category="feel">
+                                <label class="ya-dropdown__label"><?php echo esc_html( $categories['feel']['label'] ); ?></label>
+                                <div class="ya-dropdown__control" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                                    <div class="ya-dropdown__text-wrap">
+                                        <span class="ya-dropdown__placeholder"><?php esc_html_e( 'Select desired feelings...', 'trek-content-manager' ); ?></span>
+                                        <span class="ya-dropdown__value" style="display:none;"></span>
+                                        <span class="ya-dropdown__badge" style="display:none;">0</span>
+                                    </div>
+                                    <svg class="ya-dropdown__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="ya-dropdown__menu" role="listbox">
+                                    <?php foreach ( $categories['feel']['options'] as $key => $label ) : ?>
+                                        <label class="ya-dropdown__option" data-key="<?php echo esc_attr( $key ); ?>">
+                                            <input type="checkbox" class="ya-dropdown__checkbox" value="<?php echo esc_attr( $key ); ?>" />
+                                            <span class="ya-dropdown__check-custom">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </span>
+                                            <span class="ya-dropdown__opt-text"><?php echo esc_html( $label ); ?></span>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- CATEGORY 3: PACE -->
+                        <?php if ( ! empty( $categories['pace'] ) ) : ?>
+                            <div class="ya-dropdown" data-category="pace">
+                                <label class="ya-dropdown__label"><?php echo esc_html( $categories['pace']['label'] ); ?></label>
+                                <div class="ya-dropdown__control" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                                    <div class="ya-dropdown__text-wrap">
+                                        <span class="ya-dropdown__placeholder"><?php esc_html_e( 'Select preferred pacing...', 'trek-content-manager' ); ?></span>
+                                        <span class="ya-dropdown__value" style="display:none;"></span>
+                                        <span class="ya-dropdown__badge" style="display:none;">0</span>
+                                    </div>
+                                    <svg class="ya-dropdown__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="ya-dropdown__menu" role="listbox">
+                                    <?php foreach ( $categories['pace']['options'] as $key => $label ) : ?>
+                                        <label class="ya-dropdown__option" data-key="<?php echo esc_attr( $key ); ?>">
+                                            <input type="checkbox" class="ya-dropdown__checkbox" value="<?php echo esc_attr( $key ); ?>" />
+                                            <span class="ya-dropdown__check-custom">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </span>
+                                            <span class="ya-dropdown__opt-text"><?php echo esc_html( $label ); ?></span>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
-                    <div class="ya-choice-row">
-                        <label for="<?php echo esc_attr( $uid ); ?>_feeling"><?php esc_html_e( 'I want to feel', 'trek-content-manager' ); ?></label>
-                        <select id="<?php echo esc_attr( $uid ); ?>_feeling" class="ya-select-feeling">
-                            <option value="challenged"><?php esc_html_e( 'Challenged', 'trek-content-manager' ); ?></option>
-                            <option value="restored"><?php esc_html_e( 'Restored', 'trek-content-manager' ); ?></option>
-                            <option value="curious"><?php esc_html_e( 'Culturally immersed', 'trek-content-manager' ); ?></option>
-                            <option value="remote"><?php esc_html_e( 'Far from ordinary', 'trek-content-manager' ); ?></option>
-                        </select>
-                    </div>
-
-                    <div class="ya-choice-row">
-                        <label for="<?php echo esc_attr( $uid ); ?>_pace"><?php esc_html_e( 'My ideal pace', 'trek-content-manager' ); ?></label>
-                        <select id="<?php echo esc_attr( $uid ); ?>_pace" class="ya-select-pace">
-                            <option value="active"><?php esc_html_e( 'Active', 'trek-content-manager' ); ?></option>
-                            <option value="balanced"><?php esc_html_e( 'Balanced', 'trek-content-manager' ); ?></option>
-                            <option value="slow"><?php esc_html_e( 'Unhurried', 'trek-content-manager' ); ?></option>
-                            <option value="intense"><?php esc_html_e( 'Expedition-style', 'trek-content-manager' ); ?></option>
-                        </select>
-                    </div>
-
-                    <div class="ya-match">
-                        <div>
-                            <small><?php esc_html_e( 'Your starting point', 'trek-content-manager' ); ?></small>
-                            <strong id="<?php echo esc_attr( $uid ); ?>_match_title" class="ya-match-title" aria-live="polite"><?php esc_html_e( 'The Ultimate Everest Base Camp Trek', 'trek-content-manager' ); ?></strong>
+                    <!-- YOUR JOURNEY MATCH RESULT -->
+                    <div class="ya-match-result" id="<?php echo esc_attr( $uid ); ?>_match_card" role="region" aria-live="polite">
+                        <!-- Preview Card for Matched Journey (Image, Title & Meta Pills) -->
+                        <div class="ya-match-preview" id="<?php echo esc_attr( $uid ); ?>_preview_box" style="display: none;">
+                            <div class="ya-match-thumb" id="<?php echo esc_attr( $uid ); ?>_match_thumb">
+                                <img id="<?php echo esc_attr( $uid ); ?>_match_img" src="" alt="" loading="lazy" />
+                                <span class="ya-match-tag"><?php esc_html_e( 'RECOMMENDED', 'trek-content-manager' ); ?></span>
+                            </div>
+                            <div class="ya-match-details">
+                                <h3 class="ya-match-title" id="<?php echo esc_attr( $uid ); ?>_match_title"></h3>
+                                <div class="ya-match-meta-line" id="<?php echo esc_attr( $uid ); ?>_match_meta">
+                                    <span class="ya-match-meta-pill">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        <span id="<?php echo esc_attr( $uid ); ?>_region_text"></span>
+                                    </span>
+                                    <span class="ya-match-meta-pill">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        <span id="<?php echo esc_attr( $uid ); ?>_duration_text"></span>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <a id="<?php echo esc_attr( $uid ); ?>_match_link" class="ya-match-link" href="<?php echo esc_url( home_url( '/contact-us/?journey=' . rawurlencode( 'The Ultimate Everest Base Camp Trek' ) ) ); ?>" aria-label="<?php esc_attr_e( 'View suggested journey', 'trek-content-manager' ); ?>">
-                            <svg class="ya-icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <path d="M7 17L17 7M9 7h8v8" />
-                            </svg>
-                        </a>
+
+                        <!-- Default Prompt State (before all 3 categories selected) -->
+                        <div class="ya-match-prompt" id="<?php echo esc_attr( $uid ); ?>_match_prompt">
+                            <span class="ya-match-eyebrow" id="<?php echo esc_attr( $uid ); ?>_match_eyebrow">
+                                <?php esc_html_e( 'DISCOVER YOUR BESPOKE JOURNEY', 'trek-content-manager' ); ?>
+                            </span>
+                            <h3 class="ya-match-prompt-title" id="<?php echo esc_attr( $uid ); ?>_prompt_title">
+                                <?php esc_html_e( 'Choose Your Travel Style', 'trek-content-manager' ); ?>
+                            </h3>
+                        </div>
+
+                        <!-- Reassuring Message Box -->
+                        <div class="ya-match-message-box">
+                            <div class="ya-match-message-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                </svg>
+                            </div>
+                            <p class="ya-match-callout" id="<?php echo esc_attr( $uid ); ?>_match_callout">
+                                <?php esc_html_e( 'Select your preferences in all 3 categories above (Explore, Feel, and Pace) to reveal your personalized Himalayan match.', 'trek-content-manager' ); ?>
+                            </p>
+                        </div>
                     </div>
 
-                    <!-- EMAIL COLLECTION / SEND ITINERARY -->
+                    <!-- EMAIL COLLECTION: TAKE YOUR JOURNEY WITH YOU -->
                     <div class="ya-email-collect">
-                        <div class="ya-email-header">
-                            <svg class="ya-email-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                            <span><?php esc_html_e( 'Email me this customized route itinerary & trip guide', 'trek-content-manager' ); ?></span>
-                        </div>
                         <form class="ya-journey-email-form" id="<?php echo esc_attr( $uid ); ?>_email_form" data-ajax-url="<?php echo esc_url( $ajax_url ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>" onsubmit="return false;">
+                            <input type="hidden" id="<?php echo esc_attr( $uid ); ?>_hidden_dest_id" name="destination_id" value="0" />
                             <div class="ya-email-group">
                                 <input type="email" id="<?php echo esc_attr( $uid ); ?>_email_input" name="email" class="ya-email-input" placeholder="<?php esc_attr_e( 'Enter your email address...', 'trek-content-manager' ); ?>" required autocomplete="email" />
-                                <button type="submit" id="<?php echo esc_attr( $uid ); ?>_submit_btn" class="ya-email-btn" aria-label="<?php esc_attr_e( 'Send Itinerary to Email', 'trek-content-manager' ); ?>">
-                                    <span class="ya-btn-text"><?php esc_html_e( 'Send Itinerary', 'trek-content-manager' ); ?></span>
+                                <button type="submit" id="<?php echo esc_attr( $uid ); ?>_submit_btn" class="ya-hero-cta ya-email-btn" aria-label="<?php esc_attr_e( 'Get Full Journey Guide', 'trek-content-manager' ); ?>">
+                                    <span class="ya-hero-cta__text ya-btn-text"><?php esc_html_e( 'GET FULL JOURNEY GUIDE', 'trek-content-manager' ); ?></span>
+                                    <span class="ya-hero-cta__icon" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 12h14M13 6l6 6-6 6"></path>
+                                        </svg>
+                                    </span>
                                     <span class="ya-btn-loader" style="display:none;" aria-hidden="true"></span>
-                                    <svg class="ya-btn-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-                                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                    </svg>
                                 </button>
                             </div>
                             <div id="<?php echo esc_attr( $uid ); ?>_feedback" class="ya-email-feedback" style="display:none;" role="alert"></div>
                         </form>
                     </div>
+
                 </div>
             </div>
 
@@ -2540,98 +3537,320 @@ class Trek_Shortcodes {
                     const section = document.getElementById('<?php echo esc_js( $section_id ); ?>');
                     if (!section) return;
 
-                    const rEl = section.querySelector('.ya-select-region');
-                    const fEl = section.querySelector('.ya-select-feeling');
-                    const pEl = section.querySelector('.ya-select-pace');
-                    const titleEl = section.querySelector('.ya-match-title');
-                    const linkEl = section.querySelector('.ya-match-link');
+                    const uid = '<?php echo esc_js( $uid ); ?>';
+                    const ajaxUrl = '<?php echo esc_url( $ajax_url ); ?>';
+                    const nonce = '<?php echo esc_js( $nonce ); ?>';
 
-                    const formEl = section.querySelector('.ya-journey-email-form');
-                    const emailInput = section.querySelector('.ya-email-input');
-                    const submitBtn = section.querySelector('.ya-email-btn');
+                    const resultCard = document.getElementById(uid + '_match_card');
+                    const previewBox = document.getElementById(uid + '_preview_box');
+                    const promptBox = document.getElementById(uid + '_match_prompt');
+                    const thumbEl = document.getElementById(uid + '_match_thumb');
+                    const imgEl = document.getElementById(uid + '_match_img');
+                    const eyebrowEl = document.getElementById(uid + '_match_eyebrow');
+                    const titleEl = document.getElementById(uid + '_match_title');
+                    const promptTitleEl = document.getElementById(uid + '_prompt_title');
+                    const metaLineEl = document.getElementById(uid + '_match_meta');
+                    const regionEl = document.getElementById(uid + '_region_text');
+                    const durationEl = document.getElementById(uid + '_duration_text');
+                    const calloutEl = document.getElementById(uid + '_match_callout');
+                    const hiddenDestId = document.getElementById(uid + '_hidden_dest_id');
+
+                    const formEl = document.getElementById(uid + '_email_form');
+                    const emailInput = document.getElementById(uid + '_email_input');
+                    const submitBtn = document.getElementById(uid + '_submit_btn');
                     const btnText = submitBtn ? submitBtn.querySelector('.ya-btn-text') : null;
                     const btnLoader = submitBtn ? submitBtn.querySelector('.ya-btn-loader') : null;
-                    const btnIcon = submitBtn ? submitBtn.querySelector('.ya-btn-icon') : null;
-                    const feedbackEl = section.querySelector('.ya-email-feedback');
+                    const feedbackEl = document.getElementById(uid + '_feedback');
 
-                    // Known trip links published in WordPress database
-                    const tripLinks = <?php echo wp_json_encode( $trek_links_map ); ?> || {};
-                    const contactBase = '<?php echo esc_url( home_url( '/contact-us/?journey=' ) ); ?>';
+                    let debounceTimer = null;
 
-                    const recommendations = {
-                        everest: {
-                            active: 'The Ultimate Everest Base Camp Trek',
-                            balanced: 'Everest in Comfort',
-                            slow: 'Everest Monasteries & Mountain Lodges',
-                            intense: 'Everest Three Passes Expedition'
-                        },
-                        annapurna: {
-                            active: 'A Himalayan Sanctuary',
-                            balanced: 'Annapurna Villages & Mountain Views',
-                            slow: 'A Gentle Annapurna Escape',
-                            intense: 'Annapurna Circuit Adventure'
-                        },
-                        mustang: {
-                            active: 'Sky Caves & Ancient Trails',
-                            balanced: 'The Kingdom of Lo',
-                            slow: 'Mustang Culture in Comfort',
-                            intense: 'Remote Mustang Traverse'
-                        },
-                        chitwan: {
-                            active: 'Jungle Trails & River Life',
-                            balanced: 'Where Culture Meets the Wild',
-                            slow: 'A Restorative Lowland Escape',
-                            intense: 'Nepal Multi-Adventure'
-                        },
-                        culture: {
-                            active: 'Kathmandu Valley on Foot',
-                            balanced: 'Living Heritage of Nepal',
-                            slow: 'Courtyards, Craft & Cuisine',
-                            intense: 'Culture and Mountain Adventure'
-                        }
+                    // Rotating destination words in title
+                    const rotatorWord = section.querySelector('.ya-rotator-word');
+                    if (rotatorWord) {
+                        const destinations = ['Nepal', 'India', 'Bhutan', 'Tibet'];
+                        let destIndex = 0;
+                        setInterval(() => {
+                            rotatorWord.classList.add('is-animating-out');
+                            setTimeout(() => {
+                                destIndex = (destIndex + 1) % destinations.length;
+                                rotatorWord.textContent = destinations[destIndex];
+                                rotatorWord.classList.remove('is-animating-out');
+                                rotatorWord.classList.add('is-entering');
+                                void rotatorWord.offsetWidth;
+                                rotatorWord.classList.remove('is-entering');
+                            }, 380);
+                        }, 2800);
+                    }
+
+                    const catLabels = {
+                        explore: '<?php echo esc_js( __( 'Explore', 'trek-content-manager' ) ); ?>',
+                        feel: '<?php echo esc_js( __( 'Feel', 'trek-content-manager' ) ); ?>',
+                        pace: '<?php echo esc_js( __( 'Pace', 'trek-content-manager' ) ); ?>'
                     };
 
-                    const updateMatch = () => {
-                        const selectedRegion = rEl ? rEl.value : 'everest';
-                        const selectedPace = pEl ? pEl.value : 'active';
-                        const selectedFeeling = fEl ? fEl.value : 'challenged';
+                    // Dropdown interaction logic
+                    const dropdowns = section.querySelectorAll('.ya-dropdown');
 
-                        let title = recommendations[selectedRegion]?.[selectedPace] ||
-                            recommendations[selectedRegion]?.active ||
-                            'The Ultimate Everest Base Camp Trek';
+                    dropdowns.forEach(dropdown => {
+                        const control = dropdown.querySelector('.ya-dropdown__control');
+                        const placeholder = dropdown.querySelector('.ya-dropdown__placeholder');
+                        const valEl = dropdown.querySelector('.ya-dropdown__value');
+                        const badge = dropdown.querySelector('.ya-dropdown__badge');
+                        const checkboxes = dropdown.querySelectorAll('.ya-dropdown__checkbox');
+                        const options = dropdown.querySelectorAll('.ya-dropdown__option');
 
-                        if (selectedFeeling === 'restored' && selectedPace !== 'slow') {
-                            title = recommendations[selectedRegion]?.slow || title;
+                        // Toggle open/close
+                        control.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const isOpen = dropdown.classList.contains('is-open');
+
+                            // Close all other dropdowns
+                            dropdowns.forEach(d => {
+                                if (d !== dropdown) {
+                                    d.classList.remove('is-open');
+                                    d.querySelector('.ya-dropdown__control').setAttribute('aria-expanded', 'false');
+                                }
+                            });
+
+                            dropdown.classList.toggle('is-open', !isOpen);
+                            control.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+                        });
+
+                        // Checkbox changes
+                        options.forEach(option => {
+                            option.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const checkbox = option.querySelector('.ya-dropdown__checkbox');
+                                checkbox.checked = !checkbox.checked;
+                                option.classList.toggle('is-checked', checkbox.checked);
+
+                                updateDropdownHeader(dropdown);
+
+                                clearTimeout(debounceTimer);
+                                debounceTimer = setTimeout(updateMatch, 200);
+                            });
+                        });
+                    });
+
+                    function updateDropdownHeader(dropdown) {
+                        const placeholder = dropdown.querySelector('.ya-dropdown__placeholder');
+                        const valEl = dropdown.querySelector('.ya-dropdown__value');
+                        const badge = dropdown.querySelector('.ya-dropdown__badge');
+                        const checkedOptions = dropdown.querySelectorAll('.ya-dropdown__option.is-checked');
+
+                        if (checkedOptions.length === 0) {
+                            placeholder.style.display = 'inline';
+                            valEl.style.display = 'none';
+                            badge.style.display = 'none';
+                        } else if (checkedOptions.length === 1) {
+                            const firstLabel = checkedOptions[0].querySelector('.ya-dropdown__opt-text').textContent.trim();
+                            placeholder.style.display = 'none';
+                            valEl.textContent = firstLabel;
+                            valEl.style.display = 'inline';
+                            badge.style.display = 'none';
+                        } else {
+                            const firstLabel = checkedOptions[0].querySelector('.ya-dropdown__opt-text').textContent.trim();
+                            placeholder.style.display = 'none';
+                            valEl.textContent = firstLabel;
+                            valEl.style.display = 'inline';
+                            badge.textContent = '+' + (checkedOptions.length - 1);
+                            badge.style.display = 'inline-flex';
                         }
+                    }
 
-                        if (selectedFeeling === 'remote' && selectedRegion !== 'mustang') {
-                            title = (selectedRegion === 'everest')
-                                ? 'Remote Khumbu Lodges & Trails'
-                                : 'The Road Less Travelled';
-                        }
-
-                        if (titleEl) {
-                            titleEl.textContent = title;
-                        }
-
-                        if (linkEl) {
-                            const key = title.trim().toLowerCase();
-                            if (tripLinks[key]) {
-                                linkEl.href = tripLinks[key];
-                            } else {
-                                linkEl.href = contactBase + encodeURIComponent(title);
+                    // Auto-close any dropdown when clicking outside of that specific dropdown box
+                    document.addEventListener('click', function(e) {
+                        dropdowns.forEach(d => {
+                            if (!d.contains(e.target)) {
+                                d.classList.remove('is-open');
+                                d.querySelector('.ya-dropdown__control').setAttribute('aria-expanded', 'false');
                             }
-                        }
-                    };
+                        });
+                    });
 
-                    [rEl, fEl, pEl].forEach(field => {
-                        if (field) {
-                            field.addEventListener('change', updateMatch);
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape') {
+                            dropdowns.forEach(d => {
+                                d.classList.remove('is-open');
+                                d.querySelector('.ya-dropdown__control').setAttribute('aria-expanded', 'false');
+                            });
                         }
                     });
-                    updateMatch();
 
-                    // Scroll reveal animation
+                    function getSelectedKeys() {
+                        const selections = {
+                            explore: [],
+                            feel: [],
+                            pace: []
+                        };
+
+                        section.querySelectorAll('.ya-dropdown').forEach(dropdown => {
+                            const cat = dropdown.getAttribute('data-category');
+                            if (cat && selections[cat]) {
+                                dropdown.querySelectorAll('.ya-dropdown__checkbox:checked').forEach(cb => {
+                                    selections[cat].push(cb.value);
+                                });
+                            }
+                        });
+
+                        return selections;
+                    }
+
+                    function updateMatch() {
+                        const selections = getSelectedKeys();
+                        const activeCats = ['explore', 'feel', 'pace'].filter(c => selections[c].length > 0);
+                        const missingCats = ['explore', 'feel', 'pace'].filter(c => selections[c].length === 0);
+
+                        // If not all 3 categories are selected:
+                        if (activeCats.length < 3) {
+                            if (previewBox) previewBox.style.display = 'none';
+                            if (promptBox) promptBox.style.display = 'block';
+                            if (hiddenDestId) hiddenDestId.value = '0';
+
+                            if (activeCats.length === 0) {
+                                if (eyebrowEl) eyebrowEl.textContent = '<?php echo esc_js( __( 'DISCOVER YOUR BESPOKE JOURNEY', 'trek-content-manager' ) ); ?>';
+                                if (promptTitleEl) promptTitleEl.textContent = '<?php echo esc_js( __( 'Choose Your Travel Style', 'trek-content-manager' ) ); ?>';
+                                if (calloutEl) calloutEl.textContent = '<?php echo esc_js( __( 'Select your preferences in all 3 categories above (Explore, Feel, and Pace) to discover your personalized Himalayan journey.', 'trek-content-manager' ) ); ?>';
+                            } else {
+                                const missingNames = missingCats.map(c => catLabels[c]).join(' & ');
+                                if (eyebrowEl) {
+                                    eyebrowEl.textContent = (missingCats.length === 1)
+                                        ? '<?php echo esc_js( __( 'ALMOST READY • 1 STEP REMAINING', 'trek-content-manager' ) ); ?>'
+                                        : '<?php echo esc_js( __( 'STEP 2 OF 3 • KEEP GOING', 'trek-content-manager' ) ); ?>';
+                                }
+                                if (promptTitleEl) {
+                                    promptTitleEl.textContent = (missingCats.length === 1)
+                                        ? '<?php echo esc_js( __( 'Just one more preference...', 'trek-content-manager' ) ); ?>'
+                                        : '<?php echo esc_js( __( 'A few more details...', 'trek-content-manager' ) ); ?>';
+                                }
+                                if (calloutEl) {
+                                    calloutEl.innerHTML = '<?php echo esc_js( __( 'Please select your preferred', 'trek-content-manager' ) ); ?> <strong>' + missingNames + '</strong> <?php echo esc_js( __( 'above to reveal your journey match.', 'trek-content-manager' ) ); ?>';
+                                }
+                            }
+                            return;
+                        }
+
+                        // All 3 categories are selected -> Fetch and display destination match
+                        if (resultCard) {
+                            resultCard.classList.add('is-loading');
+                        }
+
+                        const formData = new FormData();
+                        formData.append('action', 'ya_match_journey');
+                        formData.append('nonce', nonce);
+                        formData.append('explore', selections.explore.join(','));
+                        formData.append('feel', selections.feel.join(','));
+                        formData.append('pace', selections.pace.join(','));
+
+                        fetch(ajaxUrl, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(res => res.json())
+                        .then(res => {
+                            if (resultCard) {
+                                resultCard.classList.remove('is-loading');
+                            }
+                            if (res && res.success && res.data) {
+                                const d = res.data;
+                                if (promptBox) promptBox.style.display = 'none';
+                                if (previewBox) previewBox.style.display = 'flex';
+                                if (titleEl && d.title) titleEl.textContent = d.title;
+                                if (regionEl && d.region) regionEl.textContent = d.region;
+                                if (durationEl && d.duration) durationEl.textContent = d.duration;
+                                if (imgEl && thumbEl) {
+                                    if (d.image_url) {
+                                        imgEl.src = d.image_url;
+                                        imgEl.alt = d.title || '';
+                                        thumbEl.style.display = 'block';
+                                    } else {
+                                        thumbEl.style.display = 'none';
+                                    }
+                                }
+                                if (calloutEl) {
+                                    calloutEl.textContent = '<?php echo esc_js( __( "We have matched your private journey. Enter your email below to receive the complete day-by-day itinerary, lodge portfolio, and bespoke pricing.", 'trek-content-manager' ) ); ?>';
+                                }
+                                if (hiddenDestId && d.destination_id) hiddenDestId.value = d.destination_id;
+                            }
+                        })
+                        .catch(() => {
+                            if (resultCard) resultCard.classList.remove('is-loading');
+                        });
+                    }
+
+                    // Email Form Submission
+                    if (formEl && submitBtn && emailInput) {
+                        formEl.addEventListener('submit', function(e) {
+                            e.preventDefault();
+
+                            const selections = getSelectedKeys();
+                            const activeCats = ['explore', 'feel', 'pace'].filter(c => selections[c].length > 0);
+
+                            if (activeCats.length < 3) {
+                                const missingCats = ['explore', 'feel', 'pace'].filter(c => selections[c].length === 0);
+                                const missingNames = missingCats.map(c => catLabels[c]).join(' & ');
+                                showFeedback('<?php echo esc_js( __( 'Please select your preferred', 'trek-content-manager' ) ); ?> ' + missingNames + ' <?php echo esc_js( __( 'above before requesting your guide.', 'trek-content-manager' ) ); ?>', 'error');
+                                return;
+                            }
+
+                            const email = emailInput.value.trim();
+                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (!email || !emailRegex.test(email)) {
+                                showFeedback('<?php echo esc_js( __( 'Please enter a valid email address.', 'trek-content-manager' ) ); ?>', 'error');
+                                emailInput.focus();
+                                return;
+                            }
+
+                            const destId = hiddenDestId ? hiddenDestId.value : 0;
+
+                            setLoading(true);
+
+                            const formData = new FormData();
+                            formData.append('action', 'ya_submit_journey_lead');
+                            formData.append('nonce', nonce);
+                            formData.append('email', email);
+                            formData.append('destination_id', destId);
+                            formData.append('explore', selections.explore.join(','));
+                            formData.append('feel', selections.feel.join(','));
+                            formData.append('pace', selections.pace.join(','));
+
+                            fetch(ajaxUrl, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                setLoading(false);
+                                if (data && data.success) {
+                                    showFeedback(data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( 'Thank you! Your personalised journey guide has been sent to your email.', 'trek-content-manager' ) ); ?>', 'success');
+                                    emailInput.value = '';
+                                } else {
+                                    const errMsg = (data && data.data && data.data.message) ? data.data.message : '<?php echo esc_js( __( 'Could not send guide. Please try again.', 'trek-content-manager' ) ); ?>';
+                                    showFeedback(errMsg, 'error');
+                                }
+                            })
+                            .catch(() => {
+                                setLoading(false);
+                                showFeedback('<?php echo esc_js( __( 'Network error. Please try again later.', 'trek-content-manager' ) ); ?>', 'error');
+                            });
+                        });
+                    }
+
+                    function setLoading(isLoading) {
+                        if (!submitBtn) return;
+                        submitBtn.disabled = isLoading;
+                        if (btnText) btnText.style.display = isLoading ? 'none' : 'inline';
+                        if (btnLoader) btnLoader.style.display = isLoading ? 'inline-block' : 'none';
+                    }
+
+                    function showFeedback(msg, type) {
+                        if (!feedbackEl) return;
+                        feedbackEl.textContent = msg;
+                        feedbackEl.className = 'ya-email-feedback is-' + type;
+                        feedbackEl.style.display = 'block';
+                    }
+
+                    // Reveal on scroll
                     const revealItems = section.querySelectorAll('.ya-reveal');
                     if (!('IntersectionObserver' in window)) {
                         revealItems.forEach(item => item.classList.add('is-visible'));
@@ -2646,75 +3865,6 @@ class Trek_Shortcodes {
                         }, { threshold: 0.1, rootMargin: '0px 0px -35px' });
                         revealItems.forEach(item => observer.observe(item));
                     }
-
-                    // Email Form Submission
-                    if (formEl && submitBtn && emailInput) {
-                        formEl.addEventListener('submit', function(e) {
-                            e.preventDefault();
-
-                            const email = emailInput.value.trim();
-                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (!email || !emailRegex.test(email)) {
-                                showFeedback('<?php echo esc_js( __( 'Please enter a valid email address.', 'trek-content-manager' ) ); ?>', 'error');
-                                emailInput.focus();
-                                return;
-                            }
-
-                            const region = rEl ? rEl.value : 'everest';
-                            const feeling = fEl ? fEl.value : 'challenged';
-                            const pace = pEl ? pEl.value : 'active';
-                            const trekTitle = titleEl ? titleEl.textContent.trim() : 'The Ultimate Everest Base Camp Trek';
-
-                            const ajaxUrl = formEl.getAttribute('data-ajax-url') || '<?php echo esc_url( $ajax_url ); ?>';
-                            const nonce = formEl.getAttribute('data-nonce') || '<?php echo esc_js( $nonce ); ?>';
-
-                            setLoading(true);
-
-                            const formData = new FormData();
-                            formData.append('action', 'ya_submit_journey_lead');
-                            formData.append('nonce', nonce);
-                            formData.append('email', email);
-                            formData.append('region', region);
-                            formData.append('feeling', feeling);
-                            formData.append('pace', pace);
-                            formData.append('trek_title', trekTitle);
-
-                            fetch(ajaxUrl, {
-                                method: 'POST',
-                                body: formData
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                setLoading(false);
-                                if (data && data.success) {
-                                    showFeedback(data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( '✓ Thank you! Your personalized itinerary has been sent to your email.', 'trek-content-manager' ) ); ?>', 'success');
-                                    emailInput.value = '';
-                                } else {
-                                    const errMsg = (data && data.data && data.data.message) ? data.data.message : '<?php echo esc_js( __( 'Could not send itinerary. Please try again.', 'trek-content-manager' ) ); ?>';
-                                    showFeedback(errMsg, 'error');
-                                }
-                            })
-                            .catch(err => {
-                                setLoading(false);
-                                showFeedback('<?php echo esc_js( __( 'Network error. Please try again later.', 'trek-content-manager' ) ); ?>', 'error');
-                            });
-                        });
-                    }
-
-                    function setLoading(isLoading) {
-                        if (!submitBtn) return;
-                        submitBtn.disabled = isLoading;
-                        if (btnText) btnText.textContent = isLoading ? '<?php echo esc_js( __( 'Sending...', 'trek-content-manager' ) ); ?>' : '<?php echo esc_js( __( 'Send Itinerary', 'trek-content-manager' ) ); ?>';
-                        if (btnLoader) btnLoader.style.display = isLoading ? 'inline-block' : 'none';
-                        if (btnIcon) btnIcon.style.display = isLoading ? 'none' : 'inline-block';
-                    }
-
-                    function showFeedback(msg, type) {
-                        if (!feedbackEl) return;
-                        feedbackEl.textContent = msg;
-                        feedbackEl.className = 'ya-email-feedback ' + (type === 'success' ? 'is-success' : 'is-error');
-                        feedbackEl.style.display = 'block';
-                    }
                 })();
             </script>
         </section>
@@ -2723,100 +3873,94 @@ class Trek_Shortcodes {
     }
 
     /**
+     * AJAX Handler: Calculate and return the best destination match dynamically
+     */
+    public static function ajax_match_journey() {
+        check_ajax_referer( 'trek_journey_lead_nonce', 'nonce' );
+
+        if ( ! class_exists( 'Trek_Journey_Matcher' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Journey matcher engine unavailable.', 'trek-content-manager' ) ) );
+        }
+
+        $explore_raw = sanitize_text_field( $_POST['explore'] ?? '' );
+        $feel_raw    = sanitize_text_field( $_POST['feel'] ?? '' );
+        $pace_raw    = sanitize_text_field( $_POST['pace'] ?? '' );
+
+        $selections = array(
+            'explore' => ! empty( $explore_raw ) ? explode( ',', $explore_raw ) : array(),
+            'feel'    => ! empty( $feel_raw ) ? explode( ',', $feel_raw ) : array(),
+            'pace'    => ! empty( $pace_raw ) ? explode( ',', $pace_raw ) : array(),
+        );
+
+        $result       = Trek_Journey_Matcher::match( $selections );
+        $display_data = Trek_Journey_Matcher::get_destination_display_data( $result['destination_id'], $result );
+
+        wp_send_json_success( $display_data );
+    }
+
+    /**
      * AJAX Handler for Journey Selector Lead Submissions
-     * Stores lead in `trek_enquiry` post type and sends custom HTML itinerary email.
+     * Recalculates match server-side, stores lead in `trek_enquiry`, and sends customer guide via wp_mail().
      */
     public static function ajax_submit_journey_lead() {
         check_ajax_referer( 'trek_journey_lead_nonce', 'nonce' );
 
-        $email      = sanitize_email( $_POST['email'] ?? '' );
-        $region     = sanitize_text_field( $_POST['region'] ?? 'everest' );
-        $feeling    = sanitize_text_field( $_POST['feeling'] ?? 'challenged' );
-        $pace       = sanitize_text_field( $_POST['pace'] ?? 'active' );
-        $trek_title = sanitize_text_field( $_POST['trek_title'] ?? 'The Ultimate Everest Base Camp Trek' );
-
+        $email = sanitize_email( $_POST['email'] ?? '' );
         if ( empty( $email ) || ! is_email( $email ) ) {
             wp_send_json_error( array( 'message' => __( 'Please provide a valid email address.', 'trek-content-manager' ) ) );
         }
 
-        // Region label map
-        $region_labels = array(
-            'everest'   => __( 'Everest Region', 'trek-content-manager' ),
-            'annapurna' => __( 'Annapurna Region', 'trek-content-manager' ),
-            'mustang'   => __( 'Upper Mustang', 'trek-content-manager' ),
-            'chitwan'   => __( 'Chitwan & the Lowlands', 'trek-content-manager' ),
-            'culture'   => __( 'Kathmandu Valley', 'trek-content-manager' ),
+        $explore_raw = sanitize_text_field( $_POST['explore'] ?? '' );
+        $feel_raw    = sanitize_text_field( $_POST['feel'] ?? '' );
+        $pace_raw    = sanitize_text_field( $_POST['pace'] ?? '' );
+
+        $selections = array(
+            'explore' => ! empty( $explore_raw ) ? explode( ',', $explore_raw ) : array(),
+            'feel'    => ! empty( $feel_raw ) ? explode( ',', $feel_raw ) : array(),
+            'pace'    => ! empty( $pace_raw ) ? explode( ',', $pace_raw ) : array(),
         );
-        $region_name = $region_labels[ $region ] ?? ucwords( str_replace( array( '-', '_' ), ' ', $region ) );
 
-        // Feeling label map
-        $feeling_labels = array(
-            'challenged' => __( 'Challenged & Inspired', 'trek-content-manager' ),
-            'restored'   => __( 'Restored & Peaceful', 'trek-content-manager' ),
-            'curious'    => __( 'Culturally Immersed', 'trek-content-manager' ),
-            'remote'     => __( 'Far From Ordinary', 'trek-content-manager' ),
-        );
-        $feeling_name = $feeling_labels[ $feeling ] ?? ucwords( $feeling );
-
-        // Pace label map
-        $pace_labels = array(
-            'active'   => __( 'Active', 'trek-content-manager' ),
-            'balanced' => __( 'Balanced', 'trek-content-manager' ),
-            'slow'     => __( 'Unhurried', 'trek-content-manager' ),
-            'intense'  => __( 'Expedition-Style', 'trek-content-manager' ),
-        );
-        $pace_name = $pace_labels[ $pace ] ?? ucwords( $pace );
-
-        // Check if matching destination exists in WordPress database
-        $matched_post_id   = 0;
-        $destination_url   = home_url( '/contact-us/?journey=' . rawurlencode( $trek_title ) );
-        $destination_intro = '';
-
-        $lookup = get_page_by_title( $trek_title, OBJECT, 'trek_destination' );
-        if ( $lookup && 'publish' === $lookup->post_status ) {
-            $matched_post_id   = $lookup->ID;
-            $destination_url   = get_permalink( $matched_post_id );
-            $destination_intro = wp_strip_all_tags( $lookup->post_excerpt ?: wp_trim_words( $lookup->post_content, 35 ) );
+        // Security: NEVER trust client-side score or destination ID. Recalculate match server-side!
+        if ( ! class_exists( 'Trek_Journey_Matcher' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Journey matcher engine unavailable.', 'trek-content-manager' ) ) );
         }
 
-        if ( empty( $destination_intro ) ) {
-            // Default rich curated blurbs for selected journey
-            $blurbs = array(
-                'The Ultimate Everest Base Camp Trek'     => 'A high-altitude classic leading into the heart of the Khumbu, crossing legendary suspension bridges, Sherpa villages, and ancient monasteries beneath the world’s greatest peaks.',
-                'Everest in Comfort'                      => 'Experience the majestic Khumbu valley staying at comfortable luxury lodges with heated blankets, local gourmet dining, and panoramic views of Ama Dablam.',
-                'Everest Monasteries & Mountain Lodges'   => 'An unhurried spiritual and cultural journey through Tengboche and Thame monasteries, taking gentle acclimatization days in alpine forests.',
-                'Everest Three Passes Expedition'         => 'A demanding expedition crossing Kongma La, Cho La, and Renjo La passes for seasoned trekkers seeking raw Himalayan wilderness.',
-                'A Himalayan Sanctuary'                   => 'Trek into the glacial amphitheatre of Annapurna Sanctuary, surrounded 360 degrees by 7,000 and 8,000-metre snow peaks.',
-                'Annapurna Villages & Mountain Views'     => 'Gentle terraced hillsides, vibrant Gurung hospitality, and sunrise panoramas over Dhaulagiri and Machapuchare.',
-                'A Gentle Annapurna Escape'               => 'Unhurried walks between charming heritage lodges with peaceful forest walks and riverside relaxation.',
-                'Annapurna Circuit Adventure'             => 'An epic circumnavigation crossing the 5,416m Thorong La pass from lush subtropical valleys into Tibetan-influenced high desert.',
-                'Sky Caves & Ancient Trails'              => 'Venture into Upper Mustang’s wind-sculpted sandstone canyons, 800-year-old cliff caves, and fortified medieval villages.',
-                'The Kingdom of Lo'                       => 'Journey to the walled capital of Lo Manthang, experiencing pure Tibetan Buddhist traditions, royal palaces, and ancient chortens.',
-                'Mustang Culture in Comfort'              => 'Discover Upper Mustang staying in heritage boutique guest houses and luxury lodges surrounded by dramatic trans-Himalayan landscapes.',
-                'Remote Mustang Traverse'                 => 'A rugged, seldom-trodden route across high passes connecting hidden gompas and deep desert river gorges.',
-                'Jungle Trails & River Life'              => 'Canoeing down mist-shrouded rivers, walking safaris in Chitwan National Park, and tracking one-horned rhinos and Bengal tigers.',
-                'Where Culture Meets the Wild'            => 'A harmonious balance of Tharu indigenous traditions, organic culinary experiences, and peaceful wildlife encounters.',
-                'A Restorative Lowland Escape'            => 'Lush luxury jungle lodges, sunset river decks, and gentle nature walks designed for rest and regeneration.',
-                'Nepal Multi-Adventure'                   => 'From white-water river rafting to elephant conservation sanctuaries and deep jungle expeditions.',
-                'Kathmandu Valley on Foot'                => 'Ridge walks connecting medieval hill stations, pine forests, and timeless Newari brick towns.',
-                'Living Heritage of Nepal'                => 'Centuries of artistry, bronze casting, wood carving, and pagoda architecture across Kathmandu, Patan, and Bhaktapur.',
-                'Courtyards, Craft & Cuisine'             => 'An intimate slow-travel exploration of traditional culinary secrets, monastic chanting, and artisan pottery studios.',
-                'Culture and Mountain Adventure'          => 'Combine ancient UNESCO World Heritage sanctuaries with scenic Himalayan foothills and sunrise viewpoints.',
-                'Remote Khumbu Lodges & Trails'           => 'Trek away from the main Everest highway into pristine side valleys, tranquil glacial lakes, and secluded Sherpa settlements.',
-                'The Road Less Travelled'                 => 'Off-the-beaten-path paths revealing untouched wilderness, raw mountain hospitality, and deep wilderness tranquility.',
-            );
-            $destination_intro = $blurbs[ $trek_title ] ?? 'An extraordinary Himalayan journey curated to immerse you in breathtaking mountain scenery, rich cultural heritage, and pristine trails.';
+        $match_result = Trek_Journey_Matcher::match( $selections );
+        $dest_data    = Trek_Journey_Matcher::get_destination_display_data( $match_result['destination_id'], $match_result );
+
+        if ( empty( $dest_data ) || empty( $dest_data['destination_id'] ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unable to find matching destination.', 'trek-content-manager' ) ) );
         }
+
+        $destination_id    = $dest_data['destination_id'];
+        $destination_title = $dest_data['title'];
+        $destination_url   = $dest_data['permalink'];
+        $destination_img   = $dest_data['image_url'];
+        $region_name       = $dest_data['region'];
+        $duration          = $dest_data['duration'];
+        $destination_intro = $dest_data['excerpt'];
+        $score             = $dest_data['score'];
+
+        $all_matched_labels = array_merge(
+            $dest_data['explore_matches'] ?? array(),
+            $dest_data['feel_matches'] ?? array(),
+            $dest_data['pace_matches'] ?? array()
+        );
+        $matched_tags_str = ! empty( $all_matched_labels ) ? implode( ' · ', $all_matched_labels ) : __( 'Curated Himalayan Journey', 'trek-content-manager' );
 
         // 1. Store Lead in WordPress Database as `trek_enquiry`
-        $post_title = sprintf( 'Journey Lead: %s (%s)', $trek_title, $email );
+        $post_title = sprintf( 'Journey Lead: %s (%s)', $destination_title, $email );
         $post_content = sprintf(
-            "Traveller Email: %s\nSuggested Journey: %s\nRegion: %s\nDesired Feeling: %s\nIdeal Pace: %s\nSource: Journey Selector\nTimestamp: %s\nIP: %s",
+            "Traveller Email: %s\nMatched Journey: %s\nDestination ID: %d\nMatch Score: %d\nRegion: %s\nDuration: %s\nExplore: %s\nFeel: %s\nPace: %s\nSource: Journey Selector\nTimestamp: %s\nIP: %s",
             $email,
-            $trek_title,
+            $destination_title,
+            $destination_id,
+            $score,
             $region_name,
-            $feeling_name,
-            $pace_name,
+            $duration,
+            implode( ', ', $selections['explore'] ),
+            implode( ', ', $selections['feel'] ),
+            implode( ', ', $selections['pace'] ),
             current_time( 'mysql' ),
             sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' )
         );
@@ -2830,12 +3974,13 @@ class Trek_Shortcodes {
 
         if ( ! is_wp_error( $enquiry_id ) ) {
             update_post_meta( $enquiry_id, '_trek_enquiry_email', $email );
-            update_post_meta( $enquiry_id, '_trek_enquiry_trek_title', $trek_title );
-            update_post_meta( $enquiry_id, '_trek_enquiry_trek_id', $matched_post_id );
+            update_post_meta( $enquiry_id, '_trek_enquiry_trek_title', $destination_title );
+            update_post_meta( $enquiry_id, '_trek_enquiry_trek_id', $destination_id );
             update_post_meta( $enquiry_id, '_trek_enquiry_source', 'Journey Selector' );
-            update_post_meta( $enquiry_id, '_trek_enquiry_region', $region );
-            update_post_meta( $enquiry_id, '_trek_enquiry_feeling', $feeling );
-            update_post_meta( $enquiry_id, '_trek_enquiry_pace', $pace );
+            update_post_meta( $enquiry_id, '_trek_enquiry_match_score', $score );
+            update_post_meta( $enquiry_id, '_trek_enquiry_explore', $selections['explore'] );
+            update_post_meta( $enquiry_id, '_trek_enquiry_feeling', $selections['feel'] );
+            update_post_meta( $enquiry_id, '_trek_enquiry_pace', $selections['pace'] );
             update_post_meta( $enquiry_id, '_trek_enquiry_date', current_time( 'mysql' ) );
         }
 
@@ -2843,7 +3988,7 @@ class Trek_Shortcodes {
         $site_name   = get_bloginfo( 'name' ) ?: 'Yeti Adventure';
         $admin_email = get_option( 'admin_email' );
 
-        $email_subject = sprintf( __( 'Your Curated Nepal Journey: %s | %s', 'trek-content-manager' ), $trek_title, $site_name );
+        $email_subject = sprintf( __( 'Your journey match: %s | %s', 'trek-content-manager' ), $destination_title, $site_name );
 
         $email_headers = array(
             'Content-Type: text/html; charset=UTF-8',
@@ -2872,36 +4017,39 @@ class Trek_Shortcodes {
                                     <h1 style="margin:0;color:#ffffff;font-family:Georgia,serif;font-size:28px;font-weight:400;letter-spacing:-0.5px;"><?php echo esc_html( $site_name ); ?></h1>
                                 </td>
                             </tr>
+                            <?php if ( ! empty( $destination_img ) ) : ?>
+                            <!-- Destination Featured Image -->
+                            <tr>
+                                <td style="padding:0;line-height:0;">
+                                    <img src="<?php echo esc_url( $destination_img ); ?>" alt="<?php echo esc_attr( $destination_title ); ?>" style="width:100%;max-height:280px;object-fit:cover;display:block;" />
+                                </td>
+                            </tr>
+                            <?php endif; ?>
                             <!-- Intro Copy -->
                             <tr>
                                 <td style="padding:35px 35px 25px;">
                                     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#333333;">Dear Explorer,</p>
                                     <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#555555;">
-                                        Thank you for using our interactive Journey Selector. Based on the landscape, feeling, and pace that draw you in, our mountain planners have curated this starting point for your next Himalayan adventure:
+                                        Thank you for exploring with our interactive Journey Matcher. Based on your personal travel preferences, our Himalayan specialists have matched you with:
                                     </p>
 
                                     <!-- Recommended Trek Card -->
                                     <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#f5f8f7;border-left:4px solid #c7a767;border-radius:8px;margin-bottom:28px;">
                                         <tr>
                                             <td style="padding:22px 24px;">
-                                                <span style="display:block;color:#c7a767;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">CURATED STARTING POINT</span>
-                                                <h2 style="margin:0 0 12px;font-family:Georgia,serif;font-size:24px;color:#022f2e;line-height:1.25;"><?php echo esc_html( $trek_title ); ?></h2>
+                                                <span style="display:block;color:#c7a767;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">YOUR JOURNEY MATCH</span>
+                                                <h2 style="margin:0 0 10px;font-family:Georgia,serif;font-size:24px;color:#022f2e;line-height:1.25;"><?php echo esc_html( $destination_title ); ?></h2>
+                                                
+                                                <p style="margin:0 0 14px;font-size:13.5px;color:#044b49;font-weight:600;">
+                                                    📍 <?php echo esc_html( $region_name ); ?> &nbsp;•&nbsp; ⏱️ <?php echo esc_html( $duration ); ?>
+                                                </p>
+
                                                 <p style="margin:0 0 16px;font-size:14.5px;line-height:1.7;color:#444444;"><?php echo esc_html( $destination_intro ); ?></p>
                                                 
-                                                <!-- Meta Pills -->
-                                                <table border="0" cellpadding="0" cellspacing="0" style="margin-top:10px;">
-                                                    <tr>
-                                                        <td style="padding-right:12px;padding-bottom:6px;">
-                                                            <span style="display:inline-block;background:#ffffff;padding:5px 12px;border-radius:999px;font-size:12px;color:#022f2e;border:1px solid #d8e5e2;"><strong>Region:</strong> <?php echo esc_html( $region_name ); ?></span>
-                                                        </td>
-                                                        <td style="padding-right:12px;padding-bottom:6px;">
-                                                            <span style="display:inline-block;background:#ffffff;padding:5px 12px;border-radius:999px;font-size:12px;color:#022f2e;border:1px solid #d8e5e2;"><strong>Pace:</strong> <?php echo esc_html( $pace_name ); ?></span>
-                                                        </td>
-                                                        <td style="padding-bottom:6px;">
-                                                            <span style="display:inline-block;background:#ffffff;padding:5px 12px;border-radius:999px;font-size:12px;color:#022f2e;border:1px solid #d8e5e2;"><strong>Feeling:</strong> <?php echo esc_html( $feeling_name ); ?></span>
-                                                        </td>
-                                                    </tr>
-                                                </table>
+                                                <!-- Selected Preferences -->
+                                                <div style="background:#ffffff;padding:10px 14px;border-radius:8px;border:1px solid #d8e5e2;font-size:12px;color:#022f2e;">
+                                                    <strong>You selected:</strong> <?php echo esc_html( $matched_tags_str ); ?>
+                                                </div>
                                             </td>
                                         </tr>
                                     </table>
@@ -2910,15 +4058,15 @@ class Trek_Shortcodes {
                                     <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:30px;">
                                         <tr>
                                             <td align="center">
-                                                <a href="<?php echo esc_url( $destination_url ); ?>" style="display:inline-block;background-color:#022f2e;color:#ffffff;text-decoration:none;padding:15px 32px;border-radius:999px;font-size:14px;font-weight:700;letter-spacing:0.5px;">
-                                                    Explore This Journey &amp; Route Details &rarr;
+                                                <a href="<?php echo esc_url( $destination_url ); ?>" style="display:inline-block;background-color:#022f2e;color:#ffffff;text-decoration:none;padding:16px 36px;border-radius:999px;font-size:14px;font-weight:700;letter-spacing:0.8px;">
+                                                    VIEW YOUR JOURNEY &rarr;
                                                 </a>
                                             </td>
                                         </tr>
                                     </table>
 
                                     <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#666666;">
-                                        Every Yeti Adventure itinerary is completely customizable. We can adjust the route, pacing, lodge standards, and acclimatization days to shape the perfect experience around you.
+                                        Every journey with Yeti Adventure is completely private and bespoke. We adapt routes, acclimatization days, and boutique lodge reservations around your rhythm.
                                     </p>
                                     <p style="margin:0;font-size:14px;line-height:1.7;color:#333333;">
                                         Warm regards,<br>
@@ -2931,7 +4079,7 @@ class Trek_Shortcodes {
                             <tr>
                                 <td style="background-color:#faf8f5;padding:20px 35px;border-top:1px solid #ece8e1;text-align:center;">
                                     <p style="margin:0;font-size:12px;color:#888888;line-height:1.5;">
-                                        You received this email because you requested route information from the Journey Selector on <?php echo esc_html( home_url() ); ?>.
+                                        You received this email because you requested a personalized journey guide on <?php echo esc_html( home_url() ); ?>.
                                     </p>
                                 </td>
                             </tr>
@@ -2948,28 +4096,1442 @@ class Trek_Shortcodes {
         wp_mail( $email, $email_subject, $customer_email_body, $email_headers );
 
         // 3. Dispatch Notification to Site Admin
-        $admin_subject = sprintf( '[New Journey Lead] %s - %s', $trek_title, $email );
+        $admin_subject = sprintf( '[New Journey Lead] %s - %s', $destination_title, $email );
         $admin_body = sprintf(
-            "A new traveller has requested an itinerary from the Journey Selector:\n\n" .
+            "A new traveller has completed the Journey Matcher:\n\n" .
             "Email: %s\n" .
-            "Suggested Journey: %s\n" .
+            "Matched Destination: %s (ID: %d)\n" .
+            "Match Score: %d\n" .
             "Region: %s\n" .
-            "Feeling: %s\n" .
-            "Pace: %s\n" .
+            "Duration: %s\n" .
+            "Selected Preferences: %s\n" .
             "Date: %s\n\n" .
-            "View in WordPress Dashboard:\n%s\n",
+            "View Enquiry in WordPress Dashboard:\n%s\n",
             $email,
-            $trek_title,
+            $destination_title,
+            $destination_id,
+            $score,
             $region_name,
-            $feeling_name,
-            $pace_name,
+            $duration,
+            $matched_tags_str,
             current_time( 'mysql' ),
             admin_url( 'post.php?post=' . $enquiry_id . '&action=edit' )
         );
         wp_mail( $admin_email, $admin_subject, $admin_body );
 
         wp_send_json_success( array(
-            'message' => sprintf( __( '✓ Thank you! We have sent your personalized itinerary for %s to %s. Please check your inbox.', 'trek-content-manager' ), $trek_title, $email ),
+            'message' => sprintf( __( '✓ Thank you! We have sent your personalized journey guide for %s to %s. Please check your inbox.', 'trek-content-manager' ), $destination_title, $email ),
+        ) );
+    }
+
+    /**
+     * =========================================================================
+     * SHORTCODE: [ya_traveller_matcher] / [trek_traveller_matcher]
+     * =========================================================================
+     * 9-Step Traveller Matcher & Journey Discovery Experience.
+     */
+    public static function render_traveller_matcher( $atts = array() ) {
+        self::$instance_counter++;
+        $uid = 'ya_matcher_' . self::$instance_counter;
+
+        $atts = shortcode_atts( array(
+            'class' => '',
+        ), $atts, 'ya_traveller_matcher' );
+
+        $ajax_url = admin_url( 'admin-ajax.php' );
+        $nonce    = wp_create_nonce( 'trek_traveller_matcher_nonce' );
+
+        ob_start();
+        ?>
+        <section class="ya-matcher-section <?php echo esc_attr( $atts['class'] ); ?>" id="<?php echo esc_attr( $uid ); ?>" data-ajax-url="<?php echo esc_url( $ajax_url ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
+            <style>
+                #<?php echo esc_attr( $uid ); ?> {
+                    --ym-gold: #d1ad54;
+                    --ym-gold-hover: #b8933f;
+                    --ym-forest: #617654;
+                    --ym-forest-dark: #4e5e44;
+                    --ym-dark: #111111;
+                    --ym-paper: #ffffff;
+                    --ym-white: #ffffff;
+                    --ym-border: rgba(16, 47, 53, 0.12);
+                    --ym-text: #111111;
+                    --ym-muted: #333333;
+                    --ym-font-serif: "Newsreader", Georgia, serif;
+                    --ym-font-sans: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+                    width: 100%;
+                    min-height: 80vh;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    padding: clamp(50px, 5vw, 85px) 0;
+                    background: #ffffff;
+                    color: var(--ym-text);
+                    font-family: var(--ym-font-sans);
+                    box-sizing: border-box;
+                    position: relative;
+                }
+                #<?php echo esc_attr( $uid ); ?> * {
+                    box-sizing: border-box;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-inner {
+                    max-width: 1240px;
+                    width: 100%;
+                    margin: 0 auto;
+                    padding: 0 clamp(20px, 3.5vw, 48px);
+                }
+
+                /* Screen Wrapper */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-screen {
+                    display: none;
+                    opacity: 0;
+                    transform: translateY(14px);
+                    transition: opacity .35s ease, transform .35s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-screen.is-active {
+                    display: block;
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+                /* Header / Progress Bar */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-nav-bar {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    max-width: 820px;
+                    margin: 0 auto 32px;
+                    padding-bottom: 16px;
+                    border-bottom: 1px solid rgba(16, 47, 53, 0.08);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-back-btn {
+                    appearance: none;
+                    background: transparent;
+                    border: none;
+                    padding: 8px 14px;
+                    font-family: var(--ym-font-sans);
+                    font-size: 14px;
+                    font-weight: 700;
+                    letter-spacing: .9px;
+                    text-transform: uppercase;
+                    color: #d1ad54;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: color .2s ease;
+                    border-radius: 4px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-back-btn:hover {
+                    color: #617654;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-progress-text {
+                    font-size: 14px;
+                    font-weight: 700;
+                    letter-spacing: 1.8px;
+                    color: #617654;
+                    font-family: var(--ym-font-sans);
+                }
+
+                /* Content Box */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-content-box {
+                    max-width: 860px;
+                    margin: 0 auto;
+                    text-align: center;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-eyebrow {
+                    display: block;
+                    font-size: clamp(12px, 1vw, 14px);
+                    font-weight: 700;
+                    letter-spacing: 2.5px;
+                    text-transform: uppercase;
+                    color: #617654;
+                    margin-bottom: 14px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-title {
+                    font-family: var(--ym-font-serif);
+                    font-size: clamp(32px, 3.8vw, 50px);
+                    font-weight: 600;
+                    line-height: 1.2;
+                    color: #111111;
+                    margin: 0 0 16px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-subtitle {
+                    font-size: clamp(17px, 1.3vw, 21px);
+                    line-height: 1.6;
+                    color: #333333;
+                    margin: 0 auto 40px;
+                    max-width: 680px;
+                }
+
+                /* 4-Option Grid (2x2) */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-options {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 20px;
+                    margin: 0 auto;
+                    max-width: 820px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-option {
+                    appearance: none;
+                    background: var(--ym-white);
+                    border: 1px solid var(--ym-border);
+                    border-radius: 8px;
+                    padding: clamp(20px, 2vw, 28px) clamp(22px, 2.2vw, 30px);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    cursor: pointer;
+                    text-align: left;
+                    transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+                    font-family: var(--ym-font-sans);
+                    font-size: clamp(17px, 1.2vw, 20px);
+                    font-weight: 600;
+                    color: #111111;
+                    min-height: 76px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-option:hover {
+                    border-color: #d1ad54;
+                    transform: translateY(-3px);
+                    box-shadow: 0 10px 28px rgba(209, 173, 84, 0.16);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-option.is-selected {
+                    border-color: #d1ad54;
+                    box-shadow: 0 0 0 2px #d1ad54, 0 10px 28px rgba(209, 173, 84, 0.18);
+                    background: #fbfdfa;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-option-indicator {
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    border: 1.5px solid rgba(16, 47, 53, 0.25);
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                    margin-left: 16px;
+                    transition: border-color .2s, background .2s;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-option.is-selected .ya-mat-option-indicator {
+                    border-color: #d1ad54;
+                    background: #d1ad54;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-option-indicator svg {
+                    width: 14px;
+                    height: 14px;
+                    color: #ffffff;
+                    opacity: 0;
+                    transition: opacity .2s;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-option.is-selected .ya-mat-option-indicator svg {
+                    opacity: 1;
+                }
+
+                /* Primary Button */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-btn {
+                    appearance: none;
+                    background: #d1ad54;
+                    border: 1px solid #d1ad54;
+                    border-radius: 6px;
+                    height: 54px;
+                    padding: 0 38px;
+                    font-family: var(--ym-font-sans);
+                    font-size: 14px;
+                    font-weight: 700;
+                    letter-spacing: 1.4px;
+                    text-transform: uppercase;
+                    color: #ffffff;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    text-decoration: none;
+                    transition: background .25s ease, transform .2s ease, box-shadow .25s ease, border-color .25s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-btn:hover {
+                    background: #617654;
+                    border-color: #617654;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(97, 118, 84, 0.3);
+                    color: #ffffff;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-btn:active {
+                    transform: translateY(0);
+                }
+
+                /* Email Screen */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-email-form {
+                    max-width: 520px;
+                    margin: 0 auto;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-input-group {
+                    position: relative;
+                    margin-bottom: 14px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-email-input {
+                    width: 100%;
+                    height: 58px;
+                    padding: 0 20px;
+                    font-family: var(--ym-font-sans);
+                    font-size: 17px;
+                    color: var(--ym-dark);
+                    background: #ffffff;
+                    border: 1.5px solid rgba(16, 47, 53, 0.2);
+                    border-radius: 8px;
+                    outline: none;
+                    transition: border-color .25s, box-shadow .25s;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-email-input:focus {
+                    border-color: var(--ym-forest);
+                    box-shadow: 0 0 0 3px rgba(97, 117, 85, 0.15);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-error-msg {
+                    color: #b32d2e;
+                    font-size: 13px;
+                    font-weight: 600;
+                    text-align: left;
+                    margin-top: 6px;
+                    display: none;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-privacy {
+                    font-size: 13px;
+                    color: var(--ym-muted);
+                    line-height: 1.5;
+                    margin-top: 16px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-loading {
+                    display: none;
+                    text-align: center;
+                    padding: 24px 0;
+                    color: var(--ym-forest);
+                    font-weight: 600;
+                    font-size: 16px;
+                }
+
+                /* Step 9: Results Carousel / Slider ("sursull") */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-results-wrap {
+                    max-width: 1240px;
+                    margin: 0 auto;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-wrapper {
+                    position: relative;
+                    margin: 36px auto 40px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel {
+                    display: flex;
+                    gap: 24px;
+                    overflow-x: auto;
+                    scroll-snap-type: x mandatory;
+                    scroll-behavior: smooth;
+                    padding: 12px 6px 28px;
+                    -webkit-overflow-scrolling: touch;
+                    scrollbar-width: thin;
+                    scrollbar-color: var(--ym-forest) rgba(16, 47, 53, 0.08);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel::-webkit-scrollbar {
+                    height: 6px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel::-webkit-scrollbar-thumb {
+                    background: var(--ym-forest);
+                    border-radius: 999px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel::-webkit-scrollbar-track {
+                    background: rgba(16, 47, 53, 0.08);
+                    border-radius: 999px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel .ya-col-card {
+                    flex: 0 0 350px;
+                    min-width: 280px;
+                    max-width: 350px;
+                    scroll-snap-align: start;
+                    scroll-snap-stop: always;
+                    display: flex;
+                    flex-direction: column;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    background: #ffffff;
+                    border: 2px solid rgba(97, 118, 84, 0.2);
+                    box-shadow: 0 4px 20px rgba(7, 94, 84, 0.05);
+                    transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease, border-color .35s ease;
+                    text-decoration: none;
+                    color: inherit;
+                    position: relative;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel .ya-col-card:hover {
+                    transform: translateY(-6px);
+                    border-color: #d1ad54;
+                    box-shadow: 0 20px 52px rgba(7, 94, 84, 0.14);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 46px;
+                    height: 46px;
+                    border-radius: 50%;
+                    background: #ffffff;
+                    border: 1px solid rgba(16, 47, 53, 0.16);
+                    box-shadow: 0 6px 20px rgba(16, 47, 53, 0.12);
+                    color: var(--ym-dark);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    z-index: 10;
+                    transition: all .25s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn svg {
+                    width: 20px;
+                    height: 20px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn:hover {
+                    background: var(--ym-forest);
+                    color: #ffffff;
+                    border-color: var(--ym-forest);
+                    transform: translateY(-50%) scale(1.08);
+                    box-shadow: 0 8px 24px rgba(97, 117, 85, 0.3);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn--prev {
+                    left: -22px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn--next {
+                    right: -22px;
+                }
+
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__media {
+                    position: relative;
+                    height: 236px;
+                    overflow: hidden;
+                    flex-shrink: 0;
+                    background: #102f35;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__img {
+                    width: 100% !important;
+                    height: 100% !important;
+                    object-fit: cover !important;
+                    display: block !important;
+                    transition: transform .65s cubic-bezier(.22, 1, .36, 1);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card:hover .ya-col-card__img {
+                    transform: scale(1.06);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-badge {
+                    position: absolute;
+                    top: 14px;
+                    right: 14px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 5px 12px 5px 8px;
+                    background: rgba(16, 47, 53, 0.65);
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                    border: 1px solid rgba(255, 255, 255, 0.28);
+                    border-radius: 50px;
+                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+                    z-index: 3;
+                    transition: background .25s ease, border-color .25s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card:hover .ya-col-card__top-badge {
+                    background: rgba(16, 47, 53, 0.85);
+                    border-color: rgba(255, 255, 255, 0.45);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-logo {
+                    width: 15px !important;
+                    height: 15px !important;
+                    max-width: 15px !important;
+                    max-height: 15px !important;
+                    object-fit: contain !important;
+                    display: block !important;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-sep {
+                    color: rgba(255, 255, 255, 0.4);
+                    font-size: 11px;
+                    font-weight: 300;
+                    line-height: 1;
+                    user-select: none;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-cat {
+                    font-family: var(--ym-font-sans);
+                    font-size: 10.5px;
+                    font-weight: 700;
+                    letter-spacing: .8px;
+                    text-transform: uppercase;
+                    color: #ffffff;
+                    line-height: 1;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__body {
+                    padding: 22px 20px 20px;
+                    display: flex;
+                    flex-direction: column;
+                    flex-grow: 1;
+                    position: relative;
+                    background: #ffffff;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__loc {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    margin-bottom: 8px;
+                    background: transparent !important;
+                    padding: 0 !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    position: static !important;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__loc-icon {
+                    width: 13px;
+                    height: 13px;
+                    color: #617654;
+                    flex-shrink: 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__loc-text {
+                    font-family: var(--ym-font-sans);
+                    font-size: 11px;
+                    font-weight: 600;
+                    letter-spacing: .9px;
+                    text-transform: uppercase;
+                    color: #617654;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__title {
+                    margin: 0 0 18px;
+                    font-family: var(--ym-font-serif);
+                    font-size: 21px;
+                    font-weight: 600;
+                    line-height: 1.28;
+                    color: #111111;
+                    transition: color .25s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card:hover .ya-col-card__title {
+                    color: #d1ad54;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 12px 14px;
+                    margin-top: auto;
+                    padding-top: 14px;
+                    border-top: 1px solid #eef5f2;
+                    position: relative;
+                    z-index: 1;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta-item {
+                    flex: 1 1 calc(33.333% - 10px);
+                    min-width: 80px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3px;
+                    padding: 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta-head {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-meta-icon {
+                    width: 12px;
+                    height: 12px;
+                    color: #617654;
+                    flex-shrink: 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta-label {
+                    font-family: var(--ym-font-sans);
+                    font-size: 9.5px;
+                    font-weight: 600;
+                    letter-spacing: .6px;
+                    text-transform: uppercase;
+                    color: #617654;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-col-card__meta-val {
+                    font-family: var(--ym-font-sans);
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #111111;
+                    white-space: normal;
+                    word-break: break-word;
+                    line-height: 1.35;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-actions {
+                    text-align: center;
+                    margin-top: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 18px;
+                    flex-wrap: wrap;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--outline {
+                    background: transparent;
+                    border: 1px solid #d1ad54;
+                    color: #d1ad54;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--outline:hover {
+                    background: #617654;
+                    border-color: #617654;
+                    color: #ffffff;
+                }
+
+                /* Responsive */
+                @media (max-width: 1280px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn--prev { left: 4px; }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn--next { right: 4px; }
+                }
+                @media (max-width: 992px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel .ya-col-card {
+                        flex: 0 0 calc(50% - 12px);
+                        min-width: 280px;
+                    }
+                }
+                @media (max-width: 640px) {
+                    #<?php echo esc_attr( $uid ); ?> {
+                        min-height: auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-options {
+                        grid-template-columns: 1fr;
+                        gap: 12px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel .ya-col-card {
+                        flex: 0 0 85%;
+                        min-width: 260px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn {
+                        display: none;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-title {
+                        font-size: 28px;
+                    }
+                }
+            </style>
+
+            <div class="ya-mat-inner">
+
+                <!-- STEP 1: INTRODUCTION -->
+                <div class="ya-mat-screen is-active" data-step="1">
+                    <div class="ya-mat-content-box">
+                        <span class="ya-mat-eyebrow"><?php esc_html_e( 'Yeti Adventure Discovery', 'trek-content-manager' ); ?></span>
+                        <h2 class="ya-mat-title"><?php esc_html_e( 'Not Sure What Kind of Traveller You Are?', 'trek-content-manager' ); ?></h2>
+                        <p class="ya-mat-subtitle"><?php esc_html_e( 'Let’s find out what kind of journey feels right for you.', 'trek-content-manager' ); ?></p>
+                        <button type="button" class="ya-mat-btn ya-mat-start-btn" data-next="2">
+                            <span><?php esc_html_e( 'Start Exploring', 'trek-content-manager' ); ?></span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: QUESTION 1 -->
+                <div class="ya-mat-screen" data-step="2">
+                    <div class="ya-mat-nav-bar">
+                        <button type="button" class="ya-mat-back-btn" data-back="1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span><?php esc_html_e( 'Back', 'trek-content-manager' ); ?></span>
+                        </button>
+                        <span class="ya-mat-progress-text">01 / 06</span>
+                        <span style="width:50px;"></span>
+                    </div>
+                    <div class="ya-mat-content-box">
+                        <h2 class="ya-mat-title"><?php esc_html_e( 'What would you most like to explore?', 'trek-content-manager' ); ?></h2>
+                        <div class="ya-mat-options" data-question="q1">
+                            <button type="button" class="ya-mat-option" data-value="culture_heritage">
+                                <span><?php esc_html_e( 'Culture & Heritage', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="nature_wildlife">
+                                <span><?php esc_html_e( 'Nature & Wildlife', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="mountains_adventure">
+                                <span><?php esc_html_e( 'Mountains & Adventure', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="people_local_life">
+                                <span><?php esc_html_e( 'People & Local Life', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: QUESTION 2 -->
+                <div class="ya-mat-screen" data-step="3">
+                    <div class="ya-mat-nav-bar">
+                        <button type="button" class="ya-mat-back-btn" data-back="2">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span><?php esc_html_e( 'Back', 'trek-content-manager' ); ?></span>
+                        </button>
+                        <span class="ya-mat-progress-text">02 / 06</span>
+                        <span style="width:50px;"></span>
+                    </div>
+                    <div class="ya-mat-content-box">
+                        <h2 class="ya-mat-title"><?php esc_html_e( 'How do you want your journey to feel?', 'trek-content-manager' ); ?></h2>
+                        <div class="ya-mat-options" data-question="q2">
+                            <button type="button" class="ya-mat-option" data-value="feel_inspired">
+                                <span><?php esc_html_e( 'Inspired', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="feel_free">
+                                <span><?php esc_html_e( 'Free', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="feel_connected">
+                                <span><?php esc_html_e( 'Connected', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="feel_excited">
+                                <span><?php esc_html_e( 'Excited', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4: QUESTION 3 -->
+                <div class="ya-mat-screen" data-step="4">
+                    <div class="ya-mat-nav-bar">
+                        <button type="button" class="ya-mat-back-btn" data-back="3">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span><?php esc_html_e( 'Back', 'trek-content-manager' ); ?></span>
+                        </button>
+                        <span class="ya-mat-progress-text">03 / 06</span>
+                        <span style="width:50px;"></span>
+                    </div>
+                    <div class="ya-mat-content-box">
+                        <h2 class="ya-mat-title"><?php esc_html_e( 'What kind of places draw you in?', 'trek-content-manager' ); ?></h2>
+                        <div class="ya-mat-options" data-question="q3">
+                            <button type="button" class="ya-mat-option" data-value="place_remote_wild">
+                                <span><?php esc_html_e( 'Remote & Wild', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="place_ancient_cultural">
+                                <span><?php esc_html_e( 'Ancient & Cultural', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="place_peaceful_scenic">
+                                <span><?php esc_html_e( 'Peaceful & Scenic', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="place_vibrant_local">
+                                <span><?php esc_html_e( 'Vibrant & Local', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 5: QUESTION 4 -->
+                <div class="ya-mat-screen" data-step="5">
+                    <div class="ya-mat-nav-bar">
+                        <button type="button" class="ya-mat-back-btn" data-back="4">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span><?php esc_html_e( 'Back', 'trek-content-manager' ); ?></span>
+                        </button>
+                        <span class="ya-mat-progress-text">04 / 06</span>
+                        <span style="width:50px;"></span>
+                    </div>
+                    <div class="ya-mat-content-box">
+                        <h2 class="ya-mat-title"><?php esc_html_e( 'What’s your ideal travel pace?', 'trek-content-manager' ); ?></h2>
+                        <div class="ya-mat-options" data-question="q4">
+                            <button type="button" class="ya-mat-option" data-value="pace_slow_easy">
+                                <span><?php esc_html_e( 'Slow & Easy', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="pace_balanced">
+                                <span><?php esc_html_e( 'Balanced', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="pace_active_exploring">
+                                <span><?php esc_html_e( 'Active & Exploring', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="pace_challenging">
+                                <span><?php esc_html_e( 'Challenging', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 6: QUESTION 5 -->
+                <div class="ya-mat-screen" data-step="6">
+                    <div class="ya-mat-nav-bar">
+                        <button type="button" class="ya-mat-back-btn" data-back="5">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span><?php esc_html_e( 'Back', 'trek-content-manager' ); ?></span>
+                        </button>
+                        <span class="ya-mat-progress-text">05 / 06</span>
+                        <span style="width:50px;"></span>
+                    </div>
+                    <div class="ya-mat-content-box">
+                        <h2 class="ya-mat-title"><?php esc_html_e( 'How do you like to experience a destination?', 'trek-content-manager' ); ?></h2>
+                        <div class="ya-mat-options" data-question="q5">
+                            <button type="button" class="ya-mat-option" data-value="exp_walk_discover">
+                                <span><?php esc_html_e( 'Walk & Discover', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="exp_meet_connect">
+                                <span><?php esc_html_e( 'Meet & Connect', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="exp_explore_photograph">
+                                <span><?php esc_html_e( 'Explore & Photograph', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="exp_challenge_myself">
+                                <span><?php esc_html_e( 'Challenge Myself', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 7: QUESTION 6 -->
+                <div class="ya-mat-screen" data-step="7">
+                    <div class="ya-mat-nav-bar">
+                        <button type="button" class="ya-mat-back-btn" data-back="6">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span><?php esc_html_e( 'Back', 'trek-content-manager' ); ?></span>
+                        </button>
+                        <span class="ya-mat-progress-text">06 / 06</span>
+                        <span style="width:50px;"></span>
+                    </div>
+                    <div class="ya-mat-content-box">
+                        <h2 class="ya-mat-title"><?php esc_html_e( 'What would make this journey unforgettable?', 'trek-content-manager' ); ?></h2>
+                        <div class="ya-mat-options" data-question="q6">
+                            <button type="button" class="ya-mat-option" data-value="mem_breathtaking_view">
+                                <span><?php esc_html_e( 'A breathtaking view', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="mem_meaningful_encounter">
+                                <span><?php esc_html_e( 'A meaningful encounter', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="mem_new_adventure">
+                                <span><?php esc_html_e( 'A new adventure', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                            <button type="button" class="ya-mat-option" data-value="mem_story_to_remember">
+                                <span><?php esc_html_e( 'A story to remember', 'trek-content-manager' ); ?></span>
+                                <span class="ya-mat-option-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 8: EMAIL COLLECTION -->
+                <div class="ya-mat-screen" data-step="8">
+                    <div class="ya-mat-nav-bar">
+                        <button type="button" class="ya-mat-back-btn" data-back="7">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span><?php esc_html_e( 'Back', 'trek-content-manager' ); ?></span>
+                        </button>
+                        <span class="ya-mat-progress-text"><?php esc_html_e( 'Almost there', 'trek-content-manager' ); ?></span>
+                        <span style="width:50px;"></span>
+                    </div>
+                    <div class="ya-mat-content-box">
+                        <h2 class="ya-mat-title"><?php esc_html_e( 'Your journey is taking shape.', 'trek-content-manager' ); ?></h2>
+                        <p class="ya-mat-subtitle"><?php esc_html_e( 'Enter your email and we’ll reveal the destinations that match the way you love to travel.', 'trek-content-manager' ); ?></p>
+                        
+                        <form class="ya-mat-email-form" novalidate>
+                            <div class="ya-mat-input-group">
+                                <input type="email" class="ya-mat-email-input" placeholder="<?php esc_attr_e( 'Your email address', 'trek-content-manager' ); ?>" required />
+                                <span class="ya-mat-error-msg"><?php esc_html_e( 'Please enter a valid email address.', 'trek-content-manager' ); ?></span>
+                            </div>
+                            <button type="submit" class="ya-mat-btn" style="width:100%;">
+                                <span><?php esc_html_e( 'Show My Matches', 'trek-content-manager' ); ?></span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </button>
+                            <p class="ya-mat-privacy"><?php esc_html_e( 'We’ll only use your email to send your travel matches and related journey information.', 'trek-content-manager' ); ?></p>
+                            
+                            <div class="ya-mat-loading">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation: spin 1s linear infinite; display:inline-block; vertical-align:middle; margin-right:8px;"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
+                                <span><?php esc_html_e( 'Finding journeys that match you...', 'trek-content-manager' ); ?></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- STEP 9: PERSONALIZED RESULTS -->
+                <div class="ya-mat-screen" data-step="9">
+                    <div class="ya-mat-results-wrap">
+                        <div class="ya-mat-content-box">
+                            <span class="ya-mat-eyebrow"><?php esc_html_e( 'Curated For You', 'trek-content-manager' ); ?></span>
+                            <h2 class="ya-mat-title"><?php esc_html_e( 'Your Journey Matches', 'trek-content-manager' ); ?></h2>
+                            <p class="ya-mat-subtitle"><?php esc_html_e( 'Destinations that fit the way you want to travel. Swipe or use arrows to discover more.', 'trek-content-manager' ); ?></p>
+                        </div>
+
+                        <!-- 6 Destination Cards Carousel / Slider ("sursull") -->
+                        <div class="ya-mat-carousel-wrapper">
+                            <button type="button" class="ya-mat-carousel-btn ya-mat-carousel-btn--prev" aria-label="<?php esc_attr_e( 'Previous', 'trek-content-manager' ); ?>" id="<?php echo esc_attr( $uid ); ?>_prev">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                            </button>
+
+                            <div class="ya-mat-cards-carousel" id="<?php echo esc_attr( $uid ); ?>_cards">
+                                <!-- Injected via JavaScript (up to 6 cards) -->
+                            </div>
+
+                            <button type="button" class="ya-mat-carousel-btn ya-mat-carousel-btn--next" aria-label="<?php esc_attr_e( 'Next', 'trek-content-manager' ); ?>" id="<?php echo esc_attr( $uid ); ?>_next">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="ya-mat-actions">
+                            <button type="button" class="ya-mat-btn ya-mat-btn--outline ya-mat-restart-btn">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                <span><?php esc_html_e( 'Retake Discovery', 'trek-content-manager' ); ?></span>
+                            </button>
+                            <a href="<?php echo esc_url( home_url( '/all-trips/' ) ); ?>" class="ya-mat-btn">
+                                <span><?php esc_html_e( 'Discover More Journeys', 'trek-content-manager' ); ?></span>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <script>
+                (function() {
+                    const shell = document.getElementById('<?php echo esc_js( $uid ); ?>');
+                    if (!shell) return;
+
+                    const ajaxUrl = shell.getAttribute('data-ajax-url');
+                    const nonce   = shell.getAttribute('data-nonce');
+                    const cardsContainer = shell.querySelector('#<?php echo esc_js( $uid ); ?>_cards');
+                    const prevBtn = shell.querySelector('#<?php echo esc_js( $uid ); ?>_prev');
+                    const nextBtn = shell.querySelector('#<?php echo esc_js( $uid ); ?>_next');
+                    const screens = Array.from(shell.querySelectorAll('.ya-mat-screen'));
+                    const emailForm = shell.querySelector('.ya-mat-email-form');
+                    const emailInput = shell.querySelector('.ya-mat-email-input');
+                    const errorMsg = shell.querySelector('.ya-mat-error-msg');
+                    const loadingIndicator = shell.querySelector('.ya-mat-loading');
+                    const submitBtn = emailForm ? emailForm.querySelector('button[type="submit"]') : null;
+
+                    const state = {
+                        step: 1,
+                        answers: {
+                            q1: '',
+                            q2: '',
+                            q3: '',
+                            q4: '',
+                            q5: '',
+                            q6: ''
+                        },
+                        email: ''
+                    };
+
+                    function showStep(stepNum) {
+                        state.step = stepNum;
+                        screens.forEach(s => {
+                            const sNum = parseInt(s.getAttribute('data-step'), 10);
+                            if (sNum === stepNum) {
+                                s.classList.add('is-active');
+                                s.style.opacity = '0';
+                                s.style.transform = 'translateY(12px)';
+                                requestAnimationFrame(() => {
+                                    s.style.opacity = '1';
+                                    s.style.transform = 'translateY(0)';
+                                });
+                            } else {
+                                s.classList.remove('is-active');
+                            }
+                        });
+
+                        // Scroll smoothly to top of matcher container if user is lower down
+                        const shellTop = shell.getBoundingClientRect().top + window.pageYOffset - 50;
+                        if (window.pageYOffset > shellTop + 200) {
+                            window.scrollTo({ top: shellTop, behavior: 'smooth' });
+                        }
+                    }
+
+                    // Start Exploring Button
+                    const startBtn = shell.querySelector('.ya-mat-start-btn');
+                    if (startBtn) {
+                        startBtn.addEventListener('click', () => showStep(2));
+                    }
+
+                    // Back Buttons
+                    shell.querySelectorAll('.ya-mat-back-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const backStep = parseInt(this.getAttribute('data-back'), 10);
+                            if (backStep >= 1) {
+                                showStep(backStep);
+                            }
+                        });
+                    });
+
+                    // Option Buttons
+                    shell.querySelectorAll('.ya-mat-option').forEach(opt => {
+                        opt.addEventListener('click', function() {
+                            const parent = this.closest('.ya-mat-options');
+                            if (!parent) return;
+
+                            const questionKey = parent.getAttribute('data-question');
+                            const val = this.getAttribute('data-value');
+
+                            // Mark active in DOM
+                            parent.querySelectorAll('.ya-mat-option').forEach(o => o.classList.remove('is-selected'));
+                            this.classList.add('is-selected');
+
+                            // Store in state
+                            state.answers[questionKey] = val;
+
+                            // Proceed to next screen after brief visual confirmation
+                            setTimeout(() => {
+                                const currentStep = state.step;
+                                showStep(currentStep + 1);
+                            }, 220);
+                        });
+                    });
+
+                    // Carousel Navigation Buttons
+                    if (prevBtn && cardsContainer) {
+                        prevBtn.addEventListener('click', () => {
+                            const card = cardsContainer.querySelector('.ya-col-card');
+                            const scrollAmount = card ? (card.offsetWidth + 24) : 340;
+                            cardsContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                        });
+                    }
+                    if (nextBtn && cardsContainer) {
+                        nextBtn.addEventListener('click', () => {
+                            const card = cardsContainer.querySelector('.ya-col-card');
+                            const scrollAmount = card ? (card.offsetWidth + 24) : 340;
+                            cardsContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                        });
+                    }
+
+                    // Email Validation
+                    function isValidEmail(email) {
+                        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
+                    }
+
+                    if (emailInput) {
+                        emailInput.addEventListener('input', function() {
+                            if (errorMsg) errorMsg.style.display = 'none';
+                            this.style.borderColor = 'rgba(16, 47, 53, 0.2)';
+                        });
+                    }
+
+                    // Email Submission
+                    if (emailForm) {
+                        emailForm.addEventListener('submit', function(e) {
+                            e.preventDefault();
+
+                            const emailVal = emailInput ? emailInput.value.trim() : '';
+
+                            if (!isValidEmail(emailVal)) {
+                                if (errorMsg) errorMsg.style.display = 'block';
+                                if (emailInput) {
+                                    emailInput.style.borderColor = '#b32d2e';
+                                    emailInput.focus();
+                                }
+                                return;
+                            }
+
+                            state.email = emailVal;
+
+                            // Loading state
+                            if (submitBtn) submitBtn.style.display = 'none';
+                            if (loadingIndicator) loadingIndicator.style.display = 'block';
+
+                            const formData = new FormData();
+                            formData.append('action', 'ya_submit_traveller_matcher');
+                            formData.append('nonce', nonce);
+                            formData.append('email', state.email);
+                            formData.append('q1', state.answers.q1);
+                            formData.append('q2', state.answers.q2);
+                            formData.append('q3', state.answers.q3);
+                            formData.append('q4', state.answers.q4);
+                            formData.append('q5', state.answers.q5);
+                            formData.append('q6', state.answers.q6);
+
+                            fetch(ajaxUrl, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (submitBtn) submitBtn.style.display = 'inline-flex';
+                                if (loadingIndicator) loadingIndicator.style.display = 'none';
+
+                                if (data.success && data.data && data.data.cards) {
+                                    renderResults(data.data.cards);
+                                    showStep(9);
+                                } else {
+                                    alert(data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( 'Something went wrong. Please try again.', 'trek-content-manager' ) ); ?>');
+                                }
+                            })
+                            .catch(() => {
+                                if (submitBtn) submitBtn.style.display = 'inline-flex';
+                                if (loadingIndicator) loadingIndicator.style.display = 'none';
+                                alert('<?php echo esc_js( __( 'Something went wrong. Please try again.', 'trek-content-manager' ) ); ?>');
+                            });
+                        });
+                    }
+
+                    // Render Result Cards using exact [ya_signature_journeys] style
+                    function renderResults(cards) {
+                        if (!cardsContainer) return;
+                        cardsContainer.innerHTML = '';
+
+                        if (!cards || cards.length === 0) {
+                            cardsContainer.innerHTML = '<div style="flex:1; text-align:center; padding:48px 20px; color:#617579;"><p><?php echo esc_js( __( 'We could not find an exact match yet. Explore all journeys to discover more possibilities.', 'trek-content-manager' ) ); ?></p></div>';
+                            return;
+                        }
+
+                        const yetiLogo = 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/yeti_logo_active.gif';
+
+                        cards.forEach(card => {
+                            const a = document.createElement('a');
+                            a.className = 'ya-col-card';
+                            a.href = card.url || '#';
+
+                            let mediaHtml = '';
+                            if (card.img) {
+                                mediaHtml = '<img src="' + card.img + '" alt="' + (card.alt || card.title) + '" loading="lazy" class="ya-col-card__img">';
+                            } else {
+                                mediaHtml = '<div class="ya-col-card__img-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, #102f35 0%, #1d4d57 100%);color:rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg></div>';
+                            }
+
+                            let badgeHtml = '';
+                            if (card.badge) {
+                                badgeHtml = '<span class="ya-col-card__top-sep" aria-hidden="true">|</span><span class="ya-col-card__top-cat">' + card.badge + '</span>';
+                            }
+
+                            let locHtml = '';
+                            if (card.location_display) {
+                                locHtml = '<div class="ya-col-card__loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ya-col-card__loc-icon"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span class="ya-col-card__loc-text">' + card.location_display + '</span></div>';
+                            }
+
+                            const daysStr = card.days ? card.days + ' <?php echo esc_js( __( 'Days', 'trek-content-manager' ) ); ?>' : '—';
+                            const diffStr = card.diff ? card.diff : '—';
+                            const seasonStr = card.season ? card.season : '—';
+
+                            a.innerHTML = `
+                                <div class="ya-col-card__media">
+                                    ${mediaHtml}
+                                    <div class="ya-col-card__top-badge">
+                                        <img src="${yetiLogo}" alt="Yeti Adventure" class="ya-col-card__top-logo">
+                                        ${badgeHtml}
+                                    </div>
+                                </div>
+                                <div class="ya-col-card__body">
+                                    ${locHtml}
+                                    <h3 class="ya-col-card__title">${card.title}</h3>
+                                    <div class="ya-col-card__meta">
+                                        <div class="ya-col-card__meta-item">
+                                            <div class="ya-col-card__meta-head">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ya-col-meta-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                                <span class="ya-col-card__meta-label"><?php echo esc_js( __( 'Duration', 'trek-content-manager' ) ); ?></span>
+                                            </div>
+                                            <span class="ya-col-card__meta-val">${daysStr}</span>
+                                        </div>
+                                        <div class="ya-col-card__meta-item">
+                                            <div class="ya-col-card__meta-head">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ya-col-meta-icon"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+                                                <span class="ya-col-card__meta-label"><?php echo esc_js( __( 'Difficulty', 'trek-content-manager' ) ); ?></span>
+                                            </div>
+                                            <span class="ya-col-card__meta-val">${diffStr}</span>
+                                        </div>
+                                        <div class="ya-col-card__meta-item">
+                                            <div class="ya-col-card__meta-head">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ya-col-meta-icon"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                                                <span class="ya-col-card__meta-label"><?php echo esc_js( __( 'Best Season', 'trek-content-manager' ) ); ?></span>
+                                            </div>
+                                            <span class="ya-col-card__meta-val">${seasonStr}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                            cardsContainer.appendChild(a);
+                        });
+                    }
+
+                    // Restart / Retake Discovery
+                    const restartBtn = shell.querySelector('.ya-mat-restart-btn');
+                    if (restartBtn) {
+                        restartBtn.addEventListener('click', () => {
+                            state.answers = { q1: '', q2: '', q3: '', q4: '', q5: '', q6: '' };
+                            state.email = '';
+                            shell.querySelectorAll('.ya-mat-option').forEach(o => o.classList.remove('is-selected'));
+                            if (emailInput) emailInput.value = '';
+                            showStep(1);
+                        });
+                    }
+                })();
+            </script>
+        </section>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * AJAX Handler: Process Traveller Matcher Answers & Save Lead
+     */
+    public static function ajax_submit_traveller_matcher() {
+        check_ajax_referer( 'trek_traveller_matcher_nonce', 'nonce' );
+
+        $email = sanitize_email( $_POST['email'] ?? '' );
+        if ( empty( $email ) || ! is_email( $email ) ) {
+            wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'trek-content-manager' ) ) );
+        }
+
+        if ( ! class_exists( 'Trek_Journey_Matcher' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Journey matcher engine unavailable.', 'trek-content-manager' ) ) );
+        }
+
+        $q1 = sanitize_key( $_POST['q1'] ?? '' );
+        $q2 = sanitize_key( $_POST['q2'] ?? '' );
+        $q3 = sanitize_key( $_POST['q3'] ?? '' );
+        $q4 = sanitize_key( $_POST['q4'] ?? '' );
+        $q5 = sanitize_key( $_POST['q5'] ?? '' );
+        $q6 = sanitize_key( $_POST['q6'] ?? '' );
+
+        // Centralized Answer -> Keyword Mapping Layer
+        $mapping = array(
+            // Question 1: What would you most like to explore?
+            'culture_heritage'       => array( 'explore' => array( 'culture_heritage', 'history' ) ),
+            'nature_wildlife'        => array( 'explore' => array( 'nature_landscapes', 'wildlife' ) ),
+            'mountains_adventure'    => array( 'explore' => array( 'mountains', 'adventure' ) ),
+            'people_local_life'      => array( 'explore' => array( 'local_life', 'food_traditions' ) ),
+
+            // Question 2: How do you want your journey to feel?
+            'feel_inspired'          => array( 'feel' => array( 'inspired' ) ),
+            'feel_free'              => array( 'feel' => array( 'free' ) ),
+            'feel_connected'         => array( 'feel' => array( 'connected' ) ),
+            'feel_excited'           => array( 'feel' => array( 'adventurous', 'alive' ) ),
+
+            // Question 3: What kind of places draw you in?
+            'place_remote_wild'      => array( 'explore' => array( 'remote_places' ), 'pace' => array( 'wild_remote' ) ),
+            'place_ancient_cultural' => array( 'explore' => array( 'history', 'culture_heritage' ) ),
+            'place_peaceful_scenic'  => array( 'feel' => array( 'peaceful' ), 'pace' => array( 'slow_scenic' ) ),
+            'place_vibrant_local'    => array( 'explore' => array( 'local_life' ), 'feel' => array( 'immersed' ) ),
+
+            // Question 4: What’s your ideal travel pace?
+            'pace_slow_easy'         => array( 'pace' => array( 'slow_scenic', 'relaxed' ) ),
+            'pace_balanced'          => array( 'pace' => array( 'balanced' ) ),
+            'pace_active_exploring'  => array( 'pace' => array( 'active', 'adventure' ) ),
+            'pace_challenging'       => array( 'pace' => array( 'challenging', 'trekking', 'expedition' ) ),
+
+            // Question 5: How do you like to experience a destination?
+            'exp_walk_discover'      => array( 'pace' => array( 'culture_discovery', 'slow_scenic' ) ),
+            'exp_meet_connect'       => array( 'feel' => array( 'connected' ), 'explore' => array( 'local_life' ) ),
+            'exp_explore_photograph' => array( 'explore' => array( 'nature_landscapes' ), 'feel' => array( 'inspired' ) ),
+            'exp_challenge_myself'   => array( 'feel' => array( 'challenged', 'accomplished' ) ),
+
+            // Question 6: What would make this journey unforgettable?
+            'mem_breathtaking_view'  => array( 'feel' => array( 'inspired' ), 'explore' => array( 'mountains' ) ),
+            'mem_meaningful_encounter'=> array( 'feel' => array( 'connected', 'spirituality' ), 'explore' => array( 'local_life' ) ),
+            'mem_new_adventure'      => array( 'explore' => array( 'adventure' ), 'feel' => array( 'adventurous' ) ),
+            'mem_story_to_remember'  => array( 'feel' => array( 'far_from_ordinary', 'accomplished' ) ),
+        );
+
+        $selections = array(
+            'explore' => array(),
+            'feel'    => array(),
+            'pace'    => array(),
+        );
+
+        foreach ( array( $q1, $q2, $q3, $q4, $q5, $q6 ) as $ans ) {
+            if ( isset( $mapping[ $ans ] ) ) {
+                foreach ( array( 'explore', 'feel', 'pace' ) as $cat ) {
+                    if ( ! empty( $mapping[ $ans ][ $cat ] ) ) {
+                        $selections[ $cat ] = array_merge( $selections[ $cat ], $mapping[ $ans ][ $cat ] );
+                    }
+                }
+            }
+        }
+
+        // De-duplicate
+        $selections['explore'] = array_unique( $selections['explore'] );
+        $selections['feel']    = array_unique( $selections['feel'] );
+        $selections['pace']    = array_unique( $selections['pace'] );
+
+        // Run multi-destination matching (top 6)
+        $matches = Trek_Journey_Matcher::match_multiple( $selections, 6 );
+
+        $cards = array();
+        $matched_titles = array();
+        $primary_dest_id = 0;
+        $primary_score   = 0;
+
+        foreach ( $matches as $idx => $m ) {
+            $p_id = $m['destination_id'];
+            if ( ! $p_id ) {
+                continue;
+            }
+            if ( 0 === $idx ) {
+                $primary_dest_id = $p_id;
+                $primary_score   = $m['score'];
+            }
+
+            $c_title = get_the_title( $p_id );
+            $matched_titles[] = $c_title;
+
+            // Image
+            $c_img = get_the_post_thumbnail_url( $p_id, 'large' );
+            if ( empty( $c_img ) ) {
+                $c_img = get_post_meta( $p_id, '_trek_card_image_url', true );
+            }
+            if ( empty( $c_img ) ) {
+                $c_img = get_post_meta( $p_id, '_trek_hero_bg_img', true );
+            }
+            if ( empty( $c_img ) ) {
+                $c_img = '';
+            }
+
+            // Category badge
+            $cat_terms = get_the_terms( $p_id, 'trek_category' );
+            $badge     = ( ! empty( $cat_terms ) && ! is_wp_error( $cat_terms ) ) ? $cat_terms[0]->name : '';
+
+            // Region / Country
+            $c_region = get_post_meta( $p_id, '_trek_fact_region', true );
+            if ( empty( $c_region ) ) {
+                $c_region = get_post_meta( $p_id, '_trek_breadcrumb_region', true );
+            }
+            if ( empty( $c_region ) ) {
+                $reg_terms = get_the_terms( $p_id, 'trek_region' );
+                if ( ! empty( $reg_terms ) && ! is_wp_error( $reg_terms ) ) {
+                    $c_region = $reg_terms[0]->name;
+                }
+            }
+            if ( empty( $c_region ) ) {
+                $c_region = get_post_meta( $p_id, '_trek_country', true );
+            }
+
+            // Difficulty
+            $diff_terms = get_the_terms( $p_id, 'trek_difficulty' );
+            $c_diff     = ( ! empty( $diff_terms ) && ! is_wp_error( $diff_terms ) ) ? $diff_terms[0]->name : get_post_meta( $p_id, '_trek_difficulty', true );
+            $c_diff     = ! empty( $c_diff ) ? preg_replace( '/\s*trek$/i', '', trim( $c_diff ) ) : '';
+
+            // Duration
+            $days_raw = get_post_meta( $p_id, '_trek_hero_days', true );
+            if ( empty( $days_raw ) ) {
+                $days_raw = get_post_meta( $p_id, '_trek_fact_duration', true );
+            }
+            $c_days = ! empty( $days_raw ) ? preg_replace( '/[^0-9]/', '', (string) $days_raw ) : '';
+
+            // Best Season
+            $c_season = get_post_meta( $p_id, '_trek_fact_season', true );
+            if ( empty( $c_season ) ) {
+                $c_season = get_post_meta( $p_id, '_trek_fact_best_season', true );
+            }
+            $c_season = ! empty( $c_season ) ? trim( (string) $c_season ) : '';
+
+            $cards[] = array(
+                'id'               => $p_id,
+                'title'            => $c_title,
+                'url'              => get_permalink( $p_id ),
+                'img'              => $c_img,
+                'alt'              => $c_title,
+                'badge'            => $badge,
+                'location_display' => $c_region,
+                'diff'             => $c_diff,
+                'days'             => $c_days,
+                'season'           => $c_season,
+                'score'            => $m['score'],
+            );
+        }
+
+        // Check if an enquiry with this email already exists (optimized lightweight query)
+        $existing_enquiries = get_posts( array(
+            'post_type'              => 'trek_enquiry',
+            'post_status'            => 'any',
+            'posts_per_page'         => 1,
+            'fields'                 => 'ids',
+            'no_found_rows'          => true,
+            'update_post_term_cache' => false,
+            'update_post_meta_cache' => false,
+            'meta_query'             => array(
+                array(
+                    'key'     => '_trek_enquiry_email',
+                    'value'   => $email,
+                    'compare' => '=',
+                ),
+            ),
+        ) );
+
+        if ( ! empty( $existing_enquiries ) ) {
+            // Existing email found: do NOT insert duplicate post in database.
+            // Increment lookup count and record latest timestamp and recommendations.
+            $enquiry_id   = $existing_enquiries[0];
+            $lookup_count = (int) get_post_meta( $enquiry_id, '_trek_enquiry_lookup_count', true );
+            if ( $lookup_count < 1 ) {
+                $lookup_count = 1;
+            }
+            $lookup_count++;
+            update_post_meta( $enquiry_id, '_trek_enquiry_lookup_count', $lookup_count );
+            update_post_meta( $enquiry_id, '_trek_enquiry_last_lookup', current_time( 'mysql' ) );
+
+            if ( ! empty( $matched_titles ) ) {
+                update_post_meta( $enquiry_id, '_trek_enquiry_trek_title', implode( ', ', $matched_titles ) );
+            }
+            if ( $primary_dest_id ) {
+                update_post_meta( $enquiry_id, '_trek_enquiry_trek_id', $primary_dest_id );
+                update_post_meta( $enquiry_id, '_trek_enquiry_match_score', $primary_score );
+            }
+            update_post_meta( $enquiry_id, '_trek_enquiry_explore', $selections['explore'] );
+            update_post_meta( $enquiry_id, '_trek_enquiry_feeling', $selections['feel'] );
+            update_post_meta( $enquiry_id, '_trek_enquiry_pace', $selections['pace'] );
+
+            // Append re-lookup log to the existing record content
+            $existing_post = get_post( $enquiry_id );
+            if ( $existing_post ) {
+                $append_note = sprintf(
+                    "\n--- Re-lookup #%d on %s ---\nMatched Journeys: %s\nPrimary Destination ID: %d (Score: %d)\nAnswers: Q1=%s, Q2=%s, Q3=%s, Q4=%s, Q5=%s, Q6=%s",
+                    $lookup_count,
+                    current_time( 'mysql' ),
+                    implode( ', ', $matched_titles ),
+                    $primary_dest_id,
+                    $primary_score,
+                    $q1, $q2, $q3, $q4, $q5, $q6
+                );
+                wp_update_post( array(
+                    'ID'           => $enquiry_id,
+                    'post_content' => $existing_post->post_content . $append_note,
+                ) );
+            }
+        } else {
+            // New email: Store Lead in `trek_enquiry` CPT
+            $enquiry_title = sprintf( 'Traveller Matcher Lead: %s (%s)', implode( ', ', $matched_titles ), $email );
+            $enquiry_content = sprintf(
+                "Traveller Email: %s\nMatched Journeys: %s\nPrimary Destination ID: %d\nPrimary Score: %d\nExplore Keys: %s\nFeel Keys: %s\nPace Keys: %s\nRaw Answers: Q1=%s, Q2=%s, Q3=%s, Q4=%s, Q5=%s, Q6=%s\nSource: Traveller Matcher\nTimestamp: %s\nIP: %s",
+                $email,
+                implode( ', ', $matched_titles ),
+                $primary_dest_id,
+                $primary_score,
+                implode( ', ', $selections['explore'] ),
+                implode( ', ', $selections['feel'] ),
+                implode( ', ', $selections['pace'] ),
+                $q1, $q2, $q3, $q4, $q5, $q6,
+                current_time( 'mysql' ),
+                sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' )
+            );
+
+            $enquiry_id = wp_insert_post( array(
+                'post_type'    => 'trek_enquiry',
+                'post_title'   => $enquiry_title,
+                'post_content' => $enquiry_content,
+                'post_status'  => 'private',
+            ), true );
+
+            if ( ! is_wp_error( $enquiry_id ) ) {
+                update_post_meta( $enquiry_id, '_trek_enquiry_email', $email );
+                update_post_meta( $enquiry_id, '_trek_enquiry_lookup_count', 1 );
+                update_post_meta( $enquiry_id, '_trek_enquiry_trek_title', implode( ', ', $matched_titles ) );
+                update_post_meta( $enquiry_id, '_trek_enquiry_trek_id', $primary_dest_id );
+                update_post_meta( $enquiry_id, '_trek_enquiry_source', 'Traveller Matcher' );
+                update_post_meta( $enquiry_id, '_trek_enquiry_match_score', $primary_score );
+                update_post_meta( $enquiry_id, '_trek_enquiry_explore', $selections['explore'] );
+                update_post_meta( $enquiry_id, '_trek_enquiry_feeling', $selections['feel'] );
+                update_post_meta( $enquiry_id, '_trek_enquiry_pace', $selections['pace'] );
+                update_post_meta( $enquiry_id, '_trek_enquiry_date', current_time( 'mysql' ) );
+            }
+        }
+
+        wp_send_json_success( array(
+            'cards'   => $cards,
+            'message' => __( 'Matches retrieved successfully.', 'trek-content-manager' ),
         ) );
     }
 
