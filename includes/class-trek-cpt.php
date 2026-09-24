@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Trek Content Manager - Custom Post Type & Complete Dynamic Form Builder
  * 
@@ -596,9 +596,7 @@ class Trek_CPT {
             'high'
         );
 
-        // 2. Quick Facts - Consolidated into Section 4: "⚡ Trip Facts Dive (Specifications & Key Parameters)" in ya_trek_hero_metabox.
-        // Disabled duplicate metabox to prevent duplicate form input names and ensure Trip Facts Dive is the single authoritative source.
-        /*
+        // 2. Quick Facts - Trip Facts Grid (Duration, Route, Difficulty, Group Size & More).
         add_meta_box(
             'ya_trek_facts_metabox',
             __( '📊 2. Trip Facts Grid (Duration, Route, Difficulty, Group Size & More)', 'trek-content-manager' ),
@@ -607,7 +605,6 @@ class Trek_CPT {
             'normal',
             'high'
         );
-        */
 
         // 3. Overview & Route Visual Map
         add_meta_box(
@@ -1742,7 +1739,7 @@ class Trek_CPT {
                 <!-- ================= LEFT COLUMN ================= -->
                 <div class="ya-panel-left">
                     <div class="ya-panel-section-title">
-                        <span>🏷️ Trip Categories & Regions</span>
+                        <span> Trip Categories & Regions</span>
                     </div>
 
                     <!-- 1. Trip Category Multi-Select -->
@@ -1922,7 +1919,7 @@ class Trek_CPT {
             <!-- Section 2: Single Main Featured Image -->
             <div style="background:#fff; border:1px solid #e0dad0; border-radius:8px; padding:16px; margin-bottom:16px;">
                 <div class="ya-panel-section-title">
-                    <span>🖼️ Featured Trek Image (Card & Hero Display)</span>
+                    <span>Featured Trek Image (Card & Hero Display)</span>
                 </div>
                 <div class="ya-admin-field" style="margin-top:10px; margin-bottom:0;">
                     <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
@@ -1971,94 +1968,9 @@ class Trek_CPT {
                 });
             </script>
 
-            <!-- Section 4: Vertical Trip Facts Dive -->
-            <div style="background:#fdfcf9; border:1px solid #dcd7cc; border-radius:8px; padding:16px; margin-bottom:16px;">
-                <div class="ya-panel-section-title" style="justify-content:space-between;">
-                    <span>⚡ Trip Facts Dive (Specifications & Key Parameters)</span>
-                    <span style="font-size:11px; font-weight:normal; text-transform:none; color:#666;"><?php esc_html_e( 'Synced with Quick Facts & Schema Data', 'trek-content-manager' ); ?></span>
-                </div>
-                
-                <div class="ya-facts-dive-grid">
-                    <!-- 1. Highest Point -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '🔺 Highest Point / Altitude', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_high_point" data-sync="fact_high_point" value="<?php echo esc_attr( $fact_high_point ); ?>" placeholder="5,550m · Kala Patthar">
-                    </div>
 
-                    <!-- 2. Lowest Point (NEW) -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '🔻 Lowest Point / Altitude', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_low_point" data-sync="fact_low_point" value="<?php echo esc_attr( $fact_low_point ); ?>" placeholder="1,400m · Kathmandu">
-                    </div>
+            <!-- Trip Facts are now managed in the dedicated "2. Trip Facts Grid" metabox. -->
 
-                    <!-- 3. Starting Point -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '🏁 Starting Point', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_start" data-sync="fact_start" value="<?php echo esc_attr( $fact_start ); ?>" placeholder="Kathmandu / Lukla">
-                    </div>
-
-                    <!-- 4. Ending Point -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '🎯 Ending Point', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_end" data-sync="fact_end" value="<?php echo esc_attr( $fact_end ); ?>" placeholder="Lukla / Kathmandu">
-                    </div>
-
-                    <!-- 5. Daily Walking Time -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '⏱️ Daily Walking Time', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_trekking" data-sync="fact_trekking" value="<?php echo esc_attr( $fact_trekking ); ?>" placeholder="5–6 hours daily">
-                    </div>
-
-                    <!-- 6. Best Season -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '☀️ Best Season', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_season" data-sync="fact_season" value="<?php echo esc_attr( $fact_season ); ?>" placeholder="Mar–May & Sep–Nov">
-                    </div>
-
-                    <!-- 7. Accommodation -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '🏡 Accommodation Style', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_accom" data-sync="fact_accom" value="<?php echo esc_attr( $fact_accom ); ?>" placeholder="Boutique Hotel & Lodges">
-                    </div>
-
-                    <!-- 8. Trip Style -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '🧭 Trip Style', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_style" data-sync="fact_style" value="<?php echo esc_attr( $fact_style ); ?>" placeholder="High-altitude trekking">
-                    </div>
-
-                    <!-- 9. Total Distance -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '📏 Total Distance', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_distance" data-sync="fact_distance" value="<?php echo esc_attr( $fact_distance ); ?>" placeholder="130 km">
-                    </div>
-
-                    <!-- 10. Group Size -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '👥 Group Size', 'trek-content-manager' ); ?></label>
-                        <input type="text" name="trek_fact_group_size" data-sync="fact_group_size" value="<?php echo esc_attr( $fact_group_size ); ?>" placeholder="2–12 Travellers">
-                    </div>
-
-                    <!-- 11. Starting Price -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '💵 Starting Price', 'trek-content-manager' ); ?></label>
-                        <input type="number" step="any" name="trek_price" data-sync="price" value="<?php echo esc_attr( $price ); ?>" placeholder="2450">
-                    </div>
-
-                    <!-- 12. Currency -->
-                    <div class="ya-fact-card">
-                        <label><?php esc_html_e( '💱 Currency Code', 'trek-content-manager' ); ?></label>
-                        <select name="trek_currency" data-sync="currency">
-                            <option value="USD" <?php selected( $currency, 'USD' ); ?>>USD ($)</option>
-                            <option value="EUR" <?php selected( $currency, 'EUR' ); ?>>EUR (€)</option>
-                            <option value="GBP" <?php selected( $currency, 'GBP' ); ?>>GBP (£)</option>
-                            <option value="AUD" <?php selected( $currency, 'AUD' ); ?>>AUD ($)</option>
-                            <option value="CAD" <?php selected( $currency, 'CAD' ); ?>>CAD ($)</option>
-                            <option value="NPR" <?php selected( $currency, 'NPR' ); ?>>NPR (Rs)</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
 
             <!-- Section 5: Trip Status & Home Feature Row -->
             <div style="background:#f4f9f8; border:1px solid #c2e2de; border-radius:8px; padding:16px;">

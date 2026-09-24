@@ -811,8 +811,7 @@
     text-align: center;
 }
 
-.trek-table-enquiries th:nth-child(6),
-.trek-table-enquiries td:nth-child(6) {
+.trek-table-enquiries th:nth-child(6) {
     width: 12%;
 }
 
@@ -1435,9 +1434,11 @@
     .trek-stats-grid {
         gap: 14px;
     }
+
     .trek-stat-value {
         font-size: 30px;
     }
+
     .trek-panoramic-banner {
         height: 100px;
     }
@@ -1453,9 +1454,11 @@
     .trek-content-grid-row {
         grid-template-columns: 1fr 1fr;
     }
+
     .trek-content-grid-row .trek-card-destinations {
         grid-column: span 2;
     }
+
     .trek-content-grid-row.bottom-row {
         grid-template-columns: 1fr;
     }
@@ -1465,18 +1468,22 @@
     .trek-stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .trek-quick-stats-grid-4 {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .trek-header-top-row {
         flex-direction: column;
         align-items: flex-start;
     }
+
     .trek-header-controls {
         width: 100%;
         justify-content: space-between;
         flex-wrap: wrap;
     }
+
     .trek-search-box {
         width: 100%;
         order: 2;
@@ -1487,13 +1494,16 @@
     .trek-stats-grid {
         grid-template-columns: 1fr;
     }
+
     .trek-content-grid-row,
     .trek-content-grid-row.bottom-row {
         grid-template-columns: 1fr;
     }
+
     .trek-content-grid-row .trek-card-destinations {
         grid-column: span 1;
     }
+
     .trek-quick-stats-grid-4 {
         grid-template-columns: 1fr;
     }

@@ -25,6 +25,7 @@ class Trek_Shortcodes {
      * Track rendered shortcode instances for unique DOM IDs
      */
     private static $instance_counter = 0;
+    private static $dest_grid_css_rendered = false;
 
     /**
      * Register all shortcodes
@@ -83,6 +84,16 @@ class Trek_Shortcodes {
         add_shortcode( 'trek_contact',               array( __CLASS__, 'render_trek_departures_section' ) );
         add_shortcode( 'trek_map',                   array( __CLASS__, 'render_trek_map_section' ) );
         add_shortcode( 'trek_card',                  array( __CLASS__, 'render_trek_card_shortcode' ) );
+
+        // Filterable Destination Cards Grid with Category & Region filter + Centered Pagination
+        add_shortcode( 'trek_destinations',          array( __CLASS__, 'render_destinations_grid' ) );
+        add_shortcode( 'trek_destination_cards',     array( __CLASS__, 'render_destinations_grid' ) );
+        add_shortcode( 'trek_category_region',       array( __CLASS__, 'render_destinations_grid' ) );
+        add_shortcode( 'trek_explorer_destinations', array( __CLASS__, 'render_destinations_grid' ) );
+        add_shortcode( 'ya_destinations',            array( __CLASS__, 'render_destinations_grid' ) );
+
+        add_action( 'wp_ajax_trek_destinations_page',        array( __CLASS__, 'ajax_destinations_page' ) );
+        add_action( 'wp_ajax_nopriv_trek_destinations_page', array( __CLASS__, 'ajax_destinations_page' ) );
 
         add_action( 'rest_api_init', array( __CLASS__, 'register_journal_comment_routes' ) );
         add_action( 'wp_ajax_ya_match_journey',               array( __CLASS__, 'ajax_match_journey' ) );
@@ -7078,5 +7089,783 @@ class Trek_Shortcodes {
         </div>
         <?php
         return ob_get_clean();
+    }
+
+    /**
+     * =========================================================================
+     * SHORTCODE: [trek_destinations] (Category & Region Filterable Grid)
+     *
+     * Usage:
+     * [trek_destinations category="signature-journey" region="nepal"]
+     * [trek_destinations category="all" region="all" posts_per_page="8" columns="4"]
+     * [trek_destinations]
+     *
+     * Features:
+     * - Category & Region filtering (or all categories / all regions)
+     * - 4 columns on desktop, 2 rows (8 items default), fully responsive
+     * - Cinematic card design with dark vignette, background photo, olive badge (#627556),
+     *   gold duration (#cfab55), off-white typography (#f7f5f0), and dark hover elevation
+     * - Centered pagination with Prev, Numbered page buttons, and Next
+     * - Seamless AJAX pagination with graceful URL fallback
+     * =========================================================================
+     */
+    public static function render_destinations_grid( $atts = array(), $is_ajax = false ) {
+        self::$instance_counter++;
+        $uid = 'te_grid_' . self::$instance_counter;
+
+        $atts = shortcode_atts(
+            array(
+                'category'       => '',
+                'region'         => '',
+                'posts_per_page' => 8,
+                'count'          => '',
+                'per_page'       => '',
+                'columns'        => 4,
+                'paged'          => 0,
+                'pagination'     => 'true',
+                'ajax'           => 'true',
+                'orderby'        => 'menu_order title',
+                'order'          => 'ASC',
+                'title'          => '',
+                'subtitle'       => '',
+                'class'          => '',
+            ),
+            $atts,
+            'trek_destinations'
+        );
+
+        // Aliases for count / per_page
+        if ( ! empty( $atts['count'] ) ) {
+            $atts['posts_per_page'] = absint( $atts['count'] );
+        } elseif ( ! empty( $atts['per_page'] ) ) {
+            $atts['posts_per_page'] = absint( $atts['per_page'] );
+        }
+
+        $posts_per_page    = max( 1, absint( $atts['posts_per_page'] ) );
+        $columns           = max( 1, min( 6, absint( $atts['columns'] ) ) );
+        $enable_pagination = in_array( strtolower( (string) $atts['pagination'] ), array( 'true', '1', 'yes', 'on' ), true );
+        $enable_ajax       = in_array( strtolower( (string) $atts['ajax'] ), array( 'true', '1', 'yes', 'on' ), true );
+
+        // Current page resolution
+        if ( ! empty( $atts['paged'] ) ) {
+            $paged = max( 1, absint( $atts['paged'] ) );
+        } elseif ( isset( $_GET['trek_paged'] ) ) {
+            $paged = max( 1, absint( $_GET['trek_paged'] ) );
+        } elseif ( get_query_var( 'paged' ) ) {
+            $paged = max( 1, absint( get_query_var( 'paged' ) ) );
+        } elseif ( get_query_var( 'page' ) ) {
+            $paged = max( 1, absint( get_query_var( 'page' ) ) );
+        } else {
+            $paged = 1;
+        }
+
+        $query_args = array(
+            'post_type'      => 'trek_destination',
+            'post_status'    => 'publish',
+            'posts_per_page' => $posts_per_page,
+            'paged'          => $paged,
+            'orderby'        => sanitize_sql_orderby( $atts['orderby'] ) ?: 'menu_order title',
+            'order'          => strtoupper( $atts['order'] ) === 'DESC' ? 'DESC' : 'ASC',
+        );
+
+        $tax_query  = array();
+        $meta_query = array();
+
+        // 1. Category Filter (slugs, names, or comma-separated)
+        $cat_raw = trim( (string) $atts['category'] );
+        if ( ! empty( $cat_raw ) && 'all' !== strtolower( $cat_raw ) ) {
+            $cat_parts  = array_map( 'trim', explode( ',', $cat_raw ) );
+            $term_slugs = array();
+            foreach ( $cat_parts as $cp ) {
+                $t = get_term_by( 'slug', sanitize_title( $cp ), 'trek_category' );
+                if ( ! $t ) {
+                    $t = get_term_by( 'name', $cp, 'trek_category' );
+                }
+                if ( $t ) {
+                    $term_slugs[] = $t->slug;
+                } else {
+                    $term_slugs[] = sanitize_title( $cp );
+                }
+            }
+            if ( ! empty( $term_slugs ) ) {
+                $tax_query[] = array(
+                    'taxonomy' => 'trek_category',
+                    'field'    => 'slug',
+                    'terms'    => $term_slugs,
+                );
+            }
+        }
+
+        // 2. Region Filter (taxonomy term or fallback to region postmeta)
+        $reg_raw = trim( (string) $atts['region'] );
+        if ( ! empty( $reg_raw ) && 'all' !== strtolower( $reg_raw ) ) {
+            $reg_parts           = array_map( 'trim', explode( ',', $reg_raw ) );
+            $term_slugs          = array();
+            $found_taxonomy_term = false;
+
+            foreach ( $reg_parts as $rp ) {
+                $t = get_term_by( 'slug', sanitize_title( $rp ), 'trek_region' );
+                if ( ! $t ) {
+                    $t = get_term_by( 'name', $rp, 'trek_region' );
+                }
+                if ( $t ) {
+                    $term_slugs[]        = $t->slug;
+                    $found_taxonomy_term = true;
+                }
+            }
+
+            if ( $found_taxonomy_term && ! empty( $term_slugs ) ) {
+                $tax_query[] = array(
+                    'taxonomy' => 'trek_region',
+                    'field'    => 'slug',
+                    'terms'    => $term_slugs,
+                );
+            } else {
+                // Match via region postmeta (e.g. "Everest", "Annapurna", "Chitwan", "Mustang")
+                $meta_group = array( 'relation' => 'OR' );
+                foreach ( $reg_parts as $rp ) {
+                    $meta_group[] = array(
+                        'key'     => '_trek_fact_region',
+                        'value'   => $rp,
+                        'compare' => 'LIKE',
+                    );
+                    $meta_group[] = array(
+                        'key'     => '_trek_breadcrumb_region',
+                        'value'   => $rp,
+                        'compare' => 'LIKE',
+                    );
+                    $meta_group[] = array(
+                        'key'     => '_trek_region',
+                        'value'   => $rp,
+                        'compare' => 'LIKE',
+                    );
+                    $meta_group[] = array(
+                        'key'     => '_trek_country',
+                        'value'   => $rp,
+                        'compare' => 'LIKE',
+                    );
+                }
+                $meta_query[] = $meta_group;
+            }
+        }
+
+        if ( ! empty( $tax_query ) ) {
+            if ( count( $tax_query ) > 1 ) {
+                $tax_query['relation'] = 'AND';
+            }
+            $query_args['tax_query'] = $tax_query;
+        }
+
+        if ( ! empty( $meta_query ) ) {
+            $query_args['meta_query'] = $meta_query;
+        }
+
+        $query       = new WP_Query( $query_args );
+        $total_pages = $query->max_num_pages;
+        $nonce       = wp_create_nonce( 'trek_dest_grid_nonce' );
+
+        ob_start();
+
+        // Output Scoped Styles if not already rendered on this page request
+        if ( ! $is_ajax && ! self::$dest_grid_css_rendered ) :
+            self::$dest_grid_css_rendered = true;
+        ?>
+        <style id="te-dest-grid-styles">
+            :root {
+                --te-gold: #cfab55;
+                --te-gold-hover: #dfbc66;
+                --te-olive: #627556;
+                --te-olive-dark: #526347;
+                --te-cream: #f7f5f0;
+                --te-dark-bg: #090e17;
+            }
+            .te-dest-grid-wrap {
+                width: 100%;
+                position: relative;
+                box-sizing: border-box;
+                font-family: inherit;
+            }
+            .te-dest-grid-wrap * {
+                box-sizing: border-box;
+            }
+            .te-dest-header {
+                text-align: center;
+                margin-bottom: 36px;
+            }
+            .te-dest-header__title {
+                font-size: 32px;
+                font-weight: 800;
+                color: #0f172a;
+                margin: 0 0 10px 0;
+                letter-spacing: -0.02em;
+            }
+            .te-dest-header__subtitle {
+                font-size: 15px;
+                color: #64748b;
+                margin: 0 auto;
+                max-width: 600px;
+                line-height: 1.6;
+            }
+            .te-dest-grid {
+                display: grid;
+                grid-template-columns: repeat(var(--te-cols, 4), 1fr);
+                gap: 24px;
+                transition: opacity 0.25s ease;
+            }
+            @media (max-width: 1100px) {
+                .te-dest-grid {
+                    grid-template-columns: repeat(2, 1fr) !important;
+                    gap: 20px;
+                }
+            }
+            @media (max-width: 640px) {
+                .te-dest-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 18px;
+                }
+            }
+            .te-dest-card {
+                position: relative;
+                border-radius: 4px;
+                overflow: hidden;
+                aspect-ratio: 3 / 4.4;
+                min-height: 440px;
+                background-color: var(--te-dark-bg);
+                box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35);
+                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+                isolation: isolate;
+            }
+            .te-dest-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.75), 0 0 0 1.5px rgba(207, 171, 85, 0.45);
+            }
+            .te-dest-card__link {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 24px 22px;
+                text-decoration: none !important;
+                z-index: 2;
+                color: inherit;
+            }
+            .te-dest-card__bg-wrap {
+                position: absolute;
+                inset: 0;
+                overflow: hidden;
+                z-index: 0;
+            }
+            .te-dest-card__bg {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+                display: block;
+                transform: scale(1.001);
+                transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+            }
+            .te-dest-card:hover .te-dest-card__bg {
+                transform: scale(1.08);
+            }
+            /* Dark gradient overlay */
+            .te-dest-card__overlay {
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(
+                    180deg,
+                    rgba(8, 14, 24, 0.28) 0%,
+                    rgba(8, 14, 24, 0.12) 32%,
+                    rgba(6, 10, 18, 0.7) 65%,
+                    rgba(3, 5, 10, 0.96) 100%
+                );
+                pointer-events: none;
+                transition: opacity 0.4s ease;
+            }
+            /* Dramatic deep black hover shade */
+            .te-dest-card__hover-shade {
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.26);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.4s ease;
+            }
+            .te-dest-card:hover .te-dest-card__hover-shade {
+                opacity: 1;
+            }
+            .te-dest-card__top {
+                position: relative;
+                z-index: 3;
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+            }
+            /* Brand olive green badge (#627556) */
+            .te-dest-card__badge {
+                display: inline-flex;
+                align-items: center;
+                background-color: var(--te-olive);
+                color: var(--te-cream);
+                padding: 5px 13px;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                border-radius: 4px;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+                border: 1px solid rgba(207, 171, 85, 0.25);
+                transition: background-color 0.3s ease, border-color 0.3s ease;
+            }
+            .te-dest-card:hover .te-dest-card__badge {
+                background-color: var(--te-olive-dark);
+                border-color: var(--te-gold);
+            }
+            .te-dest-card__arrow {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: rgba(15, 23, 42, 0.6);
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                border: 1px solid rgba(247, 245, 240, 0.2);
+                color: var(--te-cream);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0.85;
+                transition: all 0.35s ease;
+                align-self: flex-start;
+                margin-top: auto;
+                margin-bottom: 12px;
+            }
+            .te-dest-card:hover .te-dest-card__arrow {
+                opacity: 1;
+                background: var(--te-gold);
+                color: #0f172a;
+                border-color: var(--te-gold);
+                transform: translateX(4px);
+                box-shadow: 0 4px 16px rgba(207, 171, 85, 0.45);
+            }
+            .te-dest-card__content {
+                position: relative;
+                z-index: 3;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+            /* Brand signature gold duration (#cfab55) */
+            .te-dest-card__duration {
+                font-size: 11.5px;
+                font-weight: 800;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--te-gold);
+                text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+                transition: color 0.3s ease;
+            }
+            .te-dest-card:hover .te-dest-card__duration {
+                color: var(--te-gold-hover);
+            }
+            /* Soft off-white title (#f7f5f0) */
+            .te-dest-card__title {
+                font-family: inherit;
+                font-size: 22px;
+                font-weight: 700;
+                line-height: 1.24;
+                color: var(--te-cream);
+                margin: 0;
+                letter-spacing: -0.015em;
+                text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+                transition: color 0.25s ease;
+            }
+            .te-dest-card:hover .te-dest-card__title {
+                color: #ffffff;
+            }
+            .te-dest-card__excerpt {
+                font-size: 13px;
+                line-height: 1.48;
+                color: rgba(247, 245, 240, 0.88);
+                margin: 2px 0 0 0;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+            }
+            /* Centered Pagination Section */
+            .te-dest-pagination {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 48px;
+                padding-top: 16px;
+            }
+            .te-dest-page-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 44px;
+                height: 44px;
+                padding: 0 14px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none !important;
+                background-color: var(--te-cream);
+                color: #1e293b;
+                border: 1.5px solid rgba(98, 117, 86, 0.25);
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                cursor: pointer;
+            }
+            .te-dest-page-btn:hover {
+                background-color: var(--te-gold);
+                color: #0f172a;
+                border-color: var(--te-gold);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(207, 171, 85, 0.35);
+            }
+            .te-dest-page-btn.is-active {
+                background-color: var(--te-olive);
+                color: var(--te-cream);
+                border: 2px solid var(--te-gold);
+                font-weight: 800;
+                box-shadow: 0 4px 14px rgba(98, 117, 86, 0.4);
+                cursor: default;
+                transform: none;
+            }
+            .te-dest-page-btn.is-disabled {
+                opacity: 0.35;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+            .te-dest-page-ellipsis {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 44px;
+                font-size: 15px;
+                font-weight: 700;
+                color: #94a3b8;
+            }
+            .te-dest-empty {
+                text-align: center;
+                padding: 50px 20px;
+                background: #f8fafc;
+                border-radius: 12px;
+                border: 1px dashed #cbd5e1;
+                color: #64748b;
+                font-size: 15px;
+            }
+        </style>
+        <?php endif; ?>
+
+        <?php if ( ! $is_ajax ) : ?>
+            <div class="te-dest-grid-wrap <?php echo esc_attr( $atts['class'] ); ?>" 
+                 id="<?php echo esc_attr( $uid ); ?>"
+                 data-category="<?php echo esc_attr( $cat_raw ); ?>"
+                 data-region="<?php echo esc_attr( $reg_raw ); ?>"
+                 data-per-page="<?php echo esc_attr( $posts_per_page ); ?>"
+                 data-columns="<?php echo esc_attr( $columns ); ?>"
+                 data-paged="<?php echo esc_attr( $paged ); ?>"
+                 data-max-pages="<?php echo esc_attr( $total_pages ); ?>"
+                 data-orderby="<?php echo esc_attr( $atts['orderby'] ); ?>"
+                 data-order="<?php echo esc_attr( $atts['order'] ); ?>"
+                 data-pagination="<?php echo esc_attr( $atts['pagination'] ); ?>"
+                 data-ajax="<?php echo esc_attr( $atts['ajax'] ); ?>"
+                 data-nonce="<?php echo esc_attr( $nonce ); ?>"
+                 data-ajax-url="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
+        <?php endif; ?>
+
+            <?php if ( ! empty( $atts['title'] ) ) : ?>
+                <div class="te-dest-header">
+                    <h2 class="te-dest-header__title"><?php echo esc_html( $atts['title'] ); ?></h2>
+                    <?php if ( ! empty( $atts['subtitle'] ) ) : ?>
+                        <p class="te-dest-header__subtitle"><?php echo esc_html( $atts['subtitle'] ); ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Destinations Grid -->
+            <?php if ( $query->have_posts() ) : ?>
+                <div class="te-dest-grid" style="--te-cols: <?php echo esc_attr( $columns ); ?>;">
+                    <?php while ( $query->have_posts() ) : $query->the_post(); 
+                        $p_id      = get_the_ID();
+                        $title     = get_the_title( $p_id );
+                        $permalink = get_permalink( $p_id );
+
+                        // Image
+                        $image_url = get_the_post_thumbnail_url( $p_id, 'large' );
+                        if ( empty( $image_url ) ) {
+                            $image_url = get_post_meta( $p_id, '_trek_card_image_url', true );
+                        }
+                        if ( empty( $image_url ) ) {
+                            $image_url = get_post_meta( $p_id, '_trek_card_image', true );
+                        }
+                        if ( empty( $image_url ) ) {
+                            $image_url = get_post_meta( $p_id, '_trek_hero_bg', true );
+                        }
+                        if ( empty( $image_url ) ) {
+                            $image_url = get_post_meta( $p_id, '_trek_hero_bg_img', true );
+                        }
+                        if ( empty( $image_url ) ) {
+                            $image_url = 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=85';
+                        }
+
+                        // Duration / Meta (formatted as 20-DAYS TRIP, 15-DAYS TRIP)
+                        $card_meta = get_post_meta( $p_id, '_trek_card_meta', true );
+                        $hero_days = get_post_meta( $p_id, '_trek_hero_days', true );
+                        $fact_days = get_post_meta( $p_id, '_trek_fact_duration', true );
+                        $raw_days  = $card_meta ?: ( $hero_days ?: $fact_days );
+                        $num_days  = preg_replace( '/[^0-9]/', '', (string) $raw_days );
+                        if ( ! empty( $num_days ) ) {
+                            $duration_text = sprintf( __( '%d-DAYS TRIP', 'trek-content-manager' ), $num_days );
+                        } elseif ( ! empty( $raw_days ) ) {
+                            $duration_text = strtoupper( trim( $raw_days ) );
+                        } else {
+                            $duration_text = __( 'FEATURED EXPEDITION', 'trek-content-manager' );
+                        }
+
+                        // Category badge (Top-left badge in brand olive #627556)
+                        $badge_text = get_post_meta( $p_id, '_trek_card_tag', true );
+                        if ( empty( $badge_text ) ) {
+                            $badge_text = get_post_meta( $p_id, '_trek_hero_eyebrow', true );
+                        }
+                        if ( empty( $badge_text ) ) {
+                            $cats = get_the_terms( $p_id, 'trek_category' );
+                            if ( ! empty( $cats ) && ! is_wp_error( $cats ) ) {
+                                $badge_text = $cats[0]->name;
+                            }
+                        }
+                        if ( empty( $badge_text ) ) {
+                            $regs = get_the_terms( $p_id, 'trek_region' );
+                            if ( ! empty( $regs ) && ! is_wp_error( $regs ) ) {
+                                $badge_text = $regs[0]->name;
+                            }
+                        }
+                        if ( empty( $badge_text ) ) {
+                            $badge_text = __( 'SIGNATURE TREK', 'trek-content-manager' );
+                        }
+                        $badge_text = strtoupper( trim( $badge_text ) );
+
+                        // Excerpt
+                        $excerpt = get_post_meta( $p_id, '_trek_card_excerpt', true );
+                        if ( empty( $excerpt ) ) {
+                            $excerpt = get_post_meta( $p_id, '_trek_hero_subtitle', true );
+                        }
+                        if ( empty( $excerpt ) ) {
+                            $excerpt = has_excerpt( $p_id ) ? get_the_excerpt( $p_id ) : wp_trim_words( get_post_field( 'post_content', $p_id ), 16, '...' );
+                        }
+                    ?>
+                    <article class="te-dest-card">
+                        <a href="<?php echo esc_url( $permalink ); ?>" class="te-dest-card__link" aria-label="<?php echo esc_attr( $title ); ?>">
+                            <div class="te-dest-card__bg-wrap">
+                                <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="te-dest-card__bg" loading="lazy" />
+                                <div class="te-dest-card__overlay"></div>
+                                <div class="te-dest-card__hover-shade"></div>
+                            </div>
+
+                            <div class="te-dest-card__top">
+                                <span class="te-dest-card__badge"><?php echo esc_html( $badge_text ); ?></span>
+                            </div>
+
+                            <div class="te-dest-card__arrow" aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </div>
+
+                            <div class="te-dest-card__content">
+                                <span class="te-dest-card__duration"><?php echo esc_html( $duration_text ); ?></span>
+                                <h3 class="te-dest-card__title"><?php echo esc_html( $title ); ?></h3>
+                                <?php if ( ! empty( $excerpt ) ) : ?>
+                                    <p class="te-dest-card__excerpt"><?php echo esc_html( $excerpt ); ?></p>
+                                <?php endif; ?>
+                            </div>
+                        </a>
+                    </article>
+                    <?php endwhile; wp_reset_postdata(); ?>
+                </div>
+            <?php else : ?>
+                <div class="te-dest-empty">
+                    <p><?php esc_html_e( 'No trek destinations found matching your criteria.', 'trek-content-manager' ); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <!-- Centered Pagination Section -->
+            <?php if ( $enable_pagination && $total_pages > 1 ) : 
+                $base_url = remove_query_arg( array( 'trek_paged', 'paged' ) );
+            ?>
+                <nav class="te-dest-pagination" aria-label="<?php esc_attr_e( 'Destinations Pagination', 'trek-content-manager' ); ?>">
+                    <!-- Prev Button -->
+                    <?php if ( $paged > 1 ) : 
+                        $prev_url = add_query_arg( 'trek_paged', $paged - 1, $base_url );
+                    ?>
+                        <a href="<?php echo esc_url( $prev_url ); ?>" class="te-dest-page-btn te-dest-page-prev" data-page="<?php echo esc_attr( $paged - 1 ); ?>" aria-label="<?php esc_attr_e( 'Previous page', 'trek-content-manager' ); ?>">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            <span><?php esc_html_e( 'Prev', 'trek-content-manager' ); ?></span>
+                        </a>
+                    <?php else : ?>
+                        <span class="te-dest-page-btn te-dest-page-prev is-disabled" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            <span><?php esc_html_e( 'Prev', 'trek-content-manager' ); ?></span>
+                        </span>
+                    <?php endif; ?>
+
+                    <!-- Numbered Page Buttons -->
+                    <?php
+                    $page_links = array();
+                    if ( $total_pages <= 7 ) {
+                        for ( $i = 1; $i <= $total_pages; $i++ ) {
+                            $page_links[] = $i;
+                        }
+                    } else {
+                        $page_links[] = 1;
+                        if ( $paged > 3 ) {
+                            $page_links[] = '...';
+                        }
+                        $start = max( 2, $paged - 1 );
+                        $end   = min( $total_pages - 1, $paged + 1 );
+                        for ( $i = $start; $i <= $end; $i++ ) {
+                            $page_links[] = $i;
+                        }
+                        if ( $paged < $total_pages - 2 ) {
+                            $page_links[] = '...';
+                        }
+                        $page_links[] = $total_pages;
+                    }
+
+                    foreach ( $page_links as $pl ) :
+                        if ( '...' === $pl ) : ?>
+                            <span class="te-dest-page-ellipsis" aria-hidden="true">…</span>
+                        <?php elseif ( $pl == $paged ) : ?>
+                            <span class="te-dest-page-btn is-active" aria-current="page"><?php echo esc_html( $pl ); ?></span>
+                        <?php else : 
+                            $num_url = add_query_arg( 'trek_paged', $pl, $base_url );
+                        ?>
+                            <a href="<?php echo esc_url( $num_url ); ?>" class="te-dest-page-btn" data-page="<?php echo esc_attr( $pl ); ?>"><?php echo esc_html( $pl ); ?></a>
+                        <?php endif;
+                    endforeach;
+                    ?>
+
+                    <!-- Next Button -->
+                    <?php if ( $paged < $total_pages ) : 
+                        $next_url = add_query_arg( 'trek_paged', $paged + 1, $base_url );
+                    ?>
+                        <a href="<?php echo esc_url( $next_url ); ?>" class="te-dest-page-btn te-dest-page-next" data-page="<?php echo esc_attr( $paged + 1 ); ?>" aria-label="<?php esc_attr_e( 'Next page', 'trek-content-manager' ); ?>">
+                            <span><?php esc_html_e( 'Next', 'trek-content-manager' ); ?></span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 5px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </a>
+                    <?php else : ?>
+                        <span class="te-dest-page-btn te-dest-page-next is-disabled" aria-hidden="true">
+                            <span><?php esc_html_e( 'Next', 'trek-content-manager' ); ?></span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 5px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </span>
+                    <?php endif; ?>
+                </nav>
+            <?php endif; ?>
+
+        <?php if ( ! $is_ajax ) : ?>
+            </div>
+
+            <!-- Client-side AJAX script (graceful progressive enhancement) -->
+            <script>
+            (function() {
+                if (window.teDestGridLoaded) return;
+                window.teDestGridLoaded = true;
+
+                document.addEventListener('click', function(e) {
+                    var btn = e.target.closest('.te-dest-page-btn');
+                    if (!btn || btn.classList.contains('is-active') || btn.classList.contains('is-disabled')) return;
+                    var container = btn.closest('.te-dest-grid-wrap');
+                    if (!container || container.getAttribute('data-ajax') !== 'true') return;
+
+                    var page = btn.getAttribute('data-page');
+                    if (!page) return;
+
+                    e.preventDefault();
+                    var ajaxUrl = container.getAttribute('data-ajax-url') || '/wp-admin/admin-ajax.php';
+                    var grid = container.querySelector('.te-dest-grid');
+                    if (grid) grid.style.opacity = '0.35';
+
+                    var fd = new FormData();
+                    fd.append('action', 'trek_destinations_page');
+                    fd.append('paged', page);
+                    fd.append('category', container.getAttribute('data-category') || '');
+                    fd.append('region', container.getAttribute('data-region') || '');
+                    fd.append('posts_per_page', container.getAttribute('data-per-page') || '8');
+                    fd.append('columns', container.getAttribute('data-columns') || '4');
+                    fd.append('orderby', container.getAttribute('data-orderby') || 'menu_order title');
+                    fd.append('order', container.getAttribute('data-order') || 'ASC');
+                    fd.append('pagination', container.getAttribute('data-pagination') || 'true');
+
+                    fetch(ajaxUrl, {
+                        method: 'POST',
+                        body: fd
+                    })
+                    .then(function(res) { return res.json(); })
+                    .then(function(res) {
+                        if (res.success && res.data && res.data.html) {
+                            container.innerHTML = res.data.html;
+                            container.setAttribute('data-paged', page);
+                            if (window.history && window.history.pushState) {
+                                var newUrl = new URL(window.location.href);
+                                newUrl.searchParams.set('trek_paged', page);
+                                window.history.pushState({ page: page }, '', newUrl.toString());
+                            }
+                            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        } else {
+                            window.location.href = btn.getAttribute('href');
+                        }
+                    })
+                    .catch(function() {
+                        window.location.href = btn.getAttribute('href');
+                    });
+                });
+            })();
+            </script>
+        <?php endif; ?>
+
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * AJAX handler for seamless destination grid page transitions
+     */
+    public static function ajax_destinations_page() {
+        $paged          = max( 1, absint( $_POST['paged'] ?? 1 ) );
+        $category       = sanitize_text_field( $_POST['category'] ?? '' );
+        $region         = sanitize_text_field( $_POST['region'] ?? '' );
+        $posts_per_page = max( 1, absint( $_POST['posts_per_page'] ?? 8 ) );
+        $columns        = max( 1, min( 6, absint( $_POST['columns'] ?? 4 ) ) );
+        $orderby        = sanitize_text_field( $_POST['orderby'] ?? 'menu_order title' );
+        $order          = sanitize_text_field( $_POST['order'] ?? 'ASC' );
+        $pagination     = sanitize_text_field( $_POST['pagination'] ?? 'true' );
+
+        $atts = array(
+            'paged'          => $paged,
+            'category'       => $category,
+            'region'         => $region,
+            'posts_per_page' => $posts_per_page,
+            'columns'        => $columns,
+            'orderby'        => $orderby,
+            'order'          => $order,
+            'ajax'           => 'true',
+            'pagination'     => $pagination,
+        );
+
+        $html = self::render_destinations_grid( $atts, true );
+
+        wp_send_json_success( array(
+            'html'  => $html,
+            'paged' => $paged,
+        ) );
     }
 }
