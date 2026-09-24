@@ -84,10 +84,8 @@
 
             $selectedCount.text(count);
 
-            if (count > 0) {
-                $bulkBtn.prop('disabled', false);
-            } else {
-                $bulkBtn.prop('disabled', true);
+            if ($bulkBtn.length) {
+                $bulkBtn.prop('disabled', count === 0);
             }
 
             if ($visibleCheckboxes.length > 0 && count === $visibleCheckboxes.length) {
@@ -203,10 +201,6 @@
                             $editBtn.data('email', t.email);
                             $editBtn.data('phone', t.phone);
 
-                            var $emailBtn = $activeEditRow.find('.trek-btn-send-single-email');
-                            $emailBtn.data('name', t.name);
-                            $emailBtn.data('email', t.email);
-
                             var $cb = $activeEditRow.find('.trek-traveller-checkbox');
                             $cb.val(t.email);
                             $cb.data('name', t.name);
@@ -227,144 +221,7 @@
         });
 
         /* ==============================================================
-           5. SEND INDIVIDUAL EMAIL
-           ============================================================== */
-        $table.on('click', '.trek-btn-send-single-email', function(e) {
-            e.preventDefault();
-            var $btn = $(this);
-            var name = $btn.data('name') || '';
-            var email = $btn.data('email') || '';
-
-            $('#single-email-to').val(email);
-            $('#single-recipient-display').html('<strong>' + $('<div>').text(name).html() + '</strong> &lt;' + $('<div>').text(email).html() + '&gt;');
-            $('#single-email-subject').val('');
-            $('#single-email-message').val('');
-
-            $('#trek-single-email-status').addClass('trek-hidden').text('').removeClass('success error');
-            $('#trek-send-email-modal').removeClass('trek-hidden');
-            $('#single-email-subject').focus();
-        });
-
-        $('#trek-send-single-email-form').on('submit', function(e) {
-            e.preventDefault();
-            var $status = $('#trek-single-email-status');
-            var $submit = $('#trek-btn-submit-single-email');
-
-            $submit.prop('disabled', true).text(TrekTravellersData.i18n.sending || 'Sending...');
-            $status.addClass('trek-hidden').removeClass('success error');
-
-            $.ajax({
-                url: TrekTravellersData.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'trek_send_traveller_email',
-                    nonce: TrekTravellersData.nonce,
-                    to_email: $('#single-email-to').val(),
-                    subject: $('#single-email-subject').val(),
-                    message: $('#single-email-message').val()
-                },
-                success: function(res) {
-                    $submit.prop('disabled', false).html(
-                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Send Email'
-                    );
-                    if (res.success) {
-                        $status.addClass('success').removeClass('trek-hidden').text(res.data.message || TrekTravellersData.i18n.sent);
-                        setTimeout(function() {
-                            closeAllModals();
-                        }, 1200);
-                    } else {
-                        $status.addClass('error').removeClass('trek-hidden').text(res.data.message || TrekTravellersData.i18n.error);
-                    }
-                },
-                error: function() {
-                    $submit.prop('disabled', false).text('Send Email');
-                    $status.addClass('error').removeClass('trek-hidden').text(TrekTravellersData.i18n.error);
-                }
-            });
-        });
-
-        /* ==============================================================
-           6. SEND BULK EMAIL
-           ============================================================== */
-        $bulkBtn.on('click', function(e) {
-            e.preventDefault();
-            var $checked = $rows.filter(':visible').find('.trek-traveller-checkbox:checked');
-            if (!$checked.length) {
-                alert(TrekTravellersData.i18n.selectPrompt);
-                return;
-            }
-
-            var tagsHtml = '';
-            $checked.each(function() {
-                var email = $(this).val();
-                tagsHtml += '<span class="trek-recipient-chip">' + $('<div>').text(email).html() + '</span>';
-            });
-
-            $('#bulk-recipient-count').text($checked.length);
-            $('#bulk-recipients-tags').html(tagsHtml);
-            $('#bulk-email-subject').val('');
-            $('#bulk-email-message').val('');
-
-            $('#trek-bulk-email-status').addClass('trek-hidden').text('').removeClass('success error');
-            $('#trek-bulk-email-modal').removeClass('trek-hidden');
-            $('#bulk-email-subject').focus();
-        });
-
-        $('#trek-bulk-email-form').on('submit', function(e) {
-            e.preventDefault();
-            var $checked = $rows.filter(':visible').find('.trek-traveller-checkbox:checked');
-            var emails = [];
-            $checked.each(function() {
-                emails.push($(this).val());
-            });
-
-            if (!emails.length) {
-                alert(TrekTravellersData.i18n.selectPrompt);
-                return;
-            }
-
-            var $status = $('#trek-bulk-email-status');
-            var $submit = $('#trek-btn-submit-bulk-email');
-
-            $submit.prop('disabled', true).text(TrekTravellersData.i18n.sending || 'Sending...');
-            $status.addClass('trek-hidden').removeClass('success error');
-
-            $.ajax({
-                url: TrekTravellersData.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'trek_bulk_send_email',
-                    nonce: TrekTravellersData.nonce,
-                    emails: emails,
-                    subject: $('#bulk-email-subject').val(),
-                    message: $('#bulk-email-message').val()
-                },
-                success: function(res) {
-                    $submit.prop('disabled', false).html(
-                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Send Bulk Email'
-                    );
-                    if (res.success) {
-                        $status.addClass('success').removeClass('trek-hidden').text(res.data.message || TrekTravellersData.i18n.sent);
-                        setTimeout(function() {
-                            closeAllModals();
-                            $selectAll.prop('checked', false);
-                            $rows.find('.trek-traveller-checkbox').prop('checked', false);
-                            $rows.removeClass('is-selected');
-                            updateSelectionState();
-                        }, 1500);
-                    } else {
-                        $status.addClass('error').removeClass('trek-hidden').text(res.data.message || TrekTravellersData.i18n.error);
-                    }
-                },
-                error: function() {
-                    $submit.prop('disabled', false).text('Send Bulk Email');
-                    $status.addClass('error').removeClass('trek-hidden').text(TrekTravellersData.i18n.error);
-                }
-            });
-        });
-
-        /* ==============================================================
-           7. EXPORT CSV
+           5. EXPORT CSV
            ============================================================== */
         $('#trek-btn-export-travellers').on('click', function() {
             var csv = [];

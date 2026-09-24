@@ -1107,9 +1107,9 @@ class Trek_Shortcodes {
                     width: 40px;
                     height: 40px;
                     border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.22);
-                    backdrop-filter: blur(4px);
-                    -webkit-backdrop-filter: blur(4px);
+                    background: transparent;
+                    backdrop-filter: none;
+                    -webkit-backdrop-filter: none;
                     color: #ffffff;
                     transition: transform 0.4s cubic-bezier(.22, .61, .36, 1), background-color 0.35s ease;
                 }
@@ -1122,7 +1122,7 @@ class Trek_Shortcodes {
                 }
 
                 #<?php echo esc_attr( $uid ); ?> .ya-inspiration-btn:hover .ya-inspiration-btn__icon {
-                    background: rgba(255, 255, 255, 0.32);
+                    background: transparent;
                     transform: scale(1.06);
                 }
 
@@ -2088,19 +2088,19 @@ class Trek_Shortcodes {
                     display: inline-flex;
                     align-items: center;
                     gap: 8px;
-                    border-radius: 10px;
+                    border-radius: 1px;
                     padding: 5px 12px 5px 8px;
                     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
                     z-index: 3;
                     transition: background .25s ease, border-color .25s ease;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-col-card:hover .ya-col-card__top-badge {
-                    background: #617654;
+                    background: #cfab55;
                     border-color: #617654;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-logo {
-                    width: 21px !important;
-                    height: 21px !important;
+                    width: 24px !important;
+                    height: 24px !important;
                     max-width: 24px !important;
                     max-height: 24px !important;
                     object-fit: contain !important;
@@ -2722,48 +2722,103 @@ class Trek_Shortcodes {
                     margin: 0;
                     color: var(--text);
                     font-family: var(--font-display);
-                    font-size: clamp(44px, 5.2vw, 76px);
+                    font-size: clamp(44px, 5.5vw, 76px);
                     font-weight: 400;
-                    line-height: 1.06;
-                    letter-spacing: -.035em;
+                    line-height: 1.04;
+                    letter-spacing: -.03em;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-rotator-wrap {
-                    display: inline-block;
-                    position: relative;
-                    overflow: hidden;
-                    vertical-align: bottom;
-                    padding-bottom: 4px;
-                }
-
-                #<?php echo esc_attr( $section_id ); ?> .ya-rotator-word {
-                    display: inline-block;
+                #<?php echo esc_attr( $section_id ); ?> .ya-header-accent {
                     color: var(--gold);
-                    font-family: var(--font-display);
                     font-style: italic;
                     font-weight: 500;
-                    border-bottom: 2.5px solid var(--gold);
-                    transition: transform 0.38s cubic-bezier(.22, .61, .36, 1), opacity 0.38s ease;
-                    will-change: transform, opacity;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-rotator-word.is-animating-out {
-                    transform: translateY(-80%);
-                    opacity: 0;
-                }
-
-                #<?php echo esc_attr( $section_id ); ?> .ya-rotator-word.is-entering {
-                    transform: translateY(80%);
-                    opacity: 0;
-                    transition: none !important;
-                }
-
-                #<?php echo esc_attr( $section_id ); ?> .ya-selector-copy p {
-                    max-width: 500px;
-                    margin: 22px 0 0;
+                #<?php echo esc_attr( $section_id ); ?> .ya-selector-subtitle {
+                    margin: 18px 0 0;
+                    font-size: clamp(14.5px, 1.2vw, 16px);
+                    line-height: 1.75;
                     color: var(--muted);
-                    font-size: 16px;
-                    line-height: 1.8;
+                    max-width: 520px;
+                    font-weight: 400;
+                }
+
+                /* Clear All Toolbar & Actions */
+                #<?php echo esc_attr( $section_id ); ?> .ya-clear-bar {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                    padding: 10px 4px 4px;
+                    margin-top: 6px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-selected-count {
+                    font-size: 11.5px;
+                    font-weight: 700;
+                    color: var(--forest);
+                    letter-spacing: 0.8px;
+                    text-transform: uppercase;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-clear-all-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 14px;
+                    border-radius: 999px;
+                    border: 1px solid var(--forest);
+                    background: transparent;
+                    color: var(--forest);
+                    font-family: var(--font-sans);
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0.8px;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    transition: all .22s ease;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-clear-all-btn:hover {
+                    background: var(--forest);
+                    color: #ffffff;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__menu-top {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 6px 10px 8px;
+                    border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+                    margin-bottom: 4px;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__menu-title {
+                    font-size: 10.5px;
+                    font-weight: 700;
+                    letter-spacing: 1.2px;
+                    text-transform: uppercase;
+                    color: var(--forest);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__clear-btn {
+                    border: none;
+                    background: transparent;
+                    color: var(--gold);
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0.5px;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    transition: color .2s ease, background-color .2s ease;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__clear-btn:hover {
+                    color: var(--forest);
+                    background: rgba(97, 118, 84, 0.08);
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-choice-box {
@@ -2775,16 +2830,19 @@ class Trek_Shortcodes {
                     position: relative;
                 }
 
-                /* Multi-Select Dropdown Container */
+                /* Horizontal Multi-Select Dropdowns */
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown-group {
                     display: flex;
                     flex-direction: column;
-                    gap: 14px;
+                    gap: 0;
                     position: relative;
+                    border-top: 1px solid rgba(17, 17, 17, .12);
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown {
                     position: relative;
+                    border-bottom: 1px solid rgba(17, 17, 17, .12);
+                    transition: border-color .25s ease;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown[data-category="explore"] {
@@ -2797,45 +2855,59 @@ class Trek_Shortcodes {
                     z-index: 25;
                 }
 
-                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__label {
-                    display: block;
-                    font-size: 11px;
-                    font-weight: 700;
-                    letter-spacing: 1.6px;
-                    text-transform: uppercase;
-                    color: var(--forest);
-                    margin-bottom: 6px;
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown:hover {
+                    border-bottom-color: var(--forest);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown.is-open {
+                    border-bottom-color: var(--gold);
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__control {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    gap: 12px;
-                    min-height: 56px;
-                    padding: 0 20px;
-                    border-radius: 12px;
-                    border: 1px solid rgba(17, 17, 17, .12);
-                    background: rgba(255, 255, 255, 0.88);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                    box-shadow: 0 4px 18px rgba(0, 0, 0, .03);
+                    gap: 18px;
+                    padding: 20px 4px;
+                    background: transparent;
+                    border: none;
+                    border-radius: 0;
+                    box-shadow: none;
                     cursor: pointer;
                     user-select: none;
-                    transition: all .28s cubic-bezier(.22, .61, .36, 1);
+                    transition: all .25s ease;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__control:hover {
-                    border-color: var(--gold);
-                    background: #ffffff;
-                    box-shadow: 0 8px 24px rgba(207, 171, 85, .16);
-                    transform: translateY(-1px);
+                    background: transparent;
+                    box-shadow: none;
+                    transform: none;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown.is-open .ya-dropdown__control {
-                    border-color: var(--gold);
-                    background: #ffffff;
-                    box-shadow: 0 0 0 3px rgba(207, 171, 85, .18), 0 8px 24px rgba(0, 0, 0, .06);
+                    background: transparent;
+                    box-shadow: none;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__label {
+                    display: inline-block;
+                    font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 1.6px;
+                    text-transform: uppercase;
+                    color: var(--text);
+                    margin: 0;
+                    min-width: 175px;
+                    flex-shrink: 0;
+                    transition: color .25s ease;
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown:hover .ya-dropdown__label {
+                    color: var(--forest);
+                }
+
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown.is-open .ya-dropdown__label {
+                    color: var(--gold);
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__text-wrap {
@@ -2847,15 +2919,17 @@ class Trek_Shortcodes {
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__placeholder {
-                    font-size: 14px;
-                    color: #888888;
+                    font-size: 14.5px;
+                    font-weight: 400;
+                    color: var(--forest);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    transition: color .25s ease;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__value {
-                    font-size: 14px;
+                    font-size: 14.5px;
                     font-weight: 600;
                     color: var(--text);
                     white-space: nowrap;
@@ -2867,13 +2941,13 @@ class Trek_Shortcodes {
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    min-width: 22px;
-                    height: 22px;
-                    padding: 0 7px;
+                    min-width: 20px;
+                    height: 20px;
+                    padding: 0 6px;
                     border-radius: 999px;
                     background: var(--forest);
                     color: #ffffff;
-                    font-size: 11.5px;
+                    font-size: 11px;
                     font-weight: 700;
                     flex-shrink: 0;
                     line-height: 1;
@@ -2887,31 +2961,36 @@ class Trek_Shortcodes {
                     flex-shrink: 0;
                 }
 
+                #<?php echo esc_attr( $section_id ); ?> .ya-dropdown:hover .ya-dropdown__arrow {
+                    stroke: var(--forest);
+                }
+
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown.is-open .ya-dropdown__arrow {
                     transform: rotate(180deg);
                     stroke: var(--gold);
                 }
 
-                /* Dropdown Menu (Animated Floating Panel) */
+                /* Dropdown Menu (Floating Options Panel) */
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__menu {
                     position: absolute;
-                    top: calc(100% + 6px);
+                    top: 100%;
                     left: 0;
                     right: 0;
                     background: #ffffff;
-                    border-radius: 10px;
-                    border: 1px solid rgba(17, 17, 17, .10);
-                    box-shadow: 0 16px 40px rgba(0, 0, 0, .14);
+                    border-radius: 8px;
+                    border: 1px solid rgba(17, 17, 17, .12);
+                    box-shadow: 0 16px 36px rgba(0, 0, 0, .10);
                     max-height: 240px;
                     overflow-y: auto;
                     padding: 6px;
                     opacity: 0;
                     visibility: hidden;
-                    transform: translateY(-8px) scale(.98);
+                    transform: translateY(-6px) scale(.99);
                     pointer-events: none;
-                    transition: opacity .25s ease, transform .25s ease, visibility .25s ease;
+                    transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
                     scrollbar-width: thin;
                     scrollbar-color: rgba(17, 17, 17, .2) transparent;
+                    z-index: 50;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__menu::-webkit-scrollbar {
@@ -2933,24 +3012,24 @@ class Trek_Shortcodes {
                     display: flex;
                     align-items: center;
                     gap: 12px;
-                    padding: 9px 14px;
+                    padding: 10px 14px;
                     border-radius: 6px;
                     cursor: pointer;
                     user-select: none;
                     font-size: 13.5px;
-                    color: #333333;
+                    color: var(--text);
                     transition: background-color .18s ease, color .18s ease;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__option:hover {
-                    background: rgba(207, 171, 85, .10);
+                    background: rgba(209, 173, 84, .10);
                     color: var(--text);
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__option.is-checked {
-                    background: rgba(97, 117, 85, .09);
+                    background: rgba(97, 118, 84, .10);
                     font-weight: 600;
-                    color: var(--forest);
+                    color: var(--forest-dark);
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__checkbox {
@@ -2992,8 +3071,8 @@ class Trek_Shortcodes {
                 /* Matched Result Area */
                 #<?php echo esc_attr( $section_id ); ?> .ya-match-result {
                     margin-top: 24px;
-                    padding-top: 22px;
-                    border-top: 1px solid rgba(17, 17, 17, .10);
+                    padding-top: 0;
+                    border: none;
                     background: transparent;
                     transition: opacity .25s ease;
                 }
@@ -3007,14 +3086,12 @@ class Trek_Shortcodes {
                     display: flex;
                     align-items: center;
                     gap: 18px;
-                    padding: 14px 16px;
-                    background: rgba(255, 255, 255, 0.95);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                    border-radius: 12px;
-                    border: 1px solid rgba(207, 171, 85, 0.35);
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-                    margin-bottom: 16px;
+                    padding: 6px 0 14px;
+                    background: transparent;
+                    border: none;
+                    border-radius: 0;
+                    box-shadow: none;
+                    margin-bottom: 6px;
                     animation: yaFadeSlideIn .4s ease;
                 }
 
@@ -3027,10 +3104,10 @@ class Trek_Shortcodes {
                     position: relative;
                     width: 110px;
                     height: 82px;
-                    border-radius: 8px;
+                    border-radius: 4px;
                     overflow: hidden;
                     flex-shrink: 0;
-                    background: #18231a;
+                    background: transparent;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-match-thumb img {
@@ -3038,6 +3115,7 @@ class Trek_Shortcodes {
                     height: 100%;
                     object-fit: cover;
                     display: block;
+                    border-radius: 4px;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-match-tag {
@@ -3053,7 +3131,7 @@ class Trek_Shortcodes {
                     letter-spacing: 1px;
                     text-align: center;
                     padding: 2px 4px;
-                    border-radius: 4px;
+                    border-radius: 2px;
                     text-transform: uppercase;
                 }
 
@@ -3065,8 +3143,8 @@ class Trek_Shortcodes {
                 #<?php echo esc_attr( $section_id ); ?> .ya-match-title {
                     margin: 0 0 6px;
                     font-family: var(--font-display);
-                    font-size: clamp(20px, 2.2vw, 25px);
-                    font-weight: 600;
+                    font-size: clamp(21px, 2.3vw, 27px);
+                    font-weight: 500;
                     line-height: 1.25;
                     color: var(--text);
                 }
@@ -3075,24 +3153,25 @@ class Trek_Shortcodes {
                     display: flex;
                     align-items: center;
                     flex-wrap: wrap;
-                    gap: 8px;
+                    gap: 16px;
                     margin-top: 4px;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-match-meta-pill {
                     display: inline-flex;
                     align-items: center;
-                    gap: 5px;
-                    padding: 3px 10px;
-                    border-radius: 999px;
-                    background: rgba(97, 117, 85, 0.10);
-                    color: var(--forest-dark);
-                    font-size: 12px;
-                    font-weight: 600;
+                    gap: 6px;
+                    padding: 0;
+                    border-radius: 0;
+                    background: transparent;
+                    color: var(--muted);
+                    font-size: 13px;
+                    font-weight: 500;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-match-meta-pill svg {
                     color: var(--forest);
+                    flex-shrink: 0;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-match-eyebrow {
@@ -3115,28 +3194,19 @@ class Trek_Shortcodes {
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-match-message-box {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 12px;
-                    padding: 14px 18px;
-                    background: rgba(207, 171, 85, 0.09);
-                    border: 1px solid rgba(207, 171, 85, 0.25);
-                    border-radius: 10px;
-                    margin: 16px 0 22px;
-                }
-
-                #<?php echo esc_attr( $section_id ); ?> .ya-match-message-icon {
-                    width: 20px;
-                    height: 20px;
-                    color: var(--gold);
-                    flex-shrink: 0;
-                    margin-top: 2px;
+                    display: block;
+                    padding: 8px 0 8px 16px;
+                    background: transparent;
+                    border: none;
+                    border-left: 2.5px solid var(--gold);
+                    border-radius: 0;
+                    margin: 16px 0 20px;
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-match-callout {
                     margin: 0;
                     font-size: 13.5px;
-                    line-height: 1.6;
+                    line-height: 1.65;
                     color: var(--muted);
                 }
 
@@ -3223,7 +3293,7 @@ class Trek_Shortcodes {
                     width: 44px;
                     height: 44px;
                     border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.22);
+                    background: transparent;
                     color: #ffffff;
                     transition: all 0.35s ease;
                 }
@@ -3247,7 +3317,7 @@ class Trek_Shortcodes {
                 }
 
                 #<?php echo esc_attr( $section_id ); ?> .ya-hero-cta.ya-email-btn:hover .ya-hero-cta__icon {
-                    background: rgba(255, 255, 255, 0.32);
+                    background: transparent;
                     color: #ffffff;
                     transform: scale(1.06);
                 }
@@ -3322,11 +3392,22 @@ class Trek_Shortcodes {
                     #<?php echo esc_attr( $section_id ); ?> .ya-inner {
                         width: min(100% - 32px, 1280px);
                     }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-selector-copy {
+                        text-align: center;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-selector-subtitle {
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
                 }
 
                 @media (max-width: 600px) {
                     #<?php echo esc_attr( $section_id ); ?> .ya-choice-box {
                         padding: 0;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> h2 {
+                        font-size: clamp(34px, 8.5vw, 46px);
+                        line-height: 1.1;
                     }
                     #<?php echo esc_attr( $section_id ); ?> .ya-email-group {
                         flex-direction: column;
@@ -3337,10 +3418,47 @@ class Trek_Shortcodes {
                     #<?php echo esc_attr( $section_id ); ?> .ya-match-preview {
                         flex-direction: column;
                         align-items: flex-start;
+                        gap: 14px;
+                        padding: 6px 0 12px;
                     }
                     #<?php echo esc_attr( $section_id ); ?> .ya-match-thumb {
                         width: 100%;
                         height: 140px;
+                        border-radius: 4px;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-match-message-box {
+                        margin: 14px 0 18px;
+                        padding: 6px 0 6px 12px;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-clear-bar {
+                        gap: 8px;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__control {
+                        padding: 16px 0;
+                        gap: 12px;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__label {
+                        min-width: 135px;
+                        font-size: 11px;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__placeholder,
+                    #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__value {
+                        font-size: 13.5px;
+                    }
+                }
+
+                @media (max-width: 440px) {
+                    #<?php echo esc_attr( $section_id ); ?> h2 {
+                        font-size: clamp(28px, 9vw, 36px);
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__control {
+                        flex-wrap: wrap;
+                        gap: 6px 10px;
+                        padding: 14px 0;
+                    }
+                    #<?php echo esc_attr( $section_id ); ?> .ya-dropdown__label {
+                        min-width: 100%;
+                        margin-bottom: 2px;
                     }
                 }
 
@@ -3359,14 +3477,15 @@ class Trek_Shortcodes {
             <div class="ya-inner ya-selector-grid">
                 <div class="ya-selector-copy ya-reveal">
                     <h2>
-                        <?php esc_html_e( "Let's choose your desire story from", 'trek-content-manager' ); ?><br />
-                        <span class="ya-rotator-wrap">
-                            <span class="ya-rotator-word">Nepal</span>
-                        </span>
+                        <span><?php esc_html_e( "Let's choose", 'trek-content-manager' ); ?></span><br />
+                        <span><?php esc_html_e( 'your story', 'trek-content-manager' ); ?></span><br />
+                        <span class="ya-header-accent"><?php esc_html_e( 'from here.', 'trek-content-manager' ); ?></span>
                     </h2>
-                    <p>
-                        <?php echo esc_html( $atts['subtitle'] ); ?>
-                    </p>
+                    <?php if ( ! empty( $atts['subtitle'] ) ) : ?>
+                        <p class="ya-selector-subtitle">
+                            <?php echo esc_html( $atts['subtitle'] ); ?>
+                        </p>
+                    <?php endif; ?>
                 </div>
 
                 <div class="ya-choice-box ya-reveal">
@@ -3375,10 +3494,10 @@ class Trek_Shortcodes {
                         <!-- CATEGORY 1: EXPLORE -->
                         <?php if ( ! empty( $categories['explore'] ) ) : ?>
                             <div class="ya-dropdown" data-category="explore">
-                                <label class="ya-dropdown__label"><?php echo esc_html( $categories['explore']['label'] ); ?></label>
                                 <div class="ya-dropdown__control" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                                    <span class="ya-dropdown__label"><?php echo esc_html( $categories['explore']['label'] ?? __( 'I Want to Explore', 'trek-content-manager' ) ); ?></span>
                                     <div class="ya-dropdown__text-wrap">
-                                        <span class="ya-dropdown__placeholder"><?php esc_html_e( 'Select landscapes & interests...', 'trek-content-manager' ); ?></span>
+                                        <span class="ya-dropdown__placeholder"><?php esc_html_e( 'Select interest...', 'trek-content-manager' ); ?></span>
                                         <span class="ya-dropdown__value" style="display:none;"></span>
                                         <span class="ya-dropdown__badge" style="display:none;">0</span>
                                     </div>
@@ -3387,6 +3506,12 @@ class Trek_Shortcodes {
                                     </svg>
                                 </div>
                                 <div class="ya-dropdown__menu" role="listbox">
+                                    <div class="ya-dropdown__menu-top">
+                                        <span class="ya-dropdown__menu-title"><?php echo esc_html( $categories['explore']['label'] ?? __( 'I Want to Explore', 'trek-content-manager' ) ); ?></span>
+                                        <button type="button" class="ya-dropdown__clear-btn" data-category="explore">
+                                            <?php esc_html_e( 'Clear', 'trek-content-manager' ); ?>
+                                        </button>
+                                    </div>
                                     <?php foreach ( $categories['explore']['options'] as $key => $label ) : ?>
                                         <label class="ya-dropdown__option" data-key="<?php echo esc_attr( $key ); ?>">
                                             <input type="checkbox" class="ya-dropdown__checkbox" value="<?php echo esc_attr( $key ); ?>" />
@@ -3405,10 +3530,10 @@ class Trek_Shortcodes {
                         <!-- CATEGORY 2: FEEL -->
                         <?php if ( ! empty( $categories['feel'] ) ) : ?>
                             <div class="ya-dropdown" data-category="feel">
-                                <label class="ya-dropdown__label"><?php echo esc_html( $categories['feel']['label'] ); ?></label>
                                 <div class="ya-dropdown__control" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                                    <span class="ya-dropdown__label"><?php echo esc_html( $categories['feel']['label'] ?? __( 'I Want to Feel', 'trek-content-manager' ) ); ?></span>
                                     <div class="ya-dropdown__text-wrap">
-                                        <span class="ya-dropdown__placeholder"><?php esc_html_e( 'Select desired feelings...', 'trek-content-manager' ); ?></span>
+                                        <span class="ya-dropdown__placeholder"><?php esc_html_e( 'Select feeling...', 'trek-content-manager' ); ?></span>
                                         <span class="ya-dropdown__value" style="display:none;"></span>
                                         <span class="ya-dropdown__badge" style="display:none;">0</span>
                                     </div>
@@ -3417,6 +3542,12 @@ class Trek_Shortcodes {
                                     </svg>
                                 </div>
                                 <div class="ya-dropdown__menu" role="listbox">
+                                    <div class="ya-dropdown__menu-top">
+                                        <span class="ya-dropdown__menu-title"><?php echo esc_html( $categories['feel']['label'] ?? __( 'I Want to Feel', 'trek-content-manager' ) ); ?></span>
+                                        <button type="button" class="ya-dropdown__clear-btn" data-category="feel">
+                                            <?php esc_html_e( 'Clear', 'trek-content-manager' ); ?>
+                                        </button>
+                                    </div>
                                     <?php foreach ( $categories['feel']['options'] as $key => $label ) : ?>
                                         <label class="ya-dropdown__option" data-key="<?php echo esc_attr( $key ); ?>">
                                             <input type="checkbox" class="ya-dropdown__checkbox" value="<?php echo esc_attr( $key ); ?>" />
@@ -3435,10 +3566,10 @@ class Trek_Shortcodes {
                         <!-- CATEGORY 3: PACE -->
                         <?php if ( ! empty( $categories['pace'] ) ) : ?>
                             <div class="ya-dropdown" data-category="pace">
-                                <label class="ya-dropdown__label"><?php echo esc_html( $categories['pace']['label'] ); ?></label>
                                 <div class="ya-dropdown__control" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                                    <span class="ya-dropdown__label"><?php echo esc_html( $categories['pace']['label'] ?? __( 'My Ideal Pace', 'trek-content-manager' ) ); ?></span>
                                     <div class="ya-dropdown__text-wrap">
-                                        <span class="ya-dropdown__placeholder"><?php esc_html_e( 'Select preferred pacing...', 'trek-content-manager' ); ?></span>
+                                        <span class="ya-dropdown__placeholder"><?php esc_html_e( 'Select your pace...', 'trek-content-manager' ); ?></span>
                                         <span class="ya-dropdown__value" style="display:none;"></span>
                                         <span class="ya-dropdown__badge" style="display:none;">0</span>
                                     </div>
@@ -3447,6 +3578,12 @@ class Trek_Shortcodes {
                                     </svg>
                                 </div>
                                 <div class="ya-dropdown__menu" role="listbox">
+                                    <div class="ya-dropdown__menu-top">
+                                        <span class="ya-dropdown__menu-title"><?php echo esc_html( $categories['pace']['label'] ?? __( 'My Ideal Pace', 'trek-content-manager' ) ); ?></span>
+                                        <button type="button" class="ya-dropdown__clear-btn" data-category="pace">
+                                            <?php esc_html_e( 'Clear', 'trek-content-manager' ); ?>
+                                        </button>
+                                    </div>
                                     <?php foreach ( $categories['pace']['options'] as $key => $label ) : ?>
                                         <label class="ya-dropdown__option" data-key="<?php echo esc_attr( $key ); ?>">
                                             <input type="checkbox" class="ya-dropdown__checkbox" value="<?php echo esc_attr( $key ); ?>" />
@@ -3463,8 +3600,20 @@ class Trek_Shortcodes {
                         <?php endif; ?>
                     </div>
 
+                    <!-- Clear All Toolbar (appears when any options are selected) -->
+                    <div class="ya-clear-bar" id="<?php echo esc_attr( $uid ); ?>_clear_bar" style="display: none;">
+                        <span class="ya-selected-count" id="<?php echo esc_attr( $uid ); ?>_selected_count"></span>
+                        <button type="button" class="ya-clear-all-btn" id="<?php echo esc_attr( $uid ); ?>_clear_all_btn" aria-label="<?php esc_attr_e( 'Clear all selections', 'trek-content-manager' ); ?>">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            <span><?php esc_html_e( 'Clear All Options', 'trek-content-manager' ); ?></span>
+                        </button>
+                    </div>
+
                     <!-- YOUR JOURNEY MATCH RESULT -->
-                    <div class="ya-match-result" id="<?php echo esc_attr( $uid ); ?>_match_card" role="region" aria-live="polite">
+                    <div class="ya-match-result" id="<?php echo esc_attr( $uid ); ?>_match_card" role="region" aria-live="polite" style="display: none;">
                         <!-- Preview Card for Matched Journey (Image, Title & Meta Pills) -->
                         <div class="ya-match-preview" id="<?php echo esc_attr( $uid ); ?>_preview_box" style="display: none;">
                             <div class="ya-match-thumb" id="<?php echo esc_attr( $uid ); ?>_match_thumb">
@@ -3487,7 +3636,7 @@ class Trek_Shortcodes {
                         </div>
 
                         <!-- Default Prompt State (before all 3 categories selected) -->
-                        <div class="ya-match-prompt" id="<?php echo esc_attr( $uid ); ?>_match_prompt">
+                        <div class="ya-match-prompt" id="<?php echo esc_attr( $uid ); ?>_match_prompt" style="display: none;">
                             <span class="ya-match-eyebrow" id="<?php echo esc_attr( $uid ); ?>_match_eyebrow">
                                 <?php esc_html_e( 'DISCOVER YOUR BESPOKE JOURNEY', 'trek-content-manager' ); ?>
                             </span>
@@ -3498,11 +3647,6 @@ class Trek_Shortcodes {
 
                         <!-- Reassuring Message Box -->
                         <div class="ya-match-message-box">
-                            <div class="ya-match-message-icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                </svg>
-                            </div>
                             <p class="ya-match-callout" id="<?php echo esc_attr( $uid ); ?>_match_callout">
                                 <?php esc_html_e( 'Select your preferences in all 3 categories above (Explore, Feel, and Pace) to reveal your personalized Himalayan match.', 'trek-content-manager' ); ?>
                             </p>
@@ -3510,7 +3654,7 @@ class Trek_Shortcodes {
                     </div>
 
                     <!-- EMAIL COLLECTION: TAKE YOUR JOURNEY WITH YOU -->
-                    <div class="ya-email-collect">
+                    <div class="ya-email-collect" id="<?php echo esc_attr( $uid ); ?>_email_box" style="display: none;">
                         <form class="ya-journey-email-form" id="<?php echo esc_attr( $uid ); ?>_email_form" data-ajax-url="<?php echo esc_url( $ajax_url ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>" onsubmit="return false;">
                             <input type="hidden" id="<?php echo esc_attr( $uid ); ?>_hidden_dest_id" name="destination_id" value="0" />
                             <div class="ya-email-group">
@@ -3542,6 +3686,7 @@ class Trek_Shortcodes {
                     const nonce = '<?php echo esc_js( $nonce ); ?>';
 
                     const resultCard = document.getElementById(uid + '_match_card');
+                    const emailBox = document.getElementById(uid + '_email_box');
                     const previewBox = document.getElementById(uid + '_preview_box');
                     const promptBox = document.getElementById(uid + '_match_prompt');
                     const thumbEl = document.getElementById(uid + '_match_thumb');
@@ -3555,6 +3700,11 @@ class Trek_Shortcodes {
                     const calloutEl = document.getElementById(uid + '_match_callout');
                     const hiddenDestId = document.getElementById(uid + '_hidden_dest_id');
 
+                    const clearBar = document.getElementById(uid + '_clear_bar');
+                    const selectedCountEl = document.getElementById(uid + '_selected_count');
+                    const clearAllBtn = document.getElementById(uid + '_clear_all_btn');
+                    const matchClearBtn = document.getElementById(uid + '_match_clear_btn');
+
                     const formEl = document.getElementById(uid + '_email_form');
                     const emailInput = document.getElementById(uid + '_email_input');
                     const submitBtn = document.getElementById(uid + '_submit_btn');
@@ -3564,29 +3714,83 @@ class Trek_Shortcodes {
 
                     let debounceTimer = null;
 
-                    // Rotating destination words in title
-                    const rotatorWord = section.querySelector('.ya-rotator-word');
-                    if (rotatorWord) {
-                        const destinations = ['Nepal', 'India', 'Bhutan', 'Tibet'];
-                        let destIndex = 0;
-                        setInterval(() => {
-                            rotatorWord.classList.add('is-animating-out');
-                            setTimeout(() => {
-                                destIndex = (destIndex + 1) % destinations.length;
-                                rotatorWord.textContent = destinations[destIndex];
-                                rotatorWord.classList.remove('is-animating-out');
-                                rotatorWord.classList.add('is-entering');
-                                void rotatorWord.offsetWidth;
-                                rotatorWord.classList.remove('is-entering');
-                            }, 380);
-                        }, 2800);
-                    }
-
                     const catLabels = {
                         explore: '<?php echo esc_js( __( 'Explore', 'trek-content-manager' ) ); ?>',
                         feel: '<?php echo esc_js( __( 'Feel', 'trek-content-manager' ) ); ?>',
                         pace: '<?php echo esc_js( __( 'Pace', 'trek-content-manager' ) ); ?>'
                     };
+
+                    function updateClearBar() {
+                        const totalChecked = section.querySelectorAll('.ya-dropdown__checkbox:checked').length;
+                        const selections = getSelectedKeys();
+                        const activeCats = ['explore', 'feel', 'pace'].filter(c => selections[c].length > 0);
+                        const missingCats = ['explore', 'feel', 'pace'].filter(c => selections[c].length === 0);
+
+                        if (clearBar) {
+                            if (totalChecked > 0) {
+                                clearBar.style.display = 'flex';
+                                if (selectedCountEl) {
+                                    if (activeCats.length < 3) {
+                                        const missingNames = missingCats.map(c => catLabels[c]).join(' & ');
+                                        selectedCountEl.textContent = totalChecked + ' ' + (totalChecked === 1 ? '<?php echo esc_js( __( 'preference selected', 'trek-content-manager' ) ); ?>' : '<?php echo esc_js( __( 'preferences selected', 'trek-content-manager' ) ); ?>') + ' • <?php echo esc_js( __( 'Select', 'trek-content-manager' ) ); ?> ' + missingNames + ' <?php echo esc_js( __( 'to reveal match', 'trek-content-manager' ) ); ?>';
+                                    } else {
+                                        selectedCountEl.textContent = totalChecked + ' <?php echo esc_js( __( 'preferences selected • Journey matched', 'trek-content-manager' ) ); ?>';
+                                    }
+                                }
+                            } else {
+                                clearBar.style.display = 'none';
+                            }
+                        }
+                    }
+
+                    function clearAllSelections() {
+                        section.querySelectorAll('.ya-dropdown__checkbox').forEach(cb => {
+                            cb.checked = false;
+                        });
+                        section.querySelectorAll('.ya-dropdown__option').forEach(opt => {
+                            opt.classList.remove('is-checked');
+                        });
+                        dropdowns.forEach(dropdown => {
+                            updateDropdownHeader(dropdown);
+                        });
+                        updateClearBar();
+                        updateMatch();
+                    }
+
+                    if (clearAllBtn) {
+                        clearAllBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            clearAllSelections();
+                        });
+                    }
+
+                    if (matchClearBtn) {
+                        matchClearBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            clearAllSelections();
+                        });
+                    }
+
+                    // Category clear buttons inside dropdown menus
+                    section.querySelectorAll('.ya-dropdown__clear-btn').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const cat = btn.getAttribute('data-category');
+                            const dropdown = section.querySelector('.ya-dropdown[data-category="' + cat + '"]');
+                            if (dropdown) {
+                                dropdown.querySelectorAll('.ya-dropdown__checkbox').forEach(cb => {
+                                    cb.checked = false;
+                                });
+                                dropdown.querySelectorAll('.ya-dropdown__option').forEach(opt => {
+                                    opt.classList.remove('is-checked');
+                                });
+                                updateDropdownHeader(dropdown);
+                                updateClearBar();
+                                clearTimeout(debounceTimer);
+                                debounceTimer = setTimeout(updateMatch, 150);
+                            }
+                        });
+                    });
 
                     // Dropdown interaction logic
                     const dropdowns = section.querySelectorAll('.ya-dropdown');
@@ -3625,6 +3829,7 @@ class Trek_Shortcodes {
                                 option.classList.toggle('is-checked', checkbox.checked);
 
                                 updateDropdownHeader(dropdown);
+                                updateClearBar();
 
                                 clearTimeout(debounceTimer);
                                 debounceTimer = setTimeout(updateMatch, 200);
@@ -3701,38 +3906,23 @@ class Trek_Shortcodes {
                         const activeCats = ['explore', 'feel', 'pace'].filter(c => selections[c].length > 0);
                         const missingCats = ['explore', 'feel', 'pace'].filter(c => selections[c].length === 0);
 
-                        // If not all 3 categories are selected:
+                        // If not all 3 categories are selected -> hide results & email box
                         if (activeCats.length < 3) {
+                            if (resultCard) resultCard.style.display = 'none';
+                            if (emailBox) emailBox.style.display = 'none';
                             if (previewBox) previewBox.style.display = 'none';
-                            if (promptBox) promptBox.style.display = 'block';
+                            if (promptBox) promptBox.style.display = 'none';
                             if (hiddenDestId) hiddenDestId.value = '0';
-
-                            if (activeCats.length === 0) {
-                                if (eyebrowEl) eyebrowEl.textContent = '<?php echo esc_js( __( 'DISCOVER YOUR BESPOKE JOURNEY', 'trek-content-manager' ) ); ?>';
-                                if (promptTitleEl) promptTitleEl.textContent = '<?php echo esc_js( __( 'Choose Your Travel Style', 'trek-content-manager' ) ); ?>';
-                                if (calloutEl) calloutEl.textContent = '<?php echo esc_js( __( 'Select your preferences in all 3 categories above (Explore, Feel, and Pace) to discover your personalized Himalayan journey.', 'trek-content-manager' ) ); ?>';
-                            } else {
-                                const missingNames = missingCats.map(c => catLabels[c]).join(' & ');
-                                if (eyebrowEl) {
-                                    eyebrowEl.textContent = (missingCats.length === 1)
-                                        ? '<?php echo esc_js( __( 'ALMOST READY • 1 STEP REMAINING', 'trek-content-manager' ) ); ?>'
-                                        : '<?php echo esc_js( __( 'STEP 2 OF 3 • KEEP GOING', 'trek-content-manager' ) ); ?>';
-                                }
-                                if (promptTitleEl) {
-                                    promptTitleEl.textContent = (missingCats.length === 1)
-                                        ? '<?php echo esc_js( __( 'Just one more preference...', 'trek-content-manager' ) ); ?>'
-                                        : '<?php echo esc_js( __( 'A few more details...', 'trek-content-manager' ) ); ?>';
-                                }
-                                if (calloutEl) {
-                                    calloutEl.innerHTML = '<?php echo esc_js( __( 'Please select your preferred', 'trek-content-manager' ) ); ?> <strong>' + missingNames + '</strong> <?php echo esc_js( __( 'above to reveal your journey match.', 'trek-content-manager' ) ); ?>';
-                                }
-                            }
                             return;
                         }
 
-                        // All 3 categories are selected -> Fetch and display destination match
+                        // All 3 categories are selected -> show both result card and email collection box
                         if (resultCard) {
+                            resultCard.style.display = 'block';
                             resultCard.classList.add('is-loading');
+                        }
+                        if (emailBox) {
+                            emailBox.style.display = 'block';
                         }
 
                         const formData = new FormData();
@@ -3768,7 +3958,7 @@ class Trek_Shortcodes {
                                     }
                                 }
                                 if (calloutEl) {
-                                    calloutEl.textContent = '<?php echo esc_js( __( "We have matched your private journey. Enter your email below to receive the complete day-by-day itinerary, lodge portfolio, and bespoke pricing.", 'trek-content-manager' ) ); ?>';
+                                    calloutEl.textContent = '<?php echo esc_js( __( "We have matched your private journey. Enter your email below to receive the complete day-by-day itinerary, lodge portfolio, and bespoke details.", 'trek-content-manager' ) ); ?>';
                                 }
                                 if (hiddenDestId && d.destination_id) hiddenDestId.value = d.destination_id;
                             }
@@ -3801,15 +3991,13 @@ class Trek_Shortcodes {
                                 return;
                             }
 
-                            const destId = hiddenDestId ? hiddenDestId.value : 0;
-
-                            setLoading(true);
+                            setBtnLoading(true);
+                            if (feedbackEl) feedbackEl.style.display = 'none';
 
                             const formData = new FormData();
                             formData.append('action', 'ya_submit_journey_lead');
                             formData.append('nonce', nonce);
                             formData.append('email', email);
-                            formData.append('destination_id', destId);
                             formData.append('explore', selections.explore.join(','));
                             formData.append('feel', selections.feel.join(','));
                             formData.append('pace', selections.pace.join(','));
@@ -3819,24 +4007,23 @@ class Trek_Shortcodes {
                                 body: formData
                             })
                             .then(res => res.json())
-                            .then(data => {
-                                setLoading(false);
-                                if (data && data.success) {
-                                    showFeedback(data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( 'Thank you! Your personalised journey guide has been sent to your email.', 'trek-content-manager' ) ); ?>', 'success');
+                            .then(res => {
+                                setBtnLoading(false);
+                                if (res && res.success) {
+                                    showFeedback('<?php echo esc_js( __( 'Your journey dossier has been prepared! Our Himalayan specialist will email you the full itinerary breakdown shortly.', 'trek-content-manager' ) ); ?>', 'success');
                                     emailInput.value = '';
                                 } else {
-                                    const errMsg = (data && data.data && data.data.message) ? data.data.message : '<?php echo esc_js( __( 'Could not send guide. Please try again.', 'trek-content-manager' ) ); ?>';
-                                    showFeedback(errMsg, 'error');
+                                    showFeedback(res.data?.message || '<?php echo esc_js( __( 'Unable to process your request. Please try again.', 'trek-content-manager' ) ); ?>', 'error');
                                 }
                             })
                             .catch(() => {
-                                setLoading(false);
-                                showFeedback('<?php echo esc_js( __( 'Network error. Please try again later.', 'trek-content-manager' ) ); ?>', 'error');
+                                setBtnLoading(false);
+                                showFeedback('<?php echo esc_js( __( 'Network error occurred. Please try again.', 'trek-content-manager' ) ); ?>', 'error');
                             });
                         });
                     }
 
-                    function setLoading(isLoading) {
+                    function setBtnLoading(isLoading) {
                         if (!submitBtn) return;
                         submitBtn.disabled = isLoading;
                         if (btnText) btnText.style.display = isLoading ? 'none' : 'inline';
@@ -3898,10 +4085,6 @@ class Trek_Shortcodes {
         wp_send_json_success( $display_data );
     }
 
-    /**
-     * AJAX Handler for Journey Selector Lead Submissions
-     * Recalculates match server-side, stores lead in `trek_enquiry`, and sends customer guide via wp_mail().
-     */
     public static function ajax_submit_journey_lead() {
         check_ajax_referer( 'trek_journey_lead_nonce', 'nonce' );
 
@@ -4145,48 +4328,67 @@ class Trek_Shortcodes {
         ?>
         <section class="ya-matcher-section <?php echo esc_attr( $atts['class'] ); ?>" id="<?php echo esc_attr( $uid ); ?>" data-ajax-url="<?php echo esc_url( $ajax_url ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
             <style>
+                @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Jost:wght@400;500;600;700&display=swap');
+
                 #<?php echo esc_attr( $uid ); ?> {
+                    --ym-peach: #d1ad54;
+                    --ym-peach-hover: #617654;
+                    --ym-dark-card: #f9f5f0;
+                    --ym-forest: #204c2b;
+                    --ym-forest-light: #617654;
+                    --ym-text-light: #111111;
+                    --ym-text-muted: #555555;
                     --ym-gold: #d1ad54;
-                    --ym-gold-hover: #b8933f;
-                    --ym-forest: #617654;
-                    --ym-forest-dark: #4e5e44;
-                    --ym-dark: #111111;
-                    --ym-paper: #ffffff;
-                    --ym-white: #ffffff;
-                    --ym-border: rgba(16, 47, 53, 0.12);
-                    --ym-text: #111111;
-                    --ym-muted: #333333;
-                    --ym-font-serif: "Newsreader", Georgia, serif;
-                    --ym-font-sans: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    --ym-gold-hover: #617654;
+                    --ym-font-serif: "Cormorant Garamond", "Newsreader", Georgia, serif;
+                    --ym-font-sans: "Open Sans", "Jost", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
                     width: 100%;
                     min-height: 80vh;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
-                    padding: clamp(50px, 5vw, 85px) 0;
-                    background: #ffffff;
-                    color: var(--ym-text);
+                    padding: clamp(28px, 4vw, 64px) 0;
+                    background: #fff;
+                    color: var(--ym-text-light);
                     font-family: var(--ym-font-sans);
                     box-sizing: border-box;
                     position: relative;
+                    overflow-x: clip;
                 }
                 #<?php echo esc_attr( $uid ); ?> * {
                     box-sizing: border-box;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-inner {
-                    max-width: 1240px;
+                    max-width: 1400px;
                     width: 100%;
                     margin: 0 auto;
-                    padding: 0 clamp(20px, 3.5vw, 48px);
+                    padding: 0 clamp(14px, 3vw, 40px);
                 }
 
-                /* Screen Wrapper */
+                /* Master Rounded Container (#f9f5f0 background, 700px min-height desktop, 10px radius) */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-shell-card {
+                    background-color: var(--ym-dark-card);
+                    border-radius: 10px;
+                    padding: clamp(38px, 5.5vw, 72px) clamp(20px, 4.5vw, 64px);
+                    position: relative;
+                    overflow: hidden;
+                    min-height: 700px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    border: 1px solid rgba(0, 0, 0, 0.06);
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+                    transition: min-height .3s ease;
+                }
+
+                /* Screen Transitions */
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-screen {
                     display: none;
                     opacity: 0;
                     transform: translateY(14px);
                     transition: opacity .35s ease, transform .35s ease;
+                    width: 100%;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-screen.is-active {
                     display: block;
@@ -4194,122 +4396,496 @@ class Trek_Shortcodes {
                     transform: translateY(0);
                 }
 
+                /* ==========================================================
+                   STEP 1: 2-COLUMN HERO & BROCHURE COLLAGE
+                   ========================================================== */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-grid {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+                    gap: clamp(32px, 4.5vw, 68px);
+                    align-items: center;
+                    width: 100%;
+                }
+
+                /* Left: Text Block */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-text {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    max-width: 520px;
+                    width: 100%;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-title {
+                    font-family: var(--ym-font-serif);
+                    font-size: clamp(30px, 3vw, 56px);
+                    font-weight: 500;
+                    line-height: 1.15;
+                    letter-spacing: -0.015em;
+                    color: #111111;
+                    margin: 0 0 clamp(16px, 2vw, 22px) 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-subtitle {
+                    font-family: var(--ym-font-sans);
+                    font-size: clamp(15px, 1.2vw, 18px);
+                    font-weight: 400;
+                    line-height: 1.65;
+                    color: var(--ym-text-muted);
+                    margin: 0 0 clamp(24px, 3vw, 36px) 0;
+                    max-width: 460px;
+                }
+
+                /* Primary CTA Button (Default: #d1ad54, Hover: #617654) */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--peach {
+                    appearance: none;
+                    background: var(--ym-peach);
+                    border: 1px solid var(--ym-peach);
+                    border-radius: 4px;
+                    height: 52px;
+                    padding: 0 36px;
+                    font-family: var(--ym-font-sans);
+                    font-size: 13.5px;
+                    font-weight: 700;
+                    letter-spacing: 1.8px;
+                    text-transform: uppercase;
+                    color: #ffffff;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-decoration: none;
+                    box-shadow: 0 4px 14px rgba(209, 173, 84, 0.28);
+                    transition: background .25s ease, border-color .25s ease, transform .2s ease, box-shadow .25s ease;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--peach:hover {
+                    background: var(--ym-peach-hover);
+                    border-color: var(--ym-peach-hover);
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(97, 118, 84, 0.32);
+                    color: #ffffff;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--peach:active {
+                    transform: translateY(0);
+                }
+
+                /* Right: Tilted Overlapping Collage Stage */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-collage {
+                    position: relative;
+                    width: 100%;
+                    max-width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    perspective: 1000px;
+                    padding: 10px 0;
+                    overflow: hidden;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-collage-stage {
+                    position: relative;
+                    width: 530px;
+                    height: 390px;
+                    transform-origin: center center;
+                    transition: transform .3s ease;
+                }
+
+                /* Shared Brochure Card Attributes */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure {
+                    position: absolute;
+                    border: 5px solid #ffffff;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    background: #ffffff;
+                    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+                    transition: transform .35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow .35s ease;
+                    user-select: none;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure:hover {
+                    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.18);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure__inner {
+                    width: 100%;
+                    height: 100%;
+                    position: relative;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                /* Brochure Card Background Image */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure__user-img {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    z-index: 1;
+                    transition: transform .45s cubic-bezier(0.2, 0.8, 0.2, 1);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure:hover .ya-mat-brochure__user-img {
+                    transform: scale(1.06);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure__user-img:not([src]),
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure__user-img[src=""] {
+                    display: none !important;
+                }
+
+                /* Card 1: Front Left "TRAVEL" Brochure */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure--card1 {
+                    width: 224px;
+                    height: 300px;
+                    left: 8px;
+                    top: 48px;
+                    transform: rotate(-7deg);
+                    z-index: 4;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure--card1:hover {
+                    transform: rotate(-5deg) translateY(-6px) scale(1.03);
+                    z-index: 8;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card1-art {
+                    width: 100%;
+                    height: 100%;
+                    position: relative;
+                    z-index: 2;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    background: linear-gradient(180deg, rgba(16, 47, 53, 0.5) 0%, rgba(16, 47, 53, 0.15) 30%, rgba(16, 47, 53, 0.45) 65%, rgba(16, 47, 53, 0.88) 100%);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card1-top {
+                    padding: 16px 14px 0;
+                    text-align: center;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card1-brand {
+                    font-family: var(--ym-font-sans);
+                    font-size: 8.5px;
+                    font-weight: 700;
+                    letter-spacing: 1.8px;
+                    color: #ffffff;
+                    text-transform: uppercase;
+                    background: rgba(0, 0, 0, 0.35);
+                    backdrop-filter: blur(4px);
+                    -webkit-backdrop-filter: blur(4px);
+                    padding: 4px 10px;
+                    border-radius: 20px;
+                    display: inline-block;
+                    border: 1px solid rgba(255, 255, 255, 0.28);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card1-mid {
+                    text-align: center;
+                    position: relative;
+                    padding: 10px 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card1-mountain {
+                    display: none;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card1-title {
+                    font-family: var(--ym-font-serif);
+                    font-size: 34px;
+                    font-weight: 700;
+                    letter-spacing: 2.8px;
+                    color: #ffffff;
+                    position: relative;
+                    z-index: 2;
+                    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
+                    margin: 0;
+                    line-height: 1;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card1-bottom {
+                    padding: 10px 14px 12px;
+                    text-align: center;
+                    background: rgba(32, 76, 43, 0.9);
+                    backdrop-filter: blur(4px);
+                    -webkit-backdrop-filter: blur(4px);
+                    border-top: 1px solid rgba(255, 255, 255, 0.15);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card1-url {
+                    font-family: var(--ym-font-sans);
+                    font-size: 8.5px;
+                    letter-spacing: 1px;
+                    color: rgba(255, 255, 255, 0.95);
+                    display: block;
+                    font-weight: 600;
+                }
+
+                /* Card 2: Top Center Scenic Brochure (Behind) */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure--card2 {
+                    width: 200px;
+                    height: 255px;
+                    left: 172px;
+                    top: 4px;
+                    transform: rotate(4deg);
+                    z-index: 2;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure--card2:hover {
+                    transform: rotate(3deg) translateY(-6px) scale(1.03);
+                    z-index: 8;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card2-art {
+                    width: 100%;
+                    height: 100%;
+                    position: relative;
+                    z-index: 2;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card2-visual {
+                    flex-grow: 1;
+                    background: transparent;
+                    width: 100%;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card2-body {
+                    background: rgba(255, 255, 255, 0.92);
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                    padding: 14px 14px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    border-top: 1px solid rgba(0, 0, 0, 0.06);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card2-body p {
+                    font-family: var(--ym-font-serif);
+                    font-size: 11.5px;
+                    font-weight: 600;
+                    line-height: 1.4;
+                    color: #111111;
+                    margin: 0;
+                }
+
+                /* Card 3: Right "Which Traveller Are You?" Brochure */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure--card3 {
+                    width: 218px;
+                    height: 295px;
+                    left: 288px;
+                    top: 50px;
+                    transform: rotate(12deg);
+                    z-index: 5;
+                    background: #1c4b2a;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure--card3:hover {
+                    transform: rotate(10deg) translateY(-6px) scale(1.03);
+                    z-index: 8;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card3-content {
+                    width: 100%;
+                    height: 100%;
+                    position: relative;
+                    z-index: 2;
+                    background: rgba(28, 75, 42, 0.15);
+                 
+                    padding: 22px 18px 18px;
+                    display: flex;
+                    flex-direction: column;
+                    box-sizing: border-box;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card3-title {
+                    font-family: var(--ym-font-serif);
+                    font-size: 18px;
+                    font-weight: 700;
+                    line-height: 1.25;
+                    color: #ffffff;
+                    margin: 0 0 10px 0;
+                    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card3-desc,
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure__which-desc {
+                    font-family: var(--ym-font-sans);
+                    font-size: 9.5px;
+                    line-height: 1.5;
+                    color: rgba(255, 255, 255, 0.88);
+                    margin: 0 0 auto 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card3-footer {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    padding-top: 14px;
+                    border-top: 1px solid rgba(255, 255, 255, 0.2);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card3-footer span {
+                    font-family: var(--ym-font-sans);
+                    font-size: 8.5px;
+                    line-height: 1.5;
+                    color: rgba(255, 255, 255, 0.78);
+                    font-weight: 500;
+                }
+
+                /* Card 4: Route Itinerary Card (Bottom Behind) */
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure--card4 {
+                    width: 195px;
+                    height: 225px;
+                    left: 145px;
+                    top: 175px;
+                    transform: rotate(-4deg);
+                    z-index: 1;
+                    background: #ffffff;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-brochure--card4:hover {
+                    transform: rotate(-3deg) translateY(-6px) scale(1.03);
+                    z-index: 8;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card4-content {
+                    width: 100%;
+                    height: 100%;
+                    position: relative;
+                    z-index: 2;
+                    padding: 24px 18px 18px;
+                    display: flex;
+                    flex-direction: column;
+                    box-sizing: border-box;
+              
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card4-lines {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 7px;
+                    margin-bottom: 24px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card4-line {
+                    height: 5px;
+                    background: rgba(32, 76, 43, 0.18);
+                    border-radius: 3px;
+                    display: block;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card4-line.short { width: 45%; }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card4-line.medium { width: 75%; }
+                #<?php echo esc_attr( $uid ); ?> .ya-mat-card4-svg {
+                    width: 100%;
+                    height: auto;
+                    margin-top: auto;
+                }
+
                 /* Header / Progress Bar */
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-nav-bar {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    max-width: 820px;
-                    margin: 0 auto 32px;
-                    padding-bottom: 16px;
-                    border-bottom: 1px solid rgba(16, 47, 53, 0.08);
+                    max-width: 760px;
+                    width: 100%;
+                    margin: 0 auto clamp(18px, 2.5vw, 28px);
+                    padding-bottom: 14px;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-back-btn {
                     appearance: none;
                     background: transparent;
                     border: none;
-                    padding: 8px 14px;
+                    padding: 8px 12px;
                     font-family: var(--ym-font-sans);
-                    font-size: 14px;
+                    font-size: 13.5px;
                     font-weight: 700;
                     letter-spacing: .9px;
                     text-transform: uppercase;
-                    color: #d1ad54;
+                    color: #111111;
                     cursor: pointer;
                     display: inline-flex;
                     align-items: center;
                     gap: 8px;
-                    transition: color .2s ease;
+                    transition: color .2s ease, transform .2s ease;
                     border-radius: 4px;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-back-btn:hover {
                     color: #617654;
+                    transform: translateX(-3px);
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-progress-text {
-                    font-size: 14px;
+                    font-size: 13.5px;
                     font-weight: 700;
                     letter-spacing: 1.8px;
-                    color: #617654;
+                    color: #666666;
                     font-family: var(--ym-font-sans);
+                    text-align: center;
                 }
 
-                /* Content Box */
+                /* Content Box (Centered) */
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-content-box {
                     max-width: 860px;
+                    width: 100%;
                     margin: 0 auto;
                     text-align: center;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-eyebrow {
                     display: block;
-                    font-size: clamp(12px, 1vw, 14px);
+                    font-size: clamp(12px, 1vw, 13px);
                     font-weight: 700;
                     letter-spacing: 2.5px;
                     text-transform: uppercase;
                     color: #617654;
-                    margin-bottom: 14px;
+                    margin-bottom: 12px;
+                    text-align: center;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-title {
                     font-family: var(--ym-font-serif);
-                    font-size: clamp(32px, 3.8vw, 50px);
-                    font-weight: 600;
-                    line-height: 1.2;
-                    color: #111111;
-                    margin: 0 0 16px;
+                    font-size: clamp(23px, 3.2vw, 42px);
+                    font-weight: 500;
+                    line-height: 1.25;
+                    color: #111111 !important;
+                    margin: 0 auto clamp(12px, 1.8vw, 16px);
+                    max-width: 780px;
+                    text-align: center;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-subtitle {
-                    font-size: clamp(17px, 1.3vw, 21px);
+                    font-size: clamp(14.5px, 1.15vw, 17.5px);
                     line-height: 1.6;
-                    color: #333333;
-                    margin: 0 auto 40px;
-                    max-width: 680px;
+                    color: var(--ym-text-muted);
+                    margin: 0 auto clamp(20px, 3vw, 36px);
+                    max-width: 640px;
+                    text-align: center;
                 }
 
-                /* 4-Option Grid (2x2) */
+                /* 4-Option Grid (2x2 on desktop, single column centered on mobile) */
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-options {
                     display: grid;
                     grid-template-columns: repeat(2, 1fr);
-                    gap: 20px;
+                    gap: 16px;
                     margin: 0 auto;
-                    max-width: 820px;
+                    max-width: 760px;
+                    width: 100%;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-option {
                     appearance: none;
-                    background: var(--ym-white);
-                    border: 1px solid var(--ym-border);
+                    background: #ffffff;
+                    border: 1.5px solid rgba(0, 0, 0, 0.1);
                     border-radius: 8px;
-                    padding: clamp(20px, 2vw, 28px) clamp(22px, 2.2vw, 30px);
+                    padding: clamp(14px, 1.8vw, 20px) clamp(16px, 2vw, 24px);
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
                     cursor: pointer;
                     text-align: left;
-                    transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+                    transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease, background .25s ease;
                     font-family: var(--ym-font-sans);
-                    font-size: clamp(17px, 1.2vw, 20px);
+                    font-size: clamp(14.5px, 1.1vw, 18px);
                     font-weight: 600;
                     color: #111111;
-                    min-height: 76px;
+                    min-height: 64px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+                    width: 100%;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-option:hover {
                     border-color: #d1ad54;
-                    transform: translateY(-3px);
-                    box-shadow: 0 10px 28px rgba(209, 173, 84, 0.16);
+                    background: #ffffff;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(209, 173, 84, 0.16);
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-option.is-selected {
                     border-color: #d1ad54;
-                    box-shadow: 0 0 0 2px #d1ad54, 0 10px 28px rgba(209, 173, 84, 0.18);
-                    background: #fbfdfa;
+                    box-shadow: 0 0 0 2px #d1ad54, 0 8px 24px rgba(209, 173, 84, 0.18);
+                    background: #ffffff;
+                    color: #111111;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-option-indicator {
                     width: 24px;
                     height: 24px;
                     border-radius: 50%;
-                    border: 1.5px solid rgba(16, 47, 53, 0.25);
+                    border: 1.5px solid rgba(0, 0, 0, 0.25);
+                    background: #fcfcfc;
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
                     flex-shrink: 0;
-                    margin-left: 16px;
+                    margin-left: 14px;
                     transition: border-color .2s, background .2s;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-option.is-selected .ya-mat-option-indicator {
@@ -4327,18 +4903,18 @@ class Trek_Shortcodes {
                     opacity: 1;
                 }
 
-                /* Primary Button */
+                /* Primary Generic Button (Step 8 & 9) */
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-btn {
                     appearance: none;
-                    background: #d1ad54;
-                    border: 1px solid #d1ad54;
-                    border-radius: 6px;
-                    height: 54px;
-                    padding: 0 38px;
+                    background: var(--ym-peach);
+                    border: 1px solid var(--ym-peach);
+                    border-radius: 4px;
+                    height: 52px;
+                    padding: 0 36px;
                     font-family: var(--ym-font-sans);
-                    font-size: 14px;
+                    font-size: 13.5px;
                     font-weight: 700;
-                    letter-spacing: 1.4px;
+                    letter-spacing: 1.5px;
                     text-transform: uppercase;
                     color: #ffffff;
                     cursor: pointer;
@@ -4347,84 +4923,91 @@ class Trek_Shortcodes {
                     justify-content: center;
                     gap: 10px;
                     text-decoration: none;
-                    transition: background .25s ease, transform .2s ease, box-shadow .25s ease, border-color .25s ease;
+                    box-shadow: 0 4px 14px rgba(209, 173, 84, 0.28);
+                    transition: background .25s ease, border-color .25s ease, transform .2s ease, box-shadow .25s ease;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-btn:hover {
-                    background: #617654;
-                    border-color: #617654;
+                    background: var(--ym-peach-hover);
+                    border-color: var(--ym-peach-hover);
                     transform: translateY(-2px);
-                    box-shadow: 0 8px 24px rgba(97, 118, 84, 0.3);
+                    box-shadow: 0 8px 20px rgba(97, 118, 84, 0.32);
                     color: #ffffff;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-btn:active {
                     transform: translateY(0);
                 }
 
-                /* Email Screen */
+                /* Email Screen (Centered) */
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-email-form {
-                    max-width: 520px;
+                    max-width: 460px;
+                    width: 100%;
                     margin: 0 auto;
+                    text-align: center;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-input-group {
                     position: relative;
                     margin-bottom: 14px;
+                    width: 100%;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-email-input {
                     width: 100%;
-                    height: 58px;
+                    height: 54px;
                     padding: 0 20px;
                     font-family: var(--ym-font-sans);
-                    font-size: 17px;
-                    color: var(--ym-dark);
+                    font-size: 16px;
+                    color: #111111;
                     background: #ffffff;
-                    border: 1.5px solid rgba(16, 47, 53, 0.2);
-                    border-radius: 8px;
+                    border: 1.5px solid rgba(0, 0, 0, 0.15);
+                    border-radius: 6px;
                     outline: none;
                     transition: border-color .25s, box-shadow .25s;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-email-input:focus {
-                    border-color: var(--ym-forest);
-                    box-shadow: 0 0 0 3px rgba(97, 117, 85, 0.15);
+                    border-color: #d1ad54;
+                    box-shadow: 0 0 0 3px rgba(209, 173, 84, 0.2);
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-error-msg {
                     color: #b32d2e;
                     font-size: 13px;
                     font-weight: 600;
-                    text-align: left;
+                    text-align: center;
                     margin-top: 6px;
                     display: none;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-privacy {
                     font-size: 13px;
-                    color: var(--ym-muted);
+                    color: var(--ym-text-muted);
                     line-height: 1.5;
                     margin-top: 16px;
+                    text-align: center;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-loading {
                     display: none;
                     text-align: center;
                     padding: 24px 0;
-                    color: var(--ym-forest);
+                    color: #d1ad54;
                     font-weight: 600;
                     font-size: 16px;
                 }
 
-                /* Step 9: Results Carousel / Slider ("sursull") */
+                /* Step 9: Results Carousel / Slider */
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-results-wrap {
                     max-width: 1240px;
+                    width: 100%;
                     margin: 0 auto;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-wrapper {
                     position: relative;
-                    margin: 36px auto 40px;
+                    margin: clamp(24px, 3.5vw, 36px) auto clamp(28px, 4vw, 40px);
+                    width: 100%;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel {
                     display: flex;
-                    gap: 24px;
+                    gap: clamp(14px, 2vw, 24px);
                     overflow-x: auto;
                     scroll-snap-type: x mandatory;
                     scroll-behavior: smooth;
-                    padding: 12px 6px 28px;
+                    padding: 10px 4px 24px;
                     -webkit-overflow-scrolling: touch;
                     scrollbar-width: thin;
                     scrollbar-color: var(--ym-forest) rgba(16, 47, 53, 0.08);
@@ -4473,7 +5056,7 @@ class Trek_Shortcodes {
                     background: #ffffff;
                     border: 1px solid rgba(16, 47, 53, 0.16);
                     box-shadow: 0 6px 20px rgba(16, 47, 53, 0.12);
-                    color: var(--ym-dark);
+                    color: #111111;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -4524,7 +5107,7 @@ class Trek_Shortcodes {
                     align-items: center;
                     gap: 8px;
                     padding: 5px 12px 5px 8px;
-                    background: rgba(16, 47, 53, 0.65);
+                    background: #cfab55;
                     backdrop-filter: blur(8px);
                     -webkit-backdrop-filter: blur(8px);
                     border: 1px solid rgba(255, 255, 255, 0.28);
@@ -4534,7 +5117,7 @@ class Trek_Shortcodes {
                     transition: background .25s ease, border-color .25s ease;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-col-card:hover .ya-col-card__top-badge {
-                    background: rgba(16, 47, 53, 0.85);
+                    background: #cfab55;
                     border-color: rgba(255, 255, 255, 0.45);
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-col-card__top-logo {
@@ -4658,64 +5241,328 @@ class Trek_Shortcodes {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 18px;
+                    gap: 16px;
                     flex-wrap: wrap;
+                    width: 100%;
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--outline {
                     background: transparent;
-                    border: 1px solid #d1ad54;
-                    color: #d1ad54;
+                    border: 1.5px solid var(--ym-peach);
+                    color: var(--ym-peach);
                 }
                 #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--outline:hover {
-                    background: #617654;
-                    border-color: #617654;
+                    background: var(--ym-peach-hover);
+                    border-color: var(--ym-peach-hover);
                     color: #ffffff;
                 }
 
-                /* Responsive */
+                /* ==========================================================
+                   RESPONSIVE BREAKPOINTS (MOBILE-FIRST CENTERED)
+                   ========================================================== */
                 @media (max-width: 1280px) {
                     #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn--prev { left: 4px; }
                     #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn--next { right: 4px; }
-                }
-                @media (max-width: 992px) {
-                    #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel .ya-col-card {
-                        flex: 0 0 calc(50% - 12px);
-                        min-width: 280px;
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-collage-stage {
+                        transform: scale(0.92);
                     }
                 }
-                @media (max-width: 640px) {
+
+                /* Tablet / Small Laptop: Stack Hero, Center Text, Scale Collage */
+                @media (max-width: 1024px) {
                     #<?php echo esc_attr( $uid ); ?> {
                         min-height: auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-shell-card {
+                        min-height: auto;
+                        padding: 48px 32px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-grid {
+                        grid-template-columns: 1fr;
+                        gap: 36px;
+                        text-align: center;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-text {
+                        align-items: center;
+                        text-align: center;
+                        max-width: 620px;
+                        margin: 0 auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-title {
+                        text-align: center;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-subtitle {
+                        text-align: center;
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--peach {
+                        margin: 0 auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-collage {
+                        height: 350px;
+                        min-height: 350px;
+                        margin: 0 auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-collage-stage {
+                        transform: scale(0.85);
+                        margin: 0 auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel .ya-col-card {
+                        flex: 0 0 calc(50% - 12px);
+                        min-width: 270px;
+                    }
+                }
+
+                /* Mobile Landscape / Small Tablet (<= 768px): Single column, centered options */
+                @media (max-width: 768px) {
+                    #<?php echo esc_attr( $uid ); ?> {
+                        padding: 24px 0;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-shell-card {
+                        min-height: auto;
+                        padding: 38px 22px;
+                        border-radius: 10px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-nav-bar {
+                        max-width: 460px;
+                        margin: 0 auto 20px;
                     }
                     #<?php echo esc_attr( $uid ); ?> .ya-mat-options {
                         grid-template-columns: 1fr;
                         gap: 12px;
+                        max-width: 460px;
+                        margin: 0 auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-option {
+                        min-height: 58px;
+                        padding: 14px 18px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-collage {
+                        height: 290px;
+                        min-height: 290px;
+                        margin: 0 auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-collage-stage {
+                        transform: scale(0.70);
+                        margin: 0 auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--peach {
+                        max-width: 320px;
+                        width: 100%;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel {
+                        padding: 6px 2px 18px;
                     }
                     #<?php echo esc_attr( $uid ); ?> .ya-mat-cards-carousel .ya-col-card {
                         flex: 0 0 85%;
-                        min-width: 260px;
+                        min-width: 250px;
+                        max-width: 330px;
+                        scroll-snap-align: center;
                     }
                     #<?php echo esc_attr( $uid ); ?> .ya-mat-carousel-btn {
                         display: none;
                     }
+                }
+
+                /* Mobile Portrait (<= 540px): Full mobile-first vertical stack & centering */
+                @media (max-width: 540px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-actions {
+                        flex-direction: column;
+                        max-width: 320px;
+                        margin: 24px auto 0;
+                        gap: 12px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-actions .ya-mat-btn {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                }
+
+                /* Mobile Small (<= 480px) */
+                @media (max-width: 480px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-inner {
+                        padding: 0 12px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-shell-card {
+                        min-height: auto;
+                        padding: 28px 16px;
+                        border-radius: 10px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-grid {
+                        gap: 22px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-title {
+                        font-size: clamp(24px, 7vw, 30px);
+                        line-height: 1.2;
+                        margin-bottom: 12px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-subtitle {
+                        font-size: 14.5px;
+                        line-height: 1.55;
+                        margin-bottom: 22px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-btn--peach {
+                        height: 50px;
+                        font-size: 13px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-collage {
+                        height: 230px;
+                        min-height: 230px;
+                        margin: 0 auto;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-collage-stage {
+                        transform: scale(0.55);
+                        margin: 0 auto;
+                    }
                     #<?php echo esc_attr( $uid ); ?> .ya-mat-title {
-                        font-size: 28px;
+                        font-size: clamp(21px, 6vw, 26px);
+                        line-height: 1.25;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-subtitle {
+                        font-size: 14px;
+                        margin-bottom: 20px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-nav-bar {
+                        max-width: 100%;
+                        margin-bottom: 16px;
+                        padding-bottom: 10px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-options {
+                        max-width: 100%;
+                        gap: 10px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-option {
+                        min-height: 54px;
+                        padding: 12px 16px;
+                        font-size: 14.5px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-email-input {
+                        height: 50px;
+                        font-size: 15px;
+                    }
+                }
+
+                /* Extra Narrow Phones (<= 360px) */
+                @media (max-width: 360px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-shell-card {
+                        padding: 24px 12px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-title {
+                        font-size: 22px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-hero-collage {
+                        height: 195px;
+                        min-height: 195px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-mat-collage-stage {
+                        transform: scale(0.46);
                     }
                 }
             </style>
 
             <div class="ya-mat-inner">
+                <div class="ya-mat-shell-card">
 
-                <!-- STEP 1: INTRODUCTION -->
-                <div class="ya-mat-screen is-active" data-step="1">
-                    <div class="ya-mat-content-box">
-                        <span class="ya-mat-eyebrow"><?php esc_html_e( 'Yeti Adventure Discovery', 'trek-content-manager' ); ?></span>
-                        <h2 class="ya-mat-title"><?php esc_html_e( 'Not Sure What Kind of Traveller You Are?', 'trek-content-manager' ); ?></h2>
-                        <p class="ya-mat-subtitle"><?php esc_html_e( 'Let’s find out what kind of journey feels right for you.', 'trek-content-manager' ); ?></p>
-                        <button type="button" class="ya-mat-btn ya-mat-start-btn" data-next="2">
-                            <span><?php esc_html_e( 'Start Exploring', 'trek-content-manager' ); ?></span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                        </button>
+                <!-- STEP 1: INTRODUCTION (HERO 2-COLUMN WITH BROCHURE COLLAGE) -->
+                <div class="ya-mat-screen is-active ya-mat-screen--intro" data-step="1">
+                    <div class="ya-mat-hero-grid">
+                        <!-- LEFT SIDE: Vertically centered text & primary button -->
+                        <div class="ya-mat-hero-text">
+                            <h2 class="ya-mat-hero-title">
+                                <?php echo wp_kses( __( 'Not Sure What Kind of<br>Traveller, Are You?', 'trek-content-manager' ), array( 'br' => array() ) ); ?>
+                            </h2>
+                            <p class="ya-mat-hero-subtitle">
+                                <?php esc_html_e( "Let's find out Together, what kind of journey right for you.", 'trek-content-manager' ); ?>
+                            </p>
+                            <button type="button" class="ya-mat-btn ya-mat-start-btn ya-mat-btn--peach" data-next="2">
+                                <span><?php esc_html_e( 'START EXPLORING', 'trek-content-manager' ); ?></span>
+                            </button>
+                        </div>
+
+                        <!-- RIGHT SIDE: Tilted overlapping collage of cards / brochures -->
+                        <div class="ya-mat-hero-collage" aria-hidden="true">
+                            <div class="ya-mat-collage-stage">
+                                <!-- Card 2: Top Center Scenic Brochure (Behind) -->
+                                <div class="ya-mat-brochure ya-mat-brochure--card2" data-card="2">
+                                    <div class="ya-mat-brochure__inner">
+                                        <!-- USER IMAGE PLACEHOLDER: Paste image URL below or set via Customizer 'te_matcher_card2_img' -->
+                                        <?php $c2_img = get_theme_mod( 'te_matcher_card2_img', 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>
+                                        <img src="<?php echo esc_url( $c2_img ?: 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>" alt="" class="ya-mat-brochure__user-img" />
+                                        <div class="ya-mat-card2-art">
+                                            <div class="ya-mat-card2-visual"></div>
+                                            <div class="ya-mat-card2-body">
+                                                <p>yati shaped around</p>
+                                                <p>you to travel.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card 4: Route Itinerary Card (Bottom Behind) -->
+                                <div class="ya-mat-brochure ya-mat-brochure--card4" data-card="4">
+                                    <div class="ya-mat-brochure__inner">
+                                        <!-- USER IMAGE PLACEHOLDER: Paste image URL below or set via Customizer 'te_matcher_card4_img' -->
+                                        <?php $c4_img = get_theme_mod( 'te_matcher_card4_img', 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>
+                                        <img src="<?php echo esc_url( $c4_img ?: 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>" alt="" class="ya-mat-brochure__user-img" />
+                                        <div class="ya-mat-card4-content">
+                                            <div class="ya-mat-card4-lines">
+                                                <span class="ya-mat-card4-line short"></span>
+                                                <span class="ya-mat-card4-line medium"></span>
+                                            </div>
+                                            <svg class="ya-mat-card4-svg" viewBox="0 0 160 55" fill="none">
+                                                <path d="M 12 40 C 45 15, 80 42, 148 18" stroke="#3d6c38" stroke-width="2.5" stroke-linecap="round"/>
+                                                <circle cx="16" cy="38" r="4.5" fill="#ffffff" stroke="#3d6c38" stroke-width="2.5"/>
+                                                <circle cx="82" cy="33" r="4.5" fill="#ffffff" stroke="#3d6c38" stroke-width="2.5"/>
+                                                <circle cx="144" cy="20" r="4.5" fill="#ffffff" stroke="#3d6c38" stroke-width="2.5"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card 1: Main Front Travel Brochure -->
+                                <div class="ya-mat-brochure ya-mat-brochure--card1" data-card="1">
+                                    <div class="ya-mat-brochure__inner">
+                                        <!-- USER IMAGE PLACEHOLDER: Paste image URL below or set via Customizer 'te_matcher_card1_img' -->
+                                        <?php $c1_img = get_theme_mod( 'te_matcher_card1_img', 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>
+                                        <img src="<?php echo esc_url( $c1_img ?: 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>" alt="" class="ya-mat-brochure__user-img" />
+                                        <div class="ya-mat-card1-art">
+                                            <div class="ya-mat-card1-top">
+                                                <span class="ya-mat-card1-brand"><?php esc_html_e( 'YOUR TRAVEL CO.', 'trek-content-manager' ); ?></span>
+                                            </div>
+                                            <div class="ya-mat-card1-mid">
+                                                <div class="ya-mat-card1-mountain"></div>
+                                                <h3 class="ya-mat-card1-title">TRAVEL</h3>
+                                            </div>
+                                            <div class="ya-mat-card1-bottom">
+                                                <span class="ya-mat-card1-url">www.yetiadventure.com</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card 3: Which Traveller Are You? (Forest Green Right) -->
+                                <div class="ya-mat-brochure ya-mat-brochure--card3" data-card="3">
+                                    <div class="ya-mat-brochure__inner">
+                                        <!-- USER IMAGE PLACEHOLDER: Paste image URL below or set via Customizer 'te_matcher_card3_img' -->
+                                        <?php $c3_img = get_theme_mod( 'te_matcher_card3_img', 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>
+                                        <img src="<?php echo esc_url( $c3_img ?: 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>" alt="" class="ya-mat-brochure__user-img" />
+                                        <div class="ya-mat-card3-content">
+                                            <h3 class="ya-mat-card3-title">
+                                                <?php echo wp_kses( __( 'Which Traveller<br>Are You?', 'trek-content-manager' ), array( 'br' => array() ) ); ?>
+                                            </h3>
+                                            <p class="ya-mat-brochure__which-desc">
+                                                <?php esc_html_e( 'Adventurer, relaxer, culture seeker or family explorer. Start with a few questions.', 'trek-content-manager' ); ?>
+                                            </p>
+                                            <div class="ya-mat-card3-footer">
+                                                <span>sales@yetiadventure.com</span>
+                                                <span>+977 1 4371516</span>
+                                                <span>www.yetiadventure.com</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -4928,7 +5775,7 @@ class Trek_Shortcodes {
                         <span style="width:50px;"></span>
                     </div>
                     <div class="ya-mat-content-box">
-                        <h2 class="ya-mat-title"><?php esc_html_e( 'Your journey is taking shape.', 'trek-content-manager' ); ?></h2>
+                        <h2 class="ya-mat-title"><?php esc_html_e( 'Your journey is Ready..', 'trek-content-manager' ); ?></h2>
                         <p class="ya-mat-subtitle"><?php esc_html_e( 'Enter your email and we’ll reveal the destinations that match the way you love to travel.', 'trek-content-manager' ); ?></p>
                         
                         <form class="ya-mat-email-form" novalidate>
@@ -4937,7 +5784,7 @@ class Trek_Shortcodes {
                                 <span class="ya-mat-error-msg"><?php esc_html_e( 'Please enter a valid email address.', 'trek-content-manager' ); ?></span>
                             </div>
                             <button type="submit" class="ya-mat-btn" style="width:100%;">
-                                <span><?php esc_html_e( 'Show My Matches', 'trek-content-manager' ); ?></span>
+                                <span><?php esc_html_e( 'Gets My Matches', 'trek-content-manager' ); ?></span>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                             </button>
                             <p class="ya-mat-privacy"><?php esc_html_e( 'We’ll only use your email to send your travel matches and related journey information.', 'trek-content-manager' ); ?></p>
@@ -4987,7 +5834,8 @@ class Trek_Shortcodes {
                     </div>
                 </div>
 
-            </div>
+                </div><!-- /.ya-mat-shell-card -->
+            </div><!-- /.ya-mat-inner -->
 
             <script>
                 (function() {

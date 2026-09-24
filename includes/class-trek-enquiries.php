@@ -137,11 +137,15 @@ class Trek_Enquiries {
             wp_send_json_error( array( 'message' => __( 'Enquiry not found.', 'trek-content-manager' ) ) );
         }
 
-        $email      = get_post_meta( $post_id, '_trek_enquiry_email', true );
-        $phone      = get_post_meta( $post_id, '_trek_enquiry_phone', true );
-        $travellers = get_post_meta( $post_id, '_trek_enquiry_travellers', true ) ?: '1';
-        $source     = get_post_meta( $post_id, '_trek_enquiry_source', true ) ?: 'Website Enquiry';
-        $status     = get_post_meta( $post_id, '_trek_enquiry_status', true ) ?: 'New';
+        $email       = get_post_meta( $post_id, '_trek_enquiry_email', true );
+        $phone       = get_post_meta( $post_id, '_trek_enquiry_phone', true );
+        $travellers  = get_post_meta( $post_id, '_trek_enquiry_travellers', true ) ?: '1';
+        $country     = get_post_meta( $post_id, '_trek_enquiry_country', true ) ?: ( get_post_meta( $post_id, '_trek_enquiry_region', true ) ?: '' );
+        $travel_date = get_post_meta( $post_id, '_trek_enquiry_date', true ) ?: ( get_post_meta( $post_id, '_trek_enquiry_travel_date', true ) ?: '' );
+        $source      = get_post_meta( $post_id, '_trek_enquiry_source', true ) ?: 'Website Enquiry';
+        $status      = get_post_meta( $post_id, '_trek_enquiry_status', true ) ?: 'New';
+        $ip          = get_post_meta( $post_id, '_trek_enquiry_ip', true );
+        $match_score = get_post_meta( $post_id, '_trek_enquiry_match_score', true );
         
         $trek_id    = get_post_meta( $post_id, '_trek_enquiry_trek_id', true );
         $trip_title = get_post_meta( $post_id, '_trek_enquiry_trek_title', true );
@@ -149,18 +153,29 @@ class Trek_Enquiries {
             $trip_title = get_the_title( $trek_id );
         }
 
+        $clean_phone = preg_replace( '/[^0-9]/', '', $phone );
+        $whatsapp_url = ! empty( $clean_phone ) ? 'https://wa.me/' . $clean_phone : '';
+        $tries        = intval( get_post_meta( $post_id, '_trek_enquiry_lookup_count', true ) ?: 1 );
+
         wp_send_json_success( array(
-            'id'         => $post_id,
-            'name'       => $post->post_title ?: __( 'Guest Traveller', 'trek-content-manager' ),
-            'email'      => $email ?: '—',
-            'phone'      => $phone ?: '—',
-            'trip'       => $trip_title ?: __( 'General Enquiry', 'trek-content-manager' ),
-            'travellers' => $travellers,
-            'source'     => $source,
-            'status'     => $status,
-            'date'       => get_the_date( 'F j, Y g:i a', $post_id ),
-            'message'    => wpautop( $post->post_content ) ?: '<p><em>' . esc_html__( 'No message provided.', 'trek-content-manager' ) . '</em></p>',
-            'edit_url'   => get_edit_post_link( $post_id ),
+            'id'           => $post_id,
+            'name'         => $post->post_title ?: __( 'Guest Traveller', 'trek-content-manager' ),
+            'email'        => $email ?: '—',
+            'phone'        => $phone ?: '—',
+            'whatsapp_url' => $whatsapp_url,
+            'trip'         => $trip_title ?: __( 'General Enquiry', 'trek-content-manager' ),
+            'trek_url'     => $trek_id ? get_edit_post_link( $trek_id ) : '',
+            'travellers'   => $travellers,
+            'tries'        => sprintf( _n( '%d try', '%d tries', $tries, 'trek-content-manager' ), $tries ),
+            'country'      => $country ?: '—',
+            'travel_date'  => $travel_date ?: '—',
+            'ip'           => $ip ?: '—',
+            'match_score'  => $match_score ?: '',
+            'source'       => $source,
+            'status'       => $status,
+            'date'         => get_the_date( 'F j, Y g:i a', $post_id ),
+            'message'      => wpautop( $post->post_content ) ?: '<p><em>' . esc_html__( 'No message provided.', 'trek-content-manager' ) . '</em></p>',
+            'edit_url'     => get_edit_post_link( $post_id ),
         ) );
     }
 
@@ -171,6 +186,8 @@ class Trek_Enquiries {
         if ( ! current_user_can( 'edit_posts' ) ) {
             wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'trek-content-manager' ) );
         }
+
+        global $wpdb;
 
         // Query params
         $status_filter = sanitize_text_field( $_GET['status'] ?? 'all' );
@@ -187,13 +204,29 @@ class Trek_Enquiries {
         );
 
         if ( 'all' !== $status_filter && ! empty( $status_filter ) ) {
-            $args['meta_query'] = array(
-                array(
-                    'key'     => '_trek_enquiry_status',
-                    'value'   => ucfirst( $status_filter ),
-                    'compare' => '=',
-                ),
-            );
+            if ( 'new' === strtolower( $status_filter ) ) {
+                $args['meta_query'] = array(
+                    'relation' => 'OR',
+                    array(
+                        'key'     => '_trek_enquiry_status',
+                        'value'   => 'New',
+                        'compare' => '=',
+                    ),
+                    array(
+                        'key'     => '_trek_enquiry_status',
+                        'compare' => 'NOT EXISTS',
+                    ),
+                );
+            } else {
+                $status_target = ucwords( str_replace( '-', ' ', $status_filter ) );
+                $args['meta_query'] = array(
+                    array(
+                        'key'     => '_trek_enquiry_status',
+                        'value'   => $status_target,
+                        'compare' => '=',
+                    ),
+                );
+            }
         }
 
         if ( ! empty( $search_query ) ) {
@@ -202,9 +235,36 @@ class Trek_Enquiries {
 
         $query = new WP_Query( $args );
 
-        // Counts
+        // Counts across statuses
         $counts = wp_count_posts( 'trek_enquiry' );
         $total_count = intval( $counts->publish ?? 0 ) + intval( $counts->private ?? 0 ) + intval( $counts->draft ?? 0 );
+
+        $status_counts = array(
+            'all'       => $total_count,
+            'new'       => 0,
+            'contacted' => 0,
+            'follow-up' => 0,
+            'closed'    => 0,
+        );
+
+        $results = $wpdb->get_results(
+            "SELECT pm.meta_value as status_val, COUNT(p.ID) as count_val 
+             FROM {$wpdb->posts} p 
+             INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_trek_enquiry_status' 
+             WHERE p.post_type = 'trek_enquiry' AND p.post_status IN ('publish','private','draft')
+             GROUP BY pm.meta_value"
+        );
+
+        if ( ! empty( $results ) ) {
+            foreach ( $results as $row ) {
+                $slug = sanitize_title( $row->status_val );
+                if ( isset( $status_counts[ $slug ] ) ) {
+                    $status_counts[ $slug ] = (int) $row->count_val;
+                }
+            }
+        }
+        // Fallback for default 'New'
+        $status_counts['new'] = max( $status_counts['new'], $total_count - ( $status_counts['contacted'] + $status_counts['follow-up'] + $status_counts['closed'] ) );
 
         $template = TREK_MANAGER_PLUGIN_DIR . 'templates/admin-enquiries.php';
         if ( file_exists( $template ) ) {

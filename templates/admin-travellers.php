@@ -23,15 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <p class="trek-travellers-subtitle"><?php esc_html_e( 'Manage unified contacts, guest travellers, and registered users collected across enquiries and reviews.', 'trek-content-manager' ); ?></p>
         </div>
         <div class="trek-travellers-header-actions">
-            <button type="button" class="button button-primary trek-btn-bulk-email" id="trek-btn-open-bulk" disabled>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
-                </svg>
-                <?php esc_html_e( 'Send Bulk Email', 'trek-content-manager' ); ?>
-                <span class="trek-selected-badge" id="trek-selected-count">0</span>
-            </button>
-            <button type="button" class="button" id="trek-btn-export-travellers">
+            <button type="button" class="button button-primary" id="trek-btn-export-travellers">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
@@ -81,7 +73,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <th><?php esc_html_e( 'Source', 'trek-content-manager' ); ?></th>
                     <th><?php esc_html_e( 'Activity', 'trek-content-manager' ); ?></th>
                     <th><?php esc_html_e( 'Last Active', 'trek-content-manager' ); ?></th>
-                    <th class="text-right" style="width: 140px;"><?php esc_html_e( 'Actions', 'trek-content-manager' ); ?></th>
+                    <th class="text-right" style="width: 90px;"><?php esc_html_e( 'Actions', 'trek-content-manager' ); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -187,12 +179,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     title="<?php esc_attr_e( 'Edit Contact Info', 'trek-content-manager' ); ?>">
                                     <?php esc_html_e( 'Edit', 'trek-content-manager' ); ?>
                                 </button>
-                                <button type="button" class="button button-small button-primary trek-btn-send-single-email"
-                                    data-name="<?php echo esc_attr( $name ); ?>"
-                                    data-email="<?php echo esc_attr( $email ); ?>"
-                                    title="<?php esc_attr_e( 'Send Email', 'trek-content-manager' ); ?>">
-                                    <?php esc_html_e( 'Email', 'trek-content-manager' ); ?>
-                                </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -241,77 +227,5 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
     </div>
 
-    <!-- ==================================================================
-         MODAL 2: SEND INDIVIDUAL EMAIL
-         ================================================================== -->
-    <div id="trek-send-email-modal" class="trek-modal-backdrop trek-hidden">
-        <div class="trek-modal-dialog">
-            <div class="trek-modal-header">
-                <h3 class="trek-modal-title"><?php esc_html_e( 'Send Email to Traveller', 'trek-content-manager' ); ?></h3>
-                <button type="button" class="trek-modal-close" data-close-modal>&times;</button>
-            </div>
-            <form id="trek-send-single-email-form">
-                <div class="trek-modal-body">
-                    <div class="trek-form-field">
-                        <label><?php esc_html_e( 'Recipient', 'trek-content-manager' ); ?></label>
-                        <div class="trek-recipient-preview" id="single-recipient-display"></div>
-                        <input type="hidden" id="single-email-to" name="to_email" />
-                    </div>
-                    <div class="trek-form-field">
-                        <label for="single-email-subject"><?php esc_html_e( 'Subject', 'trek-content-manager' ); ?> <span class="required">*</span></label>
-                        <input type="text" id="single-email-subject" name="subject" class="widefat" required placeholder="<?php esc_attr_e( 'Regarding your trek enquiry...', 'trek-content-manager' ); ?>" />
-                    </div>
-                    <div class="trek-form-field">
-                        <label for="single-email-message"><?php esc_html_e( 'Message', 'trek-content-manager' ); ?> <span class="required">*</span></label>
-                        <textarea id="single-email-message" name="message" rows="7" class="widefat" required placeholder="<?php esc_attr_e( 'Write your message to the traveller here...', 'trek-content-manager' ); ?>"></textarea>
-                    </div>
-                    <div id="trek-single-email-status" class="trek-modal-status trek-hidden"></div>
-                </div>
-                <div class="trek-modal-footer">
-                    <button type="button" class="button" data-close-modal><?php esc_html_e( 'Cancel', 'trek-content-manager' ); ?></button>
-                    <button type="submit" class="button button-primary" id="trek-btn-submit-single-email">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                        <?php esc_html_e( 'Send Email', 'trek-content-manager' ); ?>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ==================================================================
-         MODAL 3: BULK SEND EMAIL
-         ================================================================== -->
-    <div id="trek-bulk-email-modal" class="trek-modal-backdrop trek-hidden">
-        <div class="trek-modal-dialog">
-            <div class="trek-modal-header">
-                <h3 class="trek-modal-title"><?php esc_html_e( 'Send Bulk Email', 'trek-content-manager' ); ?></h3>
-                <button type="button" class="trek-modal-close" data-close-modal>&times;</button>
-            </div>
-            <form id="trek-bulk-email-form">
-                <div class="trek-modal-body">
-                    <div class="trek-form-field">
-                        <label><?php esc_html_e( 'Selected Recipients', 'trek-content-manager' ); ?> (<span id="bulk-recipient-count">0</span>)</label>
-                        <div class="trek-bulk-recipients-list" id="bulk-recipients-tags"></div>
-                    </div>
-                    <div class="trek-form-field">
-                        <label for="bulk-email-subject"><?php esc_html_e( 'Subject', 'trek-content-manager' ); ?> <span class="required">*</span></label>
-                        <input type="text" id="bulk-email-subject" name="subject" class="widefat" required placeholder="<?php esc_attr_e( 'Special Announcement or Seasonal Offer...', 'trek-content-manager' ); ?>" />
-                    </div>
-                    <div class="trek-form-field">
-                        <label for="bulk-email-message"><?php esc_html_e( 'Message', 'trek-content-manager' ); ?> <span class="required">*</span></label>
-                        <textarea id="bulk-email-message" name="message" rows="7" class="widefat" required placeholder="<?php esc_attr_e( 'Write your message to all selected travellers...', 'trek-content-manager' ); ?>"></textarea>
-                    </div>
-                    <div id="trek-bulk-email-status" class="trek-modal-status trek-hidden"></div>
-                </div>
-                <div class="trek-modal-footer">
-                    <button type="button" class="button" data-close-modal><?php esc_html_e( 'Cancel', 'trek-content-manager' ); ?></button>
-                    <button type="submit" class="button button-primary" id="trek-btn-submit-bulk-email">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                        <?php esc_html_e( 'Send Bulk Email', 'trek-content-manager' ); ?>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
 </div>
+
