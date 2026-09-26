@@ -35,6 +35,7 @@ require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-reviews.php';
 require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-enquiries.php';
 require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-travellers.php';
 require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-journey-matcher.php';
+require_once TREK_MANAGER_PLUGIN_DIR . 'includes/class-trek-planner-submissions.php';
 // require_once TREK_MANAGER_PLUGIN_DIR . 'includes/premium-stories.php';
 
 /**
@@ -62,6 +63,7 @@ class Trek_Content_Manager_Plugin {
         Trek_Reviews::init();
         Trek_Enquiries::init();
         Trek_Travellers::init();
+        Trek_Planner_Submissions::init();
 
         // Enqueue frontend assets conditionally
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );

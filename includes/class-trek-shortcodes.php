@@ -123,16 +123,16 @@ class Trek_Shortcodes {
         $post    = $post_id ? get_post( $post_id ) : null;
 
         if ( ! $post || 'trek_destination' !== $post->post_type ) {
-            return '';
+            return self::get_no_data_html();
         }
 
         if ( 'publish' !== $post->post_status && ! current_user_can( 'edit_post', $post_id ) ) {
-            return '';
+            return self::get_no_data_html();
         }
 
         $template = TREK_MANAGER_PLUGIN_DIR . 'templates/single-trek_destination.php';
         if ( ! file_exists( $template ) ) {
-            return '';
+            return self::get_no_data_html();
         }
 
         ob_start();
@@ -277,6 +277,27 @@ class Trek_Shortcodes {
         update_post_meta( $post_id, '_trek_like_count', $likes + 1 );
 
         return rest_ensure_response( array( 'likes' => $likes + 1 ) );
+    }
+
+    /**
+     * Standard empty state markup when shortcode query finds no data.
+     *
+     * @param string $message Custom message or default.
+     * @return string
+     */
+    public static function get_no_data_html( $message = '' ) {
+        if ( empty( $message ) ) {
+            $message = __( 'Data not found. Please try again.', 'trek-content-manager' );
+        }
+        $reload_text = __( 'Reload', 'trek-content-manager' );
+
+        return '<div class="ya-empty" style="text-align:center; padding:48px 20px; font-family:inherit;">'
+            . '<p style="margin:0 0 16px; font-weight:600; font-size:16px; color:#333;">' . esc_html( $message ) . '</p>'
+            . '<button type="button" onclick="window.location.reload();" class="ya-reload-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; font-size:14px; font-weight:600; color:#fff; background:#617555; border:none; border-radius:4px; cursor:pointer; transition:all 0.2s ease; text-decoration:none;" onmouseover="this.style.background=\'#cfab55\';" onmouseout="this.style.background=\'#617555\';">'
+            . '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> '
+            . esc_html( $reload_text )
+            . '</button>'
+            . '</div>';
     }
 
     /**
@@ -534,7 +555,7 @@ class Trek_Shortcodes {
         }
 
         if ( empty( $cards ) ) {
-            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
+            return self::get_no_data_html();
         }
 
         ob_start();
@@ -806,7 +827,7 @@ class Trek_Shortcodes {
         );
 
         if ( ! $query->have_posts() ) {
-            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
+            return self::get_no_data_html();
         }
 
         $posts = $query->posts;
@@ -922,7 +943,7 @@ class Trek_Shortcodes {
         );
 
         if ( ! $query->have_posts() ) {
-            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
+            return self::get_no_data_html();
         }
 
         ob_start();
@@ -1303,7 +1324,7 @@ class Trek_Shortcodes {
         }
 
         if ( empty( $trips ) ) {
-            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
+            return self::get_no_data_html();
         }
 
         // Fetch dynamic categories from the database — only show categories that
@@ -1393,9 +1414,12 @@ class Trek_Shortcodes {
                     <?php endforeach; ?>
                 </div>
 
-                <div class="ya-empty" id="<?php echo esc_attr( $uid ); ?>_empty">
-                    <h3><?php esc_html_e( 'No Journeys Found', 'trek-content-manager' ); ?></h3>
-                    <p><?php esc_html_e( 'We could not find any journeys matching your current filters and search criteria. Try selecting "All Trips" or searching for a different keyword.', 'trek-content-manager' ); ?></p>
+                <div class="ya-empty" id="<?php echo esc_attr( $uid ); ?>_empty" style="text-align: center; padding: 48px 20px;">
+                    <p style="margin: 0 0 16px; font-size: 16px; font-weight: 600; color: #333;"><?php esc_html_e( 'Data not found. Please try again.', 'trek-content-manager' ); ?></p>
+                    <button type="button" onclick="window.location.reload();" class="ya-reload-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; font-size:14px; font-weight:600; color:#fff; background:#617555; border:none; border-radius:4px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.background='#cfab55';" onmouseout="this.style.background='#617555';">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <?php esc_html_e( 'Reload', 'trek-content-manager' ); ?>
+                    </button>
                 </div>
             </div>
 
@@ -1537,7 +1561,7 @@ class Trek_Shortcodes {
         }
 
         if ( empty( $cards ) ) {
-            return '<div class="ya-empty" style="text-align:center; padding:48px 20px; color:#666; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
+            return self::get_no_data_html();
         }
 
         $cols = max( 1, min( 4, intval( $atts['columns'] ) ) );
@@ -1897,7 +1921,7 @@ class Trek_Shortcodes {
         }
 
         if ( empty( $cards ) ) {
-            return '<div class="ya-empty" style="text-align:center; padding:60px 20px; color:#617579; font-family:\'Open Sans\',Arial,sans-serif; font-size:16px;"><p>' . esc_html__( 'No data found.', 'trek-content-manager' ) . '</p></div>';
+            return self::get_no_data_html();
         }
 
         $default_country = sanitize_title( $atts['default_country'] );
@@ -2436,8 +2460,11 @@ class Trek_Shortcodes {
 
                 <!-- Empty state when a specific country tab has 0 trips -->
                 <div class="ya-col-empty" id="<?php echo esc_attr( $uid ); ?>_empty" style="display: none; text-align: center; padding: 60px 20px; color: #617654; font-family: 'Open Sans', Arial, sans-serif; font-size: 15px;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 42px; height: 42px; margin: 0 auto 12px; color: #617654; display: block; opacity: 0.8;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <p style="margin: 0; font-weight: 600;"><?php esc_html_e( 'No data found.', 'trek-content-manager' ); ?></p>
+                    <p style="margin: 0 0 16px; font-weight: 600; font-size: 16px; color: #333;"><?php esc_html_e( 'Data not found. Please try again.', 'trek-content-manager' ); ?></p>
+                    <button type="button" onclick="window.location.reload();" class="ya-reload-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; font-size:14px; font-weight:600; color:#fff; background:#617555; border:none; border-radius:4px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.background='#cfab55';" onmouseout="this.style.background='#617555';">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <?php esc_html_e( 'Reload', 'trek-content-manager' ); ?>
+                    </button>
                 </div>
 
                 <!-- Bottom Pagination Dots -->
@@ -2685,6 +2712,10 @@ class Trek_Shortcodes {
             ? Trek_Journey_Matcher::get_destination_display_data( $initial_match['destination_id'], $initial_match )
             : array();
 
+        if ( empty( $initial_dest ) && empty( $categories['explore'] ?? array() ) ) {
+            return self::get_no_data_html();
+        }
+
         ob_start();
         ?>
         <section class="ya-selector <?php echo esc_attr( $atts['class'] ); ?>" id="<?php echo esc_attr( $section_id ); ?>" data-uid="<?php echo esc_attr( $uid ); ?>">
@@ -2839,6 +2870,7 @@ class Trek_Shortcodes {
                     box-shadow: none;
                     border: none;
                     position: relative;
+                    background:#fff;
                 }
 
                 /* Horizontal Multi-Select Dropdowns */
@@ -4235,7 +4267,7 @@ class Trek_Shortcodes {
                                                 <h2 style="margin:0 0 10px;font-family:Georgia,serif;font-size:24px;color:#022f2e;line-height:1.25;"><?php echo esc_html( $destination_title ); ?></h2>
                                                 
                                                 <p style="margin:0 0 14px;font-size:13.5px;color:#044b49;font-weight:600;">
-                                                    📍 <?php echo esc_html( $region_name ); ?> &nbsp;•&nbsp; ⏱️ <?php echo esc_html( $duration ); ?>
+                                                 <?php echo esc_html( $region_name ); ?> &nbsp;•&nbsp;  <?php echo esc_html( $duration ); ?>
                                                 </p>
 
                                                 <p style="margin:0 0 16px;font-size:14.5px;line-height:1.7;color:#444444;"><?php echo esc_html( $destination_intro ); ?></p>
@@ -5497,8 +5529,8 @@ class Trek_Shortcodes {
                                 <div class="ya-mat-brochure ya-mat-brochure--card2" data-card="2">
                                     <div class="ya-mat-brochure__inner">
                                         <!-- USER IMAGE PLACEHOLDER: Paste image URL below or set via Customizer 'te_matcher_card2_img' -->
-                                        <?php $c2_img = get_theme_mod( 'te_matcher_card2_img', 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>
-                                        <img src="<?php echo esc_url( $c2_img ?: 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>" alt="" class="ya-mat-brochure__user-img" />
+                                        <?php $c2_img = get_theme_mod( 'te_matcher_card2_img', 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/raimond-klavins-JqT2Wp5S0Dk-unsplash-scaled.webp' ); ?>
+                                        <img src="<?php echo esc_url( $c2_img ?: 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/raimond-klavins-JqT2Wp5S0Dk-unsplash-scaled.webp' ); ?>" alt="" class="ya-mat-brochure__user-img" />
                                         <div class="ya-mat-card2-art">
                                             <div class="ya-mat-card2-visual"></div>
                                             <div class="ya-mat-card2-body">
@@ -5513,8 +5545,8 @@ class Trek_Shortcodes {
                                 <div class="ya-mat-brochure ya-mat-brochure--card4" data-card="4">
                                     <div class="ya-mat-brochure__inner">
                                         <!-- USER IMAGE PLACEHOLDER: Paste image URL below or set via Customizer 'te_matcher_card4_img' -->
-                                        <?php $c4_img = get_theme_mod( 'te_matcher_card4_img', 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>
-                                        <img src="<?php echo esc_url( $c4_img ?: 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>" alt="" class="ya-mat-brochure__user-img" />
+                                        <?php $c4_img = get_theme_mod( 'te_matcher_card4_img', 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/bikalpa-pokhrel-L4NA2qRqK0s-unsplash-scaled.webp' ); ?>
+                                        <img src="<?php echo esc_url( $c4_img ?: 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/bikalpa-pokhrel-L4NA2qRqK0s-unsplash-scaled.webp' ); ?>" alt="" class="ya-mat-brochure__user-img" />
                                         <div class="ya-mat-card4-content">
                                             <div class="ya-mat-card4-lines">
                                                 <span class="ya-mat-card4-line short"></span>
@@ -5534,8 +5566,8 @@ class Trek_Shortcodes {
                                 <div class="ya-mat-brochure ya-mat-brochure--card1" data-card="1">
                                     <div class="ya-mat-brochure__inner">
                                         <!-- USER IMAGE PLACEHOLDER: Paste image URL below or set via Customizer 'te_matcher_card1_img' -->
-                                        <?php $c1_img = get_theme_mod( 'te_matcher_card1_img', 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>
-                                        <img src="<?php echo esc_url( $c1_img ?: 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>" alt="" class="ya-mat-brochure__user-img" />
+                                        <?php $c1_img = get_theme_mod( 'te_matcher_card1_img', 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/background-contact-us.png' ); ?>
+                                        <img src="<?php echo esc_url( $c1_img ?: 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/07/background-contact-us.png' ); ?>" alt="" class="ya-mat-brochure__user-img" />
                                         <div class="ya-mat-card1-art">
                                             <div class="ya-mat-card1-top">
                                                 <span class="ya-mat-card1-brand"><?php esc_html_e( 'YOUR TRAVEL CO.', 'trek-content-manager' ); ?></span>
@@ -5555,8 +5587,8 @@ class Trek_Shortcodes {
                                 <div class="ya-mat-brochure ya-mat-brochure--card3" data-card="3">
                                     <div class="ya-mat-brochure__inner">
                                         <!-- USER IMAGE PLACEHOLDER: Paste image URL below or set via Customizer 'te_matcher_card3_img' -->
-                                        <?php $c3_img = get_theme_mod( 'te_matcher_card3_img', 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>
-                                        <img src="<?php echo esc_url( $c3_img ?: 'http://localhost/travling/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.jpg' ); ?>" alt="" class="ya-mat-brochure__user-img" />
+                                        <?php $c3_img = get_theme_mod( 'te_matcher_card3_img', 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.webp' ); ?>
+                                        <img src="<?php echo esc_url( $c3_img ?: 'https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.webp' ); ?>" alt="" class="ya-mat-brochure__user-img" />
                                         <div class="ya-mat-card3-content">
                                             <h3 class="ya-mat-card3-title">
                                                 <?php echo wp_kses( __( 'Which Traveller<br>Are You?', 'trek-content-manager' ), array( 'br' => array() ) ); ?>
@@ -6416,137 +6448,70 @@ class Trek_Shortcodes {
             'order'          => 'ASC',
         ) );
 
+        if ( empty( $trips ) ) {
+            return self::get_no_data_html();
+        }
+
         $region_data = array();
 
-        // Standard map regions mapping
-        $known_regions = array(
-            'everest-region'         => array( 'title' => 'Everest Region (Khumbu)', 'keys' => array( 'everest', 'ebc', 'khumbu', 'gokyo', 'kala patthar', 'sagarmatha' ) ),
-            'annapurna'              => array( 'title' => 'Annapurna Region', 'keys' => array( 'annapurna', 'abc', 'sanctuary', 'poon hill', 'mardi', 'ghorepani' ) ),
-            'mustang'                => array( 'title' => 'Mustang (Kingdom of Lo)', 'keys' => array( 'mustang', 'lo manthang', 'upper mustang' ) ),
-            'manaslu'                => array( 'title' => 'Manaslu Region', 'keys' => array( 'manaslu', 'tsum', 'larke' ) ),
-            'ganesh-himal'           => array( 'title' => 'Ganesh Himal', 'keys' => array( 'ganesh', 'ruby valley' ) ),
-            'dhaulagiri'             => array( 'title' => 'Dhaulagiri Region', 'keys' => array( 'dhaulagiri' ) ),
-            'kanchenjunga'           => array( 'title' => 'Kanchenjunga', 'keys' => array( 'kanchenjunga', 'kangchenjunga' ) ),
-            'api-himal'              => array( 'title' => 'Api Himal', 'keys' => array( 'api', 'api himal', 'saipal' ) ),
-            'chitwan-national-park'  => array( 'title' => 'Chitwan National Park', 'keys' => array( 'chitwan', 'safari', 'jungle' ) ),
-            'bardia-national-park'   => array( 'title' => 'Bardia National Park', 'keys' => array( 'bardia' ) ),
-            'koshi-tappu-wildlife'   => array( 'title' => 'Koshi Tappu Wildlife', 'keys' => array( 'koshi', 'tappu' ) ),
-            'lumbini'                => array( 'title' => 'Lumbini (Buddha Circuit)', 'keys' => array( 'lumbini', 'buddha' ) ),
-            'kathmandu'              => array( 'title' => 'Kathmandu Valley', 'keys' => array( 'kathmandu', 'paten', 'bhaktapur' ) ),
-            'pokhara'                => array( 'title' => 'Pokhara & Lakes', 'keys' => array( 'pokhara', 'fewa' ) ),
-        );
-
-        // Key map data by actual GeoJSON district names, not broad regions.
-        $known_districts = array(
-            'solukhumbu', 'sankhuwasabha', 'taplejung', 'ilam', 'panchthar',
-            'jhapa', 'morang', 'sunsari', 'udayapur', 'khotang', 'okhaldhunga',
-            'dolakha', 'ramechhap', 'sindhuli', 'makwanpur', 'chitwan',
-            'kathmandu', 'bhaktapur', 'lalitpur', 'nuwakot', 'rasuwa',
-            'dhading', 'gorkha', 'lamjung', 'tanahu', 'kaski', 'manang',
-            'mustang', 'myagdi', 'parbat', 'baglung', 'syangja', 'gulmi',
-            'palpa', 'nawalpur', 'parasi', 'rupandehi', 'kapilvastu',
-            'arghakhanchi', 'pyuthan', 'rolpa', 'rukum east', 'rukum west',
-            'salyan', 'dang', 'banke', 'bardiya', 'surkhet', 'dailekh',
-            'jajarkot', 'jumla', 'kalikot', 'mugu', 'dolpa', 'humla',
-            'bajura', 'bajhang', 'achham', 'doti', 'kailali', 'kanchanpur',
-            'darchula', 'baitadi', 'dadeldhura', 'dhanusha', 'mahottari',
-            'sarlahi', 'rautahat', 'bara', 'parsa', 'saptari', 'siraha',
-            'sindhupalchok', 'kavrepalanchok',
-        );
-
-        $region_districts = array(
-            'everest-region'        => 'solukhumbu',
-            'annapurna'             => 'kaski',
-            'mustang'               => 'mustang',
-            'manaslu'               => 'gorkha',
-            'ganesh-himal'          => 'dhading',
-            'dhaulagiri'            => 'myagdi',
-            'kanchenjunga'          => 'taplejung',
-            'api-himal'             => 'darchula',
-            'chitwan-national-park' => 'chitwan',
-            'bardia-national-park'  => 'bardiya',
-            'koshi-tappu-wildlife'  => 'sunsari',
-            'lumbini'               => 'rupandehi',
-            'kathmandu'             => 'kathmandu',
-            'pokhara'               => 'kaski',
-        );
-
-        // Process trips and bind to regions
+        // Process trips — ONLY use explicitly set _trek_map_district CPT meta.
+        // No keyword-based auto-matching. If no district is set, skip the trip.
         foreach ( $trips as $trip ) {
-            $post_id = $trip->ID;
-            $data = self::get_formatted_trip_data( $post_id );
+            $post_id     = $trip->ID;
+            $data        = self::get_formatted_trip_data( $post_id );
             if ( empty( $data ) ) continue;
 
-            $assigned_map_region = get_post_meta( $post_id, '_trek_map_region', true );
-            $target_slug = '';
+            // Read district directly from CPT meta field
+            $map_district = get_post_meta( $post_id, '_trek_map_district', true );
+            if ( empty( $map_district ) ) {
+                continue; // No district set → skip
+            }
 
-            if ( ! empty( $assigned_map_region ) && isset( $known_regions[ $assigned_map_region ] ) ) {
-                $target_slug = $assigned_map_region;
-            } else {
-                // Auto match from region terms or title
-                $haystack = strtolower( $trip->post_title . ' ' . $data['tag'] . ' ' . $data['all_slugs'] );
-                foreach ( $known_regions as $r_slug => $r_info ) {
-                    foreach ( $r_info['keys'] as $k ) {
-                        if ( strpos( $haystack, $k ) !== false ) {
-                            $target_slug = $r_slug;
-                            break 2;
-                        }
-                    }
+            $map_district = strtolower( trim( $map_district ) );
+            $map_district = str_replace( ' ', '-', $map_district );
+
+            $location_address = ! empty( $data['address'] ) ? $data['address'] : ( ! empty( $data['location'] ) ? $data['location'] : 'Nepal' );
+
+            // Extract categories
+            $trip_cats = array();
+            $cat_terms = get_the_terms( $post_id, 'trek_category' );
+            if ( ! empty( $cat_terms ) && ! is_wp_error( $cat_terms ) ) {
+                foreach ( $cat_terms as $ct ) {
+                    $trip_cats[ $ct->slug ] = $ct->name;
                 }
             }
 
-            if ( $target_slug ) {
-                $map_district = get_post_meta( $post_id, '_trek_map_district', true );
-                $map_district = $map_district ? strtolower( trim( $map_district ) ) : '';
-
-                if ( ! $map_district ) {
-                    foreach ( $known_districts as $district ) {
-                        if ( false !== strpos( $haystack, $district ) ) {
-                            $map_district = $district;
-                            break;
-                        }
-                    }
-                }
-
-                if ( ! $map_district && isset( $region_districts[ $target_slug ] ) ) {
-                    $map_district = $region_districts[ $target_slug ];
-                }
-
-                if ( ! $map_district ) {
-                    continue;
-                }
-
-                $map_district = str_replace( ' ', '-', $map_district );
-                $location_address = ! empty( $data['address'] ) ? $data['address'] : ( ! empty( $data['location'] ) ? $data['location'] : 'Nepal' );
-
-                if ( ! isset( $region_data[ $map_district ] ) ) {
-                    $region_data[ $map_district ] = array(
-                        'district'  => $map_district,
-                        'title'     => $data['title'],
-                        'days'      => $data['duration_label'],
-                        'image'     => $data['image'],
-                        'permalink' => $data['permalink'],
-                        'address'   => $location_address,
-                        'count'     => 1,
-                        'has_trips' => true,
-                        'destinations' => array( array(
-                            'title'     => $data['title'],
-                            'days'      => $data['duration_label'],
-                            'image'     => $data['image'],
-                            'permalink' => $data['permalink'],
-                            'address'   => $location_address,
-                        ) ),
-                    );
-                } else {
-                    $region_data[ $map_district ]['count']++;
-                    $region_data[ $map_district ]['destinations'][] = array(
-                        'title'     => $data['title'],
-                        'days'      => $data['duration_label'],
-                        'image'     => $data['image'],
-                        'permalink' => $data['permalink'],
-                        'address'   => $location_address,
-                    );
-                }
+            if ( ! isset( $region_data[ $map_district ] ) ) {
+                $region_data[ $map_district ] = array(
+                    'district'     => $map_district,
+                    'title'        => $data['title'],
+                    'days'         => $data['duration_label'],
+                    'image'        => $data['image'],
+                    'permalink'    => $data['permalink'],
+                    'address'      => $location_address,
+                    'count'        => 1,
+                    'has_trips'    => true,
+                    'categories'   => $trip_cats,
+                    'destinations' => array( array(
+                        'title'      => $data['title'],
+                        'days'       => $data['duration_label'],
+                        'image'      => $data['image'],
+                        'permalink'  => $data['permalink'],
+                        'address'    => $location_address,
+                        'categories' => $trip_cats,
+                    ) ),
+                );
+            } else {
+                $region_data[ $map_district ]['count']++;
+                $region_data[ $map_district ]['categories'] = array_merge( $region_data[ $map_district ]['categories'], $trip_cats );
+                $region_data[ $map_district ]['destinations'][] = array(
+                    'title'      => $data['title'],
+                    'days'       => $data['duration_label'],
+                    'image'      => $data['image'],
+                    'permalink'  => $data['permalink'],
+                    'address'    => $location_address,
+                    'categories' => $trip_cats,
+                );
             }
         }
 
@@ -6555,7 +6520,7 @@ class Trek_Shortcodes {
         if ( file_exists( $template_file ) ) {
             include $template_file;
         } else {
-            echo '<p style="color:#d4af37; text-align:center; padding:30px;">' . esc_html__( 'Nepal Tourism Map template file not found.', 'trek-content-manager' ) . '</p>';
+            echo self::get_no_data_html();
         }
         return ob_get_clean();
     }
@@ -6574,7 +6539,7 @@ class Trek_Shortcodes {
 
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
         if ( ! $post_id ) {
-            return '';
+            return self::get_no_data_html();
         }
 
         $key = ! empty( $atts['field'] ) ? sanitize_key( $atts['field'] ) : sanitize_key( $atts['key'] );
@@ -6584,7 +6549,7 @@ class Trek_Shortcodes {
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
         if ( empty( $data ) ) {
-            return '';
+            return self::get_no_data_html();
         }
 
         $output = '';
@@ -6710,10 +6675,10 @@ class Trek_Shortcodes {
     public static function render_trek_facts_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_facts' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) ) return '';
+        if ( empty( $data ) ) return self::get_no_data_html();
 
         $facts = $data['quick_facts'] ?? array();
         ob_start();
@@ -6755,10 +6720,10 @@ class Trek_Shortcodes {
     public static function render_trek_itinerary_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_itinerary' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) || empty( $data['itinerary'] ) ) return '';
+        if ( empty( $data ) || empty( $data['itinerary'] ) ) return self::get_no_data_html();
 
         $itin = $data['itinerary'];
         ob_start();
@@ -6797,10 +6762,10 @@ class Trek_Shortcodes {
     public static function render_trek_inclusions_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_inclusions' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) ) return '';
+        if ( empty( $data ) ) return self::get_no_data_html();
 
         $inc = $data['inex']['inclusions'] ?? array();
         $exc = $data['inex']['exclusions'] ?? array();
@@ -6845,10 +6810,10 @@ class Trek_Shortcodes {
     public static function render_trek_hero_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_hero' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) ) return '';
+        if ( empty( $data ) ) return self::get_no_data_html();
 
         $hero = $data['hero'] ?? array();
         $bg   = ! empty( $hero['image'] ) ? esc_url( $hero['image'] ) : '';
@@ -6877,10 +6842,10 @@ class Trek_Shortcodes {
     public static function render_trek_overview_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_overview' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) ) return '';
+        if ( empty( $data ) ) return self::get_no_data_html();
 
         $overview = $data['overview'] ?? array();
         ob_start();
@@ -6915,10 +6880,10 @@ class Trek_Shortcodes {
     public static function render_trek_gallery_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_gallery' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) || empty( $data['gallery']['images'] ) ) return '';
+        if ( empty( $data ) || empty( $data['gallery']['images'] ) ) return self::get_no_data_html();
 
         $images = $data['gallery']['images'];
         ob_start();
@@ -6941,10 +6906,10 @@ class Trek_Shortcodes {
     public static function render_trek_essentials_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_essentials' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) || empty( $data['faqs'] ) ) return '';
+        if ( empty( $data ) || empty( $data['faqs'] ) ) return self::get_no_data_html();
 
         $faqs = $data['faqs'];
         ob_start();
@@ -6970,10 +6935,10 @@ class Trek_Shortcodes {
     public static function render_trek_reviews_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_reviews' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) || empty( $data['reviews_section']['reviews'] ) ) return '';
+        if ( empty( $data ) || empty( $data['reviews_section']['reviews'] ) ) return self::get_no_data_html();
 
         $revs = $data['reviews_section']['reviews'];
         ob_start();
@@ -7003,10 +6968,10 @@ class Trek_Shortcodes {
     public static function render_trek_departures_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_departures' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) ) return '';
+        if ( empty( $data ) ) return self::get_no_data_html();
 
         $contact = $data['contact'] ?? array();
         $wa_num  = preg_replace( '/[^0-9]/', '', $contact['whatsapp'] ?? '9779803197006' );
@@ -7036,10 +7001,10 @@ class Trek_Shortcodes {
     public static function render_trek_map_section( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_map' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_Renderer' ) ? Trek_Renderer::get_full_trek_data( $post_id ) : array();
-        if ( empty( $data ) ) return '';
+        if ( empty( $data ) ) return self::get_no_data_html();
 
         $overview = $data['overview'] ?? array();
         ob_start();
@@ -7062,10 +7027,10 @@ class Trek_Shortcodes {
     public static function render_trek_card_shortcode( $atts ) {
         $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'trek_card' );
         $post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : get_the_ID();
-        if ( ! $post_id ) return '';
+        if ( ! $post_id ) return self::get_no_data_html();
 
         $data = class_exists( 'Trek_CPT' ) ? Trek_CPT::get_card_data( $post_id ) : null;
-        if ( ! $data ) return '';
+        if ( ! $data ) return self::get_no_data_html();
 
         ob_start();
         ?>
@@ -7325,74 +7290,111 @@ class Trek_Shortcodes {
                 }
             }
             .te-dest-card {
-                position: relative;
+                position: relative !important;
                 border-radius: 4px;
-                overflow: hidden;
+                overflow: hidden !important;
                 aspect-ratio: 3 / 4.4;
-                min-height: 440px;
+                min-height: 460px;
+                height: 100%;
                 background-color: var(--te-dark-bg);
+                background-size: cover !important;
+                background-position: center center !important;
+                background-repeat: no-repeat !important;
                 box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35);
                 transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
                 isolation: isolate;
+                display: flex !important;
+                flex-direction: column !important;
             }
             .te-dest-card:hover {
                 transform: translateY(-8px);
                 box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.75), 0 0 0 1.5px rgba(207, 171, 85, 0.45);
             }
-            .te-dest-card__link {
-                position: absolute;
-                inset: 0;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                padding: 24px 22px;
-                text-decoration: none !important;
-                z-index: 2;
-                color: inherit;
-            }
             .te-dest-card__bg-wrap {
-                position: absolute;
-                inset: 0;
-                overflow: hidden;
-                z-index: 0;
+                position: absolute !important;
+                inset: 0 !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                overflow: hidden !important;
+                z-index: 0 !important;
+                pointer-events: none !important;
+                background-size: cover !important;
+                background-position: center center !important;
+                background-repeat: no-repeat !important;
             }
             .te-dest-card__bg {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                object-position: center;
-                display: block;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                min-width: 100% !important;
+                min-height: 100% !important;
+                max-width: none !important;
+                max-height: none !important;
+                object-fit: cover !important;
+                object-position: center center !important;
+                display: block !important;
                 transform: scale(1.001);
                 transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
             }
             .te-dest-card:hover .te-dest-card__bg {
-                transform: scale(1.08);
+                transform: scale(1.08) !important;
             }
-            /* Dark gradient overlay */
+            /* Dark gradient overlay - subtle bottom vignette allowing full background image visibility */
             .te-dest-card__overlay {
-                position: absolute;
-                inset: 0;
+                position: absolute !important;
+                inset: 0 !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
                 background: linear-gradient(
                     180deg,
-                    rgba(8, 14, 24, 0.28) 0%,
-                    rgba(8, 14, 24, 0.12) 32%,
-                    rgba(6, 10, 18, 0.7) 65%,
-                    rgba(3, 5, 10, 0.96) 100%
-                );
-                pointer-events: none;
+                    rgba(8, 14, 24, 0.22) 0%,
+                    rgba(8, 14, 24, 0.05) 30%,
+                    rgba(6, 10, 18, 0.3) 55%,
+                    rgba(4, 7, 13, 0.75) 80%,
+                    rgba(3, 5, 10, 0.94) 100%
+                ) !important;
+                pointer-events: none !important;
                 transition: opacity 0.4s ease;
             }
-            /* Dramatic deep black hover shade */
+            /* Subtle hover shade */
             .te-dest-card__hover-shade {
-                position: absolute;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.26);
-                opacity: 0;
-                pointer-events: none;
+                position: absolute !important;
+                inset: 0 !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: rgba(0, 0, 0, 0.2) !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
                 transition: opacity 0.4s ease;
             }
             .te-dest-card:hover .te-dest-card__hover-shade {
-                opacity: 1;
+                opacity: 1 !important;
+            }
+            .te-dest-card__link {
+                position: relative !important;
+                width: 100% !important;
+                height: 100% !important;
+                min-height: 460px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                padding: 24px 22px !important;
+                text-decoration: none !important;
+                z-index: 2 !important;
+                color: inherit !important;
+                box-sizing: border-box !important;
             }
             .te-dest-card__top {
                 position: relative;
@@ -7467,20 +7469,24 @@ class Trek_Shortcodes {
             .te-dest-card:hover .te-dest-card__duration {
                 color: var(--te-gold-hover);
             }
-            /* Soft off-white title (#f7f5f0) */
-            .te-dest-card__title {
-                font-family: inherit;
-                font-size: 22px;
-                font-weight: 700;
-                line-height: 1.24;
-                color: var(--te-cream);
-                margin: 0;
-                letter-spacing: -0.015em;
-                text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+            /* Pure crisp white title (#ffffff) protected against external/parent page overrides */
+            .te-dest-card__title,
+            .te-dest-card h3.te-dest-card__title {
+                font-family: inherit !important;
+                font-size: 22px !important;
+                font-weight: 700 !important;
+                line-height: 1.24 !important;
+                color: #ffffff !important;
+                margin: 0 !important;
+                letter-spacing: -0.015em !important;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85) !important;
                 transition: color 0.25s ease;
             }
-            .te-dest-card:hover .te-dest-card__title {
-                color: #ffffff;
+            .te-dest-card:hover .te-dest-card__title,
+            .te-dest-card a:hover .te-dest-card__title,
+            .te-dest-card__link:hover .te-dest-card__title {
+                color: #ffffff !important;
+                text-shadow: 0 4px 16px rgba(0, 0, 0, 0.95) !important;
             }
             .te-dest-card__excerpt {
                 font-size: 13px;
@@ -7662,14 +7668,14 @@ class Trek_Shortcodes {
                             $excerpt = has_excerpt( $p_id ) ? get_the_excerpt( $p_id ) : wp_trim_words( get_post_field( 'post_content', $p_id ), 16, '...' );
                         }
                     ?>
-                    <article class="te-dest-card">
-                        <a href="<?php echo esc_url( $permalink ); ?>" class="te-dest-card__link" aria-label="<?php echo esc_attr( $title ); ?>">
-                            <div class="te-dest-card__bg-wrap">
-                                <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="te-dest-card__bg" loading="lazy" />
-                                <div class="te-dest-card__overlay"></div>
-                                <div class="te-dest-card__hover-shade"></div>
-                            </div>
+                    <article class="te-dest-card" style="background-image: url('<?php echo esc_url( $image_url ); ?>');">
+                        <div class="te-dest-card__bg-wrap" style="background-image: url('<?php echo esc_url( $image_url ); ?>');">
+                            <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="te-dest-card__bg" loading="lazy" />
+                            <div class="te-dest-card__overlay"></div>
+                            <div class="te-dest-card__hover-shade"></div>
+                        </div>
 
+                        <a href="<?php echo esc_url( $permalink ); ?>" class="te-dest-card__link" aria-label="<?php echo esc_attr( $title ); ?>">
                             <div class="te-dest-card__top">
                                 <span class="te-dest-card__badge"><?php echo esc_html( $badge_text ); ?></span>
                             </div>
@@ -7693,9 +7699,7 @@ class Trek_Shortcodes {
                     <?php endwhile; wp_reset_postdata(); ?>
                 </div>
             <?php else : ?>
-                <div class="te-dest-empty">
-                    <p><?php esc_html_e( 'No trek destinations found matching your criteria.', 'trek-content-manager' ); ?></p>
-                </div>
+                <?php echo self::get_no_data_html(); ?>
             <?php endif; ?>
 
             <!-- Centered Pagination Section -->

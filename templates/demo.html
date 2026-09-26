@@ -1,0 +1,1897 @@
+<section class="ya-nepal-page" id="ya-nepal-page">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,600;1,6..72,700&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Water+Brush&display=swap');
+
+        #ya-nepal-page {
+            --forest: #3a4f2e;
+            --forest-2: #5f7554;
+            --gold: #d1ad54;
+            --paper: #f6f3eb;
+            --cream: #fbfaf6;
+            --ink: #17312f;
+            --muted: #667774;
+            --white: #fff;
+            --line: #dce2de;
+            --max: 1320px;
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--ink);
+            background: var(--paper);
+            width: 100vw;
+            max-width: 100vw;
+            margin-left: calc(50% - 50vw);
+            overflow: hidden;
+            line-height: 1.65;
+        }
+
+        #ya-nepal-page * {
+            box-sizing: border-box
+        }
+
+        #ya-nepal-page a {
+            text-decoration: none;
+            color: inherit
+        }
+
+        #ya-nepal-page button,
+        #ya-nepal-page input,
+        #ya-nepal-page select,
+        #ya-nepal-page textarea {
+            font: inherit
+        }
+
+        #ya-nepal-page .ya-container {
+            width: min(var(--max), calc(100% - 64px));
+            margin: auto
+        }
+
+        #ya-nepal-page .ya-serif {
+            font-family: "Newsreader", Times, Georgia, serif;
+        }
+
+        #ya-nepal-page .ya-script {
+            font-family: "Water Brush", cursive;
+            font-weight: 500;
+        }
+
+        /* ========================================================
+           HEADING COLOR ARCHITECTURE (h1 - h6)
+           Enforces strict section-based colors & prevents WordPress 
+           theme overrides with !important.
+           ======================================================== */
+        /* 1. Base / Light Sections: Default Forest Green (#3a4f2e) */
+        #ya-nepal-page h1,
+        #ya-nepal-page h2,
+        #ya-nepal-page h3,
+        #ya-nepal-page h4,
+        #ya-nepal-page h5,
+        #ya-nepal-page h6 {
+            font-family: "Newsreader", Times, Georgia, serif !important;
+            color: var(--forest, #3a4f2e) !important;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-top: 0;
+            letter-spacing: -0.01em;
+        }
+
+        #ya-nepal-page h1 em,
+        #ya-nepal-page h2 em,
+        #ya-nepal-page h3 em,
+        #ya-nepal-page h4 em,
+        #ya-nepal-page h5 em,
+        #ya-nepal-page h6 em {
+            color: var(--gold, #d1ad54) !important;
+            font-style: italic;
+        }
+
+        /* 2. OVERLAY & DARK SECTIONS / CARDS: Pure Crisp White (#ffffff) */
+        #ya-nepal-page .ya-hero h1,
+        #ya-nepal-page .ya-hero h2,
+        #ya-nepal-page .ya-hero h3,
+        #ya-nepal-page .ya-hero h4,
+        #ya-nepal-page .ya-hero h5,
+        #ya-nepal-page .ya-hero h6,
+        #ya-nepal-page .ya-enquiry h1,
+        #ya-nepal-page .ya-enquiry h2,
+        #ya-nepal-page .ya-enquiry h3,
+        #ya-nepal-page .ya-enquiry-copy h1,
+        #ya-nepal-page .ya-enquiry-copy h2,
+        #ya-nepal-page .ya-enquiry-copy h3,
+        #ya-nepal-page .ya-experience-card h1,
+        #ya-nepal-page .ya-experience-card h2,
+        #ya-nepal-page .ya-experience-card h3,
+        #ya-nepal-page .ya-experience-card h4,
+        #ya-nepal-page [class*="overlay"] h1,
+        #ya-nepal-page [class*="overlay"] h2,
+        #ya-nepal-page [class*="overlay"] h3,
+        #ya-nepal-page .ya-dark h1,
+        #ya-nepal-page .ya-dark h2,
+        #ya-nepal-page .ya-dark h3,
+        #ya-nepal-page .te-dest-card h1,
+        #ya-nepal-page .te-dest-card h2,
+        #ya-nepal-page .te-dest-card h3,
+        #ya-nepal-page .te-dest-card h4,
+        #ya-nepal-page .te-dest-card__title,
+        #ya-nepal-page .ya-journeys-shortcode-wrap h3,
+        #ya-nepal-page .ya-journeys-shortcode-wrap .te-dest-card__title {
+            color: #ffffff !important;
+            text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+        }
+
+        /* 3. OVERLAY & HOVER STATES: Must remain crisp white and never fade */
+        #ya-nepal-page .ya-experience-card:hover h1,
+        #ya-nepal-page .ya-experience-card:hover h2,
+        #ya-nepal-page .ya-experience-card:hover h3,
+        #ya-nepal-page .ya-experience-card:hover h4,
+        #ya-nepal-page a.ya-experience-card:hover h3,
+        #ya-nepal-page .te-dest-card:hover h3,
+        #ya-nepal-page .te-dest-card:hover .te-dest-card__title,
+        #ya-nepal-page a.te-dest-card__link:hover h3,
+        #ya-nepal-page a.te-dest-card__link:hover .te-dest-card__title,
+        #ya-nepal-page .ya-journeys-shortcode-wrap a:hover h3,
+        #ya-nepal-page .ya-journeys-shortcode-wrap a:hover .te-dest-card__title {
+            color: #ffffff !important;
+            text-shadow: 0 4px 25px rgba(0, 0, 0, 0.75);
+        }
+
+        /* 4. LIGHT SECTIONS & CARDS: Explicit Base Brand Forest Colors */
+        #ya-nepal-page .ya-intro h2,
+        #ya-nepal-page .ya-map-section h2,
+        #ya-nepal-page .ya-journeys-title,
+        #ya-nepal-page .ya-experiences .ya-section-head h2,
+        #ya-nepal-page .ya-section-head h2,
+        #ya-nepal-page .ya-form-wrap h1,
+        #ya-nepal-page .ya-form-wrap h2,
+        #ya-nepal-page .ya-form-wrap h3,
+        #ya-nepal-page .ya-form-wrap h4,
+        #ya-nepal-page .ya-form-head h3,
+        #ya-nepal-page .ya-planner-form-container h3,
+        #ya-nepal-page .ya-planner-form-container h4 {
+            color: var(--forest, #3a4f2e) !important;
+            text-shadow: none;
+        }
+
+        /* 5. Interactive / Linked Headings in Light Sections */
+        #ya-nepal-page a:not(.te-dest-card__link):hover h1,
+        #ya-nepal-page a:not(.te-dest-card__link):hover h2,
+        #ya-nepal-page a:not(.te-dest-card__link):hover h3,
+        #ya-nepal-page a:not(.te-dest-card__link):hover h4 {
+            color: var(--forest-2, #5f7554) !important;
+        }
+        #ya-nepal-page .ya-experience-card a:hover h3,
+        #ya-nepal-page a.ya-experience-card:hover h3,
+        #ya-nepal-page a.te-dest-card__link:hover .te-dest-card__title {
+            color: #ffffff !important;
+        }
+
+        #ya-nepal-page .ya-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--gold);
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 2.6px;
+            text-transform: uppercase
+        }
+
+        #ya-nepal-page .ya-label:before {
+            content: "";
+            width: 36px;
+            height: 1px;
+            background: currentColor
+        }
+
+        #ya-nepal-page .ya-reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1)
+        }
+
+        #ya-nepal-page .ya-reveal.is-visible {
+            opacity: 1;
+            transform: none
+        }
+
+        #ya-nepal-page .ya-btn {
+            min-height: 54px;
+            padding: 0 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: 0;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: capitalize;
+            transition: .3s
+        }
+
+        #ya-nepal-page .ya-btn svg {
+            width: 17px;
+            height: 17px;
+            transition: .3s
+        }
+
+        #ya-nepal-page .ya-btn:hover {
+            transform: translateY(-3px)
+        }
+
+        #ya-nepal-page .ya-btn:hover svg {
+            transform: translateX(4px)
+        }
+
+        #ya-nepal-page .ya-btn-gold {
+            background: var(--gold);
+            color: #ffffff
+        }
+
+        #ya-nepal-page .ya-btn-gold:hover {
+            background: #5f7554;
+            border-color: #5f7554;
+        }
+
+        #ya-nepal-page .ya-btn-light {
+            background: #fff;
+            color: var(--forest)
+        }
+
+        /* 1. HERO & MULTI-IMAGE CAROUSEL */
+        #ya-nepal-page .ya-hero {
+            --hero-min-height: calc(100svh - 80px);
+            position: relative;
+            min-height: var(--hero-min-height);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 130px 0 70px;
+            color: #fff;
+            overflow: hidden;
+            background: #06201e;
+            isolation: isolate;
+        }
+
+        /* Hero Background Carousel Stage */
+        #ya-nepal-page .ya-hero-stage {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        #ya-nepal-page .ya-hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(1.08);
+            transition: opacity 1.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 7s cubic-bezier(0.22, 0.61, 0.36, 1),
+                visibility 0s linear 1.4s;
+        }
+
+        #ya-nepal-page .ya-hero-slide.is-active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            transition: opacity 1.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 7s cubic-bezier(0.22, 0.61, 0.36, 1),
+                visibility 0s linear 0s;
+        }
+
+        #ya-nepal-page .ya-hero-media {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ya-nepal-page .ya-hero-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 38%;
+            display: block;
+        }
+
+        /* Cinematic Overlays */
+        #ya-nepal-page .ya-hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background:
+                linear-gradient(180deg,
+                    rgba(3, 24, 22, 0.78) 0%,
+                    rgba(4, 30, 28, 0.35) 35%,
+                    rgba(4, 30, 28, 0.70) 70%,
+                    rgba(3, 24, 22, 0.95) 100%),
+                radial-gradient(ellipse at center,
+                    rgba(0, 0, 0, 0.1) 0%,
+                    rgba(2, 20, 19, 0.75) 100%);
+            pointer-events: none;
+        }
+
+        #ya-nepal-page .ya-hero-noise {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
+            mix-blend-mode: soft-light;
+            pointer-events: none;
+        }
+
+        #ya-nepal-page .ya-hero:after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 90px;
+            background: linear-gradient(transparent, rgba(3, 24, 22, 0.4));
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Hero Content & Center Alignment */
+        #ya-nepal-page .ya-hero-main {
+            position: relative;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 0 25px;
+            flex: 1;
+        }
+
+        #ya-nepal-page .ya-hero-copy {
+            max-width: 1350px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        #ya-nepal-page .ya-hero-script {
+            font-size: clamp(62px, 7.2vw, 108px);
+            line-height: 0.85;
+            color: var(--gold);
+            margin: 0 0 16px;
+            text-shadow: 0 4px 25px rgba(199, 164, 93, 0.4);
+            filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.7));
+        }
+
+        /* Capital Letters Headline - Newsreader font with heavy bold weight */
+        #ya-nepal-page .ya-hero h1 {
+            margin: 0 auto 24px;
+            font-family: "Newsreader", Times, Georgia, serif !important;
+            font-size: clamp(52px, 5.8vw, 94px);
+            font-weight: 500 !important;
+            line-height: 1.05;
+            letter-spacing: -0.015em;
+            text-transform: uppercase;
+            color: #ffffff !important;
+            text-shadow: 0 4px 35px rgba(0, 0, 0, 0.75);
+            max-width: 100%;
+        }
+
+
+
+        /* Subtext */
+        #ya-nepal-page .ya-hero-description {
+            max-width: 740px;
+            margin: 0 auto 34px;
+            color: rgba(255, 255, 255, 0.92);
+            font-size: clamp(15px, 1.25vw, 19px);
+            line-height: 1.8;
+            letter-spacing: 0.01em;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.65);
+        }
+
+        /* Hero Actions & Front-page Button Style */
+        #ya-nepal-page .ya-hero-actions {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        /* Luxury Hero Pill CTA - Exact Match to front-page.php */
+        #ya-nepal-page .ya-hero-cta {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            min-height: 58px;
+            padding: 6px 8px 6px 32px;
+            border-radius: 999px;
+            background: #d1ad54;
+            color: #ffffff !important;
+            border: 1px solid #d1ad54;
+            box-shadow: 0 8px 24px rgba(209, 173, 84, 0.35);
+            padding: 6px 20px 6px 32px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 11.5px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: 2.2px;
+            text-decoration: none !important;
+            text-transform: uppercase;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.35s ease, background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        #ya-nepal-page .ya-hero-cta__text {
+            position: relative;
+            z-index: 1;
+            color: #ffffff;
+        }
+
+        #ya-nepal-page .ya-hero-cta__icon {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent;
+            color: #ffffff;
+            transition: transform 0.35s ease;
+        }
+
+        #ya-nepal-page .ya-hero-cta__icon svg {
+            width: 17px;
+            height: 17px;
+            stroke: currentColor;
+            transition: transform 0.3s ease;
+        }
+
+        #ya-nepal-page .ya-hero-cta:hover {
+            background: #5f7554;
+            border-color: #5f7554;
+            box-shadow: 0 12px 30px rgba(95, 117, 84, 0.55);
+            transform: translateY(-2px);
+        }
+
+        #ya-nepal-page .ya-hero-cta:hover .ya-hero-cta__icon {
+            transform: translateX(3px);
+        }
+
+        #ya-nepal-page .ya-hero-cta:hover .ya-hero-cta__icon svg {
+            transform: translateX(2px);
+        }
+
+        /* Secondary Frosted Pill CTA */
+        #ya-nepal-page .ya-hero-cta--outline {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.38);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        #ya-nepal-page .ya-hero-cta--outline .ya-hero-cta__icon {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        #ya-nepal-page .ya-hero-cta--outline:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #ffffff;
+            box-shadow: 0 12px 32px rgba(255, 255, 255, 0.28);
+            transform: translateY(-2px);
+        }
+
+        #ya-nepal-page .ya-hero-cta--outline:hover .ya-hero-cta__text {
+            color: #3a4f2e !important;
+        }
+
+        #ya-nepal-page .ya-hero-cta--outline:hover .ya-hero-cta__icon {
+            background: transparent;
+            color: #3a4f2e;
+        }
+
+        /* Hero Nav Arrow Buttons — hidden by default, visible on hero hover */
+        #ya-nepal-page .ya-hero-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 54px;
+            height: 54px;
+            border: 2px solid rgba(255, 255, 255, 0.55);
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #ffffff;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #ya-nepal-page .ya-hero-nav svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2;
+            flex-shrink: 0;
+        }
+
+        #ya-nepal-page .ya-hero-nav--prev {
+            left: clamp(16px, 3vw, 42px);
+        }
+
+        #ya-nepal-page .ya-hero-nav--next {
+            right: clamp(16px, 3vw, 42px);
+        }
+
+        /* Show arrows when hero is hovered */
+        #ya-nepal-page .ya-hero:hover .ya-hero-nav {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #ya-nepal-page .ya-hero-nav:hover {
+            background: #d1ad54;
+            border-color: #d1ad54;
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        /* Hero Stats Section — full white bar, divider lines */
+        #ya-nepal-page .ya-hero-stats-section {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            background: #ffffff;
+            border-top: 1px solid rgba(58, 79, 46, 0.12);
+            border-bottom: 1px solid rgba(58, 79, 46, 0.12);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        #ya-nepal-page .ya-hero-stats-wrap {
+            width: min(var(--max), calc(100% - 48px));
+            margin: 0 auto;
+        }
+
+        #ya-nepal-page .ya-hero-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            background: #ffffff;
+        }
+
+        #ya-nepal-page .ya-hero-stat {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 24px 28px;
+            border-right: 1px solid rgba(58, 79, 46, 0.12);
+            transition: background 0.3s ease;
+        }
+
+        #ya-nepal-page .ya-hero-stat:last-child {
+            border-right: none;
+        }
+
+        #ya-nepal-page .ya-hero-stat:hover {
+            background: #f9f9f6;
+        }
+
+        #ya-nepal-page .ya-hero-stat-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #d1ad54;
+        }
+
+        #ya-nepal-page .ya-hero-stat-icon svg {
+            width: 36px;
+            height: 36px;
+            stroke-width: 1.4;
+        }
+
+        #ya-nepal-page .ya-hero-stat-body {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        #ya-nepal-page .ya-hero-stat strong {
+            display: block;
+            color: var(--forest);
+            font-family: "Newsreader", Times, Georgia, serif;
+            font-size: clamp(24px, 2.2vw, 32px);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.01em;
+        }
+
+        #ya-nepal-page .ya-hero-stat-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: #5f7554;
+            margin-top: 3px;
+        }
+
+        #ya-nepal-page .ya-hero-stat span.ya-hero-stat-desc {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+            margin-top: 3px;
+        }
+
+        #ya-nepal-page .ya-intro {
+            padding: 120px 0;
+            background: var(--paper)
+        }
+
+        #ya-nepal-page .ya-intro-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.08fr;
+            gap: clamp(48px, 7vw, 110px);
+            align-items: center
+        }
+
+        #ya-nepal-page .ya-intro-visual {
+            position: relative;
+            height: 680px
+        }
+
+        #ya-nepal-page .ya-intro-image-main {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 80%;
+            height: 580px;
+            background: url("https://images.unsplash.com/photo-1748760036656-964ac32eefb4?auto=format&fit=crop&w=1500&q=88") center/cover;
+            border-radius: 4px;
+        }
+
+        #ya-nepal-page .ya-intro-image-small {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 50%;
+            height: 290px;
+            border: 8px solid var(--paper);
+            background: url("https://images.unsplash.com/photo-1534215782964-d58601aa091c?auto=format&fit=crop&w=1100&q=88") center/cover;
+            border-radius: 4px;
+        }
+
+        #ya-nepal-page .ya-intro-number {
+            position: absolute;
+            left: 55%;
+            bottom: 95px;
+            padding: 20px 22px;
+            background: var(--forest);
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        #ya-nepal-page .ya-intro-number strong {
+            display: block;
+            color: var(--gold);
+            font: 600 52px/.85 "Newsreader", Times, Georgia, serif;
+        }
+
+        #ya-nepal-page .ya-intro-number span {
+            font-size: 10px;
+            line-height: 1.5;
+            letter-spacing: 1px;
+            text-transform: uppercase
+        }
+
+        #ya-nepal-page .ya-intro-copy {
+            max-width: 620px
+        }
+
+        #ya-nepal-page .ya-intro-copy h2 {
+            margin: 0 0 22px;
+            color: var(--forest) !important;
+            font: 600 clamp(42px, 4.8vw, 70px)/.92 "Newsreader", Times, Georgia, serif;
+        }
+
+        #ya-nepal-page .ya-intro-copy h2 em {
+            font-style: normal;
+            color: var(--gold) !important;
+            font-weight: 400;
+        }
+
+        #ya-nepal-page .ya-intro-copy p {
+            margin: 0 0 15px;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.9
+        }
+
+        #ya-nepal-page .ya-intro-points {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            margin-top: 32px;
+            border-top: 1px solid var(--line);
+        }
+
+        #ya-nepal-page .ya-intro-point {
+            padding: 18px 12px 14px 0;
+            border-right: 1px solid var(--line);
+        }
+
+        #ya-nepal-page .ya-intro-point:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        #ya-nepal-page .ya-intro-point:not(:first-child) {
+            padding-left: 16px;
+        }
+
+        #ya-nepal-page .ya-intro-point strong {
+            display: block;
+            color: var(--forest) !important;
+            font: 600 22px/1.1 "Newsreader", Times, Georgia, serif;
+            margin-bottom: 4px;
+        }
+
+        #ya-nepal-page .ya-intro-point span {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.6;
+        }
+
+        #ya-nepal-page .ya-map-section {
+            padding: 110px 0;
+            background: var(--cream);
+        }
+
+        #ya-nepal-page .ya-section-head {
+            margin-bottom: 52px;
+            max-width: 760px;
+        }
+
+        #ya-nepal-page .ya-map-section .ya-section-head {
+            text-align: center;
+            margin: 0 auto 52px;
+            max-width: 760px;
+        }
+
+        #ya-nepal-page .ya-section-head h2 {
+            margin: 0 0 14px;
+            color: var(--forest) !important;
+            font: 600 clamp(40px, 4.8vw, 68px)/.92 "Newsreader", Times, Georgia, serif;
+        }
+
+        #ya-nepal-page .ya-map-section .ya-section-head h2 {
+            text-align: center;
+            margin: 0 0 14px;
+            color: var(--forest) !important;
+            font: 600 clamp(36px, 4vw, 58px)/1 "Newsreader", Times, Georgia, serif;
+        }
+
+        #ya-nepal-page .ya-section-head p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.85;
+        }
+
+        #ya-nepal-page .ya-map-section .ya-section-head p {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        #ya-nepal-page .ya-map-frame {
+            background: #fff;
+            box-shadow: 0 25px 70px rgba(10, 45, 42, .1);
+            overflow: hidden
+        }
+
+        #ya-nepal-page .ya-map-scroll {
+            width: 100%;
+            overflow-x: auto
+        }
+
+        #ya-nepal-page .ya-map-object {
+            display: block;
+            width: 100%;
+            min-height: 700px;
+            border: 0
+        }
+
+        #ya-nepal-page .ya-map-note {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 17px 0 0;
+            color: var(--muted);
+            font-size: 11px
+        }
+
+        #ya-nepal-page .ya-map-note strong {
+            color: var(--forest)
+        }
+
+        #ya-nepal-page .ya-journeys {
+            padding: 100px 0 110px;
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        #ya-nepal-page .ya-journeys-container {
+            width: min(1400px, calc(100% - 48px));
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        #ya-nepal-page .ya-journeys-head,
+        #ya-nepal-page .ya-journeys .ya-section-head {
+            text-align: center;
+            margin: 0 auto 52px;
+            max-width: 760px;
+        }
+
+        #ya-nepal-page .ya-journeys-title,
+        #ya-nepal-page .ya-journeys .ya-journeys-head h2,
+        #ya-nepal-page .ya-journeys .ya-section-head h2 {
+            text-align: center;
+            margin: 0 0 14px;
+            color: var(--forest) !important;
+            font: 600 clamp(36px, 4vw, 58px)/1 "Newsreader", Times, Georgia, serif !important;
+        }
+
+        #ya-nepal-page .ya-journeys-desc,
+        #ya-nepal-page .ya-journeys .ya-journeys-head p,
+        #ya-nepal-page .ya-journeys .ya-section-head p {
+            text-align: center;
+            max-width: 620px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        #ya-nepal-page .ya-journeys-shortcode-wrap {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Shortcode card style protection & isolation */
+        #ya-nepal-page .ya-journeys-shortcode-wrap .te-dest-card__title,
+        #ya-nepal-page .ya-journeys-shortcode-wrap .te-dest-card h3,
+        #ya-nepal-page .ya-journeys-shortcode-wrap .te-dest-card h3.te-dest-card__title {
+            color: #ffffff !important;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85) !important;
+        }
+
+        #ya-nepal-page .ya-journeys-shortcode-wrap .te-dest-card:hover .te-dest-card__title,
+        #ya-nepal-page .ya-journeys-shortcode-wrap a:hover .te-dest-card__title,
+        #ya-nepal-page .ya-journeys-shortcode-wrap a:hover h3 {
+            color: #ffffff !important;
+            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.95) !important;
+        }
+
+        #ya-nepal-page .ya-journeys-shortcode-wrap .te-dest-card__duration {
+            color: var(--te-gold, #cfab55) !important;
+        }
+
+        #ya-nepal-page .ya-journeys-shortcode-wrap .te-dest-card__excerpt {
+            color: rgba(247, 245, 240, 0.88) !important;
+        }
+
+        #ya-nepal-page .ya-slider {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(360px, 39%);
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 16px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none
+        }
+
+        #ya-nepal-page .ya-slider::-webkit-scrollbar {
+            display: none
+        }
+
+        #ya-nepal-page .ya-slider>* {
+            scroll-snap-align: start
+        }
+
+        #ya-nepal-page .ya-slider-shell {
+            position: relative
+        }
+
+        #ya-nepal-page .ya-slider-controls {
+            display: flex;
+            gap: 9px;
+            margin-top: 22px
+        }
+
+        #ya-nepal-page .ya-slider-btn {
+            width: 52px;
+            height: 52px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, .25);
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: .3s
+        }
+
+        #ya-nepal-page .ya-slider-btn:hover {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: var(--forest)
+        }
+
+        #ya-nepal-page .ya-experiences {
+            padding: 140px 0;
+            background: var(--paper)
+        }
+
+        #ya-nepal-page .ya-experience-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr 1fr;
+            grid-template-rows: 320px 320px;
+            gap: 16px
+        }
+
+        #ya-nepal-page .ya-experience-card {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            min-height: 320px;
+            padding: 29px;
+            overflow: hidden;
+            isolation: isolate;
+            color: #fff;
+            transition: transform .35s
+        }
+
+        #ya-nepal-page .ya-experience-card:hover {
+            transform: translateY(-6px)
+        }
+
+        #ya-nepal-page .ya-experience-card:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(to top, rgba(1, 30, 28, .95), rgba(1, 30, 28, .05) 72%)
+        }
+
+        #ya-nepal-page .ya-experience-card:after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            background: var(--experience-image) center/cover;
+            transition: transform .7s
+        }
+
+        #ya-nepal-page .ya-experience-card:hover:after {
+            transform: scale(1.06)
+        }
+
+        #ya-nepal-page .ya-experience-card:nth-child(1) {
+            grid-row: 1/span 2;
+            --experience-image: url("https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=86")
+        }
+
+        #ya-nepal-page .ya-experience-card:nth-child(2) {
+            grid-column: 2/span 2;
+            --experience-image: url("https://images.unsplash.com/photo-1748760036656-964ac32eefb4?auto=format&fit=crop&w=1600&q=86")
+        }
+
+        #ya-nepal-page .ya-experience-card:nth-child(3) {
+            --experience-image: url("https://images.unsplash.com/photo-1751931817996-368c9ee352ee?auto=format&fit=crop&w=1200&q=86")
+        }
+
+        #ya-nepal-page .ya-experience-card:nth-child(4) {
+            --experience-image: url("https://images.unsplash.com/photo-1540876391606-b23004064563?auto=format&fit=crop&w=1200&q=86")
+        }
+
+        #ya-nepal-page .ya-experience-card h3 {
+            margin: 0 0 7px;
+            font: 600 36px/.95 "Newsreader", Times, Georgia, serif;
+            color: #ffffff !important;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+        }
+
+        #ya-nepal-page .ya-experience-card p {
+            margin: 0;
+            color: rgba(255, 255, 255, .72);
+            font-size: 12px;
+            line-height: 1.7
+        }
+
+        #ya-nepal-page .ya-enquiry {
+            padding: 140px 0;
+            color: #fff;
+            background:
+                linear-gradient(90deg, rgba(1, 36, 34, .98), rgba(1, 36, 34, .9)),
+                url("https://images.unsplash.com/photo-1540876508220-988a11575ed6?auto=format&fit=crop&w=2400&q=88") center/cover
+        }
+
+        #ya-nepal-page .ya-enquiry-grid {
+            display: grid;
+            grid-template-columns: .78fr 1.22fr;
+            gap: clamp(55px, 8vw, 120px);
+            align-items: start
+        }
+
+        #ya-nepal-page .ya-enquiry-copy {
+            padding-top: 15px;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        #ya-nepal-page .ya-enquiry-copy .ya-label {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        #ya-nepal-page .ya-enquiry-copy .ya-script {
+            font: italic 400 clamp(34px, 4vw, 54px)/1.15 "Newsreader", Times, Georgia, serif;
+            letter-spacing: normal;
+            color: var(--gold);
+            margin: 14px 0 20px;
+        }
+
+        #ya-nepal-page .ya-enquiry-copy h2 {
+            margin: 0 0 23px;
+            font: 600 clamp(46px, 5vw, 76px)/.9 "Newsreader", Times, Georgia, serif;
+            color: #ffffff !important;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #ya-nepal-page .ya-enquiry-copy>p {
+            margin: 0 0 16px;
+            color: rgba(255, 255, 255, .7);
+            font: 400 15px/1.9 'Open Sans', sans-serif;
+        }
+
+        #ya-nepal-page .ya-contact-list {
+            margin-top: 32px
+        }
+
+        #ya-nepal-page .ya-contact-card {
+            display: grid;
+            grid-template-columns: 48px 1fr;
+            gap: 15px;
+            align-items: center;
+            padding: 15px 0;
+            color: #fff
+        }
+
+        #ya-nepal-page .ya-contact-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            background: var(--gold);
+            color: var(--forest);
+            font-size: 17px
+        }
+
+        #ya-nepal-page .ya-contact-card small {
+            display: block;
+            color: var(--gold);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase
+        }
+
+        #ya-nepal-page .ya-contact-card strong {
+            font-size: 14px;
+            font-weight: 500
+        }
+
+        #ya-nepal-page .ya-form-wrap {
+            padding: clamp(27px, 4vw, 52px);
+            background: #fff;
+            color: var(--ink);
+            box-shadow: 0 35px 90px rgba(0, 0, 0, .22)
+        }
+
+        #ya-nepal-page .ya-form-head {
+            margin-bottom: 30px
+        }
+
+        #ya-nepal-page .ya-form-head h3 {
+            margin: 0 0 9px;
+            color: var(--forest) !important;
+            font: 600 44px/.95 "Newsreader", Times, Georgia, serif;
+        }
+
+        #ya-nepal-page .ya-form-head p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7
+        }
+
+        #ya-nepal-page .ya-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px
+        }
+
+        #ya-nepal-page .ya-field {
+            display: grid;
+            gap: 7px
+        }
+
+        #ya-nepal-page .ya-field-full {
+            grid-column: 1/-1
+        }
+
+        #ya-nepal-page .ya-field label {
+            color: #526563;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase
+        }
+
+        #ya-nepal-page .ya-field input,
+        #ya-nepal-page .ya-field select,
+        #ya-nepal-page .ya-field textarea {
+            width: 100%;
+            border: 0;
+            border-bottom: 1px solid #d7dedc;
+            border-radius: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--forest);
+            transition: .25s;
+            padding: 0 2px
+        }
+
+        #ya-nepal-page .ya-field input,
+        #ya-nepal-page .ya-field select {
+            height: 48px
+        }
+
+        #ya-nepal-page .ya-field textarea {
+            min-height: 105px;
+            padding: 10px 2px;
+            resize: vertical
+        }
+
+        #ya-nepal-page .ya-field input:focus,
+        #ya-nepal-page .ya-field select:focus,
+        #ya-nepal-page .ya-field textarea:focus {
+            border-bottom-color: var(--gold)
+        }
+
+        #ya-nepal-page .ya-phone-row {
+            display: grid;
+            grid-template-columns: 125px 1fr;
+            gap: 12px
+        }
+
+        #ya-nepal-page .ya-counter {
+            text-align: right;
+            color: #8a9694;
+            font-size: 10px
+        }
+
+        #ya-nepal-page .ya-form-submit {
+            width: 100%;
+            margin-top: 4px
+        }
+
+        #ya-nepal-page .ya-form-note {
+            margin: 12px 0 0;
+            text-align: center;
+            color: #8a9694;
+            font-size: 10px;
+            line-height: 1.6
+        }
+
+        @media(max-width:1300px) {
+            #ya-nepal-page .ya-hero h1 {
+                font-size: clamp(44px, 4.8vw, 64px) !important;
+                max-width: 860px;
+            }
+
+            #ya-nepal-page .ya-hero-description {
+                max-width: 680px;
+                font-size: 16px;
+            }
+
+            #ya-nepal-page .ya-hero-stats {
+                gap: 0;
+            }
+
+            #ya-nepal-page .ya-hero-stat strong {
+                font-size: 24px;
+            }
+        }
+
+        @media(max-width:1100px) {
+
+            #ya-nepal-page .ya-hero h1 {
+                font-size: clamp(38px, 4.6vw, 52px) !important;
+                max-width: 760px;
+            }
+
+            #ya-nepal-page .ya-hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0;
+            }
+
+            #ya-nepal-page .ya-hero-stat {
+                padding: 20px 22px;
+                border-right: 1px solid rgba(58, 79, 46, 0.12);
+                border-bottom: 1px solid rgba(58, 79, 46, 0.12);
+            }
+
+            #ya-nepal-page .ya-hero-stat:nth-child(2n) {
+                border-right: none;
+            }
+
+            #ya-nepal-page .ya-hero-stat:nth-last-child(-n+2) {
+                border-bottom: none;
+            }
+
+            #ya-nepal-page .ya-intro-grid,
+            #ya-nepal-page .ya-enquiry-grid {
+                grid-template-columns: 1fr
+            }
+
+            #ya-nepal-page .ya-intro-visual {
+                order: 2;
+                max-width: 760px
+            }
+
+            #ya-nepal-page .ya-slider {
+                grid-auto-columns: 58%
+            }
+
+            #ya-nepal-page .ya-experience-grid {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 420px 320px 320px
+            }
+
+            #ya-nepal-page .ya-experience-card:nth-child(1) {
+                grid-column: 1/span 2;
+                grid-row: auto
+            }
+
+            #ya-nepal-page .ya-experience-card:nth-child(2) {
+                grid-column: auto
+            }
+        }
+
+        @media(max-width:760px) {
+            #ya-nepal-page .ya-container {
+                width: calc(100% - 30px)
+            }
+
+            #ya-nepal-page .ya-hero {
+                min-height: 100svh;
+                padding: 95px 0 25px;
+            }
+
+            #ya-nepal-page .ya-hero-main {
+                padding: 20px 0 15px;
+            }
+
+            #ya-nepal-page .ya-hero-copy {
+                text-align: center;
+                margin: auto;
+            }
+
+            #ya-nepal-page .ya-hero-script {
+                font-size: clamp(48px, 12vw, 68px);
+                margin: 0 0 10px;
+            }
+
+            #ya-nepal-page .ya-hero h1 {
+                font-size: clamp(28px, 7.5vw, 42px) !important;
+                line-height: 1.08;
+                margin-bottom: 16px;
+            }
+
+            #ya-nepal-page .ya-hero-description {
+                font-size: 14px;
+                line-height: 1.6;
+                margin-bottom: 22px;
+                padding: 0 4px;
+            }
+
+            #ya-nepal-page .ya-hero-actions {
+                flex-direction: column;
+                width: 100%;
+                max-width: 360px;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            #ya-nepal-page .ya-hero-cta {
+                width: 100%;
+                min-height: 52px;
+                font-size: 11px;
+                padding: 4px 6px 4px 22px;
+            }
+
+            #ya-nepal-page .ya-hero-cta__icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            #ya-nepal-page .ya-hero-stats-wrap {
+                width: 100%;
+            }
+
+            #ya-nepal-page .ya-hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0;
+            }
+
+            #ya-nepal-page .ya-hero-stat {
+                padding: 20px 18px;
+                border-right: 1px solid rgba(58, 79, 46, 0.12);
+                border-bottom: 1px solid rgba(58, 79, 46, 0.12);
+            }
+
+            #ya-nepal-page .ya-hero-stat:nth-child(2n) {
+                border-right: none;
+            }
+
+            #ya-nepal-page .ya-hero-stat:nth-last-child(-n+2) {
+                border-bottom: none;
+            }
+
+            #ya-nepal-page .ya-hero-stat-icon svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            #ya-nepal-page .ya-hero-stat strong {
+                font-size: 22px;
+            }
+
+            #ya-nepal-page .ya-intro,
+            #ya-nepal-page .ya-map-section,
+            #ya-nepal-page .ya-journeys,
+            #ya-nepal-page .ya-experiences,
+            #ya-nepal-page .ya-enquiry {
+                padding: 90px 0
+            }
+
+            #ya-nepal-page .ya-intro-visual {
+                height: 550px
+            }
+
+            #ya-nepal-page .ya-intro-image-main {
+                width: 84%;
+                height: 480px
+            }
+
+            #ya-nepal-page .ya-intro-image-small {
+                width: 48%;
+                height: 220px;
+                border-width: 7px
+            }
+
+            #ya-nepal-page .ya-intro-number {
+                left: 45%;
+                bottom: 95px;
+                padding: 17px
+            }
+
+            #ya-nepal-page .ya-intro-points {
+                grid-template-columns: 1fr
+            }
+
+            #ya-nepal-page .ya-map-object {
+                width: 1000px;
+                min-width: 1000px;
+                min-height: 580px
+            }
+
+            #ya-nepal-page .ya-map-note {
+                display: block
+            }
+
+            #ya-nepal-page .ya-map-note span+span {
+                display: block;
+                margin-top: 5px
+            }
+
+            #ya-nepal-page .ya-slider {
+                grid-auto-columns: 86%
+            }
+
+            #ya-nepal-page .ya-experience-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: none
+            }
+
+            #ya-nepal-page .ya-experience-card,
+            #ya-nepal-page .ya-experience-card:nth-child(1),
+            #ya-nepal-page .ya-experience-card:nth-child(2) {
+                grid-column: auto;
+                min-height: 350px
+            }
+
+
+            #ya-nepal-page .ya-form-grid {
+                grid-template-columns: 1fr
+            }
+
+            #ya-nepal-page .ya-field-full {
+                grid-column: auto
+            }
+        }
+
+        @media(max-width:480px) {
+            #ya-nepal-page .ya-hero-script {
+                font-size: 46px;
+                margin-bottom: 6px;
+            }
+
+            #ya-nepal-page .ya-hero h1 {
+                font-size: clamp(24px, 7vw, 32px) !important;
+                letter-spacing: -0.01em;
+            }
+
+            #ya-nepal-page .ya-section-head h2,
+            #ya-nepal-page .ya-intro-copy h2,
+            #ya-nepal-page .ya-enquiry-copy h2 {
+                font-size: 48px
+            }
+
+            #ya-nepal-page .ya-form-head h3 {
+                font-size: 37px
+            }
+
+            #ya-nepal-page .ya-phone-row {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+
+            #ya-nepal-page *,
+            #ya-nepal-page *:before,
+            #ya-nepal-page *:after {
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important
+            }
+
+            #ya-nepal-page .ya-reveal {
+                opacity: 1;
+                transform: none
+            }
+        }
+    </style>
+
+    <section class="ya-hero" id="ya-hero">
+
+        <!-- Background Slideshow Carousel -->
+        <div class="ya-hero-stage" aria-hidden="true">
+            <!-- Slide 1: Everest & Himalayan summits -->
+            <div class="ya-hero-slide is-active" data-index="0">
+                <div class="ya-hero-media">
+                    <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=2600&q=90"
+                        alt="Mount Everest and Himalayan summits in Nepal" fetchpriority="high">
+                </div>
+            </div>
+
+            <!-- Slide 2: High Himalayan trekking trail -->
+            <div class="ya-hero-slide" data-index="1">
+                <div class="ya-hero-media">
+                    <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2600&q=90"
+                        alt="Majestic Himalayan trekking trail in Nepal" loading="lazy">
+                </div>
+            </div>
+
+            <!-- Slide 3: Alpine ridge with prayer flags -->
+            <div class="ya-hero-slide" data-index="2">
+                <div class="ya-hero-media">
+                    <img src="https://images.unsplash.com/photo-1518098268026-4e89f1a2fb8a?auto=format&fit=crop&w=2600&q=90"
+                        alt="High altitude mountain ridge and prayer flags in Nepal" loading="lazy">
+                </div>
+            </div>
+
+            <!-- Slide 4: Glowing sunset over Annapurna & Himalayan valley -->
+            <div class="ya-hero-slide" data-index="3">
+                <div class="ya-hero-media">
+                    <img src="https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?auto=format&fit=crop&w=2600&q=90"
+                        alt="Vibrant mountain valley and glowing summits in Nepal" loading="lazy">
+                </div>
+            </div>
+
+            <!-- Cinematic overlays -->
+            <div class="ya-hero-overlay"></div>
+            <div class="ya-hero-noise"></div>
+        </div>
+
+        <!-- Hero Slide Nav Arrows (visible on hover) -->
+        <button class="ya-hero-nav ya-hero-nav--prev" type="button" id="ya-hero-prev" aria-label="Previous slide">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+            </svg>
+        </button>
+        <button class="ya-hero-nav ya-hero-nav--next" type="button" id="ya-hero-next" aria-label="Next slide">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6" />
+            </svg>
+        </button>
+
+        <!-- Center Hero Main Copy -->
+        <div class="ya-container ya-hero-main">
+            <div class="ya-hero-copy ya-reveal">
+                <!-- Nepal Top (Only Nepal) -->
+                <div class="ya-script ya-hero-script">Nepal</div>
+
+                <!-- Headline in Capital Letters -->
+                <h1>Where every journey<br> Becomes A Story</h1>
+
+                <!-- Subtext -->
+                <p class="ya-hero-description">From the world's highest mountains to ancient cities, quiet valleys and
+                    subtropical wilderness, discover Nepal through journeys shaped around how you want to travel.</p>
+
+                <!-- Hero Actions (matching front-page.php) -->
+                <div class="ya-hero-actions">
+                    <a href="#nepal-map" class="ya-hero-cta" id="ya-hero-cta-explore">
+                        <span class="ya-hero-cta__text">Explore Nepal</span>
+                        <span class="ya-hero-cta__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14M13 6l6 6-6 6"></path>
+                            </svg>
+                        </span>
+                    </a>
+                    <a href="#featured-journeys" class="ya-hero-cta ya-hero-cta--outline" id="ya-hero-cta-journeys">
+                        <span class="ya-hero-cta__text">Find Your Journey</span>
+                        <span class="ya-hero-cta__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14M13 6l6 6-6 6"></path>
+                            </svg>
+                        </span>
+                    </a>
+                </div>
+
+
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Hero Stats Section — full white bar, divider lines -->
+    <section class="ya-hero-stats-section" id="ya-hero-stats">
+        <div class="ya-container ya-hero-stats-wrap">
+            <div class="ya-hero-stats">
+                <!-- Stat 1: Everest -->
+                <div class="ya-hero-stat">
+                    <div class="ya-hero-stat-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M3 17l4-8 4 5 3-4 4 7H3z" />
+                            <path d="M3 17h18" />
+                        </svg>
+                    </div>
+                    <div class="ya-hero-stat-body">
+                        <strong data-count-target="8848" data-count-suffix=" m">8,848 m</strong>
+                        <div class="ya-hero-stat-title">Mount Everest</div>
+                        <span class="ya-hero-stat-desc">World's highest peak, proudly in Nepal.</span>
+                    </div>
+                </div>
+
+                <!-- Stat 2: 8 of 10 Peaks -->
+                <div class="ya-hero-stat">
+                    <div class="ya-hero-stat-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M2 20l5-9 4 5 3-5 5 9H2z" />
+                            <circle cx="18" cy="6" r="3" />
+                        </svg>
+                    </div>
+                    <div class="ya-hero-stat-body">
+                        <strong data-count-target="8" data-count-suffix=" of 10">8 of 10</strong>
+                        <div class="ya-hero-stat-title">8,000 m Giants</div>
+                        <span class="ya-hero-stat-desc">Earth's ten highest peaks, eight in Nepal.</span>
+                    </div>
+                </div>
+
+                <!-- Stat 3: 25+ Years -->
+                <div class="ya-hero-stat">
+                    <div class="ya-hero-stat-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M12 7v5l3.5 3.5" />
+                        </svg>
+                    </div>
+                    <div class="ya-hero-stat-body">
+                        <strong data-count-target="25" data-count-suffix="+ Years">25+ Years</strong>
+                        <div class="ya-hero-stat-title">Himalayan Heritage</div>
+                        <span class="ya-hero-stat-desc">Journeys crafted with expertise &amp; care.</span>
+                    </div>
+                </div>
+
+                <!-- Stat 4: 100% Local -->
+                <div class="ya-hero-stat">
+                    <div class="ya-hero-stat-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            <path d="M9 12l2 2 4-4" />
+                        </svg>
+                    </div>
+                    <div class="ya-hero-stat-body">
+                        <strong data-count-target="100" data-count-suffix="% Local">100% Local</strong>
+                        <div class="ya-hero-stat-title">Sherpa Led &amp; Owned</div>
+                        <span class="ya-hero-stat-desc">Authentic guides, insider access, honest care.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ya-intro">
+        <div class="ya-container ya-intro-grid">
+            <div class="ya-intro-visual ya-reveal">
+                <div class="ya-intro-image-main" role="img" aria-label="Himalayan landscape and Nepalese culture"></div>
+                <div class="ya-intro-image-small" role="img" aria-label="Nepal landscape and wildlife"></div>
+
+            </div>
+            <div class="ya-intro-copy ya-reveal">
+                <h2>One small country.<br><em>Endless ways to explore.</em></h2>
+                <p>Nepal brings together some of the planet's most dramatic mountain landscapes with ancient cities,
+                    sacred places, diverse communities and warm lowland wilderness.</p>
+                <p>Walk beneath Himalayan giants, discover living heritage in the Kathmandu Valley, travel into the
+                    landscapes of Mustang or slow down among forests and rivers in the Terai.</p>
+                <p>With Yeti Adventure, your Nepal journey can follow a classic route or take a more personal direction.
+                    Tell us what matters to you and we will help shape the experience around it.</p>
+                <div class="ya-intro-points">
+                    <div class="ya-intro-point"><strong>Mountains</strong><span>Everest · Annapurna · Manaslu</span>
+                    </div>
+                    <div class="ya-intro-point"><strong>Heritage</strong><span>Temples · Cities · Monasteries</span>
+                    </div>
+                    <div class="ya-intro-point"><strong>Wilderness</strong><span>Jungle · Rivers · Wildlife</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ya-map-section" id="nepal-map">
+        <div class="ya-container">
+            <div class="ya-section-head ya-reveal">
+                <h2>Find the Nepal that calls to you.</h2>
+                <p>Move across the country from the high Himalayas to the plains. Explore destinations, mountain
+                    regions and routes, then open the journey that interests you.</p>
+            </div>
+            <div class="ya-map-frame ya-reveal">
+                <div class="ya-map-scroll">[trek_nepal_map]</div>
+            </div>
+            <div class="ya-map-note"><span><strong>Click any destination marker</strong> to open its journey card.</span><span>Click the card to open its dedicated page. On mobile, swipe to explore the full map.</span></div>
+        </div>
+    </section>
+
+    <section class="ya-journeys" id="featured-journeys">
+        <div class="ya-journeys-container">
+            <div class="ya-journeys-head ya-reveal">
+                <h2 class="ya-journeys-title">Journeys worth taking slowly.</h2>
+                <p class="ya-journeys-desc">Explore classic Himalayan routes, demanding high-altitude adventures and quieter trails. Use
+                    these journeys as inspiration, then tailor the details to your travel style.</p>
+            </div>
+            <div class="ya-journeys-shortcode-wrap ya-reveal">
+                [trek_destinations category="all" region="Nepal" count="8" columns="4"]
+            </div>
+        </div>
+    </section>
+
+    <section class="ya-experiences">
+        <div class="ya-container">
+            <div class="ya-section-head ya-reveal">
+                <h2>There is more than one way to experience Nepal.</h2>
+                <p>Build your journey around mountains, culture, wildlife or the roads less travelled. Mix
+                    experiences together for a Nepal trip that feels distinctly yours.</p>
+            </div>
+            <div class="ya-experience-grid">
+                <a class="ya-experience-card ya-reveal" href="#featured-journeys">
+                    <div>
+                        <h3>Himalayan Trekking</h3>
+                        <p>Base camps, high passes, mountain circuits and remote valleys.</p>
+                    </div>
+                </a>
+                <a class="ya-experience-card ya-reveal" href="#nepal-enquiry">
+                    <div>
+                        <h3>Culture & Heritage</h3>
+                        <p>Ancient cities, temples, monasteries and traditions that remain part of everyday life.</p>
+                    </div>
+                </a>
+                <a class="ya-experience-card ya-reveal" href="#nepal-enquiry">
+                    <div>
+                        <h3>Jungle & Wildlife</h3>
+                        <p>Forests, rivers and lowland landscapes made for slower days and wildlife encounters.</p>
+                    </div>
+                </a>
+                <a class="ya-experience-card ya-reveal" href="#nepal-enquiry">
+                    <div>
+                        <h3>Hidden Nepal</h3>
+                        <p>Mustang, remote valleys and quieter trails beyond the familiar routes.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="ya-enquiry" id="nepal-enquiry">
+        <div class="ya-container ya-enquiry-grid">
+            <div class="ya-enquiry-copy ya-reveal">
+                <span class="ya-label">Speak with our team</span>
+                <div class="ya-script">Begin your journey</div>
+                <h2>Let's plan the Nepal you want to discover.</h2>
+                <p>Not sure which route fits? That is exactly what we are here for. Share your dates, interests and
+                    travel style and our team can help you turn the idea into a practical journey.</p>
+                <p>Prefer to talk first? Reach us directly.</p>
+                <div class="ya-contact-list">
+                    <a class="ya-contact-card" href="https://wa.me/9779803197006" target="_blank" rel="noopener"><span
+                            class="ya-contact-icon">◉</span><span><small>WhatsApp</small><strong>+977 980 319
+                                7006</strong></span></a>
+                    <a class="ya-contact-card" href="tel:+9779803197006"><span
+                            class="ya-contact-icon">☎</span><span><small>Call us</small><strong>+977 980 319
+                                7006</strong></span></a>
+                    <a class="ya-contact-card" href="mailto:info@yetiadventure.com"><span
+                            class="ya-contact-icon">✉</span><span><small>Email</small><strong>info@yetiadventure.com</strong></span></a>
+                </div>
+            </div>
+
+            <div class="ya-form-wrap ya-reveal">
+                [trek_nepal_enquiry_form]
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Animated counter utility
+        function yaAnimateCounter(el) {
+            const target = parseInt(el.dataset.countTarget, 10);
+            if (isNaN(target)) return;
+            const suffix = el.dataset.countSuffix || '';
+            const duration = 1800;
+            const start = performance.now();
+            function tick(now) {
+                const progress = Math.min((now - start) / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const val = Math.round(ease * target);
+                el.textContent = val.toLocaleString() + suffix;
+                if (progress < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        }
+
+        document.querySelectorAll('[data-count-target]').forEach(el => {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        yaAnimateCounter(el);
+                        observer.unobserve(el);
+                    }
+                });
+            }, { threshold: 0.4 });
+            observer.observe(el);
+        });
+    </script>
+
+    <script>
+        (() => {
+            const root = document.querySelector('#ya-nepal-page'); if (!root) return;
+
+            const items = root.querySelectorAll('.ya-reveal');
+            if ('IntersectionObserver' in window) {
+                const io = new IntersectionObserver(entries => {
+                    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target) } });
+                }, { threshold: .12, rootMargin: '0px 0px -30px 0px' });
+                items.forEach((el, i) => { el.style.transitionDelay = Math.min(i * 35, 180) + 'ms'; io.observe(el) });
+            } else items.forEach(el => el.classList.add('is-visible'));
+
+            const slider = root.querySelector('#ya-nepal-slider');
+            const amount = () => slider ? Math.max(slider.clientWidth * .75, 320) : 400;
+            root.querySelector('.ya-slider-prev')?.addEventListener('click', () => slider?.scrollBy({ left: -amount(), behavior: 'smooth' }));
+            root.querySelector('.ya-slider-next')?.addEventListener('click', () => slider?.scrollBy({ left: amount(), behavior: 'smooth' }));
+
+            root.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+                const target = document.querySelector(a.getAttribute('href')); if (!target) return;
+                e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }));
+
+            // Hero Background Image Carousel
+            const heroSlides = root.querySelectorAll('.ya-hero-slide');
+            let currentHeroIndex = 0;
+            let heroTimer = null;
+            const heroSlideTime = 4000; // auto-advance every 4 seconds
+
+            function switchHeroSlide(targetIdx) {
+                if (!heroSlides.length) return;
+                heroSlides.forEach((s, idx) => s.classList.toggle('is-active', idx === targetIdx));
+                currentHeroIndex = targetIdx;
+            }
+
+            function nextHeroSlide() {
+                switchHeroSlide((currentHeroIndex + 1) % heroSlides.length);
+            }
+
+            function prevHeroSlide() {
+                switchHeroSlide((currentHeroIndex - 1 + heroSlides.length) % heroSlides.length);
+            }
+
+            function startHeroCycle() {
+                stopHeroCycle();
+                if (heroSlides.length > 1) heroTimer = setInterval(nextHeroSlide, heroSlideTime);
+            }
+
+            function stopHeroCycle() {
+                if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
+            }
+
+            // Wire up left/right arrow buttons
+            root.querySelector('#ya-hero-prev')?.addEventListener('click', () => {
+                prevHeroSlide();
+                startHeroCycle();
+            });
+            root.querySelector('#ya-hero-next')?.addEventListener('click', () => {
+                nextHeroSlide();
+                startHeroCycle();
+            });
+
+            const heroElement = root.querySelector('.ya-hero');
+            if (heroElement) {
+                // Pause auto-play on hover, resume on leave
+                heroElement.addEventListener('mouseenter', stopHeroCycle);
+                heroElement.addEventListener('mouseleave', startHeroCycle);
+
+                // Touch swipe support for mobile
+                let touchStartX = 0;
+                heroElement.addEventListener('touchstart', e => {
+                    touchStartX = e.touches[0].clientX;
+                }, { passive: true });
+                heroElement.addEventListener('touchend', e => {
+                    const diff = e.changedTouches[0].clientX - touchStartX;
+                    if (Math.abs(diff) > 40) {
+                        diff < 0 ? nextHeroSlide() : prevHeroSlide();
+                        startHeroCycle();
+                    }
+                }, { passive: true });
+
+                startHeroCycle();
+            }
+        })();
+    </script>
+</section>

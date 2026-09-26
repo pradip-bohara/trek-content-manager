@@ -2085,6 +2085,20 @@ class Trek_CPT {
             </div>
         </div>
 
+        <!-- Duration and Best Season alias fields used by shortcodes and cards -->
+        <div class="ya-admin-row ya-admin-row--2" style="margin-top:10px; background:#f0f7ff; border:1px solid #b8d4f0; padding:14px; border-radius:6px;">
+            <div class="ya-admin-field">
+                <label style="font-weight:700; color:#1e40af;"><?php esc_html_e( 'Duration (Days) - used by shortcodes', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_fact_duration" value="<?php echo esc_attr( get_post_meta( $post->ID, '_trek_fact_duration', true ) ); ?>" placeholder="e.g. 14">
+                <span class="description" style="font-size:11px;"><?php esc_html_e( 'Numeric alias for duration. Same as Hero Days. Used by destination cards.', 'trek-content-manager' ); ?></span>
+            </div>
+            <div class="ya-admin-field">
+                <label style="font-weight:700; color:#1e40af;"><?php esc_html_e( 'Best Season (alias key)', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_fact_best_season" value="<?php echo esc_attr( get_post_meta( $post->ID, '_trek_fact_best_season', true ) ); ?>" placeholder="e.g. Mar-May and Sep-Nov">
+                <span class="description" style="font-size:11px;"><?php esc_html_e( 'Fallback alias used when Trek Season field is empty.', 'trek-content-manager' ); ?></span>
+            </div>
+        </div>
+
         <!-- Pricing, Booking Status & Commercial Details -->
         <div class="ya-admin-row ya-admin-row--3" style="margin-top:12px; background:#f0fdf4; border:1px solid #bbf7d0; padding:14px; border-radius:6px;">
             <div class="ya-admin-field">
@@ -2132,9 +2146,32 @@ class Trek_CPT {
         $route_img         = get_post_meta( $post->ID, '_trek_route_img', true );
         $map_embed_code    = get_post_meta( $post->ID, '_trek_map_embed_code', true );
         $map_file_url      = get_post_meta( $post->ID, '_trek_map_file_url', true );
-        $route_caption_sub = get_post_meta( $post->ID, '_trek_route_caption_sub', true );
-        $route_caption_h3  = get_post_meta( $post->ID, '_trek_route_caption_h3', true );
+        $route_caption_sub   = get_post_meta( $post->ID, '_trek_route_caption_sub', true );
+        $route_caption_h3    = get_post_meta( $post->ID, '_trek_route_caption_h3', true );
+        $overview_kicker     = get_post_meta( $post->ID, '_trek_overview_kicker', true );
+        $overview_script     = get_post_meta( $post->ID, '_trek_overview_script', true );
+        $overview_subheading = get_post_meta( $post->ID, '_trek_overview_subheading', true );
+        $overview_highlight  = get_post_meta( $post->ID, '_trek_overview_highlight', true );
         ?>
+        <!-- Section Labels Row: Kicker / Script / Subheading -->
+        <div class="ya-admin-row ya-admin-row--3" style="margin-bottom:12px;">
+            <div class="ya-admin-field">
+                <label><?php esc_html_e( 'Eyebrow Kicker Label', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_overview_kicker" value="<?php echo esc_attr( $overview_kicker ); ?>" placeholder="e.g. Nepal · 14 Days">
+                <span class="description" style="font-size:11px;"><?php esc_html_e( 'Small uppercase label above the heading.', 'trek-content-manager' ); ?></span>
+            </div>
+            <div class="ya-admin-field">
+                <label><?php esc_html_e( 'Script / Italic Tagline', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_overview_script" value="<?php echo esc_attr( $overview_script ); ?>" placeholder="e.g. The Ultimate Trek">
+                <span class="description" style="font-size:11px;"><?php esc_html_e( 'Italic serif tagline beside the kicker.', 'trek-content-manager' ); ?></span>
+            </div>
+            <div class="ya-admin-field">
+                <label><?php esc_html_e( 'Subheading (below Main Heading)', 'trek-content-manager' ); ?></label>
+                <input type="text" name="trek_overview_subheading" value="<?php echo esc_attr( $overview_subheading ); ?>" placeholder="e.g. Through the Himalayan homelands">
+                <span class="description" style="font-size:11px;"><?php esc_html_e( 'Secondary descriptive line below the main heading.', 'trek-content-manager' ); ?></span>
+            </div>
+        </div>
+
         <!-- Section Heading -->
         <div class="ya-admin-field" style="margin-bottom:16px;">
             <label style="font-weight:700; font-size:13px; color:#022f2e;"><?php esc_html_e( 'Overview Section Heading', 'trek-content-manager' ); ?></label>
@@ -2171,6 +2208,21 @@ class Trek_CPT {
                         </div>
                     <?php endforeach; ?>
                 </div>
+            </div>
+
+            <!-- Highlight Quote / Editorial Pull Quote -->
+            <div class="ya-admin-field" style="margin-top:16px;">
+                <label style="font-weight:700; color:#022f2e;"><?php esc_html_e( 'Highlight Pull Quote / Italic Banner Text', 'trek-content-manager' ); ?></label>
+                <span class="description" style="font-size:11px; display:block; margin-bottom:6px; color:#666;"><?php esc_html_e( 'Short italic quote displayed in the editorial highlight banner on the overview section.', 'trek-content-manager' ); ?></span>
+                <?php
+                wp_editor( $overview_highlight, 'trek_overview_highlight', array(
+                    'textarea_name' => 'trek_overview_highlight',
+                    'textarea_rows' => 4,
+                    'media_buttons' => false,
+                    'teeny'         => true,
+                    'quicktags'     => true,
+                ) );
+                ?>
             </div>
 
             <!-- Right Column: Overview Feature Image Card -->
@@ -3561,6 +3613,8 @@ class Trek_CPT {
             'trek_fact_distance',
             'trek_fact_start',
             'trek_fact_end',
+            'trek_fact_duration',
+            'trek_fact_best_season',
             'trek_overview_kicker',
             'trek_overview_script',
             'trek_overview_heading',
