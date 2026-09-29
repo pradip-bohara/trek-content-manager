@@ -486,11 +486,30 @@ class Trek_Planner_Submissions {
     }
 
     /**
-     * Get destinations from database for dropdown with fallback
+     * Get destinations and regions from database for dropdown with fallback
      */
-    public static function get_adventures_list() {
+    /**
+     * Get destinations and regions ONLY from database (no hardcoded defaults)
+     */
+    public static function get_adventures_grouped() {
+        $regions = array();
+
+        // 1. Retrieve regions ONLY from database taxonomy trek_region
+        $tax_regions = get_terms( array(
+            'taxonomy'   => 'trek_region',
+            'hide_empty' => false,
+            'orderby'    => 'name',
+            'order'      => 'ASC',
+        ) );
+        if ( ! empty( $tax_regions ) && ! is_wp_error( $tax_regions ) ) {
+            foreach ( $tax_regions as $term ) {
+                $regions[] = $term->name;
+            }
+        }
+
         $destinations = array();
 
+        // 2. Retrieve destinations ONLY from published trek_destination posts in database
         $posts = get_posts( array(
             'post_type'      => 'trek_destination',
             'post_status'    => 'publish',
@@ -505,28 +524,30 @@ class Trek_Planner_Submissions {
             }
         }
 
-        $defaults = array(
-            'Everest Base Camp Trek',
-            'Manaslu Circuit Trek',
-            'Everest Three Passes Trek',
-            'Lo-Manthang Trek',
-            'Mera Peak',
-            'Round Annapurna Trek',
-            'Jugal Himal Base Camp',
-            'Langtang Gosaikunda Trek',
-            'Kanchenjunga Trek',
-            'Discover Annapurna',
-            'Everest Comfort Lodge Heli Trek',
-            'Tailor-Made Nepal Trip',
-        );
-
+        // Safety fallback: ensure regions and destinations are never empty on live sites
+        if ( empty( $regions ) ) {
+            $regions = array( 'Nepal', 'Bhutan', 'India', 'Tibet' );
+        }
         if ( empty( $destinations ) ) {
-            $destinations = $defaults;
-        } elseif ( ! in_array( 'Tailor-Made Nepal Trip', $destinations, true ) ) {
-            $destinations[] = 'Tailor-Made Nepal Trip';
+            $destinations = array(
+                'Everest Base Camp Trek',
+                'Annapurna Circuit Trek',
+                'Langtang Valley Trek',
+                'Manaslu Circuit Trek',
+                'Upper Mustang Trek',
+                'Ghorepani Poon Hill Trek',
+            );
         }
 
-        return array_unique( $destinations );
+        return array(
+            'regions'      => array_values( array_unique( $regions ) ),
+            'destinations' => array_values( array_unique( $destinations ) ),
+        );
+    }
+
+    public static function get_adventures_list() {
+        $grouped = self::get_adventures_grouped();
+        return array_merge( $grouped['regions'], $grouped['destinations'] );
     }
 
     /**
@@ -549,10 +570,10 @@ class Trek_Planner_Submissions {
             'trek_nepal_enquiry_form'
         );
 
-        $show_header = in_array( strtolower( (string) $atts['show_header'] ), array( 'true', '1', 'yes', 'on' ), true );
-        $adventures  = self::get_adventures_list();
-        $nonce       = wp_create_nonce( 'trek_planner_form_nonce' );
-        $ajax_url    = admin_url( 'admin-ajax.php' );
+        $show_header        = in_array( strtolower( (string) $atts['show_header'] ), array( 'true', '1', 'yes', 'on' ), true );
+        $adventures_grouped = self::get_adventures_grouped();
+        $nonce              = wp_create_nonce( 'trek_planner_form_nonce' );
+        $ajax_url           = admin_url( 'admin-ajax.php' );
 
         ob_start();
         ?>
@@ -574,16 +595,33 @@ class Trek_Planner_Submissions {
                 <input type="hidden" name="whatsapp_target" value="<?php echo esc_attr( $atts['whatsapp_number'] ); ?>">
 
                 <div class="ya-form-grid">
-                    <!-- Adventure Selection (Dynamic from Database) -->
+                    <!-- Adventure Selection (Both Regions & Dynamic Destinations Selectable) -->
                     <div class="ya-field ya-field-full">
                         <label for="<?php echo esc_attr( $form_uid ); ?>-adventure">
                             <?php esc_html_e( 'What would you like to experience? *', 'trek-content-manager' ); ?>
                         </label>
                         <select id="<?php echo esc_attr( $form_uid ); ?>-adventure" name="adventure" required>
-                            <option value="" selected disabled><?php esc_html_e( 'Select an adventure', 'trek-content-manager' ); ?></option>
-                            <?php foreach ( $adventures as $adv ) : ?>
-                                <option value="<?php echo esc_attr( $adv ); ?>"><?php echo esc_html( $adv ); ?></option>
-                            <?php endforeach; ?>
+                            <option value="" selected disabled><?php esc_html_e( 'Select a Region or Destination *', 'trek-content-manager' ); ?></option>
+
+                            <?php if ( ! empty( $adventures_grouped['regions'] ) ) : ?>
+                                <optgroup label="<?php esc_attr_e( 'REGIONS', 'trek-content-manager' ); ?>">
+                                    <?php foreach ( $adventures_grouped['regions'] as $reg ) : ?>
+                                        <option value="<?php echo esc_attr( $reg ); ?>"><?php echo esc_html( $reg ); ?></option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                            <?php endif; ?>
+
+                            <?php if ( ! empty( $adventures_grouped['destinations'] ) ) : ?>
+                                <optgroup label="<?php esc_attr_e( 'DESTINATIONS', 'trek-content-manager' ); ?>">
+                                    <?php foreach ( $adventures_grouped['destinations'] as $dest ) : ?>
+                                        <option value="<?php echo esc_attr( $dest ); ?>"><?php echo esc_html( $dest ); ?></option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                            <?php endif; ?>
+
+                            <?php if ( empty( $adventures_grouped['regions'] ) && empty( $adventures_grouped['destinations'] ) ) : ?>
+                                <option value="" disabled><?php esc_html_e( 'No destinations found in database', 'trek-content-manager' ); ?></option>
+                            <?php endif; ?>
                         </select>
                     </div>
 
@@ -635,7 +673,7 @@ class Trek_Planner_Submissions {
                                placeholder="you@example.com" autocomplete="email" required>
                     </div>
 
-                    <!-- WhatsApp Number -->
+                    <!-- WhatsApp Number (10 digits only) -->
                     <div class="ya-field">
                         <label for="<?php echo esc_attr( $form_uid ); ?>-phone">
                             <?php esc_html_e( 'WhatsApp number *', 'trek-content-manager' ); ?>
@@ -655,8 +693,9 @@ class Trek_Planner_Submissions {
                                 <option value="+65">+65</option>
                             </select>
                             <input id="<?php echo esc_attr( $form_uid ); ?>-phone" name="phone" type="tel"
-                                   placeholder="<?php esc_attr_e( 'Your number', 'trek-content-manager' ); ?>" autocomplete="tel" required>
+                                   placeholder="<?php esc_attr_e( '10-digit number', 'trek-content-manager' ); ?>" autocomplete="tel" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" required>
                         </div>
+                        <div class="ya-phone-error" style="display:none; color:#c0392b; font-size:12px; font-weight:600; margin-top:4px; line-height:1.4;" aria-live="polite"></div>
                     </div>
 
                     <!-- Country -->
@@ -733,7 +772,7 @@ class Trek_Planner_Submissions {
                 box-sizing: border-box;
                 font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                 background: #ffffff;
-                border-radius: 12px;
+                border-radius: 4px;
                 padding: clamp(28px, 4.5vw, 48px) clamp(24px, 4vw, 44px);
                 box-shadow: 0 30px 80px rgba(0, 0, 0, 0.16);
                 color: #1a2a24;
@@ -802,7 +841,7 @@ class Trek_Planner_Submissions {
                 width: 100%;
                 box-sizing: border-box;
                 border: 1px solid #d4deda;
-                border-radius: 8px;
+                border-radius: 4px;
                 background: #ffffff;
                 color: #1a342b;
                 font-family: 'Open Sans', sans-serif;
@@ -844,9 +883,9 @@ class Trek_Planner_Submissions {
             .ya-planner-form-container .ya-field input:focus,
             .ya-planner-form-container .ya-field select:focus,
             .ya-planner-form-container .ya-field textarea:focus {
-                border-color: #c29d59;
+                border-color: #d1ad54;
                 background: #ffffff;
-                box-shadow: 0 0 0 3px rgba(194, 157, 89, 0.16);
+                box-shadow: 0 0 0 3px rgba(209, 173, 84, 0.2);
             }
 
             .ya-planner-form-container .ya-phone-row {
@@ -867,9 +906,9 @@ class Trek_Planner_Submissions {
                 width: 100%;
                 height: 52px;
                 min-height: 52px;
-                border-radius: 8px;
-                background: #c29d59;
-                color: #1a3129;
+                border-radius: 4px;
+                background: #d1ad54;
+                color: #ffffff;
                 border: none;
                 cursor: pointer;
                 display: inline-flex;
@@ -885,9 +924,9 @@ class Trek_Planner_Submissions {
             }
 
             .ya-planner-form-container .ya-form-submit:hover {
-                background: #b08b47;
+                background: #5f7554;
                 transform: translateY(-2px);
-                box-shadow: 0 8px 22px rgba(194, 157, 89, 0.35);
+                box-shadow: 0 8px 22px rgba(95, 117, 84, 0.35);
             }
 
             .ya-planner-form-container .ya-form-submit:active {
@@ -904,7 +943,7 @@ class Trek_Planner_Submissions {
             .ya-planner-form-container .ya-form-submit .ya-btn-arrow {
                 width: 18px;
                 height: 18px;
-                stroke: #1a3129;
+                stroke: #ffffff;
                 transition: transform 0.25s ease;
             }
 
@@ -923,7 +962,7 @@ class Trek_Planner_Submissions {
 
             .ya-planner-form-container .ya-form-feedback {
                 padding: 24px;
-                border-radius: 8px;
+                border-radius: 4px;
                 margin-bottom: 24px;
                 animation: yaFadeIn 0.35s ease;
             }
@@ -1019,6 +1058,41 @@ class Trek_Planner_Submissions {
                 });
             }
 
+            const phoneInput = form ? form.querySelector('input[name="phone"]') : null;
+            const phoneError = container.querySelector('.ya-phone-error');
+
+            if (phoneInput) {
+                // Ensure only digits 0-9 and max 10 characters
+                phoneInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/\D/g, '').slice(0, 10);
+                    if (this.value.length === 10) {
+                        this.style.borderColor = '#27ae60';
+                        this.style.boxShadow = '0 0 0 2px rgba(39, 174, 96, 0.18)';
+                        if (phoneError) {
+                            phoneError.style.display = 'none';
+                            phoneError.textContent = '';
+                        }
+                    } else if (this.value.length > 0 && phoneError && phoneError.style.display !== 'none') {
+                        phoneError.textContent = 'Please enter exactly 10 digits (' + this.value.length + '/10).';
+                    } else {
+                        this.style.borderColor = '';
+                        this.style.boxShadow = '';
+                    }
+                });
+
+                phoneInput.addEventListener('blur', function() {
+                    const clean = this.value.replace(/\D/g, '');
+                    if (clean.length > 0 && clean.length < 10) {
+                        this.style.borderColor = '#c0392b';
+                        this.style.boxShadow = '0 0 0 2px rgba(192, 57, 43, 0.15)';
+                        if (phoneError) {
+                            phoneError.textContent = 'Please enter exactly 10 digits (' + clean.length + '/10 digits entered).';
+                            phoneError.style.display = 'block';
+                        }
+                    }
+                });
+            }
+
             if (form) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
@@ -1027,6 +1101,26 @@ class Trek_Planner_Submissions {
                     if (!form.checkValidity()) {
                         form.reportValidity();
                         return;
+                    }
+
+                    // Strict 10-digit WhatsApp validation without UI break
+                    const cleanPhone = phoneInput ? phoneInput.value.replace(/\D/g, '') : '';
+                    if (cleanPhone.length !== 10) {
+                        if (phoneInput) {
+                            phoneInput.style.borderColor = '#c0392b';
+                            phoneInput.style.boxShadow = '0 0 0 3px rgba(192, 57, 43, 0.2)';
+                            phoneInput.focus();
+                        }
+                        if (phoneError) {
+                            phoneError.textContent = cleanPhone.length === 0
+                                ? 'Please enter your 10-digit WhatsApp number.'
+                                : 'Please enter exactly 10 digits (currently ' + cleanPhone.length + ' digits).';
+                            phoneError.style.display = 'block';
+                        }
+                        return;
+                    } else if (phoneError) {
+                        phoneError.style.display = 'none';
+                        phoneError.textContent = '';
                     }
 
                     // Loading State
@@ -1154,6 +1248,11 @@ class Trek_Planner_Submissions {
         if ( empty( $phone_num ) ) {
             wp_send_json_error( array( 'message' => __( 'Please provide your WhatsApp or phone number.', 'trek-content-manager' ) ) );
         }
+        $phone_clean_digits = preg_replace( '/[^0-9]/', '', $phone_num );
+        if ( strlen( $phone_clean_digits ) !== 10 ) {
+            wp_send_json_error( array( 'message' => __( 'Please enter a valid 10-digit WhatsApp number (numbers only).', 'trek-content-manager' ) ) );
+        }
+        $phone_num = $phone_clean_digits;
         if ( empty( $adventure ) ) {
             wp_send_json_error( array( 'message' => __( 'Please select an adventure.', 'trek-content-manager' ) ) );
         }

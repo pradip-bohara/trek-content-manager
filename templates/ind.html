@@ -1,1318 +1,2027 @@
-<section class="ya-tibet-page" id="ya-tibet-page">
+<section class="ya-bespoke-page">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400;1,6..72,500&display=swap">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,600;1,6..72,700&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Water+Brush&family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-
-        /* ABSOLUTE TOP-GAP FIX — WordPress, Elementor and browser defaults */
-        html:has(.ya-tibet-page),
-        body:has(.ya-tibet-page) {
+        html:has(.ya-bespoke-page),
+        body:has(.ya-bespoke-page) {
             margin: 0 !important;
             padding: 0 !important;
-            border: 0 !important;
-            background: #022f2e !important;
-        }
-
-        body:has(.ya-tibet-page) #page,
-        body:has(.ya-tibet-page) .site,
-        body:has(.ya-tibet-page) #content,
-        body:has(.ya-tibet-page) .site-content,
-        body:has(.ya-tibet-page) #primary,
-        body:has(.ya-tibet-page) #main,
-        body:has(.ya-tibet-page) .content-area,
-        body:has(.ya-tibet-page) .site-main,
-        body:has(.ya-tibet-page) article,
-        body:has(.ya-tibet-page) .inside-article,
-        body:has(.ya-tibet-page) .entry-content,
-        body:has(.ya-tibet-page) .page-content {
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-            border-top: 0 !important;
-        }
-
-        body:has(.ya-tibet-page) .elementor,
-        body:has(.ya-tibet-page) .elementor-section-wrap,
-        body:has(.ya-tibet-page) .elementor-section,
-        body:has(.ya-tibet-page) .elementor-container,
-        body:has(.ya-tibet-page) .elementor-column,
-        body:has(.ya-tibet-page) .elementor-widget-wrap,
-        body:has(.ya-tibet-page) .elementor-widget,
-        body:has(.ya-tibet-page) .elementor-widget-container,
-        body:has(.ya-tibet-page) .e-con,
-        body:has(.ya-tibet-page) .e-con-inner {
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-            gap: 0 !important;
-            row-gap: 0 !important;
-        }
-
-        body:has(.ya-tibet-page) .elementor-location-header,
-        body:has(.ya-tibet-page) header.site-header,
-        body:has(.ya-tibet-page) #masthead {
-            top: 0 !important;
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-            padding-top: 0 !important;
-            border-top: 0 !important;
-            border-bottom: 0 !important;
-        }
-
-        body:has(.ya-tibet-page) .elementor-location-header+*,
-        body:has(.ya-tibet-page) header.site-header+*,
-        body:has(.ya-tibet-page) #masthead+* {
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-        }
-
-        body:has(.ya-tibet-page) {
             overflow-x: hidden !important;
         }
 
-        body:has(.ya-tibet-page) h1.entry-title,
-        body:has(.ya-tibet-page) .entry-header,
-        body:has(.ya-tibet-page) main>.page-header,
-        body:has(.ya-tibet-page) .site-main>.page-header,
-        body:has(.ya-tibet-page) .elementor-page-title,
-        body:has(.ya-tibet-page) .page-title {
+        body.admin-bar #wpadminbar {
             display: none !important;
-            height: 0 !important;
+        }
+
+        body:has(.ya-bespoke-page) #page,
+        body:has(.ya-bespoke-page) .site,
+        body:has(.ya-bespoke-page) #content,
+        body:has(.ya-bespoke-page) #primary,
+        body:has(.ya-bespoke-page) #main,
+        body:has(.ya-bespoke-page) .site-content,
+        body:has(.ya-bespoke-page) .content-area,
+        body:has(.ya-bespoke-page) .site-main,
+        body:has(.ya-bespoke-page) article.page,
+        body:has(.ya-bespoke-page) article.hentry,
+        body:has(.ya-bespoke-page) .entry-content,
+        body:has(.ya-bespoke-page) .page-content {
             margin: 0 !important;
             padding: 0 !important;
-            overflow: hidden !important;
         }
 
-        body:has(.ya-tibet-page) #content,
-        body:has(.ya-tibet-page) #primary,
-        body:has(.ya-tibet-page) #main,
-        body:has(.ya-tibet-page) .site-content,
-        body:has(.ya-tibet-page) .content-area,
-        body:has(.ya-tibet-page) .site-main,
-        body:has(.ya-tibet-page) article.page,
-        body:has(.ya-tibet-page) article.hentry,
-        body:has(.ya-tibet-page) .inside-article,
-        body:has(.ya-tibet-page) .entry-content {
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-        }
-
-        body:has(.ya-tibet-page) .entry-content>p:empty {
+        body:has(.ya-bespoke-page) h1.entry-title,
+        body:has(.ya-bespoke-page) .entry-header,
+        body:has(.ya-bespoke-page) main>.page-header {
             display: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            height: 0 !important;
         }
 
-        body:has(.ya-tibet-page) .elementor-section:has(.ya-tibet-page),
-        body:has(.ya-tibet-page) .elementor-container:has(.ya-tibet-page),
-        body:has(.ya-tibet-page) .elementor-column:has(.ya-tibet-page),
-        body:has(.ya-tibet-page) .elementor-widget-wrap:has(.ya-tibet-page),
-        body:has(.ya-tibet-page) .elementor-widget-html:has(.ya-tibet-page),
-        body:has(.ya-tibet-page) .elementor-widget-html:has(.ya-tibet-page)>.elementor-widget-container,
-        body:has(.ya-tibet-page) .e-con:has(.ya-tibet-page),
-        body:has(.ya-tibet-page) .e-con-inner:has(.ya-tibet-page),
-        body:has(.ya-tibet-page) .elementor-element:has(.ya-tibet-page) {
-            width: 100% !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-        }
-
-        body:has(.ya-tibet-page) .site-content+footer,
-        body:has(.ya-tibet-page) .site-content+.site-footer,
-        body:has(.ya-tibet-page) #content+footer,
-        body:has(.ya-tibet-page) #content+.site-footer {
-            margin-top: 0 !important;
-        }
-
-        .ya-tibet-page,
-        .ya-tibet-page * {
+        .ya-bespoke-page,
+        .ya-bespoke-page * {
             box-sizing: border-box;
         }
 
-        .ya-tibet-page {
-            --forest: #032b28;
-            --forest-2: #054845;
-            --gold: #c7a45d;
-            --gold-hover: #dbb76e;
-            --paper: #f6f3eb;
-            --cream: #fbfaf6;
-            --ink: #17312f;
-            --muted: #667774;
-            --white: #fff;
-            --line: #dce2de;
-            --max: 1320px;
-            --green: #022f2e;
-            --green-2: #045857;
-            --green-3: #0c716f;
-            --saffron: #c96e36;
-            --ivory: #f6f1e6;
-            --ya-top-gap: 0px;
+        .ya-bespoke-page {
+            --gold: #cfab55;
+            --gold-soft: #e5cd93;
+            --gold-glow: rgba(207, 171, 85, 0.28);
+            --sage: #4f6346;
+            --sage-deep: #1d261a;
+            --sage-mist: #e8ede4;
+            --paper: #faf8f3;
+            --sand: #f2ece0;
+            --ink: #1e261a;
+            --muted: #5e6b57;
+            --line: rgba(79, 99, 70, .16);
+            --serif: "Newsreader", Georgia, serif;
+            --sans: "Plus Jakarta Sans", "Inter", -apple-system, sans-serif;
             width: 100vw;
             max-width: 100vw;
-            margin: calc(-1 * var(--ya-top-gap)) 0 0 calc(50% - 50vw) !important;
+            margin: 0 0 0 calc(50% - 50vw) !important;
             padding: 0 !important;
-            border: 0 !important;
             overflow: hidden;
-            background: #fff;
+            background: var(--paper);
             color: var(--ink);
-            font-family: 'Open Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.65;
-            position: relative;
-            z-index: 1;
+            font: 400 16px/1.7 var(--sans);
+            -webkit-font-smoothing: antialiased;
         }
 
-        .ya-tibet-page a {
+        .ya-bespoke-page a {
             color: inherit;
-        }
-
-        .ya-tibet-page button,
-        .ya-tibet-page input,
-        .ya-tibet-page select,
-        .ya-tibet-page textarea {
-            font: inherit;
-        }
-
-        .ya-tibet-page .ya-container {
-            width: min(var(--max), calc(100% - 64px));
-            margin: auto;
-        }
-
-        .ya-tibet-page .ya-inner {
-            width: min(1240px, calc(100% - 48px));
-            margin: auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .ya-tibet-page .ya-serif {
-            font-family: "Newsreader", Times, Georgia, serif;
-        }
-
-        .ya-tibet-page .ya-script {
-            font-family: "Water Brush", cursive;
-            font-weight: 500;
-        }
-
-        .ya-tibet-page .ya-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--gold);
-        }
-
-        .ya-tibet-page .ya-label:before {
-            content: "";
-            width: 32px;
-            height: 1px;
-            background: currentColor;
-        }
-
-        .ya-tibet-page .ya-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--gold);
-        }
-
-        .ya-tibet-page .ya-kicker:before {
-            content: "";
-            width: 24px;
-            height: 1px;
-            background: currentColor;
-        }
-
-        .ya-tibet-page .ya-reveal {
-            opacity: 0;
-            transform: translateY(28px);
-            transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1),
-                transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .ya-tibet-page .ya-reveal.is-visible {
-            opacity: 1;
-            transform: none;
-        }
-
-        .ya-tibet-page .ya-btn {
-            min-height: 54px;
-            padding: 0 24px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            border: 0;
-            border-radius: 2px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: capitalize;
-            transition: .3s;
             text-decoration: none;
         }
 
-        .ya-tibet-page .ya-btn svg {
-            width: 17px;
-            height: 17px;
-            transition: .3s;
-        }
-
-        .ya-tibet-page .ya-btn:hover {
-            transform: translateY(-3px);
-        }
-
-        .ya-tibet-page .ya-btn:hover svg {
-            transform: translateX(4px);
-        }
-
-        .ya-tibet-page .ya-btn-gold {
-            background: var(--gold);
-            color: #ffffff;
-        }
-
-        .ya-tibet-page .ya-btn-gold:hover {
-            background: var(--forest-2);
-            border-color: var(--forest-2);
-        }
-
-        .ya-tibet-page .ya-btn-light {
-            background: #fff;
-            color: var(--forest);
-        }
-
-        /* 1. HERO SECTION & KEN BURNS SLIDESHOW CAROUSEL */
-        .ya-tibet-page .ya-hero {
-            --hero-min-height: 100vh;
-            position: relative;
-            min-height: 100vh;
-            min-height: 100svh;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 120px 0 60px;
-            color: #fff;
-            overflow: hidden;
-            background: #022f2e;
-            isolation: isolate;
-        }
-
-        /* Hero Background Carousel Stage */
-        .ya-tibet-page .ya-hero-stage {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .ya-tibet-page .ya-hero-slide {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            visibility: hidden;
-            transform: scale(1.08);
-            transition: opacity 1.4s cubic-bezier(0.22, 0.61, 0.36, 1),
-                transform 7s cubic-bezier(0.22, 0.61, 0.36, 1),
-                visibility 0s linear 1.4s;
-        }
-
-        .ya-tibet-page .ya-hero-slide.is-active {
-            opacity: 1;
-            visibility: visible;
-            transform: scale(1);
-            transition: opacity 1.4s cubic-bezier(0.22, 0.61, 0.36, 1),
-                transform 7s cubic-bezier(0.22, 0.61, 0.36, 1),
-                visibility 0s linear 0s;
-        }
-
-        .ya-tibet-page .ya-hero-media {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .ya-tibet-page .ya-hero-media img {
+        .ya-bespoke-page img {
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center 38%;
-            display: block;
         }
 
-        .ya-tibet-page .ya-hero-overlay {
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(180deg,
-                    rgba(2, 47, 46, 0.35) 0%,
-                    rgba(2, 47, 46, 0.55) 50%,
-                    rgba(2, 47, 46, 0.92) 100%),
-                radial-gradient(ellipse at center 40%, rgba(0, 0, 0, 0.15) 0%, rgba(2, 47, 46, 0.75) 100%);
-            z-index: 1;
-            pointer-events: none;
+        .ya-bespoke-page button,
+        .ya-bespoke-page input,
+        .ya-bespoke-page select,
+        .ya-bespoke-page textarea {
+            font: inherit;
         }
 
-        .ya-tibet-page .ya-hero-noise {
-            position: absolute;
-            inset: 0;
-            opacity: 0.035;
-            background-image: radial-gradient(#fff 1px, transparent 1px);
-            background-size: 3px 3px;
-            z-index: 2;
-            pointer-events: none;
+        .ya-bespoke-page :focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: 3px;
         }
 
-        /* Hero Slide Navigation Arrows (hover revealed) */
-        .ya-tibet-page .ya-hero-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 5;
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: rgba(2, 47, 46, 0.45);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            color: #fff;
-            display: flex;
+        .ya-inner {
+            width: min(1180px, calc(100% - 48px));
+            margin: 0 auto;
+        }
+
+        .ya-bespoke-page h1,
+        .ya-bespoke-page h2,
+        .ya-bespoke-page h3,
+        .ya-bespoke-page p {
+            margin-top: 0;
+        }
+
+        .ya-bespoke-page h1,
+        .ya-bespoke-page h2,
+        .ya-bespoke-page h3 {
+            font-family: var(--serif);
+            font-weight: 400;
+            color: var(--sage-deep);
+        }
+
+        .ya-bespoke-page h1 {
+            font-size: clamp(40px, 6.2vw, 56px);
+            line-height: 1.04;
+            letter-spacing: -.03em;
+        }
+
+        .ya-bespoke-page h2 {
+            font-size: clamp(34px, 4.6vw, 48px);
+            line-height: 1.08;
+            letter-spacing: -.025em;
+            margin-bottom: 18px;
+        }
+
+        .ya-bespoke-page h3 {
+            font-size: 26px;
+            line-height: 1.18;
+            letter-spacing: -.015em;
+            margin-bottom: 8px;
+        }
+
+        .ya-script {
+            font: italic 400 clamp(22px, 3vw, 28px)/1.2 var(--serif);
+            color: var(--sage);
+            margin-bottom: 12px;
+        }
+
+        .ya-eyebrow {
+            display: inline-block;
+            margin-bottom: 14px;
+            color: var(--sage);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .ya-lead {
+            color: var(--muted);
+            font-size: 16.5px;
+            line-height: 1.8;
+            max-width: 640px;
+        }
+
+        .ya-center {
+            text-align: center;
+        }
+
+        .ya-center .ya-lead {
+            margin-inline: auto;
+        }
+
+        .ya-section {
+            padding: clamp(76px, 10vw, 124px) 0;
+        }
+
+        /* buttons */
+        .ya-btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            min-height: 52px;
+            padding: 0 32px;
+            border: none;
+            border-radius: 50px !important;
+            font-size: 14.5px;
+            font-weight: 600;
+            letter-spacing: .01em;
             cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.35s ease, background 0.25s ease, transform 0.25s ease, visibility 0.35s;
+            transition: transform .25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow .25s, background .25s, color .25s;
+            text-decoration: none;
         }
 
-        .ya-tibet-page .ya-hero-nav svg {
-            width: 22px;
-            height: 22px;
-            stroke-width: 2.2;
-            transition: transform 0.2s ease;
+        .ya-btn:hover {
+            transform: translateY(-2px);
         }
 
-        .ya-tibet-page .ya-hero-nav--prev {
-            left: 28px;
+        .ya-btn-primary {
+            background: linear-gradient(135deg, #d8b257, #c1963b);
+            color: #1a2418;
+            box-shadow: 0 8px 24px var(--gold-glow);
+            border-radius: 50px !important;
         }
 
-        .ya-tibet-page .ya-hero-nav--next {
-            right: 28px;
+        .ya-btn-primary:hover {
+            background: linear-gradient(135deg, #dfbc65, #c99f44);
+            box-shadow: 0 12px 30px rgba(207, 168, 81, .42);
+            color: #121a11;
         }
 
-        .ya-tibet-page .ya-hero:hover .ya-hero-nav {
-            opacity: 1;
-            visibility: visible;
+        .ya-btn-outline {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 50px !important;
         }
 
-        .ya-tibet-page .ya-hero-nav:hover {
-            background: rgba(199, 164, 93, 0.9);
-            color: var(--forest);
-            border-color: rgba(199, 164, 93, 1);
-            transform: translateY(-50%) scale(1.08);
+        .ya-btn-outline:hover {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.55);
+            color: #fff;
         }
 
-        /* Hero Content & Center Alignment */
-        .ya-tibet-page .ya-hero-main {
+        .ya-btn-white {
+            background: var(--gold);
+            color: var(--sage-deep);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+        }
+
+        .ya-btn-white:hover {
+            background: var(--gold-soft);
+            color: var(--sage-deep);
+        }
+
+        /* HERO: Centered layout, rich overlay masks, border removed */
+        .ya-hero {
             position: relative;
-            z-index: 4;
+            isolation: isolate;
+            min-height: 100svh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 40px 0 25px;
-            flex: 1;
+            color: #fff;
+            overflow: hidden;
+            background: #141c13;
+            padding: 130px 24px 90px;
         }
 
-        .ya-tibet-page .ya-hero-copy {
-            max-width: 1350px;
+        .ya-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            background-image: url("https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/back-view-hiker-looking-view-from-snowy-mountain-peak-scaled.webp");
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            animation: yaZoom 20s ease-out both;
+            transform-origin: center center;
+        }
+
+        /* Dual-layer cinematic overlay mask: rich center readability and mountain landscape clarity */
+        .ya-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(18, 25, 17, 0.42) 0%, rgba(18, 25, 17, 0.72) 75%, rgba(14, 20, 14, 0.88) 100%),
+                linear-gradient(180deg, rgba(14, 20, 14, 0.5) 0%, rgba(14, 20, 14, 0.18) 45%, rgba(14, 20, 14, 0.84) 100%);
+        }
+
+        @keyframes yaZoom {
+            from {
+                scale: 1.1;
+            }
+
+            to {
+                scale: 1;
+            }
+        }
+
+        @keyframes yaUp {
+            from {
+                opacity: 0;
+                translate: 0 28px;
+            }
+
+            to {
+                opacity: 1;
+                translate: 0 0;
+            }
+        }
+
+        @keyframes yaLine {
+            from {
+                translate: 0 108%;
+            }
+
+            to {
+                translate: 0 0;
+            }
+        }
+
+        .ya-hero-inner {
+            width: min(960px, 100%);
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-        }
-
-        .ya-tibet-page .ya-hero-script {
-            font-size: clamp(62px, 7.2vw, 108px);
-            line-height: 0.85;
-            color: var(--gold);
-            margin: 0 0 16px;
-            text-shadow: 0 4px 25px rgba(199, 164, 93, 0.4);
-            filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.7));
-        }
-
-        /* Headline - Newsreader font */
-        .ya-tibet-page .ya-hero h1 {
-            margin: 0 auto 24px;
-            font-family: "Newsreader", Times, Georgia, serif !important;
-            font-size: 72px !important;
-            font-weight: 500 !important;
-            line-height: 1.08;
-            letter-spacing: -0.015em;
-            text-transform: capitalize;
-            color: #ffffff !important;
-            text-shadow: 0 4px 35px rgba(0, 0, 0, 0.75);
-            max-width: 100%;
-        }
-
-        /* Subtext */
-        .ya-tibet-page .ya-hero-description {
-            max-width: 740px;
-            margin: 0 auto 34px;
-            color: rgba(255, 255, 255, 0.92);
-            font-size: clamp(15px, 1.25vw, 19px);
-            line-height: 1.8;
-            letter-spacing: 0.01em;
-            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.65);
-        }
-
-        /* Hero Actions & Luxury Pill Buttons */
-        .ya-tibet-page .ya-hero-actions {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 18px;
-            flex-wrap: wrap;
-            margin-bottom: 28px;
-        }
-
-        /* Luxury Hero Pill CTA - button background removed, icon background only */
-        .ya-tibet-page .ya-hero-cta {
             position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            min-height: 54px;
-            padding: 6px 10px 6px 28px;
-            border-radius: 999px;
-            border: 1.5px solid rgba(199, 164, 93, 0.85);
-            background: transparent !important;
-            color: #ffffff !important;
-            font-family: 'Open Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            text-decoration: none;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-                box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-                border-color 0.3s ease,
-                background 0.3s ease;
-            backdrop-filter: blur(6px);
-            cursor: pointer;
-        }
-
-        .ya-tibet-page .ya-hero-cta__text {
-            display: inline-block;
-            white-space: nowrap;
-            color: #ffffff;
-        }
-
-        .ya-tibet-page .ya-hero-cta__icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: var(--gold) !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 14px rgba(199, 164, 93, 0.45);
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.25s ease, color 0.25s ease;
-            flex-shrink: 0;
-        }
-
-        .ya-tibet-page .ya-hero-cta__icon svg {
-            width: 17px;
-            height: 17px;
-            stroke-width: 2.2;
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .ya-tibet-page .ya-hero-cta:hover {
-            transform: translateY(-2px);
-            background: rgba(199, 164, 93, 0.15) !important;
-            border-color: var(--gold-hover);
-            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35), 0 0 20px rgba(199, 164, 93, 0.3);
-        }
-
-        .ya-tibet-page .ya-hero-cta:hover .ya-hero-cta__icon {
-            background: var(--gold-hover) !important;
-            color: #ffffff !important;
-            transform: scale(1.06);
-        }
-
-        .ya-tibet-page .ya-hero-cta:hover .ya-hero-cta__icon svg {
-            transform: translateX(2px);
-        }
-
-        .ya-tibet-page .ya-hero-cta--outline {
-            background: transparent !important;
-            border: 1.5px solid rgba(255, 255, 255, 0.4);
-            color: #ffffff !important;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-        }
-
-        .ya-tibet-page .ya-hero-cta--outline .ya-hero-cta__icon {
-            background: rgba(255, 255, 255, 0.22) !important;
-            color: #ffffff !important;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .ya-tibet-page .ya-hero-cta--outline:hover {
-            background: rgba(255, 255, 255, 0.12) !important;
-            border-color: rgba(255, 255, 255, 0.85);
-            color: #ffffff !important;
-            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
-        }
-
-        .ya-tibet-page .ya-hero-cta--outline:hover .ya-hero-cta__icon {
-            background: #ffffff !important;
-            color: var(--forest) !important;
-            transform: scale(1.06);
-        }
-
-        /* 2. INTRODUCTION SECTION */
-        .ya-tibet-page .ya-intro {
-            padding: 130px 0 120px;
-            background: #fff;
-            color: var(--ink);
-        }
-
-        .ya-tibet-page .ya-intro-grid {
-            display: grid;
-            grid-template-columns: 1.05fr .95fr;
-            gap: clamp(48px, 6vw, 95px);
-            align-items: center;
-        }
-
-        .ya-tibet-page .ya-intro-copy {
-            max-width: 620px;
-        }
-
-        .ya-tibet-page .ya-intro-copy .ya-script {
-            font-size: clamp(34px, 4vw, 52px);
-            line-height: 1.15;
-            color: var(--gold);
-            margin: 14px 0 18px;
-        }
-
-        .ya-tibet-page .ya-intro-copy h2 {
-            margin: 0 0 22px;
-            color: var(--forest) !important;
-            font: 600 clamp(40px, 4.5vw, 66px)/.95 "Newsreader", Times, Georgia, serif !important;
-        }
-
-        .ya-tibet-page .ya-intro-copy h2 em {
-            font-style: italic;
-            color: var(--gold) !important;
-            font-weight: 400;
-        }
-
-        .ya-tibet-page .ya-intro-copy p {
-            margin: 0 0 15px;
-            color: var(--muted);
-            font-size: 15px;
-            line-height: 1.9;
-        }
-
-        .ya-tibet-page .ya-intro-points {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0;
-            margin-top: 32px;
-            border-top: 1px solid var(--line);
-        }
-
-        .ya-tibet-page .ya-intro-point {
-            padding: 18px 12px 14px 0;
-            border-right: 1px solid var(--line);
-        }
-
-        .ya-tibet-page .ya-intro-point:last-child {
-            border-right: none;
-            padding-right: 0;
-        }
-
-        .ya-tibet-page .ya-intro-point:not(:first-child) {
-            padding-left: 16px;
-        }
-
-        .ya-tibet-page .ya-intro-point strong {
-            display: block;
-            color: var(--forest) !important;
-            font: 600 22px/1.1 "Newsreader", Times, Georgia, serif;
-            margin-bottom: 4px;
-        }
-
-        .ya-tibet-page .ya-intro-point span {
-            font-size: 10px;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            line-height: 1.6;
-        }
-
-        .ya-tibet-page .ya-intro-note {
-            margin-top: 28px;
-            padding: 22px 24px;
-            border-left: 3px solid var(--gold);
-            background: linear-gradient(90deg, #f7f1e4, rgba(247, 241, 228, 0.4));
-            font-family: "Newsreader", Times, Georgia, serif;
-            font-size: 18px;
-            line-height: 1.5;
-            color: var(--forest);
-            font-style: italic;
-            border-radius: 0 6px 6px 0;
-        }
-
-        /* Intro Visual on Right */
-        .ya-tibet-page .ya-intro-visual {
-            position: relative;
-            min-height: 620px;
-        }
-
-        .ya-tibet-page .ya-intro-image-main {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 80%;
-            height: 580px;
-            background: url("https://images.unsplash.com/photo-1781927387350-289c1fc914aa?auto=format&fit=crop&w=1500&q=88") center/cover no-repeat;
-            border-radius: 4px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
-        }
-
-        .ya-tibet-page .ya-intro-image-small {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            width: 50%;
-            height: 290px;
-            border: 8px solid var(--paper);
-            background: url("https://images.unsplash.com/photo-1701913998582-2cb8c9db53c2?auto=format&fit=crop&w=1100&q=88") center/cover no-repeat;
-            border-radius: 4px;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .ya-tibet-page .ya-intro-number {
-            position: absolute;
-            left: 55%;
-            bottom: 95px;
-            padding: 20px 22px;
-            background: var(--forest);
-            color: #fff;
-            border-radius: 4px;
-            box-shadow: 0 14px 34px rgba(2, 47, 46, 0.35);
             z-index: 2;
         }
 
-        .ya-tibet-page .ya-intro-number strong {
-            display: block;
-            color: var(--gold);
-            font: 600 44px/.85 "Newsreader", Times, Georgia, serif;
+        /* Kicker: Border removed, soft frosted glass capsule */
+        .ya-hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 22px;
+            margin-bottom: 24px;
+            border: none;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+            animation: yaUp .9s cubic-bezier(.2, .7, .2, 1) .05s both;
         }
 
-        .ya-tibet-page .ya-intro-number span {
-            font-size: 10px;
-            line-height: 1.5;
-            letter-spacing: 1px;
+        .ya-hero-kicker::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 8px var(--gold);
+        }
+
+        .ya-hero h1 {
+            color: #fff;
+            max-width: 900px;
+            margin: 0 auto 24px;
+            font-size: clamp(44px, 8.5vw, 72px);
+            line-height: .98;
+            letter-spacing: -.035em;
+            text-align: center;
+            text-shadow: 0 4px 30px rgba(0, 0, 0, .45);
+        }
+
+        .ya-hero h1 .ln {
+            display: block;
+            overflow: hidden;
+            padding: .02em .05em .12em 0;
+            text-align: center;
+        }
+
+        .ya-hero h1 .ln>span {
+            display: inline-block;
+            animation: yaLine 1.1s cubic-bezier(.2, .7, .2, 1) .25s both;
+        }
+
+        .ya-hero h1 .ln:nth-child(2)>span {
+            animation-delay: .45s;
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .ya-hero-lead {
+            max-width: 660px;
+            margin: 0 auto 34px;
+            color: rgba(255, 255, 255, .92);
+            font-size: clamp(16px, 1.8vw, 19px);
+            line-height: 1.75;
+            text-align: center;
+            font-weight: 400;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, .35);
+            animation: yaUp .9s cubic-bezier(.2, .7, .2, 1) .75s both;
+        }
+
+        .ya-hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            animation: yaUp .9s cubic-bezier(.2, .7, .2, 1) .95s both;
+        }
+
+        .ya-hero-actions .ya-btn {
+            border-radius: 50px !important;
+        }
+
+        /* Hero meta: Border removed, refined borderless glass badges */
+        .ya-hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px 16px;
+            margin-top: 40px;
+            padding-top: 0;
+            border-top: none;
+            color: rgba(255, 255, 255, .88);
+            font-size: 13.5px;
+            animation: yaUp .9s cubic-bezier(.2, .7, .2, 1) 1.15s both;
+        }
+
+        .ya-hero-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 18px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: none;
+            transition: background 0.25s, transform 0.25s;
+        }
+
+        .ya-hero-meta span:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .ya-hero-meta span::before {
+            content: "";
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--gold-soft);
+        }
+
+        /* Centered scroll indicator */
+        .ya-scroll {
+            position: absolute;
+            left: 50%;
+            bottom: 26px;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, .7);
+            font-size: 11px;
+            letter-spacing: .12em;
             text-transform: uppercase;
         }
 
-        /* 3. FEATURED JOURNEYS SECTION */
-        .ya-tibet-page .ya-journeys {
-            padding: 100px 0 110px;
-            background: var(--paper);
-            color: var(--ink);
+        .ya-scroll::after {
+            content: "";
+            width: 1px;
+            height: 36px;
+            background: linear-gradient(var(--gold), transparent);
+            animation: yaDrop 2s ease-in-out infinite;
         }
 
-        .ya-tibet-page .ya-journeys-container {
-            width: min(1400px, calc(100% - 48px));
-            max-width: 1400px;
-            margin: 0 auto;
+        @keyframes yaDrop {
+            0% {
+                scale: 1 0;
+                transform-origin: top;
+            }
+
+            50% {
+                scale: 1 1;
+                transform-origin: top;
+            }
+
+            100% {
+                scale: 1 0;
+                transform-origin: bottom;
+            }
         }
 
-        .ya-tibet-page .ya-journeys-head {
-            text-align: center;
-            margin: 0 auto 52px;
-            max-width: 760px;
+        /* INTRO GALLERY */
+        .ya-intro-gallery {
+            display: grid;
+            grid-template-columns: 1.25fr .75fr;
+            gap: 20px;
+            margin-top: 56px;
         }
 
-        .ya-tibet-page .ya-journeys-title {
-            text-align: center;
-            margin: 0 0 14px;
-            color: var(--forest) !important;
-            font: 600 clamp(36px, 4vw, 58px)/1 "Newsreader", Times, Georgia, serif !important;
+        .ya-frame {
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 16px 36px -12px rgba(28, 38, 24, 0.12);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
         }
 
-        .ya-tibet-page .ya-journeys-desc {
-            text-align: center;
-            max-width: 620px;
-            margin: 0 auto;
+        .ya-frame img {
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ya-frame:hover img {
+            transform: scale(1.05);
+        }
+
+        .ya-frame.tall {
+            height: clamp(380px, 52vw, 620px);
+        }
+
+        .ya-intro-side {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .ya-caption {
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 13.5px;
+            font-style: italic;
+        }
+
+        /* PRINCIPLES */
+        .ya-principles {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            padding-bottom: clamp(72px, 10vw, 120px);
+        }
+
+        .ya-principle {
+            padding: 36px 32px;
+            background: var(--sage-mist);
+            border-radius: 14px;
+            transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+            position: relative;
+        }
+
+        .ya-principle:hover {
+            transform: translateY(-4px);
+            background: #e2e8dc;
+            box-shadow: 0 18px 36px -15px rgba(43, 54, 39, .15);
+        }
+
+        .ya-principle h3 {
+            margin-bottom: 12px;
+        }
+
+        .ya-principle p {
+            margin: 0;
             color: var(--muted);
             font-size: 15px;
-            line-height: 1.8;
+            line-height: 1.75;
         }
 
-        .ya-tibet-page .ya-journeys-shortcode-wrap {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
+        .ya-principle .tag {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--sage);
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
         }
 
-        /* Shortcode card style protection & isolation */
-        .ya-tibet-page .ya-journeys-shortcode-wrap .te-dest-card__title,
-        .ya-tibet-page .ya-journeys-shortcode-wrap .te-dest-card h3,
-        .ya-tibet-page .ya-journeys-shortcode-wrap .te-dest-card h3.te-dest-card__title {
-            color: #ffffff !important;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85) !important;
-        }
-
-        .ya-tibet-page .ya-journeys-shortcode-wrap .te-dest-card:hover .te-dest-card__title,
-        .ya-tibet-page .ya-journeys-shortcode-wrap a:hover .te-dest-card__title,
-        .ya-tibet-page .ya-journeys-shortcode-wrap a:hover h3 {
-            color: #ffffff !important;
-            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.95) !important;
-        }
-
-        .ya-tibet-page .ya-journeys-shortcode-wrap .te-dest-card__duration {
-            color: var(--te-gold, #cfab55) !important;
-        }
-
-        .ya-tibet-page .ya-journeys-shortcode-wrap .te-dest-card__excerpt {
-            color: rgba(247, 245, 240, 0.88) !important;
-        }
-
-        /* 4. ENQUIRY SECTION */
-        .ya-tibet-page .ya-enquiry {
-            padding: 140px 0;
+        /* STATEMENT: Fixed position background image */
+        .ya-statement {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
             color: #fff;
-            background:
-                linear-gradient(90deg, rgba(2, 47, 46, .98), rgba(2, 47, 46, .9)),
-                url("https://images.unsplash.com/photo-1781927387350-289c1fc914aa?auto=format&fit=crop&w=2400&q=88") center/cover;
+            text-align: center;
+            padding: clamp(96px, 12vw, 150px) 0;
+            background: #141c13;
         }
 
-        .ya-tibet-page .ya-enquiry-grid {
+        .ya-statement::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            background-image: url("https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/08/photo-1505058439590-d86bd136dcec-scaled.avif");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .ya-statement::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(18, 25, 17, 0.45) 0%, rgba(18, 25, 17, 0.8) 100%),
+                linear-gradient(180deg, rgba(14, 20, 14, 0.72) 0%, rgba(14, 20, 14, 0.45) 50%, rgba(14, 20, 14, 0.86) 100%);
+        }
+
+        .ya-statement h2 {
+            color: #fff;
+            max-width: 820px;
+            margin-inline: auto;
+            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .ya-statement .ya-eyebrow {
+            color: var(--gold-soft);
+        }
+
+        .ya-statement p {
+            max-width: 640px;
+            margin: 0 auto;
+            color: rgba(255, 255, 255, .92);
+            font-size: 17px;
+            line-height: 1.8;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+        }
+
+        /* PERSONAL */
+        .ya-personal {
+            background: var(--sand);
+        }
+
+        .ya-personal-grid {
             display: grid;
-            grid-template-columns: .78fr 1.22fr;
-            gap: clamp(55px, 8vw, 120px);
+            grid-template-columns: .9fr 1.1fr;
+            gap: clamp(48px, 8vw, 96px);
+            align-items: center;
+        }
+
+        .ya-personal-media {
+            position: relative;
+        }
+
+        .ya-personal-media .ya-frame {
+            height: clamp(420px, 52vw, 640px);
+            border-radius: 14px;
+        }
+
+        .ya-personal-media .small {
+            position: absolute;
+            right: -24px;
+            bottom: -28px;
+            width: 42%;
+            height: 38%;
+            border: 8px solid var(--sand);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
+        }
+
+        .ya-feature {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 20px;
+            padding: 20px 0;
+            border-top: 1px solid var(--line);
+        }
+
+        .ya-feature:last-child {
+            border-bottom: 1px solid var(--line);
+        }
+
+        .ya-feature strong {
+            font: 400 22px/1.2 var(--serif);
+            color: var(--sage-deep);
+        }
+
+        .ya-feature span {
+            color: var(--muted);
+            font-size: 14.5px;
+            line-height: 1.7;
+        }
+
+        /* CARDS (Shared) */
+        .ya-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 56px;
+        }
+
+        .ya-card {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 12px 32px -10px rgba(43, 54, 39, 0.06);
+            transition: transform .4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ya-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 50px -16px rgba(43, 54, 39, .22);
+        }
+
+        .ya-card-img {
+            height: 270px;
+            overflow: hidden;
+        }
+
+        .ya-card-img img {
+            transition: transform .75s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ya-card:hover img {
+            transform: scale(1.06);
+        }
+
+        .ya-card-body {
+            padding: 28px 24px 30px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .ya-card-body small {
+            color: var(--gold);
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            filter: brightness(.86);
+        }
+
+        .ya-card-body p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14.5px;
+            line-height: 1.7;
+        }
+
+        /* JOURNEY CARDS */
+        .ya-journeys {
+            background: var(--paper);
+        }
+
+        .ya-cards.four {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .ya-journey {
+            position: relative;
+            min-height: 440px;
+            display: flex;
+            align-items: flex-end;
+            border-radius: 4px;
+            overflow: hidden;
+            color: #fff;
+            box-shadow: 0 16px 36px -10px rgba(28, 38, 24, 0.25);
+            transition: transform .45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ya-journey:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 28px 56px -16px rgba(28, 38, 24, 0.4);
+        }
+
+        .ya-journey img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .85s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ya-journey:hover img {
+            transform: scale(1.08);
+        }
+
+        .ya-journey::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(20, 28, 18, 0.1) 20%, rgba(20, 28, 18, 0.5) 60%, rgba(18, 25, 16, 0.95) 100%);
+            transition: opacity 0.3s;
+        }
+
+        .ya-journey-body {
+            position: relative;
+            z-index: 2;
+            padding: 28px 24px;
+            width: 100%;
+        }
+
+        .ya-journey h3 {
+            color: #fff;
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+
+        .ya-journey p {
+            margin: 0 0 16px;
+            color: rgba(255, 255, 255, .88);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .ya-journey .meta {
+            display: inline-block;
+            padding: 5px 14px;
+            margin-bottom: 14px;
+            border-radius: 999px;
+            background: rgba(207, 171, 85, .96);
+            color: var(--sage-deep);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .02em;
+        }
+
+        .ya-journey .go {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gold-soft);
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.25s;
+        }
+
+        .ya-journey:hover .go {
+            gap: 10px;
+        }
+
+        /* PROCESS */
+        .ya-process {
+            background: var(--sand);
+        }
+
+        .ya-process-list {
+            margin-top: 56px;
+            border-top: 1px solid var(--line);
+        }
+
+        .ya-process-item {
+            display: grid;
+            grid-template-columns: 80px 300px 1fr;
+            gap: 24px;
+            padding: 34px 0;
+            border-bottom: 1px solid var(--line);
             align-items: start;
         }
 
-        .ya-tibet-page .ya-enquiry-copy {
-            padding-top: 15px;
-            font-family: 'Open Sans', sans-serif;
-        }
-
-        .ya-tibet-page .ya-enquiry-copy .ya-label {
-            font-family: 'Open Sans', sans-serif;
-        }
-
-        .ya-tibet-page .ya-enquiry-copy .ya-script {
-            font: italic 400 clamp(34px, 4vw, 54px)/1.15 "Newsreader", Times, Georgia, serif;
-            letter-spacing: normal;
+        .ya-process-number {
+            font: 400 32px/1 var(--serif);
             color: var(--gold);
-            margin: 14px 0 20px;
+            filter: brightness(.85);
         }
 
-        .ya-tibet-page .ya-enquiry-copy h2 {
-            margin: 0 0 23px;
-            font: 600 clamp(44px, 5vw, 72px)/.95 "Newsreader", Times, Georgia, serif;
-            color: #ffffff !important;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        .ya-process-item h3 {
+            margin: 0;
+            font-size: 28px;
         }
 
-        .ya-tibet-page .ya-enquiry-copy>p {
-            margin: 0 0 16px;
-            color: rgba(255, 255, 255, .7);
-            font: 400 15px/1.9 'Open Sans', sans-serif;
+        .ya-process-item p {
+            margin: 0;
+            max-width: 520px;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.75;
         }
 
-        .ya-tibet-page .ya-contact-list {
-            margin-top: 32px;
-        }
-
-        .ya-tibet-page .ya-contact-card {
-            display: grid;
-            grid-template-columns: 48px 1fr;
-            gap: 15px;
+        /* BAND */
+        .ya-band {
+            min-height: 540px;
+            display: flex;
             align-items: center;
-            padding: 15px 0;
+            justify-content: center;
+            text-align: center;
             color: #fff;
-            text-decoration: none;
+            padding: 90px 20px;
+            background: linear-gradient(rgba(24, 33, 22, .62), rgba(24, 33, 22, .78)), url("https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/08/photo-1505058439590-d86bd136dcec-scaled.avif") center/cover no-repeat;
         }
 
-        .ya-tibet-page .ya-contact-icon {
-            width: 42px;
-            height: 42px;
-            display: grid;
-            place-items: center;
-            background: var(--gold);
-            color: var(--forest);
+        .ya-band-content {
+            width: min(780px, calc(100% - 40px));
+        }
+
+        .ya-band h2 {
+            color: #fff;
+        }
+
+        .ya-band .ya-eyebrow {
+            color: var(--gold-soft);
+        }
+
+        .ya-band p {
+            max-width: 620px;
+            margin: 0 auto 30px;
+            color: rgba(255, 255, 255, .9);
             font-size: 17px;
-            border-radius: 50%;
+            line-height: 1.8;
         }
 
-        .ya-tibet-page .ya-contact-card small {
+
+
+
+        /* FORM SHELL RESPONSIVE LAYOUT */
+        .ya-form-shell {
+            display: grid;
+            grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+            gap: clamp(32px, 5vw, 64px);
+            align-items: start;
+            margin-top: 56px;
+        }
+
+        .ya-form-info {
+            padding-right: 12px;
+        }
+
+        .ya-form-info h3 {
+            font-size: clamp(26px, 3vw, 32px);
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: var(--sage-deep);
+        }
+
+        .ya-form-info>p {
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 28px;
+            line-height: 1.75;
+        }
+
+        .ya-info-box {
+            padding: 22px 0;
+            border-top: 1px solid var(--line);
+        }
+
+        .ya-info-box:last-child {
+            border-bottom: 1px solid var(--line);
+        }
+
+        .ya-info-box strong {
             display: block;
-            color: var(--gold);
-            font-size: 9px;
+            font: 400 21px/1.3 var(--serif);
+            color: var(--sage-deep);
+            margin-bottom: 6px;
+        }
+
+        .ya-info-box p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14.5px;
+            line-height: 1.7;
+        }
+
+        .ya-info-box a {
+            color: var(--sage);
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            font-weight: 500;
+        }
+
+
+
+        /* FINAL + CONTACT */
+        .ya-final {
+            padding: clamp(80px, 10vw, 130px) 0;
+            text-align: center;
+            color: #fff;
+            background: linear-gradient(rgba(28, 38, 25, .78), rgba(18, 25, 17, .92)), url("https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/back-view-hiker-looking-view-from-snowy-mountain-peak-scaled.webp") center/cover no-repeat;
+        }
+
+        .ya-final h2 {
+            color: #fff;
+        }
+
+        .ya-final .ya-eyebrow {
+            color: var(--gold-soft);
+        }
+
+        .ya-final p {
+            max-width: 600px;
+            margin: 0 auto 32px;
+            color: rgba(255, 255, 255, .9);
+            font-size: 17px;
+            line-height: 1.8;
+        }
+
+        .ya-final-actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        /* CONTACT: Fixed position background image */
+        .ya-contact {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            padding: clamp(90px, 11vw, 130px) 0 80px;
+            color: #fff;
+            background: #121911;
+        }
+
+        .ya-contact::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            background-image: url("https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/08/photo-1548013146-72479768bada.avif");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .ya-contact::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(16, 23, 15, 0.5) 0%, rgba(14, 20, 13, 0.88) 100%),
+                linear-gradient(180deg, rgba(14, 20, 13, 0.88) 0%, rgba(14, 20, 13, 0.65) 40%, rgba(14, 20, 13, 0.95) 100%);
+        }
+
+        .ya-contact h2 {
+            color: #fff;
+            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .ya-contact .ya-eyebrow {
+            color: var(--gold-soft);
+        }
+
+        .ya-contact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 52px;
+        }
+
+        .ya-contact-card {
+            padding: 36px 30px;
+            border: 1px solid rgba(255, 255, 255, .16);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+            transition: background .3s, transform .3s, border-color .3s, box-shadow .3s;
+        }
+
+        .ya-contact-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(207, 171, 85, 0.45);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 42px rgba(0, 0, 0, 0.35);
+        }
+
+        .ya-contact-card small {
+            display: block;
+            margin-bottom: 16px;
+            color: var(--gold-soft);
+            font-size: 12.5px;
             font-weight: 700;
-            letter-spacing: 1.5px;
+            letter-spacing: .08em;
             text-transform: uppercase;
         }
 
-        .ya-tibet-page .ya-contact-card strong {
-            font-size: 14px;
-            font-weight: 500;
+        .ya-contact-card h3 {
             color: #fff;
+            font-size: 26px;
         }
 
-        .ya-tibet-page .ya-form-wrap {
-            padding: clamp(28px, 4vw, 50px);
-            background: #fff;
-            color: var(--ink);
-            border-radius: 12px;
-            box-shadow: 0 35px 90px rgba(0, 0, 0, .22);
+        .ya-contact-card p {
+            margin: 0 0 8px;
+            color: rgba(255, 255, 255, .82);
+            font-size: 14.5px;
+            line-height: 1.7;
         }
 
-        /* RESPONSIVE BREAKPOINTS */
-        @media(max-width:1100px) {
-            .ya-tibet-page .ya-intro-grid,
-            .ya-tibet-page .ya-enquiry-grid {
+        .ya-contact-card a {
+            color: #fff;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 255, 255, .45);
+            text-underline-offset: 4px;
+            transition: color 0.2s, text-decoration-color 0.2s;
+        }
+
+        .ya-contact-card a:hover {
+            color: var(--gold-soft);
+            text-decoration-color: var(--gold-soft);
+        }
+
+        .ya-social {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px 28px;
+            margin-top: 52px;
+            font-size: 14.5px;
+        }
+
+        .ya-social span {
+            color: rgba(255, 255, 255, .65);
+        }
+
+        .ya-social a {
+            color: #fff;
+            font-weight: 600;
+            transition: color 0.2s, background 0.2s;
+            padding: 6px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .ya-social a:hover {
+            color: #1a2418;
+            background: var(--gold-soft);
+        }
+
+        /* SCROLL ANIMATIONS */
+        .ya-bespoke-page .ya-anim {
+            opacity: 0;
+            translate: 0 36px;
+            transition: opacity .85s cubic-bezier(.2, .7, .2, 1), translate .85s cubic-bezier(.2, .7, .2, 1), scale .85s cubic-bezier(.2, .7, .2, 1);
+        }
+
+        .ya-bespoke-page .ya-anim.zoom {
+            translate: 0 24px;
+            scale: .96;
+        }
+
+        .ya-bespoke-page .ya-anim.is-in {
+            opacity: 1;
+            translate: 0 0;
+            scale: 1;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:1024px) {
+            .ya-cards.four {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .ya-process-item {
+                grid-template-columns: 60px 220px 1fr;
+            }
+
+            .ya-form-shell {
                 grid-template-columns: 1fr;
-                gap: 55px;
-            }
-
-            .ya-tibet-page .ya-intro-visual {
-                max-width: 760px;
-                margin: 0 auto;
-                width: 100%;
-            }
-
-            .ya-tibet-page .ya-intro-copy {
-                max-width: 100%;
-            }
-
-            .ya-tibet-page .ya-enquiry-copy {
-                position: relative;
-                top: auto;
-                max-width: 100%;
+                gap: 40px;
             }
         }
 
-        @media(max-width:760px) {
-            .ya-tibet-page .ya-container,
-            .ya-tibet-page .ya-inner {
-                width: calc(100% - 30px);
-            }
-
-            .ya-tibet-page .ya-hero {
-                min-height: 100vh;
-                min-height: 100svh;
-                height: auto;
-                padding: 95px 0 25px;
-            }
-
-            .ya-tibet-page .ya-hero-main {
-                padding: 20px 0 15px;
-            }
-
-            .ya-tibet-page .ya-hero-script {
-                font-size: clamp(48px, 12vw, 68px);
-                margin: 0 0 10px;
-            }
-
-            .ya-tibet-page .ya-hero h1 {
-                font-size: clamp(28px, 7.5vw, 42px) !important;
-                line-height: 1.08;
-                margin-bottom: 16px;
-            }
-
-            .ya-tibet-page .ya-hero-description {
-                font-size: 14px;
-                line-height: 1.6;
-                margin-bottom: 22px;
-                padding: 0 4px;
-            }
-
-            .ya-tibet-page .ya-hero-actions {
-                flex-direction: column;
-                width: 100%;
-                max-width: 360px;
-                gap: 12px;
-                margin-bottom: 20px;
-            }
-
-            .ya-tibet-page .ya-hero-cta {
-                width: 100%;
-                justify-content: space-between;
-                padding: 6px 10px 6px 22px;
-            }
-
-            .ya-tibet-page .ya-intro,
-            .ya-tibet-page .ya-journeys,
-            .ya-tibet-page .ya-enquiry {
-                padding: 80px 0;
-            }
-
-            .ya-tibet-page .ya-intro-visual {
-                min-height: 480px;
-            }
-
-            .ya-tibet-page .ya-intro-image-main {
-                width: 85%;
-                height: 430px;
-            }
-
-            .ya-tibet-page .ya-intro-image-small {
-                width: 55%;
-                height: 230px;
-                border-width: 6px;
-            }
-
-            .ya-tibet-page .ya-intro-number {
-                left: auto;
-                right: 8px;
-                bottom: 25px;
-                padding: 14px 16px;
-            }
-
-            .ya-tibet-page .ya-intro-number strong {
-                font-size: 34px;
-            }
-
-            .ya-tibet-page .ya-intro-points {
-                grid-template-columns: 1fr;
-                gap: 12px;
-                padding-top: 16px;
-            }
-
-            .ya-tibet-page .ya-intro-point {
-                border-right: none;
-                border-bottom: 1px solid var(--line);
-                padding: 10px 0;
-            }
-
-            .ya-tibet-page .ya-intro-point:not(:first-child) {
-                padding-left: 0;
-            }
-
-            .ya-tibet-page .ya-hero-nav {
+        @media(max-width:860px) {
+            .ya-scroll {
                 display: none;
             }
 
-            .ya-tibet-page .ya-form-wrap {
-                padding: 24px 18px;
+            .ya-intro-gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .ya-intro-side {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 240px;
+            }
+
+            .ya-principles {
+                grid-template-columns: 1fr;
+            }
+
+            .ya-personal-grid {
+                grid-template-columns: 1fr;
+                gap: 64px;
+            }
+
+            .ya-personal-media .small {
+                right: 12px;
+            }
+
+            .ya-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .ya-cards>.ya-card:last-child:nth-child(odd) {
+                grid-column: 1/-1;
+            }
+
+            .ya-contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ya-statement::before,
+            .ya-contact::before {
+                background-attachment: scroll;
+            }
+        }
+
+        @media(max-width:680px) {
+            .ya-hero {
+                min-height: 95svh;
+                padding: 100px 16px 60px;
+            }
+
+            .ya-hero-inner {
+                width: 100%;
+                padding: 0;
+            }
+
+            .ya-hero h1 {
+                font-size: clamp(38px, 11vw, 56px);
+                line-height: 1.05;
+                margin-bottom: 18px;
+            }
+
+            .ya-hero-lead {
+                font-size: 16px;
+                line-height: 1.65;
+                margin-bottom: 26px;
+            }
+
+            .ya-hero-actions {
+                flex-direction: column;
+                width: 100%;
+                gap: 12px;
+            }
+
+            .ya-hero-actions .ya-btn,
+            .ya-final-actions .ya-btn {
+                width: 100%;
+            }
+
+            .ya-hero-meta {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                margin-top: 26px;
+            }
+
+            .ya-hero-meta span {
+                font-size: 12px;
+                padding: 5px 12px;
+            }
+
+            .ya-feature {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+
+            .ya-cards,
+            .ya-cards.four {
+                grid-template-columns: 1fr;
+            }
+
+            .ya-journey {
+                min-height: 380px;
+            }
+
+            .ya-process-item {
+                grid-template-columns: 48px 1fr;
+                gap: 6px 14px;
+            }
+
+            .ya-process-item p {
+                grid-column: 2;
+            }
+
+            .ya-process-item h3 {
+                font-size: 24px;
+            }
+
+            .ya-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ya-field.full {
+                grid-column: auto;
+            }
+
+            .ya-form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .ya-form-actions .ya-btn {
+                width: 100%;
+            }
+
+            .ya-intro-side {
+                grid-template-columns: 1fr;
+                grid-template-rows: none;
+            }
+
+            .ya-intro-side .ya-frame {
+                height: 240px;
             }
         }
 
         @media(prefers-reduced-motion:reduce) {
-            .ya-tibet-page * {
-                scroll-behavior: auto !important;
+            .ya-bespoke-page * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        /* =========================================================
+           FINAL RESPONSIVE / POLISH OVERRIDES
+           Desktop + tablet + mobile
+           ========================================================= */
+        .ya-bespoke-page,
+        .ya-bespoke-page * {
+            box-sizing: border-box;
+        }
+
+        .ya-bespoke-page {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: clip;
+        }
+
+        .ya-bespoke-page img {
+            max-width: 100%;
+        }
+
+        .ya-inner {
+            width: min(1180px, calc(100% - 48px));
+            margin-inline: auto;
+        }
+
+        .ya-section {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Hero */
+        .ya-hero {
+            min-height: min(900px, 100svh);
+            padding: clamp(100px, 12vw, 150px) 24px 92px;
+        }
+
+        .ya-hero::before {
+            background-position: center 50%;
+        }
+
+        .ya-hero-inner {
+            width: min(960px, 100%);
+        }
+
+        .ya-hero h1 {
+            font-size: clamp(44px, 8vw, 92px);
+        }
+
+        .ya-hero-lead {
+            max-width: 720px;
+        }
+
+        /* Keep destination cards intentionally subtle */
+        .ya-journey {
+            border-radius: 4px !important;
+        }
+
+        .ya-journey:focus-visible,
+        .ya-btn:focus-visible,
+        .ya-card:focus-within {
+            outline: 3px solid rgba(190, 151, 73, .55);
+            outline-offset: 3px;
+        }
+
+        .ya-journey-body {
+            min-width: 0;
+        }
+
+        /* Prevent long form controls from overflowing */
+        .ya-form-card input,
+        .ya-form-card select,
+        .ya-form-card textarea {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        .ya-form-grid {
+            min-width: 0;
+        }
+
+        @media (max-width: 1100px) {
+            .ya-inner {
+                width: min(100% - 40px, 920px);
+            }
+
+            .ya-cards.four {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .ya-journey {
+                min-height: 420px;
+            }
+
+            .ya-contact-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 820px) {
+            .ya-inner {
+                width: min(100% - 32px, 700px);
+            }
+
+            .ya-hero {
+                min-height: 760px;
+                padding: 105px 20px 80px;
+            }
+
+            .ya-hero h1 {
+                font-size: clamp(42px, 10vw, 70px);
+                line-height: 1;
+            }
+
+            .ya-hero-lead {
+                font-size: 16px;
+                line-height: 1.7;
+            }
+
+            .ya-hero-actions,
+            .ya-final-actions {
+                width: 100%;
+            }
+
+            .ya-hero-actions .ya-btn,
+            .ya-final-actions .ya-btn {
+                min-width: 210px;
+            }
+
+            .ya-cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 18px;
+                margin-top: 40px;
+            }
+
+            .ya-cards.four {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .ya-journey {
+                min-height: 390px;
+            }
+
+            .ya-card-img {
+                height: 230px;
+            }
+
+            .ya-contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ya-form-shell {
+                grid-template-columns: 1fr;
+                gap: 36px;
+            }
+
+            .ya-form-info {
+                padding-right: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .ya-inner {
+                width: calc(100% - 28px);
+            }
+
+            .ya-hero {
+                min-height: 720px;
+                padding: 96px 14px 76px;
+            }
+
+            .ya-hero::before {
+                background-position: 54% center;
+            }
+
+            .ya-hero::after {
+                background:
+                    linear-gradient(180deg, rgba(14, 20, 14, .58) 0%, rgba(14, 20, 14, .38) 42%, rgba(14, 20, 14, .90) 100%);
+            }
+
+            .ya-hero h1 {
+                font-size: clamp(40px, 13vw, 58px);
+                letter-spacing: -.04em;
+                margin-bottom: 18px;
+            }
+
+            .ya-hero-lead {
+                font-size: 15px;
+                line-height: 1.65;
+                max-width: 520px;
+            }
+
+            .ya-hero-actions {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 22px;
+            }
+
+            .ya-hero-actions .ya-btn,
+            .ya-final-actions .ya-btn {
+                width: min(100%, 360px);
+                min-width: 0;
+            }
+
+            .ya-scroll {
+                bottom: 18px;
+            }
+
+            .ya-cards,
+            .ya-cards.four {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                margin-top: 32px;
+            }
+
+            .ya-journey {
+                min-height: 360px;
+                border-radius: 4px !important;
+            }
+
+            .ya-journey-body {
+                padding: 24px 20px;
+            }
+
+            .ya-card-img {
+                height: 220px;
+            }
+
+            .ya-card-body {
+                padding: 24px 20px 26px;
+            }
+
+            .ya-final {
+                background-position: 58% center;
+            }
+
+            .ya-final-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .ya-contact-grid {
+                gap: 14px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .ya-inner {
+                width: calc(100% - 24px);
+            }
+
+            .ya-hero {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .ya-hero h1 {
+                font-size: 39px;
+            }
+
+            .ya-hero-lead {
+                font-size: 14.5px;
+            }
+
+            .ya-journey {
+                min-height: 330px;
+            }
+
+            .ya-journey-body {
+                padding: 20px 18px;
+            }
+
+            .ya-journey-body h3 {
+                font-size: 28px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .ya-bespoke-page *,
+            .ya-bespoke-page *::before,
+            .ya-bespoke-page *::after {
                 animation-duration: .01ms !important;
                 animation-iteration-count: 1 !important;
                 transition-duration: .01ms !important;
-            }
-
-            .ya-tibet-page .ya-reveal {
-                opacity: 1;
-                transform: none;
+                scroll-behavior: auto !important;
             }
         }
     </style>
 
     <!-- HERO -->
-    <section class="ya-hero" id="ya-hero">
-
-        <!-- Background Slideshow Carousel -->
-        <div class="ya-hero-stage" aria-hidden="true">
-            <!-- Slide 1: Potala Palace under clear blue sky in Lhasa, Tibet -->
-            <div class="ya-hero-slide is-active" data-index="0">
-                <div class="ya-hero-media">
-                    <img src="https://images.unsplash.com/photo-1781927387350-289c1fc914aa?auto=format&fit=crop&w=2600&q=90"
-                        alt="Iconic Potala Palace under clear blue sky in Lhasa, Tibet" fetchpriority="high">
-                </div>
+    <section class="ya-hero">
+        <div class="ya-hero-inner">
+            <h1>
+                <span class="ln"><span>Your journey.</span></span>
+                <span class="ln"><span>No one else's.</span></span>
+            </h1>
+            <p class="ya-hero-lead">A private journey shaped around your people, your pace, your interests, and the
+                moments you will remember long after you return home.</p>
+            <div class="ya-hero-actions">
+                <a class="ya-btn ya-btn-primary" href="#ya-bespoke-form">Tell Us About Your Trip</a>
+                <a class="ya-btn ya-btn-outline" href="mailto:sales@yetiadventure.com">Email Our Specialists</a>
             </div>
-
-            <!-- Slide 2: Yamdrok Turquoise Sacred High Lake -->
-            <div class="ya-hero-slide" data-index="1">
-                <div class="ya-hero-media">
-                    <img src="https://images.unsplash.com/photo-1701913998582-2cb8c9db53c2?auto=format&fit=crop&w=2600&q=90"
-                        alt="Turquoise alpine waters of sacred Yamdrok Lake on Tibetan Plateau" loading="lazy">
-                </div>
-            </div>
-
-            <!-- Slide 3: Mount Kailash Sacred Himalayan Peak -->
-            <div class="ya-hero-slide" data-index="2">
-                <div class="ya-hero-media">
-                    <img src="https://images.unsplash.com/photo-1691166502012-5dc9c769a1d3?auto=format&fit=crop&w=2600&q=90"
-                        alt="Sacred peak of Mount Kailash in Western Tibet" loading="lazy">
-                </div>
-            </div>
-
-            <!-- Slide 4: Night illumination of Potala Palace -->
-            <div class="ya-hero-slide" data-index="3">
-                <div class="ya-hero-media">
-                    <img src="https://images.unsplash.com/photo-1701913997567-746dd137eff6?auto=format&fit=crop&w=2600&q=90"
-                        alt="Potala Palace illuminated at night in Lhasa, Tibet" loading="lazy">
-                </div>
-            </div>
-
-            <!-- Cinematic overlays -->
-            <div class="ya-hero-overlay"></div>
-            <div class="ya-hero-noise"></div>
         </div>
+        <div class="ya-scroll"><span>Scroll</span></div>
+    </section>
 
-        <!-- Hero Slide Nav Arrows (visible on hover) -->
-        <button class="ya-hero-nav ya-hero-nav--prev" type="button" id="ya-hero-prev" aria-label="Previous slide">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 18l-6-6 6-6" />
-            </svg>
-        </button>
-        <button class="ya-hero-nav ya-hero-nav--next" type="button" id="ya-hero-next" aria-label="Next slide">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 18l6-6-6-6" />
-            </svg>
-        </button>
-
-        <!-- Center Hero Main Copy -->
-        <div class="ya-container ya-hero-main">
-            <div class="ya-hero-copy ya-reveal">
-                <!-- Tibet Top Script -->
-                <div class="ya-script ya-hero-script">Tibet</div>
-
-                <!-- Headline in 72px Title Case -->
-                <h1>Journey Across the Roof of the World</h1>
-
-                <!-- Subtext -->
-                <p class="ya-hero-description">Enter a vast high-altitude realm of sacred mountains, turquoise lakes, ancient monasteries and living traditions shaped by devotion and endurance.</p>
-
-                <!-- Hero Actions -->
-                <div class="ya-hero-actions">
-                    <a href="#tibet-journeys" class="ya-hero-cta" id="ya-hero-cta-explore">
-                        <span class="ya-hero-cta__text">Explore Tibet</span>
-                        <span class="ya-hero-cta__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 12h14M13 6l6 6-6 6"></path>
-                            </svg>
-                        </span>
-                    </a>
-                    <a href="#tibet-enquiry" class="ya-hero-cta ya-hero-cta--outline" id="ya-hero-cta-journeys">
-                        <span class="ya-hero-cta__text">Plan Your Journey</span>
-                        <span class="ya-hero-cta__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 12h14M13 6l6 6-6 6"></path>
-                            </svg>
-                        </span>
-                    </a>
+    <!-- INTRO -->
+    <section class="ya-section">
+        <div class="ya-inner">
+            <div class="ya-center">
+                <span class="ya-eyebrow">Designed exclusively for you</span>
+                <h2>Travel with the people<br>who matter most.</h2>
+                <p class="ya-lead">Your best journey does not have to follow someone else's itinerary. Choose where you
+                    want to go, who you want beside you, and how you want the days to unfold.</p>
+            </div>
+            <div class="ya-intro-gallery">
+                <div>
+                    <div class="ya-frame tall">
+                        <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/pexels-marina-zvada-844583049-20315033-scaled.webp"
+                            alt="Travellers exploring a dramatic mountain landscape" loading="lazy">
+                    </div>
+                    <div class="ya-caption">Private journeys shaped around the way you travel</div>
+                </div>
+                <div class="ya-intro-side">
+                    <div class="ya-frame">
+                        <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/08/photo-1548013146-72479768bada.avif"
+                            alt="Ancient Himalayan architecture" loading="lazy">
+                    </div>
+                    <div class="ya-frame">
+                        <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.webp"
+                            alt="Serene mountain valley in Nepal" loading="lazy">
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- INTRODUCTION -->
-    <section class="ya-intro" id="tibet-introduction">
-        <div class="ya-container ya-intro-grid">
-            <!-- Left Side: Content & Information -->
-            <div class="ya-intro-copy ya-reveal">
-                <span class="ya-label">Discover Tibet</span>
-                <div class="ya-script">The Roof of the World</div>
-                <h2>A Realm of Grandeur and<br><em>Extraordinary Devotion.</em></h2>
-                <p>Tibet travel is an invitation to explore one of the world’s most extraordinary spiritual destinations. Known as the Roof of the World and the Third Pole, Tibet evokes a sense of grandeur and devotion amid wild, high-altitude landscapes.</p>
-                <p>Across the Tibetan Plateau, immense valleys, alpine lakes and sacred mountains form the headwaters of many of Asia’s great rivers. None is more revered than Mount Kailash, a pilgrimage destination held sacred across several faiths.</p>
-                <p>Centuries of religious conviction and artistic tradition have shaped remarkable monuments throughout the region, including Norbulingka—the historic summer palace—and the iconic Potala Palace rising above Lhasa.</p>
-                <div class="ya-intro-points">
-                    <div class="ya-intro-point">
-                        <strong>Spiritual</strong>
-                        <span>Pilgrimage · Kailash · Monasteries</span>
-                    </div>
-                    <div class="ya-intro-point">
-                        <strong>Plateau</strong>
-                        <span>4,500m · Glacial Lakes · Passes</span>
-                    </div>
-                    <div class="ya-intro-point">
-                        <strong>Heritage</strong>
-                        <span>Potala · Norbulingka · Traditions</span>
-                    </div>
-                </div>
-                <div class="ya-intro-note">A journey where immense landscapes and centuries of spiritual tradition remain inseparable.</div>
-            </div>
+    <!-- PRINCIPLES -->
+    <div class="ya-inner ya-principles">
+        <article class="ya-principle">
+            <span class="tag">Your pace</span>
+            <h3>Take your time.</h3>
+            <p>Slow discovery, active adventure, or a thoughtful balance of both. Your days are built around your rhythm
+                rather than a fixed schedule.</p>
+        </article>
+        <article class="ya-principle">
+            <span class="tag">Your interests</span>
+            <h3>Follow what fascinates you.</h3>
+            <p>Culture, wildlife, trekking, photography, cuisine, wellness, history and experiences that feel personal
+                to you.</p>
+        </article>
+        <article class="ya-principle">
+            <span class="tag">Your people</span>
+            <h3>Travel together.</h3>
+            <p>A private journey for a couple, family, solo traveller or a small group of people you genuinely want to
+                share the experience with.</p>
+        </article>
+    </div>
 
-            <!-- Right Side: Elevated Visual Composition -->
-            <div class="ya-intro-visual ya-reveal">
-                <div class="ya-intro-image-main" role="img" aria-label="Iconic Potala Palace in Lhasa, Tibet"></div>
-                <div class="ya-intro-image-small" role="img" aria-label="Yamdrok Lake on the Tibetan Plateau"></div>
-                <div class="ya-intro-number">
-                    <strong>4,500m</strong>
-                    <span>High-Plateau<br>Horizons</span>
+    <!-- STATEMENT -->
+    <section class="ya-section ya-statement">
+        <div class="ya-inner">
+            <span class="ya-eyebrow">The bespoke difference</span>
+            <h2>Not a package.<br>A journey designed around you.</h2>
+            <p>The strongest journeys are not built from a template. They begin by understanding what you want to feel,
+                see, learn and share — then shaping the details around it.</p>
+        </div>
+    </section>
+
+    <!-- PERSONAL -->
+    <section class="ya-section ya-personal">
+        <div class="ya-inner ya-personal-grid">
+            <div class="ya-personal-media">
+                <div class="ya-frame">
+                    <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/08/photo-1505058439590-d86bd136dcec-scaled.avif"
+                        alt="Remote mountain journey" loading="lazy">
+                </div>
+                <div class="small">
+                    <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/back-view-hiker-looking-view-from-snowy-mountain-peak-scaled.webp"
+                        alt="Hiker overlooking snowy mountain vista" loading="lazy">
+                </div>
+            </div>
+            <div>
+                <div class="ya-script">Every detail matters.</div>
+                <h2>Travel beyond the ordinary.</h2>
+                <p class="ya-lead" style="margin-bottom:30px">Tell us what you have in mind and we will work with you to
+                    create a private journey with the freedom, depth and personal attention that fixed itineraries
+                    cannot always provide.</p>
+                <div>
+                    <div class="ya-feature">
+                        <strong>Private by design</strong>
+                        <span>Your own departure, private guide and a pace that suits the people travelling with
+                            you.</span>
+                    </div>
+                    <div class="ya-feature">
+                        <strong>Locally connected</strong>
+                        <span>Experiences informed by trusted local knowledge, relationships and years of experience in
+                            the region.</span>
+                    </div>
+                    <div class="ya-feature">
+                        <strong>Flexible in detail</strong>
+                        <span>Accommodation, activities, routes and comfort levels can all be adjusted around your
+                            priorities.</span>
+                    </div>
+                    <div class="ya-feature">
+                        <strong>Supported throughout</strong>
+                        <span>Thoughtful planning before departure and reliable local coordination while you
+                            travel.</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FEATURED JOURNEYS -->
-    <section class="ya-journeys" id="tibet-journeys">
-        <div class="ya-journeys-container">
-            <div class="ya-journeys-head ya-reveal">
-                <h2 class="ya-journeys-title">Journeys Across Tibet</h2>
-                <p class="ya-journeys-desc">From Lhasa’s architectural masterpieces to sacred Mount Kailash and remote monastery trails, these journeys reveal Tibet through culture, spirituality and adventure.</p>
+    <!-- EXPERIENCES (cards) -->
+    <section class="ya-section">
+        <div class="ya-inner">
+            <div class="ya-center">
+                <span class="ya-eyebrow">Not just places</span>
+                <h2>Travel for the moments.</h2>
+                <p class="ya-lead">The most memorable journeys are often found in the details — a conversation, a quiet
+                    morning, a meal, a hidden trail or an experience that could never be copied from a brochure.</p>
             </div>
-            <div class="ya-journeys-shortcode-wrap ya-reveal">
-                [trek_destinations category="all" region="Tibet" count="8" columns="4"]
+            <div class="ya-cards">
+                <article class="ya-card">
+                    <div class="ya-card-img">
+                        <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/pexels-marina-zvada-844583049-20315033-scaled.webp"
+                            alt="Mountain adventure" loading="lazy">
+                    </div>
+                    <div class="ya-card-body">
+                        <small>Adventure</small>
+                        <h3>Into the mountains</h3>
+                        <p>Private walks, remote trails and quiet Himalayan landscapes chosen around your interests and
+                            fitness.</p>
+                    </div>
+                </article>
+                <article class="ya-card">
+                    <div class="ya-card-img">
+                        <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/08/photo-1548013146-72479768bada.avif"
+                            alt="Cultural architecture" loading="lazy">
+                    </div>
+                    <div class="ya-card-body">
+                        <small>Culture</small>
+                        <h3>Beyond the landmarks</h3>
+                        <p>Discover living traditions, ancient streets, monasteries and local stories with people who
+                            know the places intimately.</p>
+                    </div>
+                </article>
+                <article class="ya-card">
+                    <div class="ya-card-img">
+                        <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.webp"
+                            alt="Remote serene landscape" loading="lazy">
+                    </div>
+                    <div class="ya-card-body">
+                        <small>Connection</small>
+                        <h3>The unexpected</h3>
+                        <p>Private meals, photography, wildlife, special celebrations and experiences built around what
+                            matters to you.</p>
+                    </div>
+                </article>
             </div>
         </div>
     </section>
 
-    <!-- ENQUIRY -->
-    <section class="ya-enquiry" id="tibet-enquiry">
-        <div class="ya-container ya-enquiry-grid">
-            <div class="ya-enquiry-copy ya-reveal">
-                <span class="ya-label">Speak with our team</span>
-                <div class="ya-script">Begin Your Journey</div>
-                <h2>Plan Your Tibet Journey With Our Travel Experts</h2>
-                <p>Tibet requires thoughtful planning, appropriate acclimatisation and carefully coordinated travel arrangements. Our team will help shape the route, pace and experiences around your interests.</p>
-                <p>Prefer to talk first? Reach us directly.</p>
-                <div class="ya-contact-list">
-                    <a class="ya-contact-card" href="https://wa.me/9779803197006" target="_blank" rel="noopener">
-                        <span class="ya-contact-icon">◉</span>
-                        <span><small>WhatsApp</small><strong>+977 980 319 7006</strong></span>
-                    </a>
-                    <a class="ya-contact-card" href="tel:+9779803197006">
-                        <span class="ya-contact-icon">☎</span>
-                        <span><small>Call Us</small><strong>+977 980 319 7006</strong></span>
-                    </a>
-                    <a class="ya-contact-card" href="mailto:info@yetiadventure.com">
-                        <span class="ya-contact-icon">✉</span>
-                        <span><small>Email</small><strong>info@yetiadventure.com</strong></span>
-                    </a>
+    <!-- JOURNEY CARDS -->
+    <section class="ya-section ya-journeys" style="padding-top:0">
+        <div class="ya-inner">
+            <div class="ya-center">
+                <span class="ya-eyebrow">Where to begin</span>
+                <h2>Four places, endless routes.</h2>
+                <p class="ya-lead">Start with one destination or combine several. Each card is only a starting point —
+                    we shape the rest with you.</p>
+            </div>
+            <div class="ya-cards four">
+                <a class="ya-journey" href="/destination/nepal/" data-dest="Nepal">
+                    <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/08/photo-1505058439590-d86bd136dcec-scaled.avif"
+                        alt="Nepal Himalaya" loading="lazy">
+                    <div class="ya-journey-body">
+                        <span class="meta">Trails &amp; heritage</span>
+                        <h3>Nepal</h3>
+                        <p>High passes, Kathmandu Valley, jungle and lake country.</p>
+                        <span class="go">Explore Nepal &rarr;</span>
+                    </div>
+                </a>
+                <a class="ya-journey" href="/destination/bhutan/" data-dest="Bhutan">
+                    <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/08/photo-1548013146-72479768bada.avif"
+                        alt="Bhutan heritage" loading="lazy">
+                    <div class="ya-journey-body">
+                        <span class="meta">Slow &amp; spiritual</span>
+                        <h3>Bhutan</h3>
+                        <p>Dzongs, festivals and quiet valleys at a gentle pace.</p>
+                        <span class="go">Explore Bhutan &rarr;</span>
+                    </div>
+                </a>
+                <a class="ya-journey" href="/destination/tibet/" data-dest="Tibet">
+                    <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/pexels-marina-zvada-844583049-20315033-scaled.webp"
+                        alt="Tibetan plateau" loading="lazy">
+                    <div class="ya-journey-body">
+                        <span class="meta">Plateau &amp; monasteries</span>
+                        <h3>Tibet</h3>
+                        <p>Sacred lakes, vast horizons and centuries-old monasteries.</p>
+                        <span class="go">Explore Tibet &rarr;</span>
+                    </div>
+                </a>
+                <a class="ya-journey" href="/destination/india/" data-dest="India">
+                    <img src="https://peru-oryx-583767.hostingersite.com/wp-content/uploads/2026/09/sylwia-bartyzel-FuuEdB1XN4M-unsplash-scaled.webp"
+                        alt="Himalayan India" loading="lazy">
+                    <div class="ya-journey-body">
+                        <span class="meta">Culture &amp; wildlife</span>
+                        <h3>India</h3>
+                        <p>Himalayan foothills, royal cities and tiger country.</p>
+                        <span class="go">Explore India &rarr;</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROCESS -->
+    <section class="ya-section ya-process">
+        <div class="ya-inner">
+            <div class="ya-center">
+                <span class="ya-eyebrow">From an idea to an itinerary</span>
+                <h2>Thoughtful planning<br>from the first conversation.</h2>
+                <p class="ya-lead">You do not need to know exactly what you want before contacting us. A destination
+                    idea, approximate timing and the kind of experience you are looking for are enough to begin.</p>
+            </div>
+            <div class="ya-process-list">
+                <div class="ya-process-item">
+                    <div class="ya-process-number">01</div>
+                    <h3>Share your vision</h3>
+                    <p>Tell us where you are drawn to, who is travelling, when you hope to go and what matters most to
+                        you.</p>
+                </div>
+                <div class="ya-process-item">
+                    <div class="ya-process-number">02</div>
+                    <h3>Meet your specialist</h3>
+                    <p>Work directly with a destination expert who knows the region through firsthand experience.</p>
+                </div>
+                <div class="ya-process-item">
+                    <div class="ya-process-number">03</div>
+                    <h3>Refine every detail</h3>
+                    <p>Together we shape the route, accommodation, activities, rhythm and budget until the journey feels
+                        right.</p>
+                </div>
+                <div class="ya-process-item">
+                    <div class="ya-process-number">04</div>
+                    <h3>Travel with confidence</h3>
+                    <p>Our local team coordinates the journey so you can spend less time thinking about logistics and
+                        more time being present.</p>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="ya-form-wrap ya-reveal">
-                [trek_nepal_enquiry_form]
+    <!-- BAND -->
+    <section class="ya-band">
+        <div class="ya-band-content">
+            <span class="ya-eyebrow">Nepal, Bhutan, Tibet and India</span>
+            <h2>Go where your curiosity leads.</h2>
+            <p>From Himalayan trails and ancient cities to quiet villages, wildlife and extraordinary cultural
+                encounters, your itinerary can cross borders or stay close to one place. The choice is yours.</p>
+            <a href="#ya-bespoke-form" class="ya-btn ya-btn-white">Start Planning</a>
+        </div>
+    </section>
+
+    <!-- FORM -->
+    <section class="ya-section" id="ya-bespoke-form">
+        <div class="ya-inner">
+            <div class="ya-center">
+                <div class="ya-script">Tell us what you are dreaming about.</div>
+                <h2>You don't need a finished itinerary.</h2>
+                <p class="ya-lead">Give us an idea, a destination, a feeling — and we will start shaping it with you.
+                </p>
+            </div>
+            <div class="ya-form-shell">
+                <aside class="ya-form-info">
+                    <h3>What happens next?</h3>
+                    <p>A Yeti Adventure specialist will review your enquiry and contact you to discuss possible routes,
+                        timing, accommodation, experiences and an appropriate budget.</p>
+                    <div class="ya-info-box">
+                        <strong>Prefer email?</strong>
+                        <p><a href="mailto:sales@yetiadventure.com">sales@yetiadventure.com</a></p>
+                    </div>
+                    <div class="ya-info-box">
+                        <strong>Based in Kathmandu?</strong>
+                        <p>We would be happy to meet for coffee and begin shaping your journey together.</p>
+                    </div>
+                </aside>
+                <div class="ya-form-card">
+                    [trek_nepal_enquiry_form]
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="ya-final">
+        <div class="ya-inner">
+            <span class="ya-eyebrow">Let's start planning</span>
+            <h2>Your journey starts<br>with an idea.</h2>
+            <p>Whether you know exactly where you want to go or simply know the kind of experience you are looking for,
+                we are ready to start the conversation.</p>
+            <div class="ya-final-actions">
+                <a class="ya-btn ya-btn-primary" href="#ya-bespoke-form">Begin Your Journey</a>
+                <a class="ya-btn ya-btn-outline" href="mailto:sales@yetiadventure.com">Email Our Specialists</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="ya-contact">
+        <div class="ya-inner">
+            <div class="ya-center">
+                <span class="ya-eyebrow">Let's stay connected</span>
+                <h2>Choose the way you would like to connect.</h2>
+            </div>
+            <div class="ya-contact-grid">
+                <article class="ya-contact-card">
+                    <small>Telephone</small>
+                    <h3>Speak with us.</h3>
+                    <p><a href="tel:+97714371516">+977 1 4371516</a></p>
+                    <p>Sunday–Friday<br>10:00 a.m. to 5:00 p.m.</p>
+                </article>
+                <article class="ya-contact-card">
+                    <small>Email</small>
+                    <h3>Write to us.</h3>
+                    <p>For general enquiries, complete the form or email us directly.</p>
+                    <p><a href="mailto:sales@yetiadventure.com">sales@yetiadventure.com</a></p>
+                </article>
+                <article class="ya-contact-card">
+                    <small>Kathmandu</small>
+                    <h3>Let's meet.</h3>
+                    <p>If you live in Kathmandu, let us meet for coffee and begin shaping your next journey together.
+                    </p>
+                </article>
+            </div>
+            <div class="ya-social">
+                <span>Follow Yeti Adventure</span>
+                <a href="https://www.instagram.com/officialyetiadventure" target="_blank"
+                    rel="noopener noreferrer">Instagram</a>
+                <a href="https://www.facebook.com/officialyetiadventure" target="_blank"
+                    rel="noopener noreferrer">Facebook</a>
             </div>
         </div>
     </section>
 
     <script>
         (() => {
-            const root = document.querySelector('.ya-tibet-page');
-            if (!root) return;
+            const page = document.querySelector('.ya-bespoke-page');
+            if (!page) return;
 
-            /* Runtime hard-fix: measures any top offset added by the theme/Elementor
-               and pulls this page upward by exactly that amount. */
-            const applyTopGapFix = () => {
-                root.style.setProperty('--ya-top-gap', '0px');
-                requestAnimationFrame(() => {
-                    const pageTop = root.getBoundingClientRect().top + window.scrollY;
-                    const gap = pageTop > 0 && pageTop <= 64 ? Math.ceil(pageTop + 2) : 0;
-                    root.style.setProperty('--ya-top-gap', `${gap}px`);
-                    document.documentElement.style.setProperty('margin-top', '0px', 'important');
-                    document.documentElement.style.setProperty('padding-top', '0px', 'important');
-                    document.body.style.setProperty('margin-top', '0px', 'important');
-                    document.body.style.setProperty('padding-top', '0px', 'important');
+            page.querySelectorAll('a[href^="#"]').forEach(l => l.addEventListener('click', e => {
+                const t = document.querySelector(l.getAttribute('href'));
+                if (!t) return;
+                e.preventDefault();
+                const d = l.dataset.dest, sel = page.querySelector('#ya-destination');
+                if (d && sel) sel.value = d;
+                t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }));
+
+            const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if ('IntersectionObserver' in window && !rm) {
+                const sel = [
+                    '.ya-center>*',
+                    '.ya-principle',
+                    '.ya-statement .ya-inner>*',
+                    '.ya-intro-gallery .ya-frame',
+                    '.ya-caption',
+                    '.ya-personal-media',
+                    '.ya-personal-grid>div:last-child>.ya-script',
+                    '.ya-personal-grid>div:last-child>h2',
+                    '.ya-personal-grid>div:last-child>p',
+                    '.ya-feature',
+                    '.ya-card',
+                    '.ya-journey',
+                    '.ya-process-item',
+                    '.ya-band-content>*',
+                    '.ya-form-info>*',
+                    '.ya-form-card',
+                    '.ya-final .ya-inner>*',
+                    '.ya-contact-card',
+                    '.ya-social'
+                ];
+                const io = new IntersectionObserver(es => es.forEach(en => {
+                    if (!en.isIntersecting) return;
+                    const el = en.target;
+                    io.unobserve(el);
+                    el.classList.add('is-in');
+                    el.addEventListener('transitionend', () => {
+                        el.classList.remove('ya-anim', 'is-in', 'zoom');
+                        el.style.transitionDelay = '';
+                    }, { once: true });
+                }), { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+
+                page.querySelectorAll(sel.join(',')).forEach(el => {
+                    const i = Math.min([...el.parentNode.children].indexOf(el), 5);
+                    el.style.transitionDelay = (i * 90) + 'ms';
+                    el.classList.add('ya-anim');
+                    if (el.matches('.ya-frame,.ya-personal-media')) el.classList.add('zoom');
+                    io.observe(el);
                 });
-            };
-            applyTopGapFix();
-            window.addEventListener('load', applyTopGapFix, { once: true });
+            }
 
-            const revealItems = root.querySelectorAll('.ya-reveal');
-            if ('IntersectionObserver' in window) {
-                const observer = new IntersectionObserver(entries => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('is-visible');
-                            observer.unobserve(entry.target);
-                        }
+            // Destination cards / internal links
+            page.querySelectorAll('a[href^="#"]').forEach(a => {
+                a.addEventListener('click', ev => {
+                    const href = a.getAttribute('href');
+                    const target = href && page.querySelector(href);
+                    if (!target) return;
+
+                    ev.preventDefault();
+
+                    target.scrollIntoView({
+                        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                        block: 'start'
                     });
-                }, { threshold: .12 });
-                revealItems.forEach((item, index) => {
-                    item.style.transitionDelay = `${Math.min(index * 45, 240)}ms`;
-                    observer.observe(item);
                 });
-            } else {
-                revealItems.forEach(item => item.classList.add('is-visible'));
-            }
-
-            // Hero slideshow carousel cycle
-            const heroSlides = Array.from(root.querySelectorAll('.ya-hero-slide'));
-            let currentHeroIndex = 0;
-            let heroTimer = null;
-            const heroSlideTime = 4000;
-
-            function switchHeroSlide(targetIdx) {
-                if (!heroSlides.length) return;
-                heroSlides.forEach((s, idx) => s.classList.toggle('is-active', idx === targetIdx));
-                currentHeroIndex = targetIdx;
-            }
-
-            function nextHeroSlide() {
-                switchHeroSlide((currentHeroIndex + 1) % heroSlides.length);
-            }
-
-            function prevHeroSlide() {
-                switchHeroSlide((currentHeroIndex - 1 + heroSlides.length) % heroSlides.length);
-            }
-
-            function startHeroCycle() {
-                stopHeroCycle();
-                if (heroSlides.length > 1) heroTimer = setInterval(nextHeroSlide, heroSlideTime);
-            }
-
-            function stopHeroCycle() {
-                if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
-            }
-
-            // Wire up left/right arrow buttons
-            root.querySelector('#ya-hero-prev')?.addEventListener('click', () => {
-                prevHeroSlide();
-                startHeroCycle();
             });
-            root.querySelector('#ya-hero-next')?.addEventListener('click', () => {
-                nextHeroSlide();
-                startHeroCycle();
-            });
-
-            const heroElement = root.querySelector('.ya-hero');
-            if (heroElement) {
-                // Pause auto-play on hover, resume on leave
-                heroElement.addEventListener('mouseenter', stopHeroCycle);
-                heroElement.addEventListener('mouseleave', startHeroCycle);
-
-                // Touch swipe support for mobile
-                let touchStartX = 0;
-                heroElement.addEventListener('touchstart', e => {
-                    touchStartX = e.touches[0].clientX;
-                }, { passive: true });
-                heroElement.addEventListener('touchend', e => {
-                    const diff = e.changedTouches[0].clientX - touchStartX;
-                    if (Math.abs(diff) > 40) {
-                        diff < 0 ? nextHeroSlide() : prevHeroSlide();
-                        startHeroCycle();
-                    }
-                }, { passive: true });
-
-                startHeroCycle();
-            }
         })();
     </script>
 </section>

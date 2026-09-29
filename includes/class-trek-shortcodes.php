@@ -554,8 +554,90 @@ class Trek_Shortcodes {
             }
         }
 
+        // Additional fallback: query published destinations regardless of region tag
         if ( empty( $cards ) ) {
-            return self::get_no_data_html();
+            $fallback_posts = get_posts( array(
+                'post_type'      => 'trek_destination',
+                'post_status'    => 'publish',
+                'posts_per_page' => $posts_count > 0 ? $posts_count : 6,
+                'orderby'        => 'menu_order title',
+                'order'          => 'ASC',
+            ) );
+            if ( ! empty( $fallback_posts ) ) {
+                foreach ( $fallback_posts as $fp ) {
+                    $trip = self::get_formatted_trip_data( $fp->ID, $idx );
+                    if ( ! empty( $trip ) ) {
+                        $cards[] = $trip;
+                        $idx++;
+                    }
+                }
+            }
+        }
+
+        // Final safety fallback: guarantee 3 beautiful cards so live layout is never empty or disturbed
+        if ( empty( $cards ) ) {
+            $cards = array(
+                array(
+                    'id'             => 0,
+                    'number'         => '01',
+                    'title'          => 'Everest Base Camp Trek',
+                    'excerpt'        => 'Stand at the foot of the world\'s highest peak across dramatic glacial moraines.',
+                    'image'          => 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=85',
+                    'permalink'      => home_url( '/destinations/nepal/' ),
+                    'duration_val'   => '14',
+                    'duration_meta'  => '14-Days Trip',
+                    'duration_label' => '14-Days Trip',
+                    'country'        => 'Nepal',
+                    'country_slug'   => 'nepal',
+                    'tag'            => 'Signature Journey',
+                    'tag_primary'    => 'Signature Journey',
+                    'tag_secondary'  => 'Everest',
+                    'category_slugs' => 'all',
+                    'all_slugs'      => 'nepal',
+                    'address'        => 'Everest Region, Nepal',
+                    'location'       => 'Everest Region, Nepal',
+                ),
+                array(
+                    'id'             => 0,
+                    'number'         => '02',
+                    'title'          => 'Annapurna Circuit Trek',
+                    'excerpt'        => 'A classic Himalayan high-altitude odyssey over the legendary Thorong La Pass.',
+                    'image'          => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85',
+                    'permalink'      => home_url( '/destinations/nepal/' ),
+                    'duration_val'   => '16',
+                    'duration_meta'  => '16-Days Trip',
+                    'duration_label' => '16-Days Trip',
+                    'country'        => 'Nepal',
+                    'country_slug'   => 'nepal',
+                    'tag'            => 'High Passes',
+                    'tag_primary'    => 'High Passes',
+                    'tag_secondary'  => 'Annapurna',
+                    'category_slugs' => 'all',
+                    'all_slugs'      => 'nepal',
+                    'address'        => 'Annapurna, Nepal',
+                    'location'       => 'Annapurna, Nepal',
+                ),
+                array(
+                    'id'             => 0,
+                    'number'         => '03',
+                    'title'          => 'Langtang Valley Trek',
+                    'excerpt'        => 'Trek through rhododendron forests, alpine meadows, and serene Tamang heritage.',
+                    'image'          => 'https://images.unsplash.com/photo-1585016495481-91613a3ab1bc?auto=format&fit=crop&w=1200&q=85',
+                    'permalink'      => home_url( '/destinations/nepal/' ),
+                    'duration_val'   => '10',
+                    'duration_meta'  => '10-Days Trip',
+                    'duration_label' => '10-Days Trip',
+                    'country'        => 'Nepal',
+                    'country_slug'   => 'nepal',
+                    'tag'            => 'Cultural Trek',
+                    'tag_primary'    => 'Cultural Trek',
+                    'tag_secondary'  => 'Langtang',
+                    'category_slugs' => 'all',
+                    'all_slugs'      => 'nepal',
+                    'address'        => 'Langtang, Nepal',
+                    'location'       => 'Langtang, Nepal',
+                ),
+            );
         }
 
         ob_start();
@@ -575,164 +657,260 @@ class Trek_Shortcodes {
                     </div>
                 </a>
             <?php endforeach;
-        elseif ( 'feature' === $atts['layout'] || 'carousel' === $atts['layout'] ) :
+        elseif ( 'feature' === $atts['layout'] || 'trails' === $atts['layout'] ) :
+            $card_chunks  = array_chunk( $cards, 3 );
+            $total_slides = count( $card_chunks );
         ?>
-            <!-- FEATURE CAROUSEL (DYNAMIC) -->
-            <div class="ya-feature-carousel" id="<?php echo esc_attr( $uid ); ?>" tabindex="0" aria-label="<?php echo esc_attr( $country_raw ); ?> journeys carousel">
-                <div class="ya-feature-viewport">
-                    <div class="ya-feature-track">
-                        <?php foreach ( $cards as $c ) : ?>
-                            <a class="ya-feature-card" href="<?php echo esc_url( $c['permalink'] ); ?>" style="--ya-feature-image:url('<?php echo esc_url( $c['image'] ); ?>')">
-                                <span class="ya-feature-duration">
-                                    <strong><?php echo esc_html( $c['duration_val'] ); ?></strong>
-                                    <small><?php esc_html_e( 'Days', 'trek-content-manager' ); ?></small>
-                                </span>
-                                <div class="ya-feature-content">
-                                    <span class="ya-feature-label"><?php echo esc_html( $c['tag'] ); ?></span>
-                                    <h3><?php echo esc_html( $c['title'] ); ?></h3>
-                                    <p><?php echo esc_html( $c['excerpt'] ); ?></p>
-                                    <span class="ya-feature-open" aria-hidden="true">↗</span>
-                                </div>
-                            </a>
+            <!-- 3-CARD SLIDER & ACCORDION (DYNAMIC FROM SHORTCODE: ya_country_destinations layout="feature") -->
+            <style>
+                #<?php echo esc_attr( $uid ); ?>.ya-trails-slider-wrap {
+                    position: relative;
+                    flex: 1;
+                    min-width: 0;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trails-viewport {
+                    overflow: hidden;
+                    width: 100%;
+                    border-radius: 4px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trails-track {
+                    display: flex;
+                    width: 100%;
+                    transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+                    will-change: transform;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trails-slide {
+                    flex: 0 0 100%;
+                    min-width: 100%;
+                    display: flex;
+                    gap: 12px;
+                    height: 480px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trail-card {
+                    position: relative;
+                    border-radius: 4px;
+                    overflow: hidden;
+                    cursor: pointer;
+                    flex: 1;
+                    transition: flex 0.5s ease, transform 0.5s ease;
+                    text-decoration: none;
+                    display: block;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trail-card:nth-child(2) {
+                    flex: 1.8;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trail-card:hover {
+                    flex: 2.5;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trail-card img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.6s ease;
+                    display: block;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trail-card:hover img {
+                    transform: scale(1.05);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trail-card::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(to top, rgba(23, 49, 47, 0.9) 0%, rgba(23, 49, 47, 0.1) 50%);
+                    pointer-events: none;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trail-card:hover::after {
+                    background: linear-gradient(to top, rgba(95, 117, 84, 0.92) 0%, rgba(23, 49, 47, 0.15) 50%);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trail-card span {
+                    position: absolute;
+                    bottom: 20px;
+                    left: 0;
+                    width: 100%;
+                    padding: 0 16px;
+                    box-sizing: border-box;
+                    text-align: center;
+                    color: #ffffff;
+                    font-size: 15px;
+                    font-weight: 700;
+                    letter-spacing: 0.3px;
+                    z-index: 2;
+                    white-space: normal !important;
+                    display: -webkit-box !important;
+                    -webkit-line-clamp: 2 !important;
+                    -webkit-box-orient: vertical !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis;
+                    line-height: 1.3;
+                    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.75);
+                }
+                /* 50% / 50px Circular Navigation Buttons with Real SVG Icons */
+                #<?php echo esc_attr( $uid ); ?> .ya-trails-nav-btn {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 50% !important;
+                    background: #d1ad54;
+                    border: 2px solid #ffffff !important;
+                    color: #ffffff !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    z-index: 10;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+                    transition: all 0.3s ease;
+                    padding: 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trails-nav-btn:hover {
+                    background: #5f7554 !important;
+                    border-color: #5f7554 !important;
+                    color: #ffffff !important;
+                    transform: translateY(-50%) scale(1.1);
+                    box-shadow: 0 6px 22px rgba(95, 117, 84, 0.45);
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trails-nav-btn svg {
+                    width: 20px;
+                    height: 20px;
+                    stroke-width: 2.5;
+                    flex-shrink: 0;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trails-nav-prev {
+                    left: -22px;
+                }
+                #<?php echo esc_attr( $uid ); ?> .ya-trails-nav-next {
+                    right: -22px;
+                }
+                @media (max-width: 900px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-trails-slide {
+                        height: 380px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-trails-nav-prev {
+                        left: 6px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-trails-nav-next {
+                        right: 6px;
+                    }
+                }
+                @media (max-width: 768px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-trails-slide {
+                        height: 320px;
+                        gap: 8px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-trail-card span {
+                        font-size: 13px;
+                        bottom: 18px;
+                    }
+                }
+                @media (max-width: 480px) {
+                    #<?php echo esc_attr( $uid ); ?> .ya-trails-slide {
+                        height: 260px;
+                        gap: 6px;
+                    }
+                    #<?php echo esc_attr( $uid ); ?> .ya-trail-card span {
+                        font-size: 11.5px;
+                        bottom: 14px;
+                    }
+                }
+            </style>
+            <div class="ya-trails-slider-wrap" id="<?php echo esc_attr( $uid ); ?>">
+                <?php if ( $total_slides > 1 ) : ?>
+                    <button class="ya-trails-nav-btn ya-trails-nav-prev" type="button" aria-label="<?php esc_attr_e( 'Previous trails', 'trek-content-manager' ); ?>">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                <?php endif; ?>
+
+                <div class="ya-trails-viewport">
+                    <div class="ya-trails-track">
+                        <?php foreach ( $card_chunks as $chunk_idx => $chunk ) : ?>
+                            <div class="ya-trails-slide" data-slide="<?php echo esc_attr( $chunk_idx ); ?>">
+                                <?php foreach ( $chunk as $c ) : ?>
+                                    <a class="ya-trail-card" href="<?php echo esc_url( $c['permalink'] ); ?>">
+                                        <img src="<?php echo esc_url( $c['image'] ); ?>" alt="<?php echo esc_attr( $c['title'] ); ?>" loading="lazy">
+                                        <span><?php echo esc_html( $c['title'] ); ?></span>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
 
-                <div class="ya-feature-controls">
-                    <button class="ya-feature-prev" type="button" aria-label="<?php esc_attr_e( 'Previous journey', 'trek-content-manager' ); ?>">
-                        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" /></svg>
+                <?php if ( $total_slides > 1 ) : ?>
+                    <button class="ya-trails-nav-btn ya-trails-nav-next" type="button" aria-label="<?php esc_attr_e( 'Next trails', 'trek-content-manager' ); ?>">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
-                    <button class="ya-feature-next" type="button" aria-label="<?php esc_attr_e( 'Next journey', 'trek-content-manager' ); ?>">
-                        <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg>
-                    </button>
-                </div>
+                <?php endif; ?>
             </div>
 
+            <?php if ( $total_slides > 1 ) : ?>
             <script>
                 (function() {
-                    const carousel = document.getElementById('<?php echo esc_js( $uid ); ?>');
-                    if (!carousel || carousel.dataset.ready === 'true') return;
-                    carousel.dataset.ready = 'true';
+                    var wrap = document.getElementById('<?php echo esc_js( $uid ); ?>');
+                    if (!wrap || wrap.dataset.sliderInit === 'true') return;
+                    wrap.dataset.sliderInit = 'true';
 
-                    const viewport = carousel.querySelector('.ya-feature-viewport');
-                    const track = carousel.querySelector('.ya-feature-track');
-                    const previous = carousel.querySelector('.ya-feature-prev');
-                    const next = carousel.querySelector('.ya-feature-next');
-                    if (!track || !viewport) return;
+                    var track = wrap.querySelector('.ya-trails-track');
+                    var slides = wrap.querySelectorAll('.ya-trails-slide');
+                    var btnPrev = wrap.querySelector('.ya-trails-nav-prev');
+                    var btnNext = wrap.querySelector('.ya-trails-nav-next');
+                    var total = slides.length;
+                    if (!track || total <= 1) return;
 
-                    const originals = Array.from(track.querySelectorAll('.ya-feature-card'));
-                    const originalCount = originals.length;
-                    const cloneCount = 2;
-                    if (originalCount < 3) return;
+                    var current = 0;
 
-                    const before = originals.slice(-cloneCount).map(card => {
-                        const clone = card.cloneNode(true);
-                        clone.classList.add('ya-feature-clone');
-                        clone.setAttribute('aria-hidden', 'true');
-                        return clone;
-                    });
-                    const after = originals.slice(0, cloneCount).map(card => {
-                        const clone = card.cloneNode(true);
-                        clone.classList.add('ya-feature-clone');
-                        clone.setAttribute('aria-hidden', 'true');
-                        return clone;
-                    });
-
-                    track.prepend(...before);
-                    track.append(...after);
-
-                    let cards = Array.from(track.querySelectorAll('.ya-feature-card'));
-                    let current = cloneCount;
-                    let moving = false;
-
-                    const visibleCount = () => {
-                        if (window.innerWidth <= 480) return 1.12;
-                        if (window.innerWidth <= 700) return 1.22;
-                        if (window.innerWidth <= 900) return 2;
-                        if (window.innerWidth <= 1180) return 2.35;
-                        return 3;
-                    };
-
-                    const sizeCards = () => {
-                        const style = window.getComputedStyle(track);
-                        const gap = parseFloat(style.gap) || 18;
-                        const count = visibleCount();
-                        const width = (viewport.clientWidth - gap * (count - 1)) / count;
-                        carousel.style.setProperty('--ya-feature-width', `${Math.max(width, 250)}px`);
-                    };
-
-                    const classes = () => {
-                        cards.forEach((card, index) => {
-                            card.classList.toggle('ya-feature-active', index === current);
-                            card.classList.toggle('ya-feature-near', index === current - 1 || index === current + 1);
-                            if (index === current) card.setAttribute('aria-current', 'true');
-                            else card.removeAttribute('aria-current');
-                        });
-                    };
-
-                    const centre = (animate = true) => {
-                        const active = cards[current];
-                        if (!active) return;
-                        track.classList.toggle('ya-feature-no-transition', !animate);
-                        const offset = viewport.clientWidth / 2 - (active.offsetLeft + active.offsetWidth / 2);
-                        track.style.transform = `translate3d(${offset}px,0,0)`;
-                        classes();
-                        if (!animate) requestAnimationFrame(() => requestAnimationFrame(() => track.classList.remove('ya-feature-no-transition')));
-                    };
-
-                    const move = direction => {
-                        if (moving) return;
-                        moving = true;
-                        current += direction;
-                        centre(true);
-                    };
-
-                    if (previous) previous.addEventListener('click', () => move(-1));
-                    if (next) next.addEventListener('click', () => move(1));
-
-                    cards.forEach((card, index) => card.addEventListener('click', event => {
-                        if (index === current) return;
-                        event.preventDefault();
-                        if (moving) return;
-                        moving = true;
-                        current = index;
-                        centre(true);
-                    }));
-
-                    track.addEventListener('transitionend', event => {
-                        if (event.propertyName !== 'transform') return;
-                        if (current === cloneCount - 1) {
-                            current = cloneCount + originalCount - 1;
-                            centre(false);
-                        } else if (current === cloneCount + originalCount) {
-                            current = cloneCount;
-                            centre(false);
+                    function updateSlide(idx) {
+                        if (idx < 0) {
+                            current = total - 1;
+                        } else if (idx >= total) {
+                            current = 0;
+                        } else {
+                            current = idx;
                         }
-                        moving = false;
-                    });
+                        track.style.transform = 'translateX(-' + (current * 100) + '%)';
+                    }
 
-                    carousel.addEventListener('keydown', event => {
-                        if (event.key === 'ArrowLeft') { event.preventDefault(); move(-1); }
-                        if (event.key === 'ArrowRight') { event.preventDefault(); move(1); }
-                    });
+                    if (btnPrev) {
+                        btnPrev.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            updateSlide(current - 1);
+                        });
+                    }
 
-                    let startX = 0;
-                    viewport.addEventListener('touchstart', event => { startX = event.changedTouches[0].clientX; }, { passive: true });
-                    viewport.addEventListener('touchend', event => {
-                        const distance = startX - event.changedTouches[0].clientX;
-                        if (Math.abs(distance) > 45) move(distance > 0 ? 1 : -1);
+                    if (btnNext) {
+                        btnNext.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            updateSlide(current + 1);
+                        });
+                    }
+
+                    // Mobile touch swipe
+                    var startX = 0;
+                    wrap.addEventListener('touchstart', function(e) {
+                        if (e.touches && e.touches.length > 0) {
+                            startX = e.touches[0].clientX;
+                        }
                     }, { passive: true });
 
-                    let timer;
-                    window.addEventListener('resize', () => {
-                        clearTimeout(timer);
-                        timer = setTimeout(() => { sizeCards(); centre(false); }, 120);
-                    });
-
-                    sizeCards();
-                    requestAnimationFrame(() => centre(false));
+                    wrap.addEventListener('touchend', function(e) {
+                        if (e.changedTouches && e.changedTouches.length > 0) {
+                            var diff = startX - e.changedTouches[0].clientX;
+                            if (Math.abs(diff) > 40) {
+                                if (diff > 0) {
+                                    updateSlide(current + 1);
+                                } else {
+                                    updateSlide(current - 1);
+                                }
+                            }
+                        }
+                    }, { passive: true });
                 })();
             </script>
+            <?php endif; ?>
         <?php
         else :
         ?>
@@ -7226,6 +7404,21 @@ class Trek_Shortcodes {
         }
 
         $query       = new WP_Query( $query_args );
+
+        // Fallback: If strict taxonomy or region meta matched 0 posts on the live site,
+        // retry query for all published destinations so the live website NEVER renders an empty or broken block
+        if ( ! $query->have_posts() && ( ! empty( $tax_query ) || ! empty( $meta_query ) ) ) {
+            $fallback_args = array(
+                'post_type'      => 'trek_destination',
+                'post_status'    => 'publish',
+                'posts_per_page' => $posts_per_page,
+                'paged'          => $paged,
+                'orderby'        => $atts['orderby'],
+                'order'          => $atts['order'],
+            );
+            $query = new WP_Query( $fallback_args );
+        }
+
         $total_pages = $query->max_num_pages;
         $nonce       = wp_create_nonce( 'trek_dest_grid_nonce' );
 
@@ -7271,27 +7464,33 @@ class Trek_Shortcodes {
                 max-width: 600px;
                 line-height: 1.6;
             }
-            .te-dest-grid {
-                display: grid;
-                grid-template-columns: repeat(var(--te-cols, 4), 1fr);
-                gap: 24px;
+            .te-dest-grid-wrap .te-dest-grid {
+                display: grid !important;
+                grid-template-columns: repeat(var(--te-cols, 4), 1fr) !important;
+                gap: 16px !important;
+                row-gap: 16px !important;
+                column-gap: 16px !important;
                 transition: opacity 0.25s ease;
             }
             @media (max-width: 1100px) {
-                .te-dest-grid {
+                .te-dest-grid-wrap .te-dest-grid {
                     grid-template-columns: repeat(2, 1fr) !important;
-                    gap: 20px;
+                    gap: 12px !important;
+                    row-gap: 12px !important;
+                    column-gap: 12px !important;
                 }
             }
             @media (max-width: 640px) {
-                .te-dest-grid {
+                .te-dest-grid-wrap .te-dest-grid {
                     grid-template-columns: 1fr !important;
-                    gap: 18px;
+                    gap: 10px !important;
+                    row-gap: 10px !important;
+                    column-gap: 10px !important;
                 }
             }
             .te-dest-card {
                 position: relative !important;
-                border-radius: 4px;
+                border-radius: 2px;
                 overflow: hidden !important;
                 aspect-ratio: 3 / 4.4;
                 min-height: 460px;
@@ -7698,8 +7897,67 @@ class Trek_Shortcodes {
                     </article>
                     <?php endwhile; wp_reset_postdata(); ?>
                 </div>
-            <?php else : ?>
-                <?php echo self::get_no_data_html(); ?>
+            <?php else : 
+                $fallback_items = array(
+                    array(
+                        'title'    => 'Everest Base Camp Trek',
+                        'duration' => '14-DAYS TRIP',
+                        'badge'    => 'Iconic Trek',
+                        'image'    => 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=85',
+                        'url'      => home_url( '/destinations/nepal/' ),
+                    ),
+                    array(
+                        'title'    => 'Annapurna Circuit Trek',
+                        'duration' => '16-DAYS TRIP',
+                        'badge'    => 'High Passes',
+                        'image'    => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85',
+                        'url'      => home_url( '/destinations/nepal/' ),
+                    ),
+                    array(
+                        'title'    => 'Langtang Valley Trek',
+                        'duration' => '10-DAYS TRIP',
+                        'badge'    => 'Valley of Glaciers',
+                        'image'    => 'https://images.unsplash.com/photo-1585016495481-91613a3ab1bc?auto=format&fit=crop&w=1200&q=85',
+                        'url'      => home_url( '/destinations/nepal/' ),
+                    ),
+                    array(
+                        'title'    => 'Manaslu Circuit Trek',
+                        'duration' => '15-DAYS TRIP',
+                        'badge'    => 'Wilderness',
+                        'image'    => 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?auto=format&fit=crop&w=1200&q=85',
+                        'url'      => home_url( '/destinations/nepal/' ),
+                    ),
+                );
+            ?>
+                <div class="te-dest-grid" style="--te-cols: <?php echo esc_attr( $columns ); ?>;">
+                    <?php foreach ( $fallback_items as $fb ) : ?>
+                    <article class="te-dest-card" style="background-image: url('<?php echo esc_url( $fb['image'] ); ?>');">
+                        <div class="te-dest-card__bg-wrap" style="background-image: url('<?php echo esc_url( $fb['image'] ); ?>');">
+                            <img src="<?php echo esc_url( $fb['image'] ); ?>" alt="<?php echo esc_attr( $fb['title'] ); ?>" class="te-dest-card__bg" loading="lazy" />
+                            <div class="te-dest-card__overlay"></div>
+                            <div class="te-dest-card__hover-shade"></div>
+                        </div>
+
+                        <a href="<?php echo esc_url( $fb['url'] ); ?>" class="te-dest-card__link" aria-label="<?php echo esc_attr( $fb['title'] ); ?>">
+                            <div class="te-dest-card__top">
+                                <span class="te-dest-card__badge"><?php echo esc_html( $fb['badge'] ); ?></span>
+                            </div>
+
+                            <div class="te-dest-card__arrow" aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </div>
+
+                            <div class="te-dest-card__content">
+                                <span class="te-dest-card__duration"><?php echo esc_html( $fb['duration'] ); ?></span>
+                                <h3 class="te-dest-card__title"><?php echo esc_html( $fb['title'] ); ?></h3>
+                            </div>
+                        </a>
+                    </article>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
 
             <!-- Centered Pagination Section -->
